@@ -53,7 +53,7 @@ export class Header {
       {
         label: 'Beneficiary List',
         icon: 'fas fa-list',
-        routerLink: 'beneficiary/list',
+        routerLink: '/beneficiary/list',
         routerLinkActiveOptions: 'active',
       },
       {

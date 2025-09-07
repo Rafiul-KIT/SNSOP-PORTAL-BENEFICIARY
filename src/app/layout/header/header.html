@@ -10,10 +10,14 @@
   <div class="menues">
     @for(menu of menuList; track menu){
     <p-button
-      label="{{ menu.label }}"
-      variant="text"
-      severity="secondary"
-      size="small"
+      [label]="menu.label"
+      [icon]="menu.icon"
+      [routerLink]="menu.routerLink"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [text]="true"
+      severity="info"
+      size="medium"
     />
     }
   </div>
