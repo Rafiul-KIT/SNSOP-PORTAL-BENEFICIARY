@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
@@ -9,9 +14,12 @@ import { PaginatorModule } from 'primeng/paginator';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { Router, ActivatedRoute  } from '@angular/router';
-import { RouterModule } from '@angular/router'; 
+import { Router, ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+import { Loader } from '../../../components/loader/loader';
 
 interface Location {
   name: string;
@@ -46,16 +54,18 @@ interface Beneficiary {
     ConfirmDialogModule,
     PaginatorModule,
     BreadcrumbModule,
+    FloatLabelModule,
     InputTextModule,
+    SelectModule,
     TooltipModule,
     RouterModule,
-    
+    Loader,
   ],
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService],
 })
 export class BeneficiaryList implements OnInit {
-
-   bid!: string;
+  isLoading: boolean = true;
+  bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;
   states: Location[] = [];
@@ -67,6 +77,7 @@ export class BeneficiaryList implements OnInit {
   breadcrumbHome: any;
   currentPage = 0;
   pageSize = 10;
+  advanceSearchPanelVisible: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -84,6 +95,7 @@ export class BeneficiaryList implements OnInit {
     this.loadBeneficiaries();
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
     this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.isLoading = false;
   }
 
   initForm() {
@@ -96,7 +108,7 @@ export class BeneficiaryList implements OnInit {
       state: [null],
       county: [null],
       payam: [null],
-      boma: [null]
+      boma: [null],
     });
   }
 
@@ -106,26 +118,28 @@ export class BeneficiaryList implements OnInit {
       { name: 'Eastern Equatoria', code: 'EE' },
       { name: 'Jonglei', code: 'JG' },
       { name: 'Unity', code: 'UN' },
-      { name: 'Upper Nile', code: 'UN2' }
+      { name: 'Upper Nile', code: 'UN2' },
     ];
 
     this.counties = [
       { name: 'Juba', code: 'JB' },
       { name: 'Yei', code: 'YE' },
-      { name: 'Terekeka', code: 'TR' }
+      { name: 'Terekeka', code: 'TR' },
     ];
 
     this.payams = [
       { name: 'Munuki', code: 'MN' },
       { name: 'Kator', code: 'KT' },
-      { name: 'Juba Town', code: 'JT' }
+      { name: 'Juba Town', code: 'JT' },
     ];
 
     this.bomas = [
       { name: 'Gudele', code: 'GD' },
       { name: 'Hai Thoura', code: 'HT' },
-      { name: 'Nyakuron', code: 'NK' }
+      { name: 'Nyakuron', code: 'NK' },
     ];
+
+     this.searchForm.patchValue({ state: this.states[0], county: this.counties[0], payam: this.payams[0], boma: this.bomas[0] });
   }
 
   loadBeneficiaries() {
@@ -141,7 +155,7 @@ export class BeneficiaryList implements OnInit {
         state: 'Central Equatoria',
         county: 'Juba',
         payam: 'Munuki',
-        boma: 'Gudele'
+        boma: 'Gudele',
       },
       {
         householdNumber: 'HH002',
@@ -154,7 +168,7 @@ export class BeneficiaryList implements OnInit {
         state: 'Central Equatoria',
         county: 'Juba',
         payam: 'Kator',
-        boma: 'Nyakuron'
+        boma: 'Nyakuron',
       },
       {
         householdNumber: 'HH003',
@@ -167,8 +181,160 @@ export class BeneficiaryList implements OnInit {
         state: 'Eastern Equatoria',
         county: 'Yei',
         payam: 'Juba Town',
-        boma: 'Hai Thoura'
-      }
+        boma: 'Hai Thoura',
+      },{
+        householdNumber: 'HH001',
+        firstName: 'John',
+        middleName: 'Peter',
+        lastName: 'Doe',
+        gender: 'Male',
+        age: 35,
+        phoneNumber: '+211912345678',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Munuki',
+        boma: 'Gudele',
+      },
+      {
+        householdNumber: 'HH002',
+        firstName: 'Jane',
+        middleName: 'Mary',
+        lastName: 'Smith',
+        gender: 'Female',
+        age: 28,
+        phoneNumber: '+211923456789',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Kator',
+        boma: 'Nyakuron',
+      },
+      {
+        householdNumber: 'HH003',
+        firstName: 'David',
+        middleName: '',
+        lastName: 'Johnson',
+        gender: 'Male',
+        age: 42,
+        phoneNumber: '+211934567890',
+        state: 'Eastern Equatoria',
+        county: 'Yei',
+        payam: 'Juba Town',
+        boma: 'Hai Thoura',
+      },{
+        householdNumber: 'HH001',
+        firstName: 'John',
+        middleName: 'Peter',
+        lastName: 'Doe',
+        gender: 'Male',
+        age: 35,
+        phoneNumber: '+211912345678',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Munuki',
+        boma: 'Gudele',
+      },
+      {
+        householdNumber: 'HH002',
+        firstName: 'Jane',
+        middleName: 'Mary',
+        lastName: 'Smith',
+        gender: 'Female',
+        age: 28,
+        phoneNumber: '+211923456789',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Kator',
+        boma: 'Nyakuron',
+      },
+      {
+        householdNumber: 'HH003',
+        firstName: 'David',
+        middleName: '',
+        lastName: 'Johnson',
+        gender: 'Male',
+        age: 42,
+        phoneNumber: '+211934567890',
+        state: 'Eastern Equatoria',
+        county: 'Yei',
+        payam: 'Juba Town',
+        boma: 'Hai Thoura',
+      },{
+        householdNumber: 'HH001',
+        firstName: 'John',
+        middleName: 'Peter',
+        lastName: 'Doe',
+        gender: 'Male',
+        age: 35,
+        phoneNumber: '+211912345678',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Munuki',
+        boma: 'Gudele',
+      },
+      {
+        householdNumber: 'HH002',
+        firstName: 'Jane',
+        middleName: 'Mary',
+        lastName: 'Smith',
+        gender: 'Female',
+        age: 28,
+        phoneNumber: '+211923456789',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Kator',
+        boma: 'Nyakuron',
+      },
+      {
+        householdNumber: 'HH003',
+        firstName: 'David',
+        middleName: '',
+        lastName: 'Johnson',
+        gender: 'Male',
+        age: 42,
+        phoneNumber: '+211934567890',
+        state: 'Eastern Equatoria',
+        county: 'Yei',
+        payam: 'Juba Town',
+        boma: 'Hai Thoura',
+      },{
+        householdNumber: 'HH001',
+        firstName: 'John',
+        middleName: 'Peter',
+        lastName: 'Doe',
+        gender: 'Male',
+        age: 35,
+        phoneNumber: '+211912345678',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Munuki',
+        boma: 'Gudele',
+      },
+      {
+        householdNumber: 'HH002',
+        firstName: 'Jane',
+        middleName: 'Mary',
+        lastName: 'Smith',
+        gender: 'Female',
+        age: 28,
+        phoneNumber: '+211923456789',
+        state: 'Central Equatoria',
+        county: 'Juba',
+        payam: 'Kator',
+        boma: 'Nyakuron',
+      },
+      {
+        householdNumber: 'HH003',
+        firstName: 'David',
+        middleName: '',
+        lastName: 'Johnson',
+        gender: 'Male',
+        age: 42,
+        phoneNumber: '+211934567890',
+        state: 'Eastern Equatoria',
+        county: 'Yei',
+        payam: 'Juba Town',
+        boma: 'Hai Thoura',
+      },
     ];
   }
 
@@ -186,7 +352,7 @@ export class BeneficiaryList implements OnInit {
     this.messageService.add({
       severity: 'info',
       summary: 'Search',
-      detail: 'Search performed with the provided criteria'
+      detail: 'Search performed with the provided criteria',
     });
     console.log('Search criteria:', this.searchForm.value);
   }
@@ -195,42 +361,38 @@ export class BeneficiaryList implements OnInit {
     this.searchForm.reset();
   }
 
-editBeneficiary(b: Beneficiary) {
-  const bid = b?.householdNumber;
-
-  if (!bid) {
-    console.error('Edit clicked, but b.householdNumber is missing:', b);
-    return;
-  }
-
-  this.router.navigate(['/beneficiary/edit', String(bid)]);
-
-}
-
-
-migrateBeneficiary(b: Beneficiary) {
-  const bid = b?.householdNumber;
-
-  if (!bid) {
-    console.error('Migrate clicked, but b.householdNumber is missing:', b);
-    return;
-  }
-
-  this.router.navigate(['/beneficiary/migrate', String(bid)]);
-
-}
-
-  beneficiaryDetails(b: Beneficiary){
+  editBeneficiary(b: Beneficiary) {
     const bid = b?.householdNumber;
 
-  if (!bid) {
-    console.error('Edit clicked, but b.householdNumber is missing:', b);
-    return;
+    if (!bid) {
+      console.error('Edit clicked, but b.householdNumber is missing:', b);
+      return;
+    }
+
+    this.router.navigate(['/beneficiary/edit', String(bid)]);
   }
 
-  this.router.navigate(['/beneficiary/details', String(bid)]);
+  migrateBeneficiary(b: Beneficiary) {
+    const bid = b?.householdNumber;
+
+    if (!bid) {
+      console.error('Migrate clicked, but b.householdNumber is missing:', b);
+      return;
+    }
+
+    this.router.navigate(['/beneficiary/migrate', String(bid)]);
   }
 
+  beneficiaryDetails(b: Beneficiary) {
+    const bid = b?.householdNumber;
+
+    if (!bid) {
+      console.error('Edit clicked, but b.householdNumber is missing:', b);
+      return;
+    }
+
+    this.router.navigate(['/beneficiary/details', String(bid)]);
+  }
 
   deleteBeneficiary(beneficiary: Beneficiary) {
     this.confirmationService.confirm({
@@ -238,17 +400,21 @@ migrateBeneficiary(b: Beneficiary) {
       header: 'Confirm',
       icon: 'fas fa-warning',
       accept: () => {
-        this.beneficiaries = this.beneficiaries.filter(b => b.householdNumber !== beneficiary.householdNumber);
+        this.beneficiaries = this.beneficiaries.filter(
+          (b) => b.householdNumber !== beneficiary.householdNumber
+        );
         this.messageService.add({
           severity: 'success',
           summary: 'Archived',
-          detail: 'Beneficiary archived successfully'
+          detail: 'Beneficiary archived successfully',
         });
-      }
+      },
     });
   }
 
   getFullName(beneficiary: Beneficiary): string {
-    return [beneficiary.firstName, beneficiary.middleName, beneficiary.lastName].filter(Boolean).join(' ');
+    return [beneficiary.firstName, beneficiary.middleName, beneficiary.lastName]
+      .filter(Boolean)
+      .join(' ');
   }
 }
