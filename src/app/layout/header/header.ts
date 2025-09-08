@@ -53,45 +53,45 @@ export class Header {
       {
         label: 'Beneficiary List',
         icon: 'fas fa-list',
-        routerLink: 'beneficiary/list',
+        routerLink: '/beneficiary/list',
         routerLinkActiveOptions: 'active',
       },
       {
-        label: 'Import from Mobile',
+        label: 'Beneficiary Approval',
         icon: 'fas fa-list',
-        routerLink: 'beneficiary/import-from-mobile',
+        routerLink: 'beneficiary-approval/edit',
         routerLinkActiveOptions: 'active',
       },
-      {
-        label: 'Beneficiary Attendance',
-        icon: 'fas fa-list',
-        routerLink: 'beneficiary/attendance',
-        routerLinkActiveOptions: 'active',
-      },
-      {
-        label: 'Beneficiary ID Cards',
-        icon: 'fas fa-list',
-        routerLink: 'beneficiary/id-card',
-        routerLinkActiveOptions: 'active',
-      },
-      {
-        label: 'Job Card',
-        icon: 'fas fa-list',
-        routerLink: 'beneficiary/job-card',
-        routerLinkActiveOptions: 'active',
-      },
-      {
-        label: 'Work Progress',
-        icon: 'fas fa-list',
-        routerLink: 'beneficiary/work-progress',
-        routerLinkActiveOptions: 'active',
-      },
-      {
-        label: 'LIPW Export',
-        icon: 'fas fa-list',
-        routerLink: 'beneficiary/lipw-export',
-        routerLinkActiveOptions: 'active',
-      },
+      // {
+      //   label: 'Beneficiary Attendance',
+      //   icon: 'fas fa-list',
+      //   routerLink: 'beneficiary/attendance',
+      //   routerLinkActiveOptions: 'active',
+      // },
+      // {
+      //   label: 'Beneficiary ID Cards',
+      //   icon: 'fas fa-list',
+      //   routerLink: 'beneficiary/id-card',
+      //   routerLinkActiveOptions: 'active',
+      // },
+      // {
+      //   label: 'Job Card',
+      //   icon: 'fas fa-list',
+      //   routerLink: 'beneficiary/job-card',
+      //   routerLinkActiveOptions: 'active',
+      // },
+      // {
+      //   label: 'Work Progress',
+      //   icon: 'fas fa-list',
+      //   routerLink: 'beneficiary/work-progress',
+      //   routerLinkActiveOptions: 'active',
+      // },
+      // {
+      //   label: 'LIPW Export',
+      //   icon: 'fas fa-list',
+      //   routerLink: 'beneficiary/lipw-export',
+      //   routerLinkActiveOptions: 'active',
+      // },
     ];
   }
 
