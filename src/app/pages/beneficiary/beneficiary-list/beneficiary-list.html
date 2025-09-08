@@ -151,7 +151,7 @@
           pTooltip="Details"
           tooltipPosition="top"
           appendTo="body"
-          (click)="beneficiaryDetails(b)"
+          (onClick)="beneficiaryDetails(b)"
           size="small"
           outlined="true"
           severity="primary"
@@ -162,7 +162,7 @@
           pTooltip="Edit"
           tooltipPosition="top"
           appendTo="body"
-          (click)="editBeneficiary(b)"
+          (onClick)="editBeneficiary(b)"
           size="small"
           outlined="true"
           severity="info"
@@ -173,7 +173,7 @@
           pTooltip="Migrate"
           tooltipPosition="top"
           appendTo="body"
-          (click)="migrateBeneficiary(b)"
+          (onClick)="migrateBeneficiary(b)"
           size="small"
           outlined="true"
           severity="warn"
@@ -184,7 +184,7 @@
           pTooltip="Archive"
           tooltipPosition="top"
           appendTo="body"
-          (click)="deleteBeneficiary(b)"
+          (onClick)="deleteBeneficiary(b)"
           size="small"
           outlined="true"
           severity="help"
@@ -211,4 +211,4 @@
 ></p-paginator>
 }
 <p-toast position="bottom-right" />
-<p-confirmDialog [style]="{ width: '450px' }" />
+<p-confirmdialog position="center" />

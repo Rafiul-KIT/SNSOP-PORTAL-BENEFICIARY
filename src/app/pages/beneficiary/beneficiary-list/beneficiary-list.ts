@@ -9,17 +9,17 @@ import {
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { PaginatorModule } from 'primeng/paginator';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { MessageService, ConfirmationService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { Loader } from '../../../components/loader/loader';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface Location {
   name: string;
@@ -57,8 +57,8 @@ interface Beneficiary {
     FloatLabelModule,
     InputTextModule,
     SelectModule,
-    TooltipModule,
     RouterModule,
+    TooltipModule,
     Loader,
   ],
   providers: [MessageService, ConfirmationService],
@@ -139,7 +139,12 @@ export class BeneficiaryList implements OnInit {
       { name: 'Nyakuron', code: 'NK' },
     ];
 
-     this.searchForm.patchValue({ state: this.states[0], county: this.counties[0], payam: this.payams[0], boma: this.bomas[0] });
+    this.searchForm.patchValue({
+      state: this.states[0],
+      county: this.counties[0],
+      payam: this.payams[0],
+      boma: this.bomas[0],
+    });
   }
 
   loadBeneficiaries() {
@@ -182,7 +187,8 @@ export class BeneficiaryList implements OnInit {
         county: 'Yei',
         payam: 'Juba Town',
         boma: 'Hai Thoura',
-      },{
+      },
+      {
         householdNumber: 'HH001',
         firstName: 'John',
         middleName: 'Peter',
@@ -220,7 +226,8 @@ export class BeneficiaryList implements OnInit {
         county: 'Yei',
         payam: 'Juba Town',
         boma: 'Hai Thoura',
-      },{
+      },
+      {
         householdNumber: 'HH001',
         firstName: 'John',
         middleName: 'Peter',
@@ -258,7 +265,8 @@ export class BeneficiaryList implements OnInit {
         county: 'Yei',
         payam: 'Juba Town',
         boma: 'Hai Thoura',
-      },{
+      },
+      {
         householdNumber: 'HH001',
         firstName: 'John',
         middleName: 'Peter',
@@ -296,7 +304,8 @@ export class BeneficiaryList implements OnInit {
         county: 'Yei',
         payam: 'Juba Town',
         boma: 'Hai Thoura',
-      },{
+      },
+      {
         householdNumber: 'HH001',
         firstName: 'John',
         middleName: 'Peter',
@@ -395,6 +404,7 @@ export class BeneficiaryList implements OnInit {
   }
 
   deleteBeneficiary(beneficiary: Beneficiary) {
+    console.log(beneficiary);
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',

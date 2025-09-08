@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BeneficiaryMigrate } from './beneficiary-migrate';
+import { BeneficiaryManage } from './beneficiary-manage';
 
-describe('BeneficiaryMigrate', () => {
-  let component: BeneficiaryMigrate;
-  let fixture: ComponentFixture<BeneficiaryMigrate>;
+describe('BeneficiaryManage', () => {
+  let component: BeneficiaryManage;
+  let fixture: ComponentFixture<BeneficiaryManage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BeneficiaryMigrate]
+      imports: [BeneficiaryManage]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BeneficiaryMigrate);
+    fixture = TestBed.createComponent(BeneficiaryManage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

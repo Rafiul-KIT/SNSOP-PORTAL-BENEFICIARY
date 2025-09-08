@@ -1,0 +1,481 @@
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+@if(isLoading){
+<app-loader />
+}@else {
+<form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+  <p-tabs value="0">
+    <p-tablist value="0">
+      <p-tab value="0">Personal Information</p-tab>
+      <p-tab value="1">Alternate Payee Information</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <!-- Tab 1: Personal Information -->
+      <p-tabpanel value="0">
+        <div style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="container user-form" style="padding-bottom: 100px">
+            <!-- Basic Information Section -->
+            <div class="card mt-2">
+              <h5 class="card-header">Basic Information</h5>
+              <div class="card-body row g-3">
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Respondent First Name"
+                    formControlName="respondentFirstName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Respondent Middle Name"
+                    formControlName="respondentMiddleName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Respondent Last Name"
+                    formControlName="respondentLastName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Respondent Nick Name"
+                    formControlName="respondentNickName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="relationship"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Respondent Age"
+                    formControlName="respondentAge"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="gender"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="maritalStatus"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Spouse First Name"
+                    formControlName="spouseFirstName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Spouse Middle Name"
+                    formControlName="spouseMiddleName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Spouse Last Name"
+                    formControlName="spouseLastName"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="legalStatus"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label>Do you have a national ID?</label> <br />
+
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    value="Yes"
+                    formControlName="hasNationalId"
+                  />
+                  Yes &NonBreakingSpace; &NonBreakingSpace;
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    value="No"
+                    formControlName="hasNationalId"
+                  />
+                  No
+                </div>
+                <div class="col-md-3">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="idType"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <input
+                    class="w-100"
+                    pInputText
+                    placeholder="Respondent Id Number"
+                    formControlName="respondentIdNumber"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Phone Number"
+                    formControlName="respondentPhone"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="card mt-3">
+              <h5 class="card-header">Selection Criteria</h5>
+              <div class="card-body row g-3">
+                <div class="col-md-4">
+                  <div class="w-100">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="mainIncomeSource"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Could you specify the household main source of Income?"
+                    formControlName="otherIncomeSource"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <input
+                    pInputText
+                    class="w-100"
+                    placeholder="Household Monthly Average Income (in Sudanese Pound)"
+                    formControlName="avgMonthlyIncome"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label>Support Type</label><br />
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="Public Works"
+                      formControlName="supportType"
+                    />
+                    Public Works
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="Direct Income Support"
+                      formControlName="supportType"
+                    />
+                    Direct Income Support
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Household Information Section -->
+            <div class="card mt-3">
+              <h5 class="card-header">Household Information</h5>
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Age Group</th>
+                      <th colspan="3">Male</th>
+                      <th colspan="3">Female</th>
+                    </tr>
+                    <tr>
+                      <th>Normal</th>
+                      <th>With Disability</th>
+                      <th>With Chronic Illness</th>
+                      <th>Normal</th>
+                      <th>With Disability</th>
+                      <th>With Chronic Illness</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let ageGroup of ageGroups">
+                      <td>{{ ageGroup.label }}</td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.maleNormal"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.maleDisability"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.maleChronic"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.femaleNormal"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.femaleDisability"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          pInputText
+                          class="w-100"
+                          [formControlName]="ageGroup.femaleChronic"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row g-3 mt-2">
+                  <div class="col-md-6">
+                    <label>Do you read and write?</label><br />
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        value="Yes"
+                        formControlName="canReadWrite"
+                      />
+                      Yes
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        value="No"
+                        formControlName="canReadWrite"
+                      />
+                      No
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <input
+                      pInputText
+                      class="w-100"
+                      placeholder="18-35 yr literate members (excluding yourself)"
+                      formControlName="literate1835Count"
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <input
+                      pInputText
+                      class="w-100"
+                      placeholder="Household Size (including yourself)"
+                      formControlName="householdSize"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- [Keep your original 'Basic Information', 'Selection Criteria', and 'Household Info' sections here] -->
+            <!-- Submit button can remain here OR moved outside the tabView if needed globally -->
+            <div class="mt-3 d-flex justify-content-end">
+              <p-button
+                severity="info"
+                type="submit"
+                [disabled]="beneficiaryForm.invalid"
+                icon="fas fa-save"
+                label="Update"
+              />
+            </div>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- Tab 2: Alternate Payee Information -->
+      <p-tabpanel value="1">
+        <div style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="container user-form">
+            <div class="card mt-3">
+              <h5 class="card-header">Alternate Payee Information</h5>
+              <div class="card-body row">
+                <!-- Alternate Payee One -->
+                <div class="col-md-6">
+                  <h6>Alternate Payee One</h6>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Name"
+                    formControlName="alt1Name"
+                  />
+                  <div class="w-100 mb-2">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="alt1Gender"
+                    />
+                  </div>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Age"
+                    formControlName="alt1Age"
+                  />
+                  <label>Do you have a national ID?</label><br />
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="Yes"
+                      formControlName="alt1HasNationalId"
+                    />
+                    Yes
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="No"
+                      formControlName="alt1HasNationalId"
+                    />
+                    No
+                  </div>
+                  <div class="w-100 mb-2">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="alt1IdType"
+                    />
+                  </div>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Id Number"
+                    formControlName="alt1IdNumber"
+                  />
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Contact Number"
+                    formControlName="alt1Phone"
+                  />
+                </div>
+
+                <!-- Alternate Payee Two -->
+                <div class="col-md-6">
+                  <h6>Alternate Payee Two</h6>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Name"
+                    formControlName="alt2Name"
+                  />
+                  <div class="w-100 mb-2">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="alt2Gender"
+                    />
+                  </div>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Age"
+                    formControlName="alt2Age"
+                  />
+                  <label>Do you have a national ID?</label><br />
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="Yes"
+                      formControlName="alt2HasNationalId"
+                    />
+                    Yes
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="No"
+                      formControlName="alt2HasNationalId"
+                    />
+                    No
+                  </div>
+                  <div class="w-100 mb-2">
+                    <p-select
+                      placeholder="Select Option"
+                      formControlName="alt2IdType"
+                    />
+                  </div>
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Id Number"
+                    formControlName="alt2IdNumber"
+                  />
+                  <input
+                    pInputText
+                    class="w-100 mb-2"
+                    placeholder="Contact Number"
+                    formControlName="alt2Phone"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end">
+              <p-button
+                severity="info"
+                type="submit"
+                [disabled]="beneficiaryForm.invalid"
+                icon="fas fa-save"
+                label="Update"
+              />
+            </div>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+  <!-- Submit Button (outside tab view, if global for all tabs) -->
+</form>
+}
