@@ -404,23 +404,26 @@ export class BeneficiaryList implements OnInit {
   }
 
   deleteBeneficiary(beneficiary: Beneficiary) {
-    console.log(beneficiary);
-    this.confirmationService.confirm({
-      message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
-      header: 'Confirm',
-      icon: 'fas fa-warning',
-      accept: () => {
-        this.beneficiaries = this.beneficiaries.filter(
-          (b) => b.householdNumber !== beneficiary.householdNumber
-        );
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Archived',
-          detail: 'Beneficiary archived successfully',
-        });
-      },
-    });
-  }
+  this.confirmationService.confirm({
+    message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
+    header: 'Confirm',
+    icon: 'pi pi-exclamation-triangle',      // optional
+    acceptLabel: 'Yes',
+    rejectLabel: 'No',
+    acceptButtonStyleClass: 'p-button-success',
+    rejectButtonStyleClass: 'p-button-danger', // <- red "No"
+    accept: () => {
+      this.beneficiaries = this.beneficiaries.filter(
+        (b) => b.householdNumber !== beneficiary.householdNumber
+      );
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Archived',
+        detail: 'Beneficiary archived successfully',
+      });
+    }
+  });
+}
 
   getFullName(beneficiary: Beneficiary): string {
     return [beneficiary.firstName, beneficiary.middleName, beneficiary.lastName]

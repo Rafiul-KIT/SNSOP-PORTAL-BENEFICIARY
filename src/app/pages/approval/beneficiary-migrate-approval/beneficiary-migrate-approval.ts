@@ -208,7 +208,7 @@ export class BeneficiaryMigrateApproval implements OnInit {
       return;
     }
 
-    this.router.navigate(['/private/beneficiary/edit', String(bid)]);
+    this.router.navigate(['/beneficiary/edit', String(bid)]);
   }
 
   migrateBeneficiary(b: Beneficiary) {
@@ -219,7 +219,7 @@ export class BeneficiaryMigrateApproval implements OnInit {
       return;
     }
 
-    this.router.navigate(['/private/beneficiary/migration', String(bid)]);
+    this.router.navigate(['/beneficiary/migrate', String(bid)]);
   }
 
   beneficiaryDetails(b: Beneficiary) {
@@ -230,7 +230,7 @@ export class BeneficiaryMigrateApproval implements OnInit {
       return;
     }
 
-    this.router.navigate(['/private/beneficiary/migration', String(bid)]);
+    this.router.navigate(['/beneficiary/migrate', String(bid)]);
   }
 
   deleteBeneficiary(beneficiary: Beneficiary) {

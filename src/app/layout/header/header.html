@@ -1,50 +1,41 @@
 <div class="header">
+  <!-- Portal selector (left) -->
   <div class="portals" (click)="showPortalOptions = !showPortalOptions">
     <i class="fas fa-braille hand"></i>
-    <div><small>Portal</small><span class="name">Beneficiary</span></div>
-    <i class="fas fa-angle-{{showPortalOptions ? 'down' : 'right'}} hand"></i>
+    <div>
+      <small>Portal</small>
+      <span class="name">Beneficiary</span>
+    </div>
+    <i class="fas fa-angle-{{ showPortalOptions ? 'down' : 'right' }} hand"></i>
     <span class="vertical-line"></span>
   </div>
-
-  @if(menuList && menuList.length > 0){
   <div class="menues">
-    @for(menu of menuList; track menu){
-    <p-button
-      [label]="menu.label"
-      [icon]="menu.icon"
-      [routerLink]="menu.routerLink"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      [text]="true"
-      severity="info"
-    />
-    }
+    <p-menubar [model]="menuList"></p-menubar>
   </div>
-  }
 
   <div
-    class="portals-option-wrapper {{showPortalOptions ? 'show' : ''}}"
+    class="portals-option-wrapper {{ showPortalOptions ? 'show' : '' }}"
     (mouseleave)="showPortalOptions = false"
   >
     <div class="portal-items">
-      @for(portal of portalList;track portal){
-      <a class="item" [href]="portal.link">
-        <i class="{{ portal.icon }}" class="w-50"></i>
-        <span>{{ portal.label }}</span>
-      </a>
+      @for (portal of portalList; track portal) {
+        <a class="item" [href]="portal.link">
+          <i class="{{ portal.icon }} w-50"></i>
+          <span>{{ portal.label }}</span>
+        </a>
       }
     </div>
   </div>
 
   <p-button
-    variant="text"
+    [text]="true"
     icon="fas fa-user-circle fa-lg"
     severity="info"
     (onClick)="showUsermenu = !showUsermenu"
-  />
+  ></p-button>
 
   <div
-    class="user-menu {{showUsermenu ? 'show' : ''}}"
+    class="user-menu {{ showUsermenu ? 'show' : '' }}"
     (mouseleave)="showUsermenu = false"
   >
     <div class="item" (click)="goToProfile()">
