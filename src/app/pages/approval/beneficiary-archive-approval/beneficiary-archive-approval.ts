@@ -80,7 +80,7 @@ export class BeneficiaryArchiveApproval implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.bid = this.route.snapshot.paramMap.get('bid')!;
@@ -238,7 +238,11 @@ export class BeneficiaryArchiveApproval implements OnInit {
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',
-      icon: 'fas fa-warning',
+      icon: 'pi pi-exclamation-triangle',      // optional
+      acceptLabel: 'Yes',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-success',
       accept: () => {
         this.beneficiaries = this.beneficiaries.filter(
           (b) => b.householdNumber !== beneficiary.householdNumber
@@ -248,7 +252,7 @@ export class BeneficiaryArchiveApproval implements OnInit {
           summary: 'Archived',
           detail: 'Beneficiary archived successfully',
         });
-      },
+      }
     });
   }
 

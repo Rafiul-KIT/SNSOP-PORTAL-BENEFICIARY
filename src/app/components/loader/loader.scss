@@ -8,9 +8,21 @@
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
-  opacity: 0.8;
+  opacity: 2;
+  z-index: 9999;
+}
 
-  img {
-    max-width: 100%;
-  }
+.spinner {
+  border: 10px solid #e0f0ff;
+  border-top: 10px solid #3ba7ff;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  animation: spin 1s linear infinite;
+}
+
+// animation
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
