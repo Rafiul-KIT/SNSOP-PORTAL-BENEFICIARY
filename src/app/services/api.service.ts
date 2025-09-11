@@ -9,8 +9,9 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class ApiService {
-  private globalApi: any = environment.globalApi;
+  private globalApi: string = environment.globalApi;
   private globalContentApi = `${environment.globalApi}/contentservice`;
+
   public loginState = signal({
     token: null,
     user: null,
@@ -21,18 +22,21 @@ export class ApiService {
   public USER_ID = 'mis_uid';
   public USER_SELLER_ID = 'mis_usid';
   public USER_ROLE = 'mis_rl';
+
   private multiPartApiHeader = {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   };
+
   private apiHeader: any = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
+
   axiosInstance = axios.create({
-    baseURL: this.globalApi,
+    baseURL: this.globalApi, // ✅ already sets baseURL
   });
 
   constructor(private cookieService: CookieService, private router: Router) {
@@ -46,7 +50,8 @@ export class ApiService {
     }
 
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    // ########################### Refresh Token Functionality Start ############################
+
+    // ================= Interceptors =================
     this.axiosInstance.interceptors.request.use(
       (request: any) => {
         request.headers['Time-Zone'] = timeZone;
@@ -56,13 +61,11 @@ export class ApiService {
         }
         return request;
       },
-      (error) => {
-        return Promise.reject(error);
-      }
+      (error) => Promise.reject(error)
     );
 
     this.axiosInstance.interceptors.response.use(
-      (response) => response, // Directly return successful responses.
+      (response) => response,
       async (error) => {
         const originalRequest = error.config;
         if (
@@ -70,7 +73,7 @@ export class ApiService {
           error.response.status === 401 &&
           !originalRequest._retry
         ) {
-          originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+          originalRequest._retry = true;
           try {
             const apiHeader = {
               headers: {
@@ -78,13 +81,13 @@ export class ApiService {
                 'Refresh-Token': this.cookieService.get(this.REFRESH_TOKEN),
               },
             };
-            // Make a request to your auth server to refresh the token.
             const response = await axios.get(
               `${environment.globalApi}/ums/api/authenticate/newAccessToken`,
               apiHeader
             );
             const accessToken = response.data.data.content.accessToken;
             const refreshToken = response.data.data.content.refreshToken;
+
             this.cookieService.set(
               this.ACCESS_TOKEN,
               accessToken,
@@ -99,32 +102,27 @@ export class ApiService {
               '/',
               environment.domain
             );
-            // Update the authorization header with the new access token.
+
             this.axiosInstance.defaults.headers.common[
               'Authorization'
-            ] = `Bearer ${response.data.data.content.accessToken}`;
-            return this.axiosInstance(originalRequest); // Retry the original request with the new access token.
+            ] = `Bearer ${accessToken}`;
+
+            return this.axiosInstance(originalRequest);
           } catch (refreshError) {
-            // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
             console.error('Token refresh failed:', refreshError);
-            // this.helperService.logout();
             return Promise.reject(refreshError);
           }
         } else if (error.response && error.response.status === 403) {
           return Promise.reject(error);
         }
-        return Promise.reject(error); // For all other errors, return the error as is.
+        return Promise.reject(error);
       }
     );
-
-    // ########################### Refresh Token Functionality End ############################
   }
 
-  // ########################### Handle Login ############################
-
+  // ================= Login / Logout =================
   setToken = (jwtToken: any) => {
     const userData: any = jwtDecode(jwtToken);
-    console.log(userData);
     this.loginState.set({
       token: jwtToken,
       user: userData,
@@ -140,68 +138,38 @@ export class ApiService {
   };
 
   logout = () => {
-    console.log('logout');
     this.cookieService.deleteAll('/', environment.domain, false);
-    this.loginState.set({
-      token: null,
-      user: null,
-    });
+    this.loginState.set({ token: null, user: null });
     this.router.navigateByUrl('/auth/sign-in');
   };
 
-  // ########################### Basic HTTP Functions ############################
-
-  // Http post Method
+  // ================= Basic HTTP Functions =================
   GET = (endpoint: string) => {
-    return this.axiosInstance.get(
-      `${this.globalApi}/${endpoint}`,
-      this.apiHeader
-    );
+    return this.axiosInstance.get(endpoint, this.apiHeader);
   };
 
-  // Http post Method
   POST = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.post(
-      `${this.globalApi}/${endpoint}`,
-      payload,
-      this.apiHeader
-    );
+    return this.axiosInstance.post(endpoint, payload, this.apiHeader);
   };
 
   PUTWITHPAYLOAD = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.put(
-      `${this.globalApi}/${endpoint}`,
-      payload,
-      this.apiHeader
-    );
+    return this.axiosInstance.put(endpoint, payload, this.apiHeader);
   };
 
   PUT = (endpoint: string) => {
-    return this.axiosInstance.put(
-      `${this.globalApi}/${endpoint}`,
-      {},
-      this.apiHeader
-    );
+    return this.axiosInstance.put(endpoint, {}, this.apiHeader);
   };
 
-  // Http patch Method
   PATCH = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.patch(
-      `${this.globalApi}/${endpoint}`,
-      payload,
-      this.apiHeader
-    );
+    return this.axiosInstance.patch(endpoint, payload, this.apiHeader);
   };
 
   DELETE = (endpoint: string) => {
-    return this.axiosInstance.delete(
-      `${this.globalApi}/${endpoint}`,
-      this.apiHeader
-    );
+    return this.axiosInstance.delete(endpoint, this.apiHeader);
   };
 
+  // ================= Refresh Token =================
   refreshTokenManually = async () => {
-    console.log('refreshTokenManually');
     try {
       const apiHeader = {
         headers: {
@@ -209,7 +177,6 @@ export class ApiService {
           'Refresh-Token': this.cookieService.get(this.REFRESH_TOKEN),
         },
       };
-      // Make a request to your auth server to refresh the token.
       const response = await axios.get(
         `${environment.globalApi}/ums/api/authenticate/newAccessToken`,
         apiHeader
@@ -217,6 +184,7 @@ export class ApiService {
       const accessToken = response.data.data.content.accessToken;
       const refreshToken = response.data.data.content.refreshToken;
       const decoded: any = jwtDecode(accessToken);
+
       this.cookieService.set(
         this.ACCESS_TOKEN,
         accessToken,
@@ -246,13 +214,11 @@ export class ApiService {
         environment.domain
       );
     } catch (refreshError) {
-      // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
       console.error('Token refresh failed:', refreshError);
     }
   };
 
-  // ################################# Specific HTTP Functions ##########################################
-
+  // ================= File Upload & User Profile =================
   uploadImage = (endpoint: string, payload: {}) => {
     return this.axiosInstance.post(
       `${this.globalContentApi}/${endpoint}`,
@@ -263,7 +229,7 @@ export class ApiService {
 
   getUserProfile = (endpoint: string) => {
     return this.axiosInstance.get(
-      `${environment.globalApi}/ums/${endpoint}`,
+      `/ums/${endpoint}`,
       this.apiHeader
     );
   };
