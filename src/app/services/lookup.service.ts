@@ -32,7 +32,7 @@ export class LookupService {
   private payamList: LookupItem[] = [];
   private bomaList: LookupItem[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   // ---------- State ----------
   setStateList(states: LookupItem[]) {
@@ -126,4 +126,19 @@ export class LookupService {
         return [];
       });
   }
+
+  getGenderList(): LookupItem[] {
+    return [
+      { id: 'MALE', name: 'Male' },
+      { id: 'FEMALE', name: 'Female' },
+    ];
+  }
+
+  getRegistrationPhaseList(): LookupItem[] {
+    return [
+      { id: 'PARENT', name: 'Parent' },
+      { id: 'AF', name: 'AF' },
+    ];
+  }
+
 }

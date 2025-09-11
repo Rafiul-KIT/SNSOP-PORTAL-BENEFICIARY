@@ -23,10 +23,7 @@ export const routes: Routes = [
         component: BeneficiaryList,
         path: 'list',
       },
-      {
-        component: BeneficiaryDetails,
-        path: 'details/:bid',
-      },
+      { path: 'details/:applicationId', component: BeneficiaryDetails },
       {
         component: BeneficiaryManage,
         path: 'edit/:bid',

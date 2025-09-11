@@ -97,6 +97,10 @@ export class BeneficiaryList implements OnInit {
   payams: LookupItem[] = [];
   bomas: LookupItem[] = [];
 
+  genderOptions: LookupItem[] = [];
+  registrationPhaseOptions: LookupItem[] = [];
+
+
   beneficiaries: BeneficiaryVm[] = [];
   totalRecords = 0;
 
@@ -122,14 +126,23 @@ export class BeneficiaryList implements OnInit {
     this.initForm();
     this.initBreadcrumb();
 
-    // preload all lookups
-    this.lookup.getOrFetchStateList().then(list => { this.states = list; this.cdr.markForCheck(); });
-    this.lookup.getCountyListByStateId('')  // fetch all if backend supports
-    this.lookup.getPayamListByCountyId('')
-    this.lookup.getBomaListByPayamId('')
+    // Preload all lookup lists first
+    Promise.all([
+      this.lookup.getOrFetchStateList().then(list => this.states = list),
+      this.lookup.getCountyListByStateId('').then(list => this.counties = list),
+      this.lookup.getPayamListByCountyId('').then(list => this.payams = list),
+      this.lookup.getBomaListByPayamId('').then(list => this.bomas = list),
+    ])
+      .then(() => {
+        this.genderOptions = this.lookup.getGenderList();
+        this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
-    this.fetchPage(0, this.pageSize);
+        // ✅ Only fetch beneficiaries after lookup data is ready
+        this.fetchPage(0, this.pageSize);
+        this.cdr.markForCheck();
+      });
   }
+
 
   initForm() {
     this.searchForm = this.fb.group({
@@ -142,6 +155,8 @@ export class BeneficiaryList implements OnInit {
       county: [null as LookupItem | null],
       payam: [null as LookupItem | null],
       boma: [null as LookupItem | null],
+      gender: [null as Gender | null],
+      registrationPhase: [null as RegPhase | null],
     });
   }
 
@@ -231,7 +246,10 @@ export class BeneficiaryList implements OnInit {
   // ---------- Mapping ----------
   private toVm(list: BeneficiaryDto[]): BeneficiaryVm[] {
     return list.map((b) => {
-      const fullName = [b.respondentFirstName, b.respondentMiddleName, b.respondentLastName].filter(Boolean).join(' ');
+      const fullName = [b.respondentFirstName, b.respondentMiddleName, b.respondentLastName]
+        .filter(Boolean)
+        .join(' ');
+
       return {
         applicationId: b.applicationId,
         respondentGender: b.respondentGender,
@@ -239,7 +257,9 @@ export class BeneficiaryList implements OnInit {
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,
         fullName,
-        stateName: b.address?.stateId ? this.lookup.getStateNameById(b.address.stateId) : '',
+        stateName: b.address?.stateId
+          ? this.lookup.getStateNameById(b.address.stateId) || String(b.address.stateId)
+          : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) || String(b.address.countyId)
           : '',
@@ -252,6 +272,7 @@ export class BeneficiaryList implements OnInit {
       };
     });
   }
+
 
   // ---------- Data loading ----------
   fetchPage(page: number, size: number) {

@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import axios from 'axios';
 import { CookieService } from 'ngx-cookie-service';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.development';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 
