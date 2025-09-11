@@ -26,7 +26,7 @@ export const routes: Routes = [
       { path: 'details/:applicationId', component: BeneficiaryDetails },
       {
         component: BeneficiaryManage,
-        path: 'edit/:bid',
+        path: 'edit/:applicationId',
       },
       {
         component: BeneficiaryMigration,
