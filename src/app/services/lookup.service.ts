@@ -195,20 +195,20 @@ export class LookupService {
     return this.SelectionReasonEnum;
   }
   getSelectionReasonEnumByValue = (value: any) => {
-    const dataFpund = this.SelectionReasonEnum.find((sce: any) => sce.value == value);
-    if (dataFpund) {
-      return dataFpund.label;
+    const dataFound = this.SelectionReasonEnum.find((sce: any) => sce.value == value);
+    if (dataFound) {
+      return dataFound.label;
     } else {
       return '--';
     }
   }
 
   PublicWorkEnum = [
-    { id: 0, value: 'POOR_HOUSEHOLD', label: "Poor household with no sufficient income to sustain the household" },
-    { id: 1, value: 'BODIED_YOUTH_MEMBER', label: "Household contain able bodied youth member (18–35)" },
-    { id: 1, value: 'HEADED_YOUNG_MEMBER', label: "Household headed by young men and women between the ages of 18 and 35" },
-    { id: 1, value: 'HOUSEHOLD_THREE_OR_MORE_DEPENDENTS', label: "Household has three or more dependents" },
-    { id: 1, value: 'POOR_HOUSEHOLD_WITH_SEVERE_DISABILITIES', label: "Poor household which have persons with severe disabilities" },
+    { id: 1, value: 'POOR_HOUSEHOLD', label: "Poor household with no sufficient income to sustain the household" },
+    { id: 2, value: 'BODIED_YOUTH_MEMBER', label: "Household contain able bodied youth member (18–35)" },
+    { id: 3, value: 'HEADED_YOUNG_MEMBER', label: "Household headed by young men and women between the ages of 18 and 35" },
+    { id: 4, value: 'HOUSEHOLD_THREE_OR_MORE_DEPENDENTS', label: "Household has three or more dependents" },
+    { id: 5, value: 'POOR_HOUSEHOLD_WITH_SEVERE_DISABILITIES', label: "Poor household which have persons with severe disabilities" },
   ];
   getPublicWorkEnum = () => {
     return this.PublicWorkEnum;

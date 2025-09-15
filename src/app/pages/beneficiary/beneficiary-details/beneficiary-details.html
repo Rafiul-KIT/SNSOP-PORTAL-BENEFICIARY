@@ -121,13 +121,14 @@
                           <th>Selection Criteria</th>
                           <td>{{ beneficiaryDetails.household?.selectionCriteria || '-' }}</td>
                         </tr>
+
                         <tr>
                           <th>Selection Reasons</th>
                           <td>
                             @if (beneficiaryDetails.household?.selectionReasons?.length) {
-                            <ul class="mb-0 ps-3">
-                              @for (r of beneficiaryDetails.household.selectionReasons; track r) {
-                              <li>{{ r }}</li>
+                            <ul>
+                              @for (r of beneficiaryDetails.household.selectionReasons; track r; let i = $index) {
+                                <li>{{ i + 1 }}. {{ r }}</li>
                               }
                             </ul>
                             } @else { N/A }
@@ -184,13 +185,13 @@
                     <table class="table table-bordered mb-0 mt-3">
                       <tbody>
                         <tr>
-                          <th>Other members (18–35) can read/write:</th>
+                          <th>Not including yourself, how many other members of your household are between 18 and 35 and can read and write</th>
                           <td class="text-center">
                             {{ beneficiaryDetails.household?.memberReadWrite ?? 0 }}
                           </td>
                         </tr>
                         <tr>
-                          <th>Respondent Can Read/Write</th>
+                          <th>Respondent Can read/Write (Any Language)</th>
                           <td class="text-center">
                             {{ beneficiaryDetails.household?.isReadWrite === true ? 'Yes' :
                             beneficiaryDetails.household?.isReadWrite === false ? 'No' : '-' }}

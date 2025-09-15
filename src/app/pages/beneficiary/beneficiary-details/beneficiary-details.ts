@@ -158,7 +158,9 @@ export class BeneficiaryDetails implements OnInit {
         incomeSource: dto.householdIncomeSource,
         monthlyIncome: dto.householdMonthlyAvgIncome,
         selectionCriteria: dto.selectionCriteria,
-        selectionReasons: dto.selectionReason,
+        selectionReasons: (dto.selectionReason || []).map((r: string) =>
+        this.lookup.getSelectionReasonEnumByValue(r)
+      ),
         size: dto.householdSize,
         isReadWrite: dto.isReadWrite,
         memberReadWrite: dto.memberReadWrite,

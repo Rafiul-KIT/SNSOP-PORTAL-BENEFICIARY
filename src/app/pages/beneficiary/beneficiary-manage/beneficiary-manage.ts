@@ -63,7 +63,7 @@ export class BeneficiaryManage implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private lookup: LookupService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -254,10 +254,14 @@ export class BeneficiaryManage implements OnInit {
       return;
     }
 
-    const payload = this.buildUpdatePayload(this.beneficiaryForm.value);
+    const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
+
+    const payload = {
+      beneficiaries: [beneficiary]
+    };
 
     this.api
-      .POST('api/beneficiary/update/temp', payload)
+      .POST('api/beneficiary/update/batch', payload)
       .then(() => {
         alert('Beneficiary updated successfully!');
       })
