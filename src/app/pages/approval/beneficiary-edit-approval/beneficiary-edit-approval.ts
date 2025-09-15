@@ -112,7 +112,7 @@ export class BeneficiaryEditApproval implements OnInit {
       payam: [null],
       boma: [null],
       taskType: ['BENEFICIARY_EDIT'],
-      approvalStatus: ['APPROVED']
+      approvalStatus: ['PENDING']
     });
   }
 
