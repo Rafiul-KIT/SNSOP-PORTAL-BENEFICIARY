@@ -39,7 +39,7 @@ interface Beneficiary {
 }
 
 @Component({
-  selector: 'app-beneficiary-migrate-approval',
+  selector: 'app-beneficiary-migrate-approval-list',
   imports: [
     CommonModule,
     FormsModule,
@@ -56,10 +56,10 @@ interface Beneficiary {
     Select,
   ],
   providers: [MessageService, ConfirmationService],
-  templateUrl: './beneficiary-migrate-approval.html',
-  styleUrl: './beneficiary-migrate-approval.scss',
+  templateUrl: './beneficiary-migrate-approval-list.html',
+  styleUrl: './beneficiary-migrate-approval-list.scss',
 })
-export class BeneficiaryMigrateApproval implements OnInit {
+export class BeneficiaryMigrateApprovalList implements OnInit {
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;

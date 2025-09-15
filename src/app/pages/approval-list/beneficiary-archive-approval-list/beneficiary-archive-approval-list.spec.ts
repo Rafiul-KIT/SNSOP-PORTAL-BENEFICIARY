@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BeneficiaryArchiveApproval } from './beneficiary-archive-approval';
+import { BeneficiaryArchiveApprovalList } from './beneficiary-archive-approval-list';
 
 describe('BeneficiaryArchiveApproval', () => {
-  let component: BeneficiaryArchiveApproval;
-  let fixture: ComponentFixture<BeneficiaryArchiveApproval>;
+  let component: BeneficiaryArchiveApprovalList;
+  let fixture: ComponentFixture<BeneficiaryArchiveApprovalList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BeneficiaryArchiveApproval]
+      imports: [BeneficiaryArchiveApprovalList]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BeneficiaryArchiveApproval);
+    fixture = TestBed.createComponent(BeneficiaryArchiveApprovalList);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

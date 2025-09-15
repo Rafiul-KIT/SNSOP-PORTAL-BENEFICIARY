@@ -61,19 +61,19 @@ export class Header {
         icon: 'fas fa-check-circle',
         items: [
           {
-            label: 'Beneficiary Approval',
+            label: 'Beneficiary Approval List',
             icon: 'fas fa-user-check',
-            routerLink: 'beneficiary-approval/edit',
+            routerLink: 'beneficiary-approval-list/edit',
           },
           {
-            label: 'Migration Approval',
+            label: 'Migration Approval List',
             icon: 'fas fa-right-left',
-            routerLink: 'beneficiary-approval/migrate',
+            routerLink: 'beneficiary-approval-list/migrate',
           },
           {
-            label: 'Archiving Approval',
+            label: 'Archiving Approval List',
             icon: 'fas fa-archive',
-            routerLink: 'beneficiary-approval/archive',
+            routerLink: 'beneficiary-approval-list/archive',
           },
         ],
       },

@@ -176,7 +176,7 @@
   [totalRecords]="beneficiaries.length"
   [rowsPerPageOptions]="[10, 25, 50]"
   (onPageChange)="onPageChange($event)"
-  [dropdownAppendTo]="'body'"
+  [appendTo]="'body'"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
 ></p-paginator>
 }

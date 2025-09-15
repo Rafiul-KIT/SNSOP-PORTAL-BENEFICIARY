@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BeneficiaryEditApproval } from './beneficiary-edit-approval';
+import { BeneficiaryEditApprovalList } from './beneficiary-edit-approval-list';
 
 describe('BeneficiaryEditApproval', () => {
-  let component: BeneficiaryEditApproval;
-  let fixture: ComponentFixture<BeneficiaryEditApproval>;
+  let component: BeneficiaryEditApprovalList;
+  let fixture: ComponentFixture<BeneficiaryEditApprovalList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BeneficiaryEditApproval]
+      imports: [BeneficiaryEditApprovalList]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BeneficiaryEditApproval);
+    fixture = TestBed.createComponent(BeneficiaryEditApprovalList);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
