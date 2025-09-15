@@ -54,7 +54,14 @@
 
                   <div class="col-md-3 mb-3">
                     <p-floatlabel>
-                      <p-select id="relationship" formControlName="relationship" class="w-100"></p-select>
+                      <p-select
+                        id="relationship"
+                        formControlName="relationship"
+                        class="w-100"
+                        [options]="relationshipOptions"
+                        optionLabel="label"
+                        optionValue="value">
+                      </p-select>
                       <label for="relationship">Relationship</label>
                     </p-floatlabel>
                   </div>
@@ -68,14 +75,28 @@
 
                   <div class="col-md-3 mb-3">
                     <p-floatlabel>
-                      <p-select id="gender" formControlName="gender" class="w-100"></p-select>
+                      <p-select
+                        id="gender"
+                        formControlName="gender"
+                        class="w-100"
+                        [options]="genderOptions"
+                        optionLabel="name"
+                        optionValue="id">
+                      </p-select>
                       <label for="gender">Gender</label>
                     </p-floatlabel>
                   </div>
 
                   <div class="col-md-3 mb-3">
                     <p-floatlabel>
-                      <p-select id="maritalStatus" formControlName="maritalStatus" class="w-100"></p-select>
+                      <p-select
+                        id="maritalStatus"
+                        formControlName="maritalStatus"
+                        class="w-100"
+                        [options]="maritalStatusOptions"
+                        optionLabel="label"
+                        optionValue="value">
+                      </p-select>
                       <label for="maritalStatus">Marital Status</label>
                     </p-floatlabel>
                   </div>
@@ -103,7 +124,14 @@
 
                   <div class="col-md-3 mb-3">
                     <p-floatlabel>
-                      <p-select id="legalStatus" formControlName="legalStatus" class="w-100"></p-select>
+                      <p-select
+                        id="legalStatus"
+                        formControlName="legalStatus"
+                        class="w-100"
+                        [options]="legalStatusOptions"
+                        optionLabel="label"
+                        optionValue="value">
+                      </p-select>
                       <label for="legalStatus">Legal Status</label>
                     </p-floatlabel>
                   </div>
@@ -117,7 +145,14 @@
 
                   <div class="col-md-3 mb-3">
                     <p-floatlabel>
-                      <p-select id="idType" formControlName="idType" class="w-100"></p-select>
+                      <p-select
+                        id="idType"
+                        formControlName="idType"
+                        class="w-100"
+                        [options]="idTypeOptions"
+                        optionLabel="label"
+                        optionValue="value">
+                      </p-select>
                       <label for="idType">ID Type</label>
                     </p-floatlabel>
                   </div>
@@ -145,7 +180,14 @@
                 <div class="card-body row g-3">
                   <div class="col-md-4 mb-3">
                     <p-floatlabel>
-                      <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"></p-select>
+                      <p-select
+                        id="mainIncomeSource"
+                        formControlName="mainIncomeSource"
+                        class="w-100"
+                        [options]="occupationOptions"
+                        optionLabel="label"
+                        optionValue="value">
+                      </p-select>
                       <label for="mainIncomeSource">Main Income Source</label>
                     </p-floatlabel>
                   </div>
@@ -269,7 +311,14 @@
 
                     <div class="col-md-12 mb-4">
                       <p-floatlabel>
-                        <p-select id="alt1Gender" formControlName="alt1Gender" class="w-100"></p-select>
+                        <p-select
+                          id="alt1Gender"
+                          formControlName="alt1Gender"
+                          class="w-100"
+                          [options]="genderOptions"
+                          optionLabel="name"
+                          optionValue="id">
+                        </p-select>
                         <label for="alt1Gender">Gender</label>
                       </p-floatlabel>
                     </div>
@@ -293,7 +342,14 @@
 
                     <div class="col-md-12 mb-4">
                       <p-floatlabel>
-                        <p-select id="alt1IdType" formControlName="alt1IdType" class="w-100"></p-select>
+                        <p-select
+                          id="alt1IdType"
+                          formControlName="alt1IdType"
+                          class="w-100"
+                          [options]="idTypeOptions"
+                          optionLabel="label"
+                          optionValue="value">
+                        </p-select>
                         <label for="alt1IdType">ID Type</label>
                       </p-floatlabel>
                     </div>
@@ -327,7 +383,14 @@
 
                     <div class="col-md-12 mb-4">
                       <p-floatlabel>
-                        <p-select id="alt2Gender" formControlName="alt2Gender" class="w-100"></p-select>
+                        <p-select
+                          id="alt2Gender"
+                          formControlName="alt2Gender"
+                          class="w-100"
+                          [options]="genderOptions"
+                          optionLabel="name"
+                          optionValue="id">
+                        </p-select>
                         <label for="alt2Gender">Gender</label>
                       </p-floatlabel>
                     </div>
@@ -351,7 +414,14 @@
 
                     <div class="col-md-12 mb-4">
                       <p-floatlabel>
-                        <p-select id="alt2IdType" formControlName="alt2IdType" class="w-100"></p-select>
+                        <p-select
+                          id="alt2IdType"
+                          formControlName="alt2IdType"
+                          class="w-100"
+                          [options]="idTypeOptions"
+                          optionLabel="label"
+                          optionValue="value">
+                        </p-select>
                         <label for="alt2IdType">ID Type</label>
                       </p-floatlabel>
                     </div>

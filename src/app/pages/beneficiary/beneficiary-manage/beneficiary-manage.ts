@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { BeneficiaryDto } from '../../../models/beneficiary';
 import { FloatLabel } from 'primeng/floatlabel';
+import { LookupService, LookupItem } from '../../../services/lookup.service';
 
 @Component({
   selector: 'app-beneficiary-manage',
@@ -35,6 +36,13 @@ export class BeneficiaryManage implements OnInit {
   beneficiaryForm!: FormGroup;
   originalDto!: BeneficiaryDto;   // ✅ keep original DTO for update
 
+  genderOptions: LookupItem[] = [];
+  maritalStatusOptions: any[] = [];
+  relationshipOptions: any[] = [];
+  legalStatusOptions: any[] = [];
+  idTypeOptions: any[] = [];
+  occupationOptions: any[] = [];
+
   ageGroups = [
     { label: '0-2 yrs', maleNormal: 'mn0_2', maleDisability: 'md0_2', maleChronic: 'mc0_2', femaleNormal: 'fn0_2', femaleDisability: 'fd0_2', femaleChronic: 'fc0_2' },
     { label: '3-5 yrs', maleNormal: 'mn3_5', maleDisability: 'md3_5', maleChronic: 'mc3_5', femaleNormal: 'fn3_5', femaleDisability: 'fd3_5', femaleChronic: 'fc3_5' },
@@ -53,11 +61,19 @@ export class BeneficiaryManage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private api: ApiService
+    private api: ApiService,
+    private lookup: LookupService
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.genderOptions = this.lookup.getGenderList();
+    this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
+    this.relationshipOptions = this.lookup.getRelationshipEnum();
+    this.legalStatusOptions = this.lookup.getLegalStatusEnum();
+    this.idTypeOptions = this.lookup.getDocumentTypeEnum();
+    this.occupationOptions = this.lookup.getOccupationEnum();
+
     this.ageGroups.forEach((group) => {
       this.beneficiaryForm.addControl(group.maleNormal, this.fb.control(''));
       this.beneficiaryForm.addControl(group.maleDisability, this.fb.control(''));
