@@ -20,6 +20,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { Loader } from '../../../components/loader/loader';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { ApiService } from '../../../services/api.service';
 
 interface Location {
   name: string;
@@ -81,6 +82,7 @@ export class BeneficiaryEditApproval implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private apiService: ApiService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
@@ -109,6 +111,8 @@ export class BeneficiaryEditApproval implements OnInit {
       county: [null],
       payam: [null],
       boma: [null],
+      taskType: ['BENEFICIARY_EDIT'],
+      approvalStatus: ['APPROVED']
     });
   }
 
@@ -141,47 +145,26 @@ export class BeneficiaryEditApproval implements OnInit {
   }
 
   loadBeneficiaries() {
-    this.beneficiaries = [
-      {
-        householdNumber: 'HH001',
-        firstName: 'John',
-        middleName: 'Peter',
-        lastName: 'Doe',
-        gender: 'Male',
-        age: 35,
-        phoneNumber: '+211912345678',
-        state: 'Central Equatoria',
-        county: 'Juba',
-        payam: 'Munuki',
-        boma: 'Gudele',
-      },
-      {
-        householdNumber: 'HH002',
-        firstName: 'Jane',
-        middleName: 'Mary',
-        lastName: 'Smith',
-        gender: 'Female',
-        age: 28,
-        phoneNumber: '+211923456789',
-        state: 'Central Equatoria',
-        county: 'Juba',
-        payam: 'Kator',
-        boma: 'Nyakuron',
-      },
-      {
-        householdNumber: 'HH003',
-        firstName: 'David',
-        middleName: '',
-        lastName: 'Johnson',
-        gender: 'Male',
-        age: 42,
-        phoneNumber: '+211934567890',
-        state: 'Eastern Equatoria',
-        county: 'Yei',
-        payam: 'Juba Town',
-        boma: 'Hai Thoura',
-      },
-    ];
+    this.isLoading = true;
+
+    const payload = this.searchForm.value;
+    this.apiService
+      .POST('/api/approval/taskList', payload)
+      .then((res: any) => {
+        // response -> approvalTaskList
+        this.beneficiaries = res.data?.approvalTaskList || [];
+      })
+      .catch((err: any) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load beneficiaries',
+        });
+        console.error(err);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   }
 
   get paginatedBeneficiaries(): Beneficiary[] {
@@ -207,7 +190,7 @@ export class BeneficiaryEditApproval implements OnInit {
     this.searchForm.reset();
   }
 
-  editBeneficiary(b: Beneficiary) {
+  /*editBeneficiary(b: Beneficiary) {
     const bid = b?.householdNumber;
 
     if (!bid) {
@@ -216,9 +199,9 @@ export class BeneficiaryEditApproval implements OnInit {
     }
 
     this.router.navigate(['/private/beneficiary/edit', String(bid)]);
-  }
+  }*/
 
-  migrateBeneficiary(b: Beneficiary) {
+  /*migrateBeneficiary(b: Beneficiary) {
     const bid = b?.householdNumber;
 
     if (!bid) {
@@ -227,7 +210,7 @@ export class BeneficiaryEditApproval implements OnInit {
     }
 
     this.router.navigate(['/private/beneficiary/migration', String(bid)]);
-  }
+  }*/
 
   beneficiaryDetails(b: Beneficiary) {
     const bid = b?.householdNumber;
@@ -239,7 +222,7 @@ export class BeneficiaryEditApproval implements OnInit {
     this.router.navigate(['/beneficiary/details', String(bid)]);
   }
 
-  deleteBeneficiary(beneficiary: Beneficiary) {
+  /*deleteBeneficiary(beneficiary: Beneficiary) {
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',
@@ -255,7 +238,7 @@ export class BeneficiaryEditApproval implements OnInit {
         });
       },
     });
-  }
+  }*/
 
   getFullName(beneficiary: Beneficiary): string {
     return [beneficiary.firstName, beneficiary.middleName, beneficiary.lastName]
