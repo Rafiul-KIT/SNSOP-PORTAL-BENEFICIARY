@@ -19,6 +19,12 @@ import {
   NomineeDto,
 } from '../../../models/beneficiary';
 
+export interface FingerVm {
+  label: string;
+  image: string;
+  tooltip: string;
+}
+
 // ---------- ViewModel for UI ----------
 interface BeneficiaryVm {
   applicationId: string;
@@ -40,6 +46,8 @@ interface BeneficiaryVm {
     documentType: string;
     photo?: string;
     biometric?: BiometricDto;
+    rightFingers: FingerVm[];
+    leftFingers: FingerVm[];
   }[];
 
   nominees: {
@@ -49,6 +57,9 @@ interface BeneficiaryVm {
     relation: string;
     photo?: string;
   }[];
+
+  rightFingers: FingerVm[];
+  leftFingers: FingerVm[];
 }
 
 @Component({
@@ -91,22 +102,22 @@ export class BeneficiaryDetails implements OnInit {
   ) { }
 
   ngOnInit() {
-  const applicationId = this.route.snapshot.paramMap.get('applicationId');
+    const applicationId = this.route.snapshot.paramMap.get('applicationId');
 
-  if (applicationId) {
-    // 1. preload geo lookup data first
-    Promise.all([
-      this.lookup.getOrFetchStateList(),
-      this.lookup.getCountyListByStateId(''),
-      this.lookup.getPayamListByCountyId(''),
-      this.lookup.getBomaListByPayamId('')
-    ])
-    .then(() => {
-      // 2. only then fetch beneficiary details
-      this.fetchBeneficiaryDetails(applicationId);
-    });
+    if (applicationId) {
+      // 1. preload geo lookup data first
+      Promise.all([
+        this.lookup.getOrFetchStateList(),
+        this.lookup.getCountyListByStateId(''),
+        this.lookup.getPayamListByCountyId(''),
+        this.lookup.getBomaListByPayamId('')
+      ])
+        .then(() => {
+          // 2. only then fetch beneficiary details
+          this.fetchBeneficiaryDetails(applicationId);
+        });
+    }
   }
-}
 
   fetchBeneficiaryDetails(householdId: string) {
 
@@ -126,6 +137,13 @@ export class BeneficiaryDetails implements OnInit {
   }
 
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
+    // helper: adds prefix if base64 exists, otherwise empty string (or placeholder if you want)
+    const normalizePhoto = (img?: string): string =>
+    img ? `data:image/jpeg;base64,${img}` : '/images/dummyHuman.jpg';
+
+  const normalizeFinger = (img?: string): string =>
+    img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+
     return {
       applicationId: dto.applicationId,
       name: [dto.respondentFirstName, dto.respondentMiddleName, dto.respondentLastName]
@@ -134,7 +152,7 @@ export class BeneficiaryDetails implements OnInit {
       age: dto.respondentAge,
       gender: dto.respondentGender,
       phone: dto.respondentPhoneNo,
-      photo: dto.biometric?.photo,
+      photo: normalizePhoto(dto.biometric?.photoData),
 
       household: {
         incomeSource: dto.householdIncomeSource,
@@ -170,42 +188,79 @@ export class BeneficiaryDetails implements OnInit {
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
-          photo: alt.biometric?.photo,
+          photo: normalizePhoto(alt.biometric?.photoData),
           biometric: alt.biometric,
+
+          // ✨ alternate-specific finger sets
+          rightFingers: [
+            { label: 'Thumb', tooltip: 'Right Thumb', image: normalizeFinger(alt.biometric?.rtFingerData) },
+            { label: 'Index', tooltip: 'Right Index', image: normalizeFinger(alt.biometric?.riFingerData) },
+            { label: 'Middle', tooltip: 'Right Middle', image: normalizeFinger(alt.biometric?.rmFingerData) },
+            { label: 'Ring', tooltip: 'Right Ring', image: normalizeFinger(alt.biometric?.rrFingerData) },
+            { label: 'Little', tooltip: 'Right Little', image: normalizeFinger(alt.biometric?.rsFingerData) },
+          ],
+          leftFingers: [
+            { label: 'Thumb', tooltip: 'Left Thumb', image: normalizeFinger(alt.biometric?.ltFingerData) },
+            { label: 'Index', tooltip: 'Left Index', image: normalizeFinger(alt.biometric?.liFingerData) },
+            { label: 'Middle', tooltip: 'Left Middle', image: normalizeFinger(alt.biometric?.lmFingerData) },
+            { label: 'Ring', tooltip: 'Left Ring', image: normalizeFinger(alt.biometric?.lrFingerData) },
+            { label: 'Little', tooltip: 'Left Little', image: normalizeFinger(alt.biometric?.lsFingerData) },
+          ],
         })),
+
 
       nominees: (dto.nominees || []).map((n: NomineeDto) => ({
         name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName].filter(Boolean).join(' '),
         age: n.nomineeAge,
         gender: n.nomineeGender,
         relation: n.relationshipWithHouseholdHead,
-        photo: n.biometric?.photo,
+        photo: normalizeFinger(n.biometric?.photoData),
       })),
+
+      rightFingers: [
+        { label: 'Thumb', tooltip: 'Right Thumb', image: normalizeFinger(dto.biometric?.rtFingerData) },
+        { label: 'Index', tooltip: 'Right Index', image: normalizeFinger(dto.biometric?.riFingerData) },
+        { label: 'Middle', tooltip: 'Right Middle', image: normalizeFinger(dto.biometric?.rmFingerData) },
+        { label: 'Ring', tooltip: 'Right Ring', image: normalizeFinger(dto.biometric?.rrFingerData) },
+        { label: 'Little', tooltip: 'Right Little', image: normalizeFinger(dto.biometric?.rsFingerData) },
+      ],
+      leftFingers: [
+        { label: 'Thumb', tooltip: 'Left Thumb', image: normalizeFinger(dto.biometric?.ltFingerData) },
+        { label: 'Index', tooltip: 'Left Index', image: normalizeFinger(dto.biometric?.liFingerData) },
+        { label: 'Middle', tooltip: 'Left Middle', image: normalizeFinger(dto.biometric?.lmFingerData) },
+        { label: 'Ring', tooltip: 'Left Ring', image: normalizeFinger(dto.biometric?.lrFingerData) },
+        { label: 'Little', tooltip: 'Left Little', image: normalizeFinger(dto.biometric?.lsFingerData) },
+      ],
     };
   }
 
   private prepareFingerImages(bio?: BiometricDto) {
+    const normalizeFinger = (img?: string): string =>
+      img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+
     if (!bio) {
       this.rightFingers = [];
       this.leftFingers = [];
       return;
     }
+
     this.rightFingers = [
-      { label: 'Thumb', image: bio.wsqRt || '/images/tick.jpg', tooltip: 'Right Thumb' },
-      { label: 'Index', image: bio.wsqRi || '/images/tick.jpg', tooltip: 'Right Index' },
-      { label: 'Middle', image: bio.wsqRm || '/images/tick.jpg', tooltip: 'Right Middle' },
-      { label: 'Ring', image: bio.wsqRr || '/images/tick.jpg', tooltip: 'Right Ring' },
-      { label: 'Little', image: bio.wsqRs || '/images/tick.jpg', tooltip: 'Right Little' },
+      { label: 'Thumb', image: normalizeFinger(bio.rtFingerData), tooltip: 'Right Thumb' },
+      { label: 'Index', image: normalizeFinger(bio.riFingerData), tooltip: 'Right Index' },
+      { label: 'Middle', image: normalizeFinger(bio.rmFingerData), tooltip: 'Right Middle' },
+      { label: 'Ring', image: normalizeFinger(bio.rrFingerData), tooltip: 'Right Ring' },
+      { label: 'Little', image: normalizeFinger(bio.rsFingerData), tooltip: 'Right Little' },
     ];
 
     this.leftFingers = [
-      { label: 'Thumb', image: bio.wsqLt || '/images/tick.jpg', tooltip: 'Left Thumb' },
-      { label: 'Index', image: bio.wsqLi || '/images/tick.jpg', tooltip: 'Left Index' },
-      { label: 'Middle', image: bio.wsqLm || '/images/tick.jpg', tooltip: 'Left Middle' },
-      { label: 'Ring', image: bio.wsqLr || '/images/tick.jpg', tooltip: 'Left Ring' },
-      { label: 'Little', image: bio.wsqLs || '/images/tick.jpg', tooltip: 'Left Little' },
+      { label: 'Thumb', image: normalizeFinger(bio.ltFingerData), tooltip: 'Left Thumb' },
+      { label: 'Index', image: normalizeFinger(bio.liFingerData), tooltip: 'Left Index' },
+      { label: 'Middle', image: normalizeFinger(bio.lmFingerData), tooltip: 'Left Middle' },
+      { label: 'Ring', image: normalizeFinger(bio.lrFingerData), tooltip: 'Left Ring' },
+      { label: 'Little', image: normalizeFinger(bio.lsFingerData), tooltip: 'Left Little' },
     ];
   }
+
 
   onApprove(comment: string) {
     this.isSubmitting = true;

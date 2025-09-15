@@ -129,8 +129,8 @@ export class LookupService {
 
   getGenderList(): LookupItem[] {
     return [
-      { id: 'MALE', name: 'Male' },
-      { id: 'FEMALE', name: 'Female' },
+      { id: '0', name: 'Male' },
+      { id: '1', name: 'Female' },
     ];
   }
 

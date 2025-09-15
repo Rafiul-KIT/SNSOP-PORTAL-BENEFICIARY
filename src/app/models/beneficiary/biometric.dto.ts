@@ -6,16 +6,16 @@ export interface BiometricDto {
   noFingerPrint: boolean;
   noFingerprintReason?: string;
   noFingerprintReasonText?: string;
-  photo?: string;
+  photoData?: string;
 
-  wsqLt?: string;
-  wsqLi?: string;
-  wsqLm?: string;
-  wsqLr?: string;
-  wsqLs?: string;
-  wsqRt?: string;
-  wsqRi?: string;
-  wsqRm?: string;
-  wsqRr?: string;
-  wsqRs?: string;
+  ltFingerData?: string;
+  liFingerData?: string;
+  lmFingerData?: string;
+  lrFingerData?: string;
+  lsFingerData?: string;
+  rtFingerData?: string;
+  riFingerData?: string;
+  rmFingerData?: string;
+  rrFingerData?: string;
+  rsFingerData?: string;
 }
