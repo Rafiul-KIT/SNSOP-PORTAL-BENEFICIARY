@@ -138,7 +138,7 @@ export class BeneficiaryList implements OnInit {
         this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
         // ✅ Only fetch beneficiaries after lookup data is ready
-        this.fetchPage(0, this.pageSize);
+        this.fetchPage(this.currentPage, this.pageSize);
         this.cdr.markForCheck();
       });
   }
@@ -222,6 +222,7 @@ export class BeneficiaryList implements OnInit {
     if (f.county?.id) criteria.push({ fieldName: 'COUNTY_ID', operator: 'EQUAL', value: f.county.id });
     if (f.payam?.id) criteria.push({ fieldName: 'PAYAM_ID', operator: 'EQUAL', value: f.payam.id });
     if (f.boma?.id) criteria.push({ fieldName: 'BOMA_ID', operator: 'EQUAL', value: f.boma.id });
+    if (f.gender) criteria.push({ fieldName: 'RESPONDENT_GENDER', operator: 'EQUAL', value: f.gender });
 
     return criteria;
   }
@@ -234,7 +235,8 @@ export class BeneficiaryList implements OnInit {
       respondentMiddleName: f.middleName ? f.middleName.trim() : null,
       respondentLastName: f.lastName ? f.lastName.trim() : null,
       respondentId: null,
-      registrationPhase: null,
+      registrationPhase: f.registrationPhase || null,
+      respondentGender: f.gender || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',
@@ -310,7 +312,6 @@ export class BeneficiaryList implements OnInit {
   }
 
   searchBeneficiaries() {
-    this.currentPage = 0;
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
