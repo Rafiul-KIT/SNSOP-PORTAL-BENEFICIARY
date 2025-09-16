@@ -57,7 +57,7 @@ export class Header {
         routerLinkActiveOptions: 'active',
       },
       {
-        label: 'Approval',        
+        label: 'Approval',
         icon: 'fas fa-check-circle',
         items: [
           {
@@ -114,5 +114,14 @@ export class Header {
     window.location.href = `${environment.portals.master}/home/profile`;
   };
 
-  logout = () => {};
+  //logout = () => {};
+  logout = () => {
+    // Clear the authentication token from cookies
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the token cookie
+    document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
+
+    // Redirect to the login page of the master portal (or landing page)
+    window.location.href = `${environment.portals.master}/landing`;  // Redirect to the master portal's login page
+  };
+
 }
