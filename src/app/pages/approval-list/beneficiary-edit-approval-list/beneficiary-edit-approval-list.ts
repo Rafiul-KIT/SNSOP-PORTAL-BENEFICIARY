@@ -97,7 +97,6 @@ export class BeneficiaryEditApprovalList implements OnInit {
     this.loadBeneficiaries();
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
     this.breadcrumbItems = [{ label: 'Beneficiary List' }];
-    this.isLoading = false;
   }
 
   initForm() {
