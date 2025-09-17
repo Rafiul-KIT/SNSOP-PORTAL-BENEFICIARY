@@ -1,13 +1,12 @@
 @if(isLoading){
-<app-loader></app-loader>
+<app-loader />
 }@else{
 <div class="breadcrumb-wrapper">
   <p-breadcrumb
     [model]="breadcrumbItems"
     [home]="breadcrumbHome"
-    class="max-w-full"
-  >
-  </p-breadcrumb>
+    class="w-100"
+  />
 </div>
 
 <div class="card p-3 mb-2">
@@ -123,48 +122,48 @@
 >
   <ng-template pTemplate="header">
     <tr>
-      <th>Household Number</th>
-      <th>Name</th>
-      <th>Gender</th>
-      <th>Age</th>
-      <th>Phone</th>
-      <th>State</th>
-      <th>County</th>
-      <th>Payam</th>
-      <th>Boma</th>
+      <th>ID</th>
+      <th>Status</th>
+      <th>Approvar Role</th>
+      <th>Task Type</th>
       <th class="text-center">Action</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-b>
     <tr>
-      <td>{{ b.householdNumber }}</td>
-      <td>{{ getFullName(b) }}</td>
-      <td>{{ b.gender }}</td>
-      <td>{{ b.age }}</td>
-      <td>{{ b.phoneNumber }}</td>
-      <td>{{ b.state }}</td>
-      <td>{{ b.county }}</td>
-      <td>{{ b.payam }}</td>
-      <td>{{ b.boma }}</td>
+      <td>{{ b.id }}</td>
+      <td>{{ b.approvalStatus }}</td>
+      <td>{{ b.approverRole }}</td>
+      <td>{{ b.taskType }}</td>
       <td class="text-center">
         <p-button
           type="button"
-          icon="fas fa-eye"
-          pTooltip="Details"
+          icon="fas fa-check"
+          pTooltip="Approve"
           tooltipPosition="top"
           appendTo="body"
-          (onClick)="beneficiaryDetails(b)"
           size="small"
           outlined="true"
           severity="primary"
+        />
+        &nbsp;
+        <p-button
+          type="button"
+          icon="fas fa-ban"
+          pTooltip="Reject"
+          tooltipPosition="top"
+          appendTo="body"
+          size="small"
+          outlined="true"
+          severity="danger"
         />
       </td>
     </tr>
   </ng-template>
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="10" class="text-center text-danger">
-        <b>**No beneficiaries found**</b>
+      <td colspan="5" class="text-center text-danger">
+        <b>No beneficiaries found!</b>
       </td>
     </tr>
   </ng-template>
@@ -180,5 +179,5 @@
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
 ></p-paginator>
 }
-<p-toast position="bottom-right"> </p-toast>
-<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+<p-toast position="bottom-right" />
+<p-confirmDialog [style]="{ width: '450px' }" />

@@ -16,9 +16,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
-
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+import { Loader } from '../../../components/loader/loader';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Select } from 'primeng/select';
 
 interface Location {
   name: string;
@@ -50,17 +51,20 @@ interface Beneficiary {
     ToastModule,
     ConfirmDialogModule,
     PaginatorModule,
+    FloatLabelModule,
+    SelectModule,
+    Loader,
     BreadcrumbModule,
     InputTextModule,
     TooltipModule,
     RouterModule,
-    Select,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './beneficiary-archive-approval-list.html',
   styleUrl: './beneficiary-archive-approval-list.scss',
 })
 export class BeneficiaryArchiveApprovalList implements OnInit {
+  isLoading: boolean = true;
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;
@@ -73,6 +77,7 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
   breadcrumbHome: any;
   currentPage = 0;
   pageSize = 10;
+  advanceSearchPanelVisible: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -80,7 +85,7 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.bid = this.route.snapshot.paramMap.get('bid')!;
@@ -176,6 +181,7 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
         boma: 'Hai Thoura',
       },
     ];
+    this.isLoading = false;
   }
 
   get paginatedBeneficiaries(): Beneficiary[] {
@@ -238,7 +244,7 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',      // optional
+      icon: 'pi pi-exclamation-triangle', // optional
       acceptLabel: 'Yes',
       rejectLabel: 'No',
       acceptButtonStyleClass: 'p-button-danger',
@@ -252,7 +258,7 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
           summary: 'Archived',
           detail: 'Beneficiary archived successfully',
         });
-      }
+      },
     });
   }
 

@@ -44,12 +44,12 @@ export class Header {
     ];
 
     this.menuList = [
-      {
-        label: 'New Registration',
-        icon: 'fas fa-user-plus',
-        routerLink: 'beneficiary/registration',
-        routerLinkActiveOptions: 'active',
-      },
+      // {
+      //   label: 'New Registration',
+      //   icon: 'fas fa-user-plus',
+      //   routerLink: 'beneficiary/registration',
+      //   routerLinkActiveOptions: 'active',
+      // },
       {
         label: 'Beneficiary List',
         icon: 'fas fa-list',

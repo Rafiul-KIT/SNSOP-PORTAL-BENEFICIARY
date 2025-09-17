@@ -16,8 +16,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { Select } from 'primeng/select';
+import { Select, SelectModule } from 'primeng/select';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { Loader } from '../../../components/loader/loader';
 
 interface Location {
   name: string;
@@ -52,14 +54,17 @@ interface Beneficiary {
     BreadcrumbModule,
     InputTextModule,
     TooltipModule,
+    FloatLabelModule,
+    SelectModule,
+    Loader,
     RouterModule,
-    Select,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './beneficiary-migrate-approval-list.html',
   styleUrl: './beneficiary-migrate-approval-list.scss',
 })
 export class BeneficiaryMigrateApprovalList implements OnInit {
+  isLoading: boolean = true;
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;
@@ -72,6 +77,7 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
   breadcrumbHome: any;
   currentPage = 0;
   pageSize = 10;
+  advanceSearchPanelVisible: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -175,6 +181,7 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
         boma: 'Hai Thoura',
       },
     ];
+    this.isLoading = false;
   }
 
   get paginatedBeneficiaries(): Beneficiary[] {
