@@ -40,7 +40,7 @@ interface Beneficiary {
 }
 
 @Component({
-  selector: 'app-beneficiary-archive-approval',
+  selector: 'app-beneficiary-archive-approval-list',
   imports: [
     CommonModule,
     FormsModule,
@@ -57,10 +57,10 @@ interface Beneficiary {
     Select,
   ],
   providers: [MessageService, ConfirmationService],
-  templateUrl: './beneficiary-archive-approval.html',
-  styleUrl: './beneficiary-archive-approval.scss',
+  templateUrl: './beneficiary-archive-approval-list.html',
+  styleUrl: './beneficiary-archive-approval-list.scss',
 })
-export class BeneficiaryArchiveApproval implements OnInit {
+export class BeneficiaryArchiveApprovalList implements OnInit {
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;

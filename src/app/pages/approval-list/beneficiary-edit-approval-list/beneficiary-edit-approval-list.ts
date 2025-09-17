@@ -42,9 +42,9 @@ interface Beneficiary {
 }
 
 @Component({
-  selector: 'app-beneficiary-edit-approval',
-  templateUrl: './beneficiary-edit-approval.html',
-  styleUrl: './beneficiary-edit-approval.scss',
+  selector: 'app-beneficiary-edit-approval-list',
+  templateUrl: './beneficiary-edit-approval-list.html',
+  styleUrl: './beneficiary-edit-approval-list.scss',
   imports: [
     CommonModule,
     FormsModule,
@@ -64,7 +64,7 @@ interface Beneficiary {
   ],
   providers: [MessageService, ConfirmationService],
 })
-export class BeneficiaryEditApproval implements OnInit {
+export class BeneficiaryEditApprovalList implements OnInit {
   isLoading: boolean = true;
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;

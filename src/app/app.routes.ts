@@ -5,9 +5,9 @@ import { BeneficiaryList } from './pages/beneficiary/beneficiary-list/beneficiar
 import { BeneficiaryDetails } from './pages/beneficiary/beneficiary-details/beneficiary-details';
 import { BeneficiaryManage } from './pages/beneficiary/beneficiary-manage/beneficiary-manage';
 import { BeneficiaryMigration } from './pages/beneficiary/beneficiary-migration/beneficiary-migration';
-import { BeneficiaryArchiveApproval } from './pages/approval/beneficiary-archive-approval/beneficiary-archive-approval';
-import { BeneficiaryEditApproval } from './pages/approval/beneficiary-edit-approval/beneficiary-edit-approval';
-import { BeneficiaryMigrateApproval } from './pages/approval/beneficiary-migrate-approval/beneficiary-migrate-approval';
+import { BeneficiaryArchiveApprovalList } from './pages/approval-list/beneficiary-archive-approval-list/beneficiary-archive-approval-list';
+import { BeneficiaryEditApprovalList } from './pages/approval-list/beneficiary-edit-approval-list/beneficiary-edit-approval-list';
+import { BeneficiaryMigrateApprovalList } from './pages/approval-list/beneficiary-migrate-approval-list/beneficiary-migrate-approval-list';
 
 export const routes: Routes = [
   {
@@ -36,16 +36,16 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'beneficiary-approval',
+    path: 'beneficiary-approval-list',
     children: [
-      { path: 'edit', component: BeneficiaryEditApproval },
+      { path: 'edit', component: BeneficiaryEditApprovalList },
       {
         path: 'migrate',
-        component: BeneficiaryMigrateApproval,
+        component: BeneficiaryMigrateApprovalList,
       },
       {
         path: 'archive',
-        component: BeneficiaryArchiveApproval,
+        component: BeneficiaryArchiveApprovalList,
       },
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
