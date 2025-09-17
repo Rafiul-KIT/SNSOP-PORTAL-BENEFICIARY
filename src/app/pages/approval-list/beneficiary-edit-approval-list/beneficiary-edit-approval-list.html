@@ -145,6 +145,7 @@
           size="small"
           outlined="true"
           severity="primary"
+          (onClick)="approveTask(b)"
         />
         &nbsp;
         <p-button
@@ -156,6 +157,19 @@
           size="small"
           outlined="true"
           severity="danger"
+          (onClick)="rejectTask(b)"
+        />
+        &nbsp;
+        <p-button
+          type="button"
+          icon="fas fa-eye"
+          pTooltip="View"
+          tooltipPosition="top"
+          appendTo="body"
+          size="small"
+          outlined="true"
+          severity="info"
+          (onClick)="viewTask(b)"
         />
       </td>
     </tr>

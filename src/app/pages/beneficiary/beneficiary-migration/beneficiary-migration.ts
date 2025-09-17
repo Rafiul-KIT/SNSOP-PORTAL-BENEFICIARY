@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TabsModule } from 'primeng/tabs';
@@ -8,6 +8,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Loader } from '../../../components/loader/loader';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
+import { ActivatedRoute } from '@angular/router';
+import { ApiService } from '../../../services/api.service';
+import { LookupService, LookupItem } from '../../../services/lookup.service';
+
+import { BeneficiaryDto} from '../../../models/beneficiary'
 
 @Component({
   selector: 'app-beneficiary-migration',
@@ -25,9 +30,10 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './beneficiary-migration.html',
   styleUrl: './beneficiary-migration.scss',
 })
-export class BeneficiaryMigration {
+export class BeneficiaryMigration implements OnInit {
   isSubmitting = false;
   isLoading = false;
+
   items = [
     {
       label: 'Beneficiary List',
@@ -39,30 +45,28 @@ export class BeneficiaryMigration {
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 
   beneficiaryForm!: FormGroup;
-  stateList = [
-    { id: 1, name: 'Juba' },
-    { id: 2, name: 'Wau' },
-  ];
-  countyList = [
-    { id: 1, name: 'County A' },
-    { id: 2, name: 'County B' },
-  ];
-  payamList = [
-    { id: 1, name: 'Payam A' },
-    { id: 2, name: 'Payam B' },
-  ];
-  bomaList = [
-    { id: 1, name: 'Boma A' },
-    { id: 2, name: 'Boma B' },
-  ];
-
-  beneficiaryDetails: any;
+  beneficiaryDetails!: BeneficiaryDto;
   beneficiaryPhoto = '/images/dummyHuman.jpg';
 
-  constructor(private fb: FormBuilder) {}
+  // Lookup dropdowns
+  stateList: LookupItem[] = [];
+  countyList: LookupItem[] = [];
+  payamList: LookupItem[] = [];
+  bomaList: LookupItem[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private api: ApiService,
+    private lookup: LookupService
+  ) {}
 
   ngOnInit(): void {
-    this.initializeDemoData();
+    const id = this.route.snapshot.paramMap.get('bid'); // applicationId from route
+    if (!id) return;
+
+    this.isLoading = true;
+
     this.beneficiaryForm = this.fb.group({
       state: [''],
       county: [''],
@@ -72,55 +76,147 @@ export class BeneficiaryMigration {
       gpsLong: [''],
       approvalComment: [''],
     });
+
+    this.setupLocationListeners();
+
+    // step 1: load states first
+    this.lookup.getOrFetchStateList().then((states) => {
+      this.stateList = states;
+      // step 2: fetch beneficiary details AFTER we have states
+      this.fetchBeneficiaryDetails(id);
+    });
   }
 
-  initializeDemoData(): void {
-    this.beneficiaryDetails = {
-      applicationId: 'HH001',
-      name: 'John Doe',
-      age: 45,
-      gender: 'Male',
-      phone: '123-456-7890',
 
-      address: {
-        state: 'Central Equatoria',
-        county: 'Juba',
-        payam: 'Munuki',
-        boma: 'Gudele',
-        lat: '4.8517',
-        lon: '31.5822',
-      },
-    };
+  private setupLocationListeners() {
+    this.beneficiaryForm.get('state')?.valueChanges.subscribe((stateId: string) => {
+      if (stateId) {
+        this.lookup.getCountyListByStateId(stateId).then((list) => {
+          this.countyList = list;
+          this.beneficiaryForm.patchValue({ county: null, payam: null, boma: null }, { emitEvent: false });
+          this.payamList = [];
+          this.bomaList = [];
+        });
+      } else {
+        this.countyList = [];
+        this.payamList = [];
+        this.bomaList = [];
+      }
+    });
+
+    this.beneficiaryForm.get('county')?.valueChanges.subscribe((countyId: string) => {
+      if (countyId) {
+        this.lookup.getPayamListByCountyId(countyId).then((list) => {
+          this.payamList = list;
+          this.beneficiaryForm.patchValue({ payam: null, boma: null }, { emitEvent: false });
+          this.bomaList = [];
+        });
+      } else {
+        this.payamList = [];
+        this.bomaList = [];
+      }
+    });
+
+    this.beneficiaryForm.get('payam')?.valueChanges.subscribe((payamId: string) => {
+      if (payamId) {
+        this.lookup.getBomaListByPayamId(payamId).then((list) => {
+          this.bomaList = list;
+          this.beneficiaryForm.patchValue({ boma: null }, { emitEvent: false });
+        });
+      } else {
+        this.bomaList = [];
+      }
+    });
   }
+
+
+
+  async fetchBeneficiaryDetails(applicationId: string) {
+    try {
+      const res = await this.api.GET(`api/beneficiary/details/${applicationId}`);
+      const dto = res?.data as BeneficiaryDto;
+      this.beneficiaryDetails = dto;
+
+      if (dto.biometric?.photoData) {
+        this.beneficiaryPhoto = 'data:image/png;base64,' + dto.biometric.photoData;
+      }
+
+      if (dto.address) {
+        this.beneficiaryForm.patchValue({
+          gpsLat: dto.address.location?.lat ?? '',
+          gpsLong: dto.address.location?.lon ?? ''
+        }, { emitEvent: false });
+
+        // ✅ cast to string so it matches lookup.id
+        if (dto.address.stateId != null) {
+          this.beneficiaryForm.patchValue({ state: String(dto.address.stateId) }, { emitEvent: false });
+          this.countyList = await this.lookup.getCountyListByStateId(String(dto.address.stateId));
+        }
+
+        if (dto.address.countyId != null) {
+          this.beneficiaryForm.patchValue({ county: String(dto.address.countyId) }, { emitEvent: false });
+          this.payamList = await this.lookup.getPayamListByCountyId(String(dto.address.countyId));
+        }
+
+        if (dto.address.payam != null) {
+          this.beneficiaryForm.patchValue({ payam: String(dto.address.payam) }, { emitEvent: false });
+          this.bomaList = await this.lookup.getBomaListByPayamId(String(dto.address.payam));
+        }
+
+        if (dto.address.boma) {
+          this.beneficiaryForm.patchValue({ boma: dto.address.boma }, { emitEvent: false });
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching beneficiary details:', err);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
 
   onSubmit() {
-    if (this.beneficiaryForm.valid) {
-      console.log('Form submitted:', this.beneficiaryForm.value);
-      alert('Form submitted successfully!');
-    } else {
-      alert('Please fill out all required fields.');
-    }
+    if (this.beneficiaryForm.invalid) return;
+
+    const updatedGeo = this.beneficiaryForm.value;
+
+    // clone full dto and update only geo fields
+    const payload: BeneficiaryDto = {
+      ...this.beneficiaryDetails,
+      address: {
+        ...this.beneficiaryDetails.address,
+        stateId: updatedGeo.state,
+        countyId: updatedGeo.county,
+        payam: updatedGeo.payam,
+        boma: updatedGeo.boma,
+        location: {
+          lat: updatedGeo.gpsLat,
+          lon: updatedGeo.gpsLong,
+        },
+      },
+    };
+
+    this.isSubmitting = true;
+    this.api
+      .POST('api/beneficiary/update/batch', [payload])
+      .then(() => {
+        alert('Beneficiary migration updated successfully!');
+      })
+      .catch((err) => {
+        console.error('Error updating beneficiary migration:', err);
+        alert('Update failed. Try again.');
+      })
+      .finally(() => {
+        this.isSubmitting = false;
+      });
   }
 
+  // keep approve/reject stubs
   onApprove() {
-    this.isSubmitting = true;
-    const comment = this.beneficiaryForm.get('approvalComment')?.value ?? '';
-    try {
-      // TODO: call Approve API with comment + IDs you need
-      // this.service.approve(this.beneficiaryDetails.applicationId, comment).subscribe(...)
-    } finally {
-      this.isSubmitting = false;
-    }
+    // TODO: call Approve API with comment
   }
 
   onReject() {
-    this.isSubmitting = true;
-    const comment = this.beneficiaryForm.get('approvalComment')?.value ?? '';
-    try {
-      // TODO: call Reject API with comment + IDs you need
-      // this.service.reject(this.beneficiaryDetails.applicationId, comment).subscribe(...)
-    } finally {
-      this.isSubmitting = false;
-    }
+    // TODO: call Reject API with comment
   }
 }

@@ -101,7 +101,7 @@ export class BeneficiaryDetails implements OnInit {
     private lookup: LookupService,
   ) { }
 
-  ngOnInit() {
+  /*ngOnInit() {
     const applicationId = this.route.snapshot.paramMap.get('applicationId');
 
     if (applicationId) {
@@ -117,6 +117,27 @@ export class BeneficiaryDetails implements OnInit {
           this.fetchBeneficiaryDetails(applicationId);
         });
     }
+  }*/
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    const isTaskMode = this.route.snapshot.queryParamMap.get('taskMode') === 'true';
+
+    if (id) {
+      // preload geo lookup data first
+      Promise.all([
+        this.lookup.getOrFetchStateList(),
+        this.lookup.getCountyListByStateId(''),
+        this.lookup.getPayamListByCountyId(''),
+        this.lookup.getBomaListByPayamId('')
+      ]).then(() => {
+        if (isTaskMode) {
+          this.fetchTaskDetails(id); // 👈 call task details API
+        } else {
+          this.fetchBeneficiaryDetails(id); // 👈 call beneficiary details API
+        }
+      });
+    }
   }
 
   fetchBeneficiaryDetails(householdId: string) {
@@ -130,6 +151,22 @@ export class BeneficiaryDetails implements OnInit {
         this.prepareFingerImages(dto.biometric);
       })
       .catch((err) => console.error('Error loading beneficiary details:', err))
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  fetchTaskDetails(taskId: string) {
+    this.isLoading = true;
+    this.api
+      .GET(`api/approval/details/${taskId}`)
+      .then((res: any) => {
+        const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
+        this.beneficiaryDetails = this.mapToVm(dto);
+        this.prepareFingerImages(dto.biometric);
+      })
+      .catch((err) => console.error('Error loading task details:', err))
       .finally(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -264,7 +301,7 @@ export class BeneficiaryDetails implements OnInit {
   }
 
 
-  onApprove(comment: string) {
+  /*onApprove(comment: string) {
     this.isSubmitting = true;
     try {
       // TODO: integrate with approval API
@@ -280,5 +317,5 @@ export class BeneficiaryDetails implements OnInit {
     } finally {
       this.isSubmitting = false;
     }
-  }
+  }*/
 }

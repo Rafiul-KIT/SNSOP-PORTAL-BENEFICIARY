@@ -244,4 +244,94 @@ export class BeneficiaryEditApprovalList implements OnInit {
       .filter(Boolean)
       .join(' ');
   }
+
+
+  approveTask(b: any) {
+    if (!b?.id) {
+      console.error('Approve clicked, but task id is missing:', b);
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to approve task #${b.id}?`,
+      header: 'Confirm Approval',
+      icon: 'fas fa-check',
+      accept: () => {
+        const payload = {
+          approvalTaskId: b.id,
+          approved: true
+        };
+
+        this.apiService
+          .POST('/api/approval/doApprove', payload)
+          .then(() => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Approved',
+              detail: `Task #${b.id} approved successfully.`
+            });
+            this.loadBeneficiaries();
+          })
+          .catch((err: any) => {
+            console.error(err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to approve task'
+            });
+          });
+      }
+    });
+  }
+
+  rejectTask(b: any) {
+    if (!b?.id) {
+      console.error('Reject clicked, but task id is missing:', b);
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to reject task #${b.id}?`,
+      header: 'Confirm Rejection',
+      icon: 'fas fa-ban',
+      accept: () => {
+        const payload = {
+          approvalTaskId: b.id,
+          approved: false
+        };
+
+        this.apiService
+          .POST('/api/approval/doApprove', payload)
+          .then(() => {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Rejected',
+              detail: `Task #${b.id} rejected successfully.`
+            });
+            this.loadBeneficiaries();
+          })
+          .catch((err: any) => {
+            console.error(err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to reject task'
+            });
+          });
+      }
+    });
+  }
+
+
+  viewTask(b: any) {
+    if (!b?.id) {
+      console.error('View clicked, but task id is missing:', b);
+      return;
+    }
+
+    this.router.navigate(['/beneficiary/details', String(b.id)], {
+      queryParams: { taskMode: true }
+    });
+  }
+
 }
