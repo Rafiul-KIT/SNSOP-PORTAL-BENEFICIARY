@@ -258,6 +258,7 @@ export class BeneficiaryList implements OnInit {
         respondentAge: b.respondentAge,
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,
+        registrationPhase: b.registrationPhase,
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) || String(b.address.stateId)
