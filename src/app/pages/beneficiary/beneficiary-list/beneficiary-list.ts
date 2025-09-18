@@ -346,12 +346,40 @@ export class BeneficiaryList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-success',
       accept: () => {
-        this.beneficiaries = this.beneficiaries.filter((x) => x.applicationId !== b.applicationId);
-        this.messageService.add({ severity: 'success', summary: 'Archived', detail: 'Beneficiary archived successfully' });
-        this.cdr.markForCheck();
+        // Prepare the data for the API call
+        const requestData = {
+          householdId: b.applicationId, // Send the applicationId as the householdId in the request body
+        };
+
+        // Call the API to archive (POST request)
+        const apiPath = '/api/beneficiary/delete'; // Your API endpoint for deleting (archiving)
+        this.api
+          .POST(apiPath, requestData) // Call API via the POST method
+          .then((res: any) => {
+            const data = res?.data;
+            if (!data) throw new Error('Empty response');
+            if (data.operationResult === false) {
+              this.messageService.add({ severity: 'warn', summary: 'Archive Failed', detail: data.errorMsg || 'Failed to archive beneficiary' });
+            } else {
+              // Successfully archived from backend, now update UI
+              this.beneficiaries = this.beneficiaries.filter((x) => x.applicationId !== b.applicationId);
+
+              // Show success message
+              this.messageService.add({ severity: 'success', summary: 'Archived', detail: 'Beneficiary archive request sent successfully' });
+              this.cdr.markForCheck();
+            }
+          })
+          .catch((err) => {
+            console.error('Archive beneficiary error:', err);
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to archive beneficiary' });
+          })
+          .finally(() => {
+            this.cdr.markForCheck();
+          });
       },
     });
   }
+
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }

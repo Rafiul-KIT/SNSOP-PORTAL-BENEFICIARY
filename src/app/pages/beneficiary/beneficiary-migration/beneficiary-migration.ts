@@ -175,13 +175,10 @@ export class BeneficiaryMigration implements OnInit {
   }
 
 
-  onSubmit() {
-    if (this.beneficiaryForm.invalid) return;
+  private buildUpdatePayload(formValue: any): BeneficiaryDto {
+    const updatedGeo = formValue;
 
-    const updatedGeo = this.beneficiaryForm.value;
-
-    // clone full dto and update only geo fields
-    const payload: BeneficiaryDto = {
+    return {
       ...this.beneficiaryDetails,
       address: {
         ...this.beneficiaryDetails.address,
@@ -195,16 +192,29 @@ export class BeneficiaryMigration implements OnInit {
         },
       },
     };
+  }
+
+  onSubmit() {
+    if (!this.beneficiaryForm.valid) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
+
+    const payload = {
+      beneficiaries: [beneficiary]
+    };
 
     this.isSubmitting = true;
     this.api
-      .POST('api/beneficiary/update/batch', [payload])
+      .POST('api/beneficiary/update/batch', payload)
       .then(() => {
-        alert('Beneficiary migration updated successfully!');
+        alert('Beneficiary updated successfully!');
       })
       .catch((err) => {
-        console.error('Error updating beneficiary migration:', err);
-        alert('Update failed. Try again.');
+        console.error('Update failed:', err);
+        alert('Failed to update beneficiary');
       })
       .finally(() => {
         this.isSubmitting = false;
