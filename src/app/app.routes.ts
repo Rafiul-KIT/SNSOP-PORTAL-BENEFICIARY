@@ -20,17 +20,17 @@ export const routes: Routes = [
     path: 'beneficiary',
     children: [
       {
-        component: BeneficiaryList,
         path: 'list',
+        component: BeneficiaryList,
       },
       { path: 'details/:id', component: BeneficiaryDetails },
       {
-        component: BeneficiaryManage,
         path: 'edit/:applicationId',
+        component: BeneficiaryManage,
       },
       {
-        component: BeneficiaryMigration,
         path: 'migrate/:bid',
+        component: BeneficiaryMigration,
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],

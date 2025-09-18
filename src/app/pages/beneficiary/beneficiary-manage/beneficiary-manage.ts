@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -62,7 +62,8 @@ export class BeneficiaryManage implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private api: ApiService,
-    private lookup: LookupService
+    private lookup: LookupService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -89,6 +90,7 @@ export class BeneficiaryManage implements OnInit {
     }
 
     this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
   initForm() {
@@ -196,7 +198,9 @@ export class BeneficiaryManage implements OnInit {
         }
       })
       .catch((err) => console.error('Failed to load beneficiary:', err))
-      .finally(() => (this.isLoading = false));
+      .finally(() => {
+        this.isLoading = false;this.cdr.detectChanges();
+  });
   }
 
   private buildUpdatePayload(formValue: any): BeneficiaryDto {

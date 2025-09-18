@@ -141,7 +141,6 @@ export class BeneficiaryDetails implements OnInit {
   }
 
   fetchBeneficiaryDetails(householdId: string) {
-
     this.isLoading = true;
     this.api
       .GET(`api/beneficiary/details/${householdId}`)
@@ -153,7 +152,7 @@ export class BeneficiaryDetails implements OnInit {
       .catch((err) => console.error('Error loading beneficiary details:', err))
       .finally(() => {
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       });
   }
 
@@ -169,7 +168,7 @@ export class BeneficiaryDetails implements OnInit {
       .catch((err) => console.error('Error loading task details:', err))
       .finally(() => {
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       });
   }
 

@@ -279,10 +279,7 @@ export class BeneficiaryList implements OnInit {
   // ---------- Data loading ----------
   fetchPage(page: number, size: number) {
     this.isLoading = true;
-    this.cdr.markForCheck();
-
     const body = this.buildSearchBody(page, size);
-
     this.api
       .POST('api/beneficiary/search', body)
       .then((res: any) => {
@@ -301,7 +298,7 @@ export class BeneficiaryList implements OnInit {
       })
       .finally(() => {
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       });
   }
 

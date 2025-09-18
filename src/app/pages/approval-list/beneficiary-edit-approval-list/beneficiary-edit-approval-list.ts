@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -86,7 +86,8 @@ export class BeneficiaryEditApprovalList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -163,6 +164,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
       })
       .finally(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       });
   }
 
