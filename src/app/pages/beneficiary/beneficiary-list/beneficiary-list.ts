@@ -1,4 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -100,7 +105,6 @@ export class BeneficiaryList implements OnInit {
   genderOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
 
-
   beneficiaries: BeneficiaryVm[] = [];
   totalRecords = 0;
 
@@ -120,7 +124,7 @@ export class BeneficiaryList implements OnInit {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.initForm();
@@ -128,21 +132,23 @@ export class BeneficiaryList implements OnInit {
 
     // Preload all lookup lists first
     Promise.all([
-      this.lookup.getOrFetchStateList().then(list => this.states = list),
-      this.lookup.getCountyListByStateId('').then(list => this.counties = list),
-      this.lookup.getPayamListByCountyId('').then(list => this.payams = list),
-      this.lookup.getBomaListByPayamId('').then(list => this.bomas = list),
-    ])
-      .then(() => {
-        this.genderOptions = this.lookup.getGenderList();
-        this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+      this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
+      this.lookup
+        .getCountyListByStateId('')
+        .then((list) => (this.counties = list)),
+      this.lookup
+        .getPayamListByCountyId('')
+        .then((list) => (this.payams = list)),
+      this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
+    ]).then(() => {
+      this.genderOptions = this.lookup.getGenderList();
+      this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
-        // ✅ Only fetch beneficiaries after lookup data is ready
-        this.fetchPage(this.currentPage, this.pageSize);
-        this.cdr.markForCheck();
-      });
+      // ✅ Only fetch beneficiaries after lookup data is ready
+      this.fetchPage(this.currentPage, this.pageSize);
+      this.cdr.markForCheck();
+    });
   }
-
 
   initForm() {
     this.searchForm = this.fb.group({
@@ -213,16 +219,61 @@ export class BeneficiaryList implements OnInit {
     const f = this.searchForm.value;
     const criteria: any[] = [];
 
-    if (f.firstName) criteria.push({ fieldName: 'RESPONDENT_FIRST_NAME', operator: 'LIKE', value: f.firstName.trim() });
-    if (f.middleName) criteria.push({ fieldName: 'RESPONDENT_MIDDLE_NAME', operator: 'LIKE', value: f.middleName.trim() });
-    if (f.lastName) criteria.push({ fieldName: 'RESPONDENT_LAST_NAME', operator: 'LIKE', value: f.lastName.trim() });
-    if (f.phoneNumber) criteria.push({ fieldName: 'RESPONDENT_PHONE_NO', operator: 'LIKE', value: f.phoneNumber.trim() });
+    if (f.firstName)
+      criteria.push({
+        fieldName: 'RESPONDENT_FIRST_NAME',
+        operator: 'LIKE',
+        value: f.firstName.trim(),
+      });
+    if (f.middleName)
+      criteria.push({
+        fieldName: 'RESPONDENT_MIDDLE_NAME',
+        operator: 'LIKE',
+        value: f.middleName.trim(),
+      });
+    if (f.lastName)
+      criteria.push({
+        fieldName: 'RESPONDENT_LAST_NAME',
+        operator: 'LIKE',
+        value: f.lastName.trim(),
+      });
+    if (f.phoneNumber)
+      criteria.push({
+        fieldName: 'RESPONDENT_PHONE_NO',
+        operator: 'LIKE',
+        value: f.phoneNumber.trim(),
+      });
 
-    if (f.state?.id) criteria.push({ fieldName: 'STATE_ID', operator: 'EQUAL', value: f.state.id });
-    if (f.county?.id) criteria.push({ fieldName: 'COUNTY_ID', operator: 'EQUAL', value: f.county.id });
-    if (f.payam?.id) criteria.push({ fieldName: 'PAYAM_ID', operator: 'EQUAL', value: f.payam.id });
-    if (f.boma?.id) criteria.push({ fieldName: 'BOMA_ID', operator: 'EQUAL', value: f.boma.id });
-    if (f.gender) criteria.push({ fieldName: 'RESPONDENT_GENDER', operator: 'EQUAL', value: f.gender });
+    if (f.state?.id)
+      criteria.push({
+        fieldName: 'STATE_ID',
+        operator: 'EQUAL',
+        value: f.state.id,
+      });
+    if (f.county?.id)
+      criteria.push({
+        fieldName: 'COUNTY_ID',
+        operator: 'EQUAL',
+        value: f.county.id,
+      });
+    if (f.payam?.id)
+      criteria.push({
+        fieldName: 'PAYAM_ID',
+        operator: 'EQUAL',
+        value: f.payam.id,
+      });
+    if (f.boma?.id)
+      criteria.push({
+        fieldName: 'BOMA_ID',
+        operator: 'EQUAL',
+        value: f.boma.id,
+      });
+    if (f.gender)
+      criteria.push({
+        fieldName: 'RESPONDENT_GENDER',
+        operator: 'EQUAL',
+        value: f.gender,
+      });
 
     return criteria;
   }
@@ -248,7 +299,11 @@ export class BeneficiaryList implements OnInit {
   // ---------- Mapping ----------
   private toVm(list: BeneficiaryDto[]): BeneficiaryVm[] {
     return list.map((b) => {
-      const fullName = [b.respondentFirstName, b.respondentMiddleName, b.respondentLastName]
+      const fullName = [
+        b.respondentFirstName,
+        b.respondentMiddleName,
+        b.respondentLastName,
+      ]
         .filter(Boolean)
         .join(' ');
 
@@ -261,21 +316,24 @@ export class BeneficiaryList implements OnInit {
         registrationPhase: b.registrationPhase,
         fullName,
         stateName: b.address?.stateId
-          ? this.lookup.getStateNameById(b.address.stateId) || String(b.address.stateId)
+          ? this.lookup.getStateNameById(b.address.stateId) ||
+            String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
-          ? this.lookup.getCountyNameById(b.address.countyId) || String(b.address.countyId)
+          ? this.lookup.getCountyNameById(b.address.countyId) ||
+            String(b.address.countyId)
           : '',
         payamName: b.address?.payam
-          ? this.lookup.getPayamNameById(b.address.payam) || String(b.address.payam)
+          ? this.lookup.getPayamNameById(b.address.payam) ||
+            String(b.address.payam)
           : '',
         bomaName: b.address?.boma
-          ? this.lookup.getBomaNameById(b.address.boma) || String(b.address.boma)
+          ? this.lookup.getBomaNameById(b.address.boma) ||
+            String(b.address.boma)
           : '',
       };
     });
   }
-
 
   // ---------- Data loading ----------
   fetchPage(page: number, size: number) {
@@ -287,7 +345,11 @@ export class BeneficiaryList implements OnInit {
         const data = res?.data;
         if (!data) throw new Error('Empty response');
         if (data.operationResult === false) {
-          this.messageService.add({ severity: 'warn', summary: 'Search', detail: data.errorMsg || 'No beneficiaries found' });
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Search',
+            detail: data.errorMsg || 'No beneficiaries found',
+          });
         }
         const raw: BeneficiaryDto[] = data.beneficiaries || [];
         this.beneficiaries = this.toVm(raw);
@@ -295,7 +357,11 @@ export class BeneficiaryList implements OnInit {
       })
       .catch((err) => {
         console.error('Fetch beneficiaries error:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch beneficiaries' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to fetch beneficiaries',
+        });
       })
       .finally(() => {
         this.isLoading = false;
@@ -357,19 +423,33 @@ export class BeneficiaryList implements OnInit {
             const data = res?.data;
             if (!data) throw new Error('Empty response');
             if (data.operationResult === false) {
-              this.messageService.add({ severity: 'warn', summary: 'Archive Failed', detail: data.errorMsg || 'Failed to archive beneficiary' });
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Archive Failed',
+                detail: data.errorMsg || 'Failed to archive beneficiary',
+              });
             } else {
               // Successfully archived from backend, now update UI
-              this.beneficiaries = this.beneficiaries.filter((x) => x.applicationId !== b.applicationId);
+              this.beneficiaries = this.beneficiaries.filter(
+                (x) => x.applicationId !== b.applicationId
+              );
 
               // Show success message
-              this.messageService.add({ severity: 'success', summary: 'Archived', detail: 'Beneficiary archive request sent successfully' });
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Archived',
+                detail: 'Beneficiary archive request sent successfully',
+              });
               this.cdr.markForCheck();
             }
           })
           .catch((err) => {
             console.error('Archive beneficiary error:', err);
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to archive beneficiary' });
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to archive beneficiary',
+            });
           })
           .finally(() => {
             this.cdr.markForCheck();
@@ -377,7 +457,6 @@ export class BeneficiaryList implements OnInit {
       },
     });
   }
-
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }

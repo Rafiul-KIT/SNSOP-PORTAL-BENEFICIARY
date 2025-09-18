@@ -247,6 +247,9 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',
       icon: 'fas fa-warning',
+      rejectButtonProps: {
+        severity: 'danger',
+      },
       accept: () => {
         this.beneficiaries = this.beneficiaries.filter(
           (b) => b.householdNumber !== beneficiary.householdNumber
