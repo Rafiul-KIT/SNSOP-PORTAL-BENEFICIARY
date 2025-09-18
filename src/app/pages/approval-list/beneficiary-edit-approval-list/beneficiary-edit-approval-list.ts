@@ -110,7 +110,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
       county: [null],
       payam: [null],
       boma: [null],
-      taskType: ['BENEFICIARY_DELETE'],
+      taskType: [null],
       approvalStatus: ['PENDING']
     });
   }
