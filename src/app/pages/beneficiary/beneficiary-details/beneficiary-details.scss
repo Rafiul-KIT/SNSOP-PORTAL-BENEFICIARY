@@ -3,7 +3,7 @@
   /* Adjust 120px if your header/breadcrumb is taller/shorter */
   max-height: calc(100vh - 120px);
   overflow-y: auto;
-  padding-right: 0.5rem; /* optional, keeps content off the scrollbar */
+  // padding-right: 0.5rem; /* optional, keeps content off the scrollbar */
 }
 
 /* Optional: ensure TabView panel itself can scroll if it overflows */

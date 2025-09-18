@@ -248,6 +248,8 @@ export class BeneficiaryEditApprovalList implements OnInit {
   }
 
   approveTask(b: any) {
+    console.log(b);
+    
     if (!b?.id) {
       console.error('Approve clicked, but task id is missing:', b);
       return;
