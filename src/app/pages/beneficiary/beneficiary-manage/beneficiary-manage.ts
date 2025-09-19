@@ -13,6 +13,8 @@ import { ApiService } from '../../../services/api.service';
 import { BeneficiaryDto } from '../../../models/beneficiary';
 import { FloatLabel } from 'primeng/floatlabel';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
+import { FormArray } from '@angular/forms';
+
 
 @Component({
   selector: 'app-beneficiary-manage',
@@ -134,6 +136,8 @@ export class BeneficiaryManage implements OnInit {
       alt2IdType: [''],
       alt2IdNumber: [''],
       alt2Phone: [''],
+
+      nominees: this.fb.array([])
     });
   }
 
@@ -196,11 +200,18 @@ export class BeneficiaryManage implements OnInit {
             alt2Phone: dto.alternatePayee2.payeePhoneNo,
           });
         }
+        if (dto.nominees && Array.isArray(dto.nominees)) {
+          this.nominees.clear(); // reset before patching
+          dto.nominees.forEach((n: any) => {
+            this.nominees.push(this.createNomineeGroup(n));
+          });
+        }
+
       })
       .catch((err) => console.error('Failed to load beneficiary:', err))
       .finally(() => {
-        this.isLoading = false;this.cdr.detectChanges();
-  });
+        this.isLoading = false; this.cdr.detectChanges();
+      });
   }
 
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
@@ -248,6 +259,21 @@ export class BeneficiaryManage implements OnInit {
       payload.alternatePayee2.nationalId = formValue.alt2IdNumber;
       payload.alternatePayee2.payeePhoneNo = formValue.alt2Phone;
     }
+    payload.nominees = this.nominees.value.map((n: any) => ({
+      id: n.id,
+      nomineeFirstName: n.nomineeFirstName,
+      nomineeMiddleName: n.nomineeMiddleName,
+      nomineeLastName: n.nomineeLastName,
+      nomineeNickName: n.nomineeNickName,
+      relationshipWithHouseholdHead: n.relationshipWithHouseholdHead,
+      relationshipOther: n.relationshipOther,
+      nomineeAge: n.nomineeAge,
+      nomineeGender: n.nomineeGender,
+      isReadWrite: n.isReadWrite,
+      nomineeOccupation: n.nomineeOccupation,
+      otherOccupation: n.otherOccupation
+    }));
+
 
     return payload;
   }
@@ -274,4 +300,26 @@ export class BeneficiaryManage implements OnInit {
         alert('Failed to update beneficiary');
       });
   }
+
+  get nominees(): FormArray {
+    return this.beneficiaryForm.get('nominees') as FormArray;
+  }
+
+  private createNomineeGroup(nominee: any = {}): FormGroup {
+    return this.fb.group({
+      id: [nominee.id || null],
+      nomineeFirstName: [nominee.nomineeFirstName || ''],
+      nomineeMiddleName: [nominee.nomineeMiddleName || ''],
+      nomineeLastName: [nominee.nomineeLastName || ''],
+      nomineeNickName: [nominee.nomineeNickName || ''],
+      relationshipWithHouseholdHead: [nominee.relationshipWithHouseholdHead || ''],
+      relationshipOther: [nominee.relationshipOther || ''],
+      nomineeAge: [nominee.nomineeAge || ''],
+      nomineeGender: [nominee.nomineeGender || ''],
+      isReadWrite: [nominee.isReadWrite || false],
+      nomineeOccupation: [nominee.nomineeOccupation || ''],
+      otherOccupation: [nominee.otherOccupation || '']
+    });
+  }
+
 }
