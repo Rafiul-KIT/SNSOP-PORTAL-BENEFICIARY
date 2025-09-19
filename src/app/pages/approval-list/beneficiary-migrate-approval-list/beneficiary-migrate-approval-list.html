@@ -118,7 +118,7 @@
   [value]="paginatedBeneficiaries"
   [scrollable]="true"
   scrollHeight="55vh"
-  [tableStyle]="{ 'min-width': '100%' }"
+  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
 >
   <ng-template pTemplate="header">
     <tr>
@@ -131,7 +131,7 @@
       <th>County</th>
       <th>Payam</th>
       <th>Boma</th>
-      <th class="text-center">Action</th>
+      <th class="text-center" [style]="{ width: '185px' }">Action</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-b>

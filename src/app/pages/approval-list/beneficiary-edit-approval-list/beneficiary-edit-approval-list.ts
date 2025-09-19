@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -86,7 +86,8 @@ export class BeneficiaryEditApprovalList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -110,8 +111,8 @@ export class BeneficiaryEditApprovalList implements OnInit {
       county: [null],
       payam: [null],
       boma: [null],
-      taskType: ['BENEFICIARY_DELETE'],
-      approvalStatus: ['PENDING']
+      taskType: [null],
+      approvalStatus: ['PENDING'],
     });
   }
 
@@ -163,6 +164,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
       })
       .finally(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       });
   }
 
@@ -245,8 +247,9 @@ export class BeneficiaryEditApprovalList implements OnInit {
       .join(' ');
   }
 
-
   approveTask(b: any) {
+    console.log(b);
+    
     if (!b?.id) {
       console.error('Approve clicked, but task id is missing:', b);
       return;
@@ -255,11 +258,14 @@ export class BeneficiaryEditApprovalList implements OnInit {
     this.confirmationService.confirm({
       message: `Are you sure you want to approve task #${b.id}?`,
       header: 'Confirm Approval',
-      icon: 'fas fa-check',
+      icon: 'fas fa-check-circle',
+      rejectButtonProps: {
+        severity: 'danger',
+      },
       accept: () => {
         const payload = {
           approvalTaskId: b.id,
-          approved: true
+          approved: true,
         };
 
         this.apiService
@@ -268,7 +274,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Approved',
-              detail: `Task #${b.id} approved successfully.`
+              detail: `Task #${b.id} approved successfully.`,
             });
             this.loadBeneficiaries();
           })
@@ -277,10 +283,10 @@ export class BeneficiaryEditApprovalList implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Failed to approve task'
+              detail: 'Failed to approve task',
             });
           });
-      }
+      },
     });
   }
 
@@ -294,10 +300,13 @@ export class BeneficiaryEditApprovalList implements OnInit {
       message: `Are you sure you want to reject task #${b.id}?`,
       header: 'Confirm Rejection',
       icon: 'fas fa-ban',
+      rejectButtonProps: {
+        severity: 'danger',
+      },
       accept: () => {
         const payload = {
           approvalTaskId: b.id,
-          approved: false
+          approved: false,
         };
 
         this.apiService
@@ -306,7 +315,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
             this.messageService.add({
               severity: 'warn',
               summary: 'Rejected',
-              detail: `Task #${b.id} rejected successfully.`
+              detail: `Task #${b.id} rejected successfully.`,
             });
             this.loadBeneficiaries();
           })
@@ -315,13 +324,12 @@ export class BeneficiaryEditApprovalList implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Failed to reject task'
+              detail: 'Failed to reject task',
             });
           });
-      }
+      },
     });
   }
-
 
   viewTask(b: any) {
     if (!b?.id) {
@@ -330,8 +338,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     }
 
     this.router.navigate(['/beneficiary/details', String(b.id)], {
-      queryParams: { taskMode: true }
+      queryParams: { taskMode: true },
     });
   }
-
 }

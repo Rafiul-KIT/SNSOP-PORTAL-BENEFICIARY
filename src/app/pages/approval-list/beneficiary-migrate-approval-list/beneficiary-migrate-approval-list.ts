@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -84,7 +84,8 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -182,6 +183,7 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
       },
     ];
     this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
   get paginatedBeneficiaries(): Beneficiary[] {
@@ -245,6 +247,9 @@ export class BeneficiaryMigrateApprovalList implements OnInit {
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
       header: 'Confirm',
       icon: 'fas fa-warning',
+      rejectButtonProps: {
+        severity: 'danger',
+      },
       accept: () => {
         this.beneficiaries = this.beneficiaries.filter(
           (b) => b.householdNumber !== beneficiary.householdNumber

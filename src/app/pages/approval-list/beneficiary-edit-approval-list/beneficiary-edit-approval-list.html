@@ -118,7 +118,7 @@
   [value]="paginatedBeneficiaries"
   [scrollable]="true"
   [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
-  [tableStyle]="{ 'min-width': '100%' }"
+  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
 >
   <ng-template pTemplate="header">
     <tr>
@@ -126,7 +126,7 @@
       <th>Status</th>
       <th>Approvar Role</th>
       <th>Task Type</th>
-      <th class="text-center">Action</th>
+      <th class="text-center" [style]="{ width: '185px' }">Action</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-b>
@@ -138,6 +138,18 @@
       <td class="text-center">
         <p-button
           type="button"
+          icon="fas fa-eye"
+          pTooltip="View"
+          tooltipPosition="top"
+          appendTo="body"
+          size="small"
+          outlined="true"
+          severity="info"
+          (onClick)="viewTask(b)"
+          class="me-2"
+        />
+        <p-button
+          type="button"
           icon="fas fa-check"
           pTooltip="Approve"
           tooltipPosition="top"
@@ -146,8 +158,8 @@
           outlined="true"
           severity="primary"
           (onClick)="approveTask(b)"
+          class="me-2"
         />
-        &nbsp;
         <p-button
           type="button"
           icon="fas fa-ban"
@@ -158,18 +170,6 @@
           outlined="true"
           severity="danger"
           (onClick)="rejectTask(b)"
-        />
-        &nbsp;
-        <p-button
-          type="button"
-          icon="fas fa-eye"
-          pTooltip="View"
-          tooltipPosition="top"
-          appendTo="body"
-          size="small"
-          outlined="true"
-          severity="info"
-          (onClick)="viewTask(b)"
         />
       </td>
     </tr>

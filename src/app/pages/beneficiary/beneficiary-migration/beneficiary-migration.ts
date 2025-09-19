@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
 
-import { BeneficiaryDto} from '../../../models/beneficiary'
+import { BeneficiaryDto } from '../../../models/beneficiary';
 
 @Component({
   selector: 'app-beneficiary-migration',
@@ -31,9 +31,8 @@ import { BeneficiaryDto} from '../../../models/beneficiary'
   styleUrl: './beneficiary-migration.scss',
 })
 export class BeneficiaryMigration implements OnInit {
-  isSubmitting = false;
-  isLoading = false;
-
+  isSubmitting: boolean = false;
+  isLoading: boolean = true;
   items = [
     {
       label: 'Beneficiary List',
@@ -43,7 +42,6 @@ export class BeneficiaryMigration implements OnInit {
     { label: 'Migrate Beneficiary', icon: 'fas fa-user-plus me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
-
   beneficiaryForm!: FormGroup;
   beneficiaryDetails!: BeneficiaryDto;
   beneficiaryPhoto = '/images/dummyHuman.jpg';
@@ -58,15 +56,13 @@ export class BeneficiaryMigration implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private api: ApiService,
-    private lookup: LookupService
+    private lookup: LookupService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('bid'); // applicationId from route
     if (!id) return;
-
-    this.isLoading = true;
-
     this.beneficiaryForm = this.fb.group({
       state: [''],
       county: [''],
@@ -76,9 +72,7 @@ export class BeneficiaryMigration implements OnInit {
       gpsLong: [''],
       approvalComment: [''],
     });
-
     this.setupLocationListeners();
-
     // step 1: load states first
     this.lookup.getOrFetchStateList().then((states) => {
       this.stateList = states;
@@ -87,93 +81,129 @@ export class BeneficiaryMigration implements OnInit {
     });
   }
 
-
   private setupLocationListeners() {
-    this.beneficiaryForm.get('state')?.valueChanges.subscribe((stateId: string) => {
-      if (stateId) {
-        this.lookup.getCountyListByStateId(stateId).then((list) => {
-          this.countyList = list;
-          this.beneficiaryForm.patchValue({ county: null, payam: null, boma: null }, { emitEvent: false });
+    this.beneficiaryForm
+      .get('state')
+      ?.valueChanges.subscribe((stateId: string) => {
+        if (stateId) {
+          this.lookup.getCountyListByStateId(stateId).then((list) => {
+            this.countyList = list;
+            this.beneficiaryForm.patchValue(
+              { county: null, payam: null, boma: null },
+              { emitEvent: false }
+            );
+            this.payamList = [];
+            this.bomaList = [];
+          });
+        } else {
+          this.countyList = [];
           this.payamList = [];
           this.bomaList = [];
-        });
-      } else {
-        this.countyList = [];
-        this.payamList = [];
-        this.bomaList = [];
-      }
-    });
+        }
+      });
 
-    this.beneficiaryForm.get('county')?.valueChanges.subscribe((countyId: string) => {
-      if (countyId) {
-        this.lookup.getPayamListByCountyId(countyId).then((list) => {
-          this.payamList = list;
-          this.beneficiaryForm.patchValue({ payam: null, boma: null }, { emitEvent: false });
+    this.beneficiaryForm
+      .get('county')
+      ?.valueChanges.subscribe((countyId: string) => {
+        if (countyId) {
+          this.lookup.getPayamListByCountyId(countyId).then((list) => {
+            this.payamList = list;
+            this.beneficiaryForm.patchValue(
+              { payam: null, boma: null },
+              { emitEvent: false }
+            );
+            this.bomaList = [];
+          });
+        } else {
+          this.payamList = [];
           this.bomaList = [];
-        });
-      } else {
-        this.payamList = [];
-        this.bomaList = [];
-      }
-    });
+        }
+      });
 
-    this.beneficiaryForm.get('payam')?.valueChanges.subscribe((payamId: string) => {
-      if (payamId) {
-        this.lookup.getBomaListByPayamId(payamId).then((list) => {
-          this.bomaList = list;
-          this.beneficiaryForm.patchValue({ boma: null }, { emitEvent: false });
-        });
-      } else {
-        this.bomaList = [];
-      }
-    });
+    this.beneficiaryForm
+      .get('payam')
+      ?.valueChanges.subscribe((payamId: string) => {
+        if (payamId) {
+          this.lookup.getBomaListByPayamId(payamId).then((list) => {
+            this.bomaList = list;
+            this.beneficiaryForm.patchValue(
+              { boma: null },
+              { emitEvent: false }
+            );
+          });
+        } else {
+          this.bomaList = [];
+        }
+      });
   }
-
-
 
   async fetchBeneficiaryDetails(applicationId: string) {
     try {
-      const res = await this.api.GET(`api/beneficiary/details/${applicationId}`);
+      const res = await this.api.GET(
+        `api/beneficiary/details/${applicationId}`
+      );
       const dto = res?.data as BeneficiaryDto;
       this.beneficiaryDetails = dto;
 
       if (dto.biometric?.photoData) {
-        this.beneficiaryPhoto = 'data:image/png;base64,' + dto.biometric.photoData;
+        this.beneficiaryPhoto =
+          'data:image/png;base64,' + dto.biometric.photoData;
       }
 
       if (dto.address) {
-        this.beneficiaryForm.patchValue({
-          gpsLat: dto.address.location?.lat ?? '',
-          gpsLong: dto.address.location?.lon ?? ''
-        }, { emitEvent: false });
+        this.beneficiaryForm.patchValue(
+          {
+            gpsLat: dto.address.location?.lat ?? '',
+            gpsLong: dto.address.location?.lon ?? '',
+          },
+          { emitEvent: false }
+        );
 
         // ✅ cast to string so it matches lookup.id
         if (dto.address.stateId != null) {
-          this.beneficiaryForm.patchValue({ state: String(dto.address.stateId) }, { emitEvent: false });
-          this.countyList = await this.lookup.getCountyListByStateId(String(dto.address.stateId));
+          this.beneficiaryForm.patchValue(
+            { state: String(dto.address.stateId) },
+            { emitEvent: false }
+          );
+          this.countyList = await this.lookup.getCountyListByStateId(
+            String(dto.address.stateId)
+          );
         }
 
         if (dto.address.countyId != null) {
-          this.beneficiaryForm.patchValue({ county: String(dto.address.countyId) }, { emitEvent: false });
-          this.payamList = await this.lookup.getPayamListByCountyId(String(dto.address.countyId));
+          this.beneficiaryForm.patchValue(
+            { county: String(dto.address.countyId) },
+            { emitEvent: false }
+          );
+          this.payamList = await this.lookup.getPayamListByCountyId(
+            String(dto.address.countyId)
+          );
         }
 
         if (dto.address.payam != null) {
-          this.beneficiaryForm.patchValue({ payam: String(dto.address.payam) }, { emitEvent: false });
-          this.bomaList = await this.lookup.getBomaListByPayamId(String(dto.address.payam));
+          this.beneficiaryForm.patchValue(
+            { payam: String(dto.address.payam) },
+            { emitEvent: false }
+          );
+          this.bomaList = await this.lookup.getBomaListByPayamId(
+            String(dto.address.payam)
+          );
         }
 
         if (dto.address.boma) {
-          this.beneficiaryForm.patchValue({ boma: dto.address.boma }, { emitEvent: false });
+          this.beneficiaryForm.patchValue(
+            { boma: dto.address.boma },
+            { emitEvent: false }
+          );
         }
       }
     } catch (err) {
       console.error('Error fetching beneficiary details:', err);
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
-
 
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
     const updatedGeo = formValue;
@@ -203,7 +233,7 @@ export class BeneficiaryMigration implements OnInit {
     const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
 
     const payload = {
-      beneficiaries: [beneficiary]
+      beneficiaries: [beneficiary],
     };
 
     this.isSubmitting = true;
