@@ -2,32 +2,35 @@
 <app-loader />
 }@else{
 <div class="breadcrumb-wrapper">
-  <p-breadcrumb
-    [model]="breadcrumbItems"
-    [home]="breadcrumbHome"
-    class="w-100"
-  />
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100" />
 </div>
 
 <div class="card p-3 mb-2">
   <form [formGroup]="searchForm" class="row g-3">
     <div class="col-md-3">
-      <p-floatlabel variant="on">
-        <input
-          pInputText
-          class="form-control"
-          formControlName="householdNumber"
-        />
-        <label>Household Number</label>
+      <p-floatlabel variant="on" class="w-100">
+        <p-select formControlName="approvalStatus" [options]="[
+        { label: 'Pending', value: 'PENDING' },
+        { label: 'Approved', value: 'APPROVED' },
+        { label: 'Rejected', value: 'REJECTED' }
+      ]" optionLabel="label" optionValue="value" class="w-100">
+        </p-select>
+        <label>Approval Status</label>
       </p-floatlabel>
     </div>
+
     <div class="col-md-3">
-      <p-floatlabel variant="on">
-        <input pInputText class="form-control" formControlName="firstName" />
-        <label>First Name</label>
+      <p-floatlabel variant="on" class="w-100">
+        <p-select formControlName="taskType" [options]="[
+        { label: 'Edit', value: 'BENEFICIARY_EDIT' },
+        { label: 'Delete', value: 'BENEFICIARY_DELETE' }
+      ]" optionLabel="label" optionValue="value" class="w-100">
+        </p-select>
+        <label>Task Type</label>
       </p-floatlabel>
     </div>
-    @if(advanceSearchPanelVisible){
+
+    <!-- @if(advanceSearchPanelVisible){
     <div class="col-md-3">
       <p-floatlabel variant="on">
         <input pInputText class="form-control" formControlName="middleName" />
@@ -50,31 +53,19 @@
     @if(advanceSearchPanelVisible){
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="states"
-          optionLabel="name"
-          formControlName="state"
-        />
+        <p-select [options]="states" optionLabel="name" formControlName="state" />
         <label>State</label>
       </p-floatlabel>
     </div>
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="counties"
-          optionLabel="name"
-          formControlName="county"
-        />
+        <p-select [options]="counties" optionLabel="name" formControlName="county" />
         <label>County</label>
       </p-floatlabel>
     </div>
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="payams"
-          optionLabel="name"
-          formControlName="payam"
-        />
+        <p-select [options]="payams" optionLabel="name" formControlName="payam" />
         <label>Payam</label>
       </p-floatlabel>
     </div>
@@ -84,42 +75,21 @@
         <label>Boma</label>
       </p-floatlabel>
     </div>
-    }
+    } -->
     <div class="col-12 text-end">
-      <p-button
-        [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'"
-        icon="fas fa-filter"
-        severity="warn"
-        class="me-2"
-        size="small"
-        outlined="true"
-        (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"
-      ></p-button>
-      <p-button
-        label="Reset"
-        icon="fas fa-refresh"
-        severity="danger"
-        class="me-2"
-        size="small"
-        (onClick)="resetForm()"
-        outlined="true"
-      ></p-button>
-      <p-button
-        label="Search"
-        icon="fas fa-search"
-        severity="primary"
-        size="small"
-        (onClick)="searchBeneficiaries()"
-      ></p-button>
+      <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small" (onClick)="resetForm()"
+        outlined="true">
+      </p-button>
+
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small" (onClick)="searchBeneficiaries()">
+      </p-button>
     </div>
+
   </form>
 </div>
-<p-table
-  [value]="paginatedBeneficiaries"
-  [scrollable]="true"
+<p-table [value]="paginatedBeneficiaries" [scrollable]="true"
   [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
-  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
->
+  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }">
   <ng-template pTemplate="header">
     <tr>
       <th>ID</th>
@@ -136,19 +106,9 @@
       <td>{{ b.approverRole }}</td>
       <td>{{ b.taskType }}</td>
       <td class="text-center">
-        <p-button
-          type="button"
-          icon="fas fa-eye"
-          pTooltip="View"
-          tooltipPosition="top"
-          appendTo="body"
-          size="small"
-          outlined="true"
-          severity="info"
-          (onClick)="viewTask(b)"
-          class="me-2"
-        />
-        <p-button
+        <p-button type="button" icon="fas fa-eye" pTooltip="View" tooltipPosition="top" appendTo="body" size="small"
+          outlined="true" severity="info" (onClick)="viewTask(b)" class="me-2" />
+        <!-- <p-button
           type="button"
           icon="fas fa-check"
           pTooltip="Approve"
@@ -170,7 +130,7 @@
           outlined="true"
           severity="danger"
           (onClick)="rejectTask(b)"
-        />
+        /> -->
       </td>
     </tr>
   </ng-template>
@@ -183,15 +143,9 @@
   </ng-template>
 </p-table>
 
-<p-paginator
-  class="paginator-sticky"
-  [rows]="pageSize"
-  [totalRecords]="beneficiaries.length"
-  [rowsPerPageOptions]="[10, 25, 50]"
-  (onPageChange)="onPageChange($event)"
-  [appendTo]="'body'"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-></p-paginator>
+<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="beneficiaries.length"
+  [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [appendTo]="'body'"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"></p-paginator>
 }
 <p-toast position="bottom-right" />
 <p-confirmDialog [style]="{ width: '450px' }" />
