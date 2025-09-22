@@ -3,7 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.development';
 
 @Component({
   selector: 'app-header',
@@ -50,6 +50,12 @@ export class Header {
       //   routerLink: 'beneficiary/registration',
       //   routerLinkActiveOptions: 'active',
       // },
+      {
+        label: 'Dashboard',
+        icon: 'fas fa-dashboard',
+        routerLink: '/dashboard',
+        routerLinkActiveOptions: 'active',
+      },
       {
         label: 'Beneficiary List',
         icon: 'fas fa-list',

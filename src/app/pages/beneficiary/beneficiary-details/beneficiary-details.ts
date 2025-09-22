@@ -17,6 +17,8 @@ import {
   BiometricDto,
   AlternatePayeeDto,
   NomineeDto,
+  MobileMoneyProvider,
+  RelationshipWithHead,
 } from '../../../models/beneficiary';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -32,18 +34,38 @@ export interface FingerVm {
 interface BeneficiaryVm {
   applicationId: string;
   name: string;
+  spouseName: string;
   age: number;
   gender: string;
+  relationshipWithHouseholdHead: string;
+  respondentMaritalStatus: string;
+  respondentLegalStatus: string;
+  respondentId: string;
   phone: string;
+  documentType: string;
+  mobileMoneyProvider?: MobileMoneyProvider;
+  mobileWalletNumber?: string;
+  registrationPhase: string;
+
 
   photo?: string;
   household: any;
   address: any;
 
+  householdSize: number;
+  householdMember2: any;
+  householdMember5: any;
+  householdMember17: any;
+  householdMember35: any;
+  householdMember64: any;
+  householdMember65: any;
+
   alternates: {
     name: string;
     age: number;
     gender: string;
+    relationshipWithHouseholdHead: RelationshipWithHead;
+    relationshipOther?: string;
     nationalId: string;
     phone: string;
     documentType: string;
@@ -58,6 +80,7 @@ interface BeneficiaryVm {
     age: number;
     gender: string;
     relation: string;
+    relationshipOther?: string;
     photo?: string;
   }[];
 
@@ -109,7 +132,7 @@ export class BeneficiaryDetails implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private cdr: ChangeDetectorRef,
-    private lookup: LookupService,
+    public lookup: LookupService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
@@ -288,8 +311,24 @@ export class BeneficiaryDetails implements OnInit {
       ]
         .filter(Boolean)
         .join(' '),
+
+      spouseName: [ dto.spouseFirstName,
+        dto.spouseMiddleName,
+        dto.spouseLastName,
+      ]
+        .filter(Boolean)
+        .join(' '),
       age: dto.respondentAge,
       gender: dto.respondentGender,
+      relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      respondentMaritalStatus: dto.respondentMaritalStatus,
+      respondentLegalStatus: dto.respondentLegalStatus,
+      respondentId: dto.respondentId,
+      documentType: dto.documentType,
+      mobileMoneyProvider: dto.mobileMoneyProvider,
+      mobileWalletNumber: dto.mobileWalletNumber,
+      registrationPhase: dto.registrationPhase,
+
       phone: dto.respondentPhoneNo,
       photo: normalizePhoto(dto.biometric?.photoData),
 
@@ -303,13 +342,14 @@ export class BeneficiaryDetails implements OnInit {
         size: dto.householdSize,
         isReadWrite: dto.isReadWrite,
         memberReadWrite: dto.memberReadWrite,
-        group2: dto.householdMember2,
-        group5: dto.householdMember5,
-        group17: dto.householdMember17,
-        group35: dto.householdMember35,
-        group64: dto.householdMember64,
-        group65: dto.householdMember65,
       },
+      householdSize: dto.householdSize ?? 0,
+      householdMember2: dto.householdMember2,
+      householdMember5: dto.householdMember5,
+      householdMember17: dto.householdMember17,
+      householdMember35: dto.householdMember35,
+      householdMember64: dto.householdMember64,
+      householdMember65: dto.householdMember65,
 
       address: {
         state:
@@ -337,6 +377,8 @@ export class BeneficiaryDetails implements OnInit {
           name: `${alt.payeeFirstName ?? ''} ${alt.payeeLastName ?? ''}`.trim(),
           age: alt.payeeAge ?? 0,
           gender: alt.payeeGender,
+          relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
+          relationshipOther: alt.relationshipOther,
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
@@ -407,6 +449,7 @@ export class BeneficiaryDetails implements OnInit {
         age: n.nomineeAge,
         gender: n.nomineeGender,
         relation: n.relationshipWithHouseholdHead,
+        relationshipOther: n.relationshipOther,
         photo: normalizeFinger(n.biometric?.photoData),
       })),
 

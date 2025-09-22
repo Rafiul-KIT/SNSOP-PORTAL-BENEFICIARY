@@ -121,7 +121,12 @@ export class BeneficiaryEditApprovalList implements OnInit {
   loadBeneficiaries() {
     this.isLoading = true;
 
-    const payload = this.searchForm.value;
+    const payload = {
+      ...this.searchForm.value,
+      approvalStatus: this.searchForm.value.approvalStatus ?? 'PENDING',
+      page: this.currentPage,
+      size: this.pageSize,
+    };
     this.apiService
       .POST('/api/approval/taskList', payload)
       .then((res: any) => {

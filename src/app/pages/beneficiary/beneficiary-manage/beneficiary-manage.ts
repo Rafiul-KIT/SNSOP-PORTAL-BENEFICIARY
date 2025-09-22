@@ -46,13 +46,15 @@ export class BeneficiaryManage implements OnInit {
   occupationOptions: any[] = [];
 
   ageGroups = [
-    { label: '0-2 yrs', maleNormal: 'mn0_2', maleDisability: 'md0_2', maleChronic: 'mc0_2', femaleNormal: 'fn0_2', femaleDisability: 'fd0_2', femaleChronic: 'fc0_2' },
-    { label: '3-5 yrs', maleNormal: 'mn3_5', maleDisability: 'md3_5', maleChronic: 'mc3_5', femaleNormal: 'fn3_5', femaleDisability: 'fd3_5', femaleChronic: 'fc3_5' },
-    { label: '6-17 yrs', maleNormal: 'mn6_17', maleDisability: 'md6_17', maleChronic: 'mc6_17', femaleNormal: 'fn6_17', femaleDisability: 'fd6_17', femaleChronic: 'fc6_17' },
-    { label: '18-35 yrs', maleNormal: 'mn18_35', maleDisability: 'md18_35', maleChronic: 'mc18_35', femaleNormal: 'fn18_35', femaleDisability: 'fd18_35', femaleChronic: 'fc18_35' },
-    { label: '36-64 yrs', maleNormal: 'mn36_64', maleDisability: 'md36_64', maleChronic: 'mc36_64', femaleNormal: 'fn36_64', femaleDisability: 'fd36_64', femaleChronic: 'fc36_64' },
-    { label: '65 yrs and Above', maleNormal: 'mn65', maleDisability: 'md65', maleChronic: 'mc65', femaleNormal: 'fn65', femaleDisability: 'fd65', femaleChronic: 'fc65' },
+    { label: '0-2 yrs', maleTotal: 'm0_2_total', maleDisable: 'm0_2_disable', maleChronicalIll: 'm0_2_chronic', maleBoth: 'm0_2_both', femaleTotal: 'f0_2_total', femaleDisable: 'f0_2_disable', femaleChronicalIll: 'f0_2_chronic', femaleBoth: 'f0_2_both' },
+    { label: '3-5 yrs', maleTotal: 'm3_5_total', maleDisable: 'm3_5_disable', maleChronicalIll: 'm3_5_chronic', maleBoth: 'm3_5_both', femaleTotal: 'f3_5_total', femaleDisable: 'f3_5_disable', femaleChronicalIll: 'f3_5_chronic', femaleBoth: 'f3_5_both' },
+    { label: '6-17 yrs', maleTotal: 'm6_17_total', maleDisable: 'm6_17_disable', maleChronicalIll: 'm6_17_chronic', maleBoth: 'm6_17_both', femaleTotal: 'f6_17_total', femaleDisable: 'f6_17_disable', femaleChronicalIll: 'f6_17_chronic', femaleBoth: 'f6_17_both' },
+    { label: '18-35 yrs', maleTotal: 'm18_35_total', maleDisable: 'm18_35_disable', maleChronicalIll: 'm18_35_chronic', maleBoth: 'm18_35_both', femaleTotal: 'f18_35_total', femaleDisable: 'f18_35_disable', femaleChronicalIll: 'f18_35_chronic', femaleBoth: 'f18_35_both' },
+    { label: '36-64 yrs', maleTotal: 'm36_64_total', maleDisable: 'm36_64_disable', maleChronicalIll: 'm36_64_chronic', maleBoth: 'm36_64_both', femaleTotal: 'f36_64_total', femaleDisable: 'f36_64_disable', femaleChronicalIll: 'f36_64_chronic', femaleBoth: 'f36_64_both' },
+    { label: '65+ yrs', maleTotal: 'm65_total', maleDisable: 'm65_disable', maleChronicalIll: 'm65_chronic', maleBoth: 'm65_both', femaleTotal: 'f65_total', femaleDisable: 'f65_disable', femaleChronicalIll: 'f65_chronic', femaleBoth: 'f65_both' },
   ];
+
+
 
   items = [
     { label: 'Beneficiary List', icon: 'fas fa-users me-2', routerLink: '/beneficiary/list' },
@@ -77,13 +79,15 @@ export class BeneficiaryManage implements OnInit {
     this.idTypeOptions = this.lookup.getDocumentTypeEnum();
     this.occupationOptions = this.lookup.getOccupationEnum();
 
-    this.ageGroups.forEach((group) => {
-      this.beneficiaryForm.addControl(group.maleNormal, this.fb.control(''));
-      this.beneficiaryForm.addControl(group.maleDisability, this.fb.control(''));
-      this.beneficiaryForm.addControl(group.maleChronic, this.fb.control(''));
-      this.beneficiaryForm.addControl(group.femaleNormal, this.fb.control(''));
-      this.beneficiaryForm.addControl(group.femaleDisability, this.fb.control(''));
-      this.beneficiaryForm.addControl(group.femaleChronic, this.fb.control(''));
+    this.ageGroups.forEach(group => {
+      this.beneficiaryForm.addControl(group.maleTotal, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.maleDisable, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.maleChronicalIll, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.maleBoth, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.femaleTotal, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.femaleDisable, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.femaleChronicalIll, this.fb.control(''));
+      this.beneficiaryForm.addControl(group.femaleBoth, this.fb.control(''));
     });
 
     const applicationId = this.route.snapshot.paramMap.get('applicationId');
@@ -177,6 +181,81 @@ export class BeneficiaryManage implements OnInit {
           householdSize: dto.householdSize,
         });
 
+        // ✅ Patch household member age group data
+        if (dto.householdMember2) {
+          this.beneficiaryForm.patchValue({
+            m0_2_total: dto.householdMember2.maleTotal,
+            m0_2_disable: dto.householdMember2.maleDisable,
+            m0_2_chronic: dto.householdMember2.maleChronicalIll,
+            m0_2_both: dto.householdMember2.maleBoth,
+            f0_2_total: dto.householdMember2.femaleTotal,
+            f0_2_disable: dto.householdMember2.femaleDisable,
+            f0_2_chronic: dto.householdMember2.femaleChronicalIll,
+            f0_2_both: dto.householdMember2.femaleBoth,
+          });
+        }
+        if (dto.householdMember5) {
+          this.beneficiaryForm.patchValue({
+            m3_5_total: dto.householdMember5.maleTotal,
+            m3_5_disable: dto.householdMember5.maleDisable,
+            m3_5_chronic: dto.householdMember5.maleChronicalIll,
+            m3_5_both: dto.householdMember5.maleBoth,
+            f3_5_total: dto.householdMember5.femaleTotal,
+            f3_5_disable: dto.householdMember5.femaleDisable,
+            f3_5_chronic: dto.householdMember5.femaleChronicalIll,
+            f3_5_both: dto.householdMember5.femaleBoth,
+          });
+        }
+        if (dto.householdMember17) {
+          this.beneficiaryForm.patchValue({
+            m6_17_total: dto.householdMember17.maleTotal,
+            m6_17_disable: dto.householdMember17.maleDisable,
+            m6_17_chronic: dto.householdMember17.maleChronicalIll,
+            m6_17_both: dto.householdMember17.maleBoth,
+            f6_17_total: dto.householdMember17.femaleTotal,
+            f6_17_disable: dto.householdMember17.femaleDisable,
+            f6_17_chronic: dto.householdMember17.femaleChronicalIll,
+            f6_17_both: dto.householdMember17.femaleBoth,
+          });
+        }
+        if (dto.householdMember35) {
+          this.beneficiaryForm.patchValue({
+            m18_35_total: dto.householdMember35.maleTotal,
+            m18_35_disable: dto.householdMember35.maleDisable,
+            m18_35_chronic: dto.householdMember35.maleChronicalIll,
+            m18_35_both: dto.householdMember35.maleBoth,
+            f18_35_total: dto.householdMember35.femaleTotal,
+            f18_35_disable: dto.householdMember35.femaleDisable,
+            f18_35_chronic: dto.householdMember35.femaleChronicalIll,
+            f18_35_both: dto.householdMember35.femaleBoth,
+          });
+        }
+        if (dto.householdMember64) {
+          this.beneficiaryForm.patchValue({
+            m36_64_total: dto.householdMember64.maleTotal,
+            m36_64_disable: dto.householdMember64.maleDisable,
+            m36_64_chronic: dto.householdMember64.maleChronicalIll,
+            m36_64_both: dto.householdMember64.maleBoth,
+            f36_64_total: dto.householdMember64.femaleTotal,
+            f36_64_disable: dto.householdMember64.femaleDisable,
+            f36_64_chronic: dto.householdMember64.femaleChronicalIll,
+            f36_64_both: dto.householdMember64.femaleBoth,
+          });
+        }
+        if (dto.householdMember65) {
+          this.beneficiaryForm.patchValue({
+            m65_total: dto.householdMember65.maleTotal,
+            m65_disable: dto.householdMember65.maleDisable,
+            m65_chronic: dto.householdMember65.maleChronicalIll,
+            m65_both: dto.householdMember65.maleBoth,
+            f65_total: dto.householdMember65.femaleTotal,
+            f65_disable: dto.householdMember65.femaleDisable,
+            f65_chronic: dto.householdMember65.femaleChronicalIll,
+            f65_both: dto.householdMember65.femaleBoth,
+          });
+        }
+
+
         // ✅ Patch alternates
         if (dto.alternatePayee1) {
           this.beneficiaryForm.patchValue({
@@ -214,9 +293,11 @@ export class BeneficiaryManage implements OnInit {
       });
   }
 
+
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
     const payload: BeneficiaryDto = JSON.parse(JSON.stringify(this.originalDto));
 
+    // ✅ Personal info
     payload.respondentFirstName = formValue.respondentFirstName;
     payload.respondentMiddleName = formValue.respondentMiddleName;
     payload.respondentLastName = formValue.respondentLastName;
@@ -240,9 +321,97 @@ export class BeneficiaryManage implements OnInit {
     payload.memberReadWrite = formValue.literate1835Count;
     payload.householdSize = formValue.householdSize;
 
+    // ✅ Household Member Groups
+    if (payload.householdMember2) {
+      payload.householdMember2 = {
+        ...payload.householdMember2,
+        maleTotal: formValue.m0_2_total,
+        maleDisable: formValue.m0_2_disable,
+        maleChronicalIll: formValue.m0_2_chronic,
+        maleBoth: formValue.m0_2_both,
+        femaleTotal: formValue.f0_2_total,
+        femaleDisable: formValue.f0_2_disable,
+        femaleChronicalIll: formValue.f0_2_chronic,
+        femaleBoth: formValue.f0_2_both,
+      };
+    }
+
+    if (payload.householdMember5) {
+      payload.householdMember5 = {
+        ...payload.householdMember5,
+        maleTotal: formValue.m3_5_total,
+        maleDisable: formValue.m3_5_disable,
+        maleChronicalIll: formValue.m3_5_chronic,
+        maleBoth: formValue.m3_5_both,
+        femaleTotal: formValue.f3_5_total,
+        femaleDisable: formValue.f3_5_disable,
+        femaleChronicalIll: formValue.f3_5_chronic,
+        femaleBoth: formValue.f3_5_both,
+      };
+    }
+
+    if (payload.householdMember17) {
+      payload.householdMember17 = {
+        ...payload.householdMember17,
+        maleTotal: formValue.m6_17_total,
+        maleDisable: formValue.m6_17_disable,
+        maleChronicalIll: formValue.m6_17_chronic,
+        maleBoth: formValue.m6_17_both,
+        femaleTotal: formValue.f6_17_total,
+        femaleDisable: formValue.f6_17_disable,
+        femaleChronicalIll: formValue.f6_17_chronic,
+        femaleBoth: formValue.f6_17_both,
+      };
+    }
+
+    if (payload.householdMember35) {
+      payload.householdMember35 = {
+        ...payload.householdMember35,
+        maleTotal: formValue.m18_35_total,
+        maleDisable: formValue.m18_35_disable,
+        maleChronicalIll: formValue.m18_35_chronic,
+        maleBoth: formValue.m18_35_both,
+        femaleTotal: formValue.f18_35_total,
+        femaleDisable: formValue.f18_35_disable,
+        femaleChronicalIll: formValue.f18_35_chronic,
+        femaleBoth: formValue.f18_35_both,
+      };
+    }
+
+    if (payload.householdMember64) {
+      payload.householdMember64 = {
+        ...payload.householdMember64,
+        maleTotal: formValue.m36_64_total,
+        maleDisable: formValue.m36_64_disable,
+        maleChronicalIll: formValue.m36_64_chronic,
+        maleBoth: formValue.m36_64_both,
+        femaleTotal: formValue.f36_64_total,
+        femaleDisable: formValue.f36_64_disable,
+        femaleChronicalIll: formValue.f36_64_chronic,
+        femaleBoth: formValue.f36_64_both,
+      };
+    }
+
+    if (payload.householdMember65) {
+      payload.householdMember65 = {
+        ...payload.householdMember65,
+        maleTotal: formValue.m65_total,
+        maleDisable: formValue.m65_disable,
+        maleChronicalIll: formValue.m65_chronic,
+        maleBoth: formValue.m65_both,
+        femaleTotal: formValue.f65_total,
+        femaleDisable: formValue.f65_disable,
+        femaleChronicalIll: formValue.f65_chronic,
+        femaleBoth: formValue.f65_both,
+      };
+    }
+
+    // ✅ Alternates
     if (payload.alternatePayee1) {
-      payload.alternatePayee1.payeeFirstName = formValue.alt1Name?.split(' ')[0] || '';
-      payload.alternatePayee1.payeeLastName = formValue.alt1Name?.split(' ')[1] || '';
+      payload.alternatePayee1.payeeFirstName =
+        formValue.alt1Name?.split(' ')[0] || '';
+      payload.alternatePayee1.payeeLastName =
+        formValue.alt1Name?.split(' ')[1] || '';
       payload.alternatePayee1.payeeGender = formValue.alt1Gender;
       payload.alternatePayee1.payeeAge = formValue.alt1Age;
       payload.alternatePayee1.documentType = formValue.alt1IdType;
@@ -251,14 +420,18 @@ export class BeneficiaryManage implements OnInit {
     }
 
     if (payload.alternatePayee2) {
-      payload.alternatePayee2.payeeFirstName = formValue.alt2Name?.split(' ')[0] || '';
-      payload.alternatePayee2.payeeLastName = formValue.alt2Name?.split(' ')[1] || '';
+      payload.alternatePayee2.payeeFirstName =
+        formValue.alt2Name?.split(' ')[0] || '';
+      payload.alternatePayee2.payeeLastName =
+        formValue.alt2Name?.split(' ')[1] || '';
       payload.alternatePayee2.payeeGender = formValue.alt2Gender;
       payload.alternatePayee2.payeeAge = formValue.alt2Age;
       payload.alternatePayee2.documentType = formValue.alt2IdType;
       payload.alternatePayee2.nationalId = formValue.alt2IdNumber;
       payload.alternatePayee2.payeePhoneNo = formValue.alt2Phone;
     }
+
+    // ✅ Nominees
     payload.nominees = this.nominees.value.map((n: any) => ({
       id: n.id,
       nomineeFirstName: n.nomineeFirstName,
@@ -271,12 +444,12 @@ export class BeneficiaryManage implements OnInit {
       nomineeGender: n.nomineeGender,
       isReadWrite: n.isReadWrite,
       nomineeOccupation: n.nomineeOccupation,
-      otherOccupation: n.otherOccupation
+      otherOccupation: n.otherOccupation,
     }));
-
 
     return payload;
   }
+
 
   onSubmit() {
     if (!this.beneficiaryForm.valid) {
