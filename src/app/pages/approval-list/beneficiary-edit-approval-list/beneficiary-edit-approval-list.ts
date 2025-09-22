@@ -81,6 +81,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
   currentPage = 0;
   pageSize = 10;
   advanceSearchPanelVisible: boolean = false;
+  totalRecords = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -123,7 +124,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
 
     const payload = {
       ...this.searchForm.value,
-      approvalStatus: this.searchForm.value.approvalStatus ?? 'PENDING',
+      approvalStatus: this.searchForm.value.approvalStatus ?? null,
       page: this.currentPage,
       size: this.pageSize,
     };
@@ -132,6 +133,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
       .then((res: any) => {
         // response -> approvalTaskList
         this.beneficiaries = res.data?.approvalTaskList || [];
+        this.totalRecords = res.data?.total || 0;
       })
       .catch((err: any) => {
         this.messageService.add({
@@ -153,8 +155,9 @@ export class BeneficiaryEditApprovalList implements OnInit {
   }
 
   onPageChange(event: any) {
-    this.currentPage = event.page;
+    this.currentPage = event.page;   // event.page = 0-based index
     this.pageSize = event.rows;
+    this.loadBeneficiaries();        // fetch new page from API
   }
 
   searchBeneficiaries() {

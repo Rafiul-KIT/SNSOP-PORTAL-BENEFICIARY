@@ -143,9 +143,10 @@
   </ng-template>
 </p-table>
 
-<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="beneficiaries.length"
+<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
   [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [appendTo]="'body'"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"></p-paginator>
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+</p-paginator>
 }
 <p-toast position="bottom-right" />
 <p-confirmDialog [style]="{ width: '450px' }" />
