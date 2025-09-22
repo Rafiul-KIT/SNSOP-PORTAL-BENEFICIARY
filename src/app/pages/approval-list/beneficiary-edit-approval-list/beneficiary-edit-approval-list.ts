@@ -28,6 +28,8 @@ interface Location {
 }
 
 interface Beneficiary {
+  tashId: number;
+  taskType: string;
   householdNumber: string;
   firstName: string;
   middleName: string;
@@ -88,13 +90,12 @@ export class BeneficiaryEditApprovalList implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.bid = this.route.snapshot.paramMap.get('bid')!;
     this.mode = this.route.snapshot.queryParamMap.get('mode') as any;
     this.initForm();
-    this.loadLocations();
     this.loadBeneficiaries();
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
     this.breadcrumbItems = [{ label: 'Beneficiary List' }];
@@ -102,47 +103,20 @@ export class BeneficiaryEditApprovalList implements OnInit {
 
   initForm() {
     this.searchForm = this.fb.group({
-      householdNumber: [''],
-      firstName: [''],
-      middleName: [''],
-      lastName: [''],
-      phoneNumber: [''],
-      state: [null],
-      county: [null],
-      payam: [null],
-      boma: [null],
+      // householdNumber: [''],
+      // firstName: [''],
+      // middleName: [''],
+      // lastName: [''],
+      // phoneNumber: [''],
+      // state: [null],
+      // county: [null],
+      // payam: [null],
+      // boma: [null],
       taskType: [null],
-      approvalStatus: ['PENDING'],
+      approvalStatus: [null],
     });
   }
 
-  loadLocations() {
-    this.states = [
-      { name: 'Central Equatoria', code: 'CE' },
-      { name: 'Eastern Equatoria', code: 'EE' },
-      { name: 'Jonglei', code: 'JG' },
-      { name: 'Unity', code: 'UN' },
-      { name: 'Upper Nile', code: 'UN2' },
-    ];
-
-    this.counties = [
-      { name: 'Juba', code: 'JB' },
-      { name: 'Yei', code: 'YE' },
-      { name: 'Terekeka', code: 'TR' },
-    ];
-
-    this.payams = [
-      { name: 'Munuki', code: 'MN' },
-      { name: 'Kator', code: 'KT' },
-      { name: 'Juba Town', code: 'JT' },
-    ];
-
-    this.bomas = [
-      { name: 'Gudele', code: 'GD' },
-      { name: 'Hai Thoura', code: 'HT' },
-      { name: 'Nyakuron', code: 'NK' },
-    ];
-  }
 
   loadBeneficiaries() {
     this.isLoading = true;
@@ -179,13 +153,48 @@ export class BeneficiaryEditApprovalList implements OnInit {
   }
 
   searchBeneficiaries() {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Search',
-      detail: 'Search performed with the provided criteria',
-    });
-    console.log('Search criteria:', this.searchForm.value);
+    if (!this.searchForm.valid) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: 'Please fill required fields before searching',
+      });
+      return;
+    }
+
+    // Build payload according to ApprovalTaskSearchRequest
+    const payload = {
+      taskType: this.searchForm.value.taskType || null,   // "BENEFICIARY_EDIT" etc.
+      approvalStatus: this.searchForm.value.approvalStatus || null,
+      page: this.currentPage,   // 🔹 hook into your paginator
+      size: this.pageSize
+    };
+
+    this.isLoading = true;
+    this.apiService
+      .POST('/api/approval/taskList', payload)
+      .then((res: any) => {
+        this.beneficiaries = res.data?.approvalTaskList || [];
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Search Complete',
+          detail: `Found ${this.beneficiaries.length} task(s)`,
+        });
+      })
+      .catch((err: any) => {
+        console.error('Search failed:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load approval tasks',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
   }
+
 
   resetForm() {
     this.searchForm.reset();
@@ -249,7 +258,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
 
   approveTask(b: any) {
     console.log(b);
-    
+
     if (!b?.id) {
       console.error('Approve clicked, but task id is missing:', b);
       return;

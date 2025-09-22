@@ -57,25 +57,25 @@ export class Header {
         routerLinkActiveOptions: 'active',
       },
       {
-        label: 'Approval',
-        icon: 'fas fa-check-circle',
-        items: [
-          {
+        // label: 'Approval',
+        // icon: 'fas fa-check-circle',
+        // items: [
+        //  {
             label: 'Beneficiary Approval List',
             icon: 'fas fa-user-check',
             routerLink: 'beneficiary-approval-list/edit',
-          },
-          {
-            label: 'Migration Approval List',
-            icon: 'fas fa-right-left',
-            routerLink: 'beneficiary-approval-list/migrate',
-          },
-          {
-            label: 'Archiving Approval List',
-            icon: 'fas fa-archive',
-            routerLink: 'beneficiary-approval-list/archive',
-          },
-        ],
+          //},
+          // {
+          //   label: 'Migration Approval List',
+          //   icon: 'fas fa-right-left',
+          //   routerLink: 'beneficiary-approval-list/migrate',
+          // },
+          // {
+          //   label: 'Archiving Approval List',
+          //   icon: 'fas fa-archive',
+          //   routerLink: 'beneficiary-approval-list/archive',
+          // },
+       // ],
       },
       // {
       //   label: 'Beneficiary Attendance',
