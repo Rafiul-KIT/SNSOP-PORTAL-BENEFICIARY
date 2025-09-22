@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "dev": "ng serve --port 4020 --ssl false",
+    "dev": "ng serve --port 4020 --ssl true",
     "build-staging": "ng build --configuration staging --ssl true",
     "build-dev": "ng build --configuration development",
     "build-prod": "ng build --configuration production",
@@ -26,6 +26,7 @@
     "bootstrap": "^5.3.8",
     "jwt-decode": "^4.0.0",
     "lite-server": "^2.6.1",
+    "ng2-charts": "^8.0.0",
     "ngx-cookie-service": "^20.1.0",
     "primeicons": "^7.0.0",
     "primeng": "^20.1.1",

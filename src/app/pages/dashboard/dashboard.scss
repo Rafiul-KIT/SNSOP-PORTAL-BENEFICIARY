@@ -1,0 +1,23 @@
+.dashboard-wrapper {
+  height: calc(100vh - 78px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.table-wrapper {
+  height: calc(100vh - 588px);
+  min-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.chart {
+  cursor: pointer;
+}
+
+
+
+:host ::ng-deep .p-tabview-panels {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}

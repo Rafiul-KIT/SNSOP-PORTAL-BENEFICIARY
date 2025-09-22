@@ -51,6 +51,12 @@ export class Header {
       //   routerLinkActiveOptions: 'active',
       // },
       {
+        label: 'Dashboard',
+        icon: 'fas fa-dashboard',
+        routerLink: '/dashboard',
+        routerLinkActiveOptions: 'active',
+      },
+      {
         label: 'Beneficiary List',
         icon: 'fas fa-list',
         routerLink: '/beneficiary/list',
