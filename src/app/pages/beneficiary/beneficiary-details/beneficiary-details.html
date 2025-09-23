@@ -561,6 +561,22 @@
                           {{ nominee.relation === 'OTHER' ? '(' + nominee.relationshipOther + ')' : '' }}
                         </td>
                       </tr>
+                      <tr>
+                        <th>Occupation</th>
+                        <td>{{ nominee.nomineeOccupation }}</td>
+                        
+                      </tr>
+                      <tr>
+                                <th>
+                                  Can read/Write
+                                </th>
+                                <td>
+                                  {{ nominee.isReadWrite
+                                  === true ? 'Yes' :
+                                  nominee.isReadWrite ===
+                                  false ? 'No' : '-' }}
+                                </td>
+                              </tr>
 
                     </tbody>
                   </table>

@@ -19,6 +19,7 @@ import {
   NomineeDto,
   MobileMoneyProvider,
   RelationshipWithHead,
+  Occupation,
 } from '../../../models/beneficiary';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -80,8 +81,10 @@ interface BeneficiaryVm {
     age: number;
     gender: string;
     relation: string;
+    nomineeOccupation: Occupation;
     relationshipOther?: string;
     photo?: string;
+    isReadWrite?: boolean;
   }[];
 
   rightFingers: FingerVm[];
@@ -450,7 +453,10 @@ export class BeneficiaryDetails implements OnInit {
         gender: n.nomineeGender,
         relation: n.relationshipWithHouseholdHead,
         relationshipOther: n.relationshipOther,
+        nomineeOccupation: n.nomineeOccupation,
         photo: normalizeFinger(n.biometric?.photoData),
+        isReadWrite: n.isReadWrite
+        
       })),
 
       rightFingers: [
