@@ -8,6 +8,7 @@ import { BeneficiaryMigration } from './pages/beneficiary/beneficiary-migration/
 import { BeneficiaryArchiveApprovalList } from './pages/approval-list/beneficiary-archive-approval-list/beneficiary-archive-approval-list';
 import { BeneficiaryEditApprovalList } from './pages/approval-list/beneficiary-edit-approval-list/beneficiary-edit-approval-list';
 import { BeneficiaryMigrateApprovalList } from './pages/approval-list/beneficiary-migrate-approval-list/beneficiary-migrate-approval-list';
+import { BeneficiaryEditApprovalDetails } from './pages/approval-details/beneficiary-edit-approval-details/beneficiary-edit-approval-details';
 
 export const routes: Routes = [
   {
@@ -49,6 +50,10 @@ export const routes: Routes = [
       },
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
+  },
+
+  {path:'beneficiary-edit-details/:id',
+    component: BeneficiaryEditApprovalDetails
   },
   {
     component: NotFound,
