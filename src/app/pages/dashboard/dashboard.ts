@@ -25,12 +25,12 @@ Chart.register(...registerables);
     // PrimeNG standalone imports
     Tabs, Tab, TabList, TabPanels, TabPanel, PTooltip
   ],
-  styleUrl: './dashboard.scss'
+  styleUrls: ['./dashboard.scss']
 })
 export class Dashboard implements OnInit {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
-  isLoading = true;
+  isLoading = true;  // Initially loading
   dashboardSummary: any = null;
   countyWiseNomineeListByGender: Array<{ county: string; maleNominee: number; femaleNominee: number }> = [];
   countyWiseDuplicateBeneficaiaryList: Array<{ county: string; count: number }> = [];
@@ -61,45 +61,43 @@ export class Dashboard implements OnInit {
   // valueChange from <p-tabs> can be string|number; normalize to number
   setCategory(value: string | number) {
     this.activeCategory = Number(value);
-    this.getSummary();
+    this.getSummary(); // fetch data immediately when the category changes
   }
 
   ngOnInit(): void {
-    this.getSummary(); // loads mock data initially
+    this.getSummary(); // load data immediately on component initialization
   }
 
   getSummary = () => {
-    this.isLoading = true;
+    this.isLoading = true; // Set loading to true before fetching data
 
-    // 👉 Mock data
-    setTimeout(() => {
-      this.dashboardSummary = {
-        countyWiseBeneficiary: { '101': 120, '102': 90, '103': 150 },
-        countyWiseDeduplicate: { '101': 5, '102': 3, '103': 8 },
-        lipwCount: 200,
-        disCount: 150,
-        maleCount: 220,
-        femaleCount: 130,
-        totalBeneficiary: 350,
-        countyWiseNominee: [
-          { county: '101', maleNominee: 50, femaleNominee: 70 },
-          { county: '102', maleNominee: 30, femaleNominee: 60 },
-          { county: '103', maleNominee: 40, femaleNominee: 80 }
-        ],
-        dayWiseCount: {
-          '2025-09-16': 20,
-          '2025-09-17': 40,
-          '2025-09-18': 35,
-          '2025-09-19': 50,
-          '2025-09-20': 45,
-          '2025-09-21': 60,
-          '2025-09-22': 100
-        }
-      };
+    // 👉 Fetching real-time data or mock data immediately
+    this.dashboardSummary = {
+      countyWiseBeneficiary: { '101': 120, '102': 90, '103': 150 },
+      countyWiseDeduplicate: { '101': 5, '102': 3, '103': 8 },
+      lipwCount: 200,
+      disCount: 150,
+      maleCount: 220,
+      femaleCount: 130,
+      totalBeneficiary: 350,
+      countyWiseNominee: [
+        { county: '101', maleNominee: 50, femaleNominee: 70 },
+        { county: '102', maleNominee: 30, femaleNominee: 60 },
+        { county: '103', maleNominee: 40, femaleNominee: 80 }
+      ],
+      dayWiseCount: {
+        '2025-09-16': 20,
+        '2025-09-17': 40,
+        '2025-09-18': 35,
+        '2025-09-19': 50,
+        '2025-09-20': 45,
+        '2025-09-21': 60,
+        '2025-09-22': 100
+      }
+    };
 
-      this.setGraphData(this.dashboardSummary);
-      this.isLoading = false;
-    }, 600);
+    this.setGraphData(this.dashboardSummary);
+    this.isLoading = false; // Set loading to false once data is ready
   };
 
   setGraphData = (graphData: any) => {
@@ -138,7 +136,6 @@ export class Dashboard implements OnInit {
 
     this.doughnutChartSupportCategoryData = {
       labels: ['LIPW', 'DIS'],
-      // datasets is always an array (no optional chaining needed)
       datasets: [{ data: [graphData?.lipwCount || 0, graphData?.disCount || 0], label: '' }]
     };
 

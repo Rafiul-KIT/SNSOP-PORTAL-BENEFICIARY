@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  env: 'prod',
   domain: 'snsopmis.com',
   globalApi: 'http://api.snsopmis.com:8000/services',
   portals: {

@@ -3,7 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -122,12 +122,17 @@ export class Header {
 
   //logout = () => {};
   logout = () => {
-    // Clear the authentication token from cookies
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the token cookie
-    document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
+  // Clear the authentication token from cookies
+  document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the token cookie
+  document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
 
-    // Redirect to the login page of the master portal (or landing page)
-    window.location.href = `${environment.portals.master}/landing`;  // Redirect to the master portal's login page
-  };
+  // Redirect based on routing strategy
+  const redirectUrl = environment.env === 'dev'
+    ? `${environment.portals.master}/landing` // Use path-based routing for dev
+    : `${environment.portals.master}/#/landing`; // Use hash-based routing for production
+  
+  window.location.href = redirectUrl;  // Redirect to the correct landing page
+};
+
 
 }

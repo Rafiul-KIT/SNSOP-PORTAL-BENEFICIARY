@@ -14,7 +14,7 @@ export const routes: Routes = [
     component: Dashboard,
     path: 'dashboard',
   },
-  { path: '', pathMatch: 'full', redirectTo: 'beneficiary' },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
 
   {
     path: 'beneficiary',
