@@ -127,7 +127,7 @@ export class Header {
   document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
 
   // Redirect based on routing strategy
-  const redirectUrl = environment.env === 'dev'
+  const redirectUrl = environment.env === 'local'
     ? `${environment.portals.master}/landing` // Use path-based routing for dev
     : `${environment.portals.master}/#/landing`; // Use hash-based routing for production
   
