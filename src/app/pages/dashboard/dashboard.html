@@ -1,1 +1,218 @@
-<p>dashboard works!</p>
+<p-tabs [(value)]="activeCategory" (valueChange)="setCategory($event)">
+  <p-tablist>
+    <p-tab [value]="0">Summary ALL</p-tab>
+    <p-tab [value]="1">Summary PP</p-tab>
+    <p-tab [value]="2">Summary AF</p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <p-tabpanel [value]="0">
+      <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
+    </p-tabpanel>
+    <p-tabpanel [value]="1">
+      <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
+    </p-tabpanel>
+    <p-tabpanel [value]="2">
+      <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>
+
+<ng-template #dashboardTemplate>
+  <div class="dashboard-scroll">
+    @if (isLoading) {
+      <app-loader />
+    } @else {
+      @if (dashboardSummary) {
+        <div class="dashboard-wrapper">
+          <div class="row">
+            <!-- County-wise Registered Households -->
+            <div class="col-12 col-md-12 col-lg-12">
+              <div class="card">
+                <div
+                  class="card-header alert alert-success mb-0 p-2 fw-bold d-flex justify-content-between align-items-center"
+                >
+                  <span>County wise registered households count</span>
+                  <i
+                    class="fas fa-refresh hand"
+                    pTooltip="Refresh"
+                    tooltipPosition="left"
+                    appendTo="body"
+                    (click)="getSummary()"
+                  ></i>
+                </div>
+                <div class="card-body" style="overflow-x: auto;">
+                  <canvas
+                    baseChart
+                    class="chart"
+                    [data]="barChartCountyData"
+                    height="40"
+                    [options]="barChartOptions"
+                    [type]="barChartType"
+                    (chartClick)="onBarClick($event)"
+                  ></canvas>
+
+                  <!-- labels can be undefined per Chart.js types, so optional chain on labels is OK -->
+                  @if (!barChartCountyData.labels?.length) {
+                    <div>No Data Available</div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Other Panels -->
+            <div class="col-12 col-md-12 col-lg-12 mt-2">
+              <div class="row">
+                <!-- Total Registered Households & Daily Counts -->
+                <div class="col-12 col-md-2">
+                  <div
+                    class="alert alert-primary d-flex align-items-center justify-content-between mb-2"
+                    role="button"
+                    tabindex="0"
+                    style="cursor: pointer"
+                    (click)="gotoBeneficiaryList()"
+                    (keydown.enter)="gotoBeneficiaryList()"
+                    (keydown.space)="gotoBeneficiaryList()"
+                  >
+                    <span class="fw-bold">Total Registered Households</span>
+                    <h3 class="mb-0"><kbd>{{ totalBeneficiaryCount }}</kbd></h3>
+                  </div>
+
+                  <div class="card">
+                    <div class="card-header alert alert-success mb-0 p-2 fw-bold">
+                      Daily Count of Registered Households (Last 7 Days)
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered table-sm mb-0">
+                        <tr>
+                          <th>Date</th>
+                          <th class="text-center">Count</th>
+                        </tr>
+                        @for (dcount of dailyCountList; track dcount) {
+                          <tr>
+                            <td>{{ dcount.day }}</td>
+                            <td class="text-center">{{ dcount.count }}</td>
+                          </tr>
+                        }
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Duplicate Registrations -->
+                <div class="col-12 col-md-3">
+                  <div class="card">
+                    <div class="card-header alert alert-success mb-0 p-2 fw-bold">
+                      Duplicate Registration by County
+                    </div>
+                    <div class="card-body">
+                      <div class="table-wrapper">
+                        <div class="table-responsive">
+                          <table class="table table-sm table-striped mb-0">
+                            <thead>
+                            <tr>
+                              <th>County Name</th>
+                              <th class="text-center">Duplicate Count</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                              @for (duplicate of countyWiseDuplicateBeneficaiaryList; track duplicate) {
+                                <tr>
+                                  <td>{{ duplicate.county }}</td>
+                                  <td class="text-center">{{ duplicate.count }}</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Gender-wise Nominees -->
+                <div class="col-12 col-md-3">
+                  <div class="card">
+                    <div class="card-header alert alert-success mb-0 p-2 fw-bold">
+                      Gender wise Nominee Count by County
+                    </div>
+                    <div class="card-body">
+                      <div class="table-wrapper">
+                        <div class="table-responsive">
+                          <table class="table table-sm table-striped mb-0">
+                            <thead>
+                            <tr>
+                              <th>County Name</th>
+                              <th class="text-center">Male Nominee</th>
+                              <th class="text-center">Female Nominee</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                              @for (cwn of countyWiseNomineeListByGender; track cwn) {
+                                <tr>
+                                  <td>{{ lookupService.getCountyNameById(cwn.county) }}</td>
+                                  <td class="text-center">{{ cwn.maleNominee }}</td>
+                                  <td class="text-center">{{ cwn.femaleNominee }}</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Gender-wise Registrations -->
+                <div class="col-12 col-md-2">
+                  <div class="card">
+                    <div class="card-header alert alert-success mb-0 p-2 fw-bold">
+                      Registrations by Gender
+                    </div>
+                    <div class="card-body">
+                      <canvas
+                        baseChart
+                        class="chart"
+                        height="350"
+                        [data]="doughnutChartGenderData"
+                        [type]="doughnutChartType"
+                        [options]="genderLegendOptions"
+                        (chartClick)="onDoughnutClick($event, 'gender')"
+                      ></canvas>
+                      @if (!doughnutChartGenderData.datasets.length) {
+                        <div>No Data Available</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Support Category-wise Registrations -->
+                <div class="col-12 col-md-2">
+                  <div class="card">
+                    <div class="card-header alert alert-success mb-0 p-2 fw-bold">
+                      Registrations by Support Category
+                    </div>
+                    <div class="card-body">
+                      <canvas
+                        baseChart
+                        class="chart"
+                        height="350"
+                        [data]="doughnutChartSupportCategoryData"
+                        [type]="doughnutChartType"
+                        [options]="supportLegendOptions"
+                        (chartClick)="onDoughnutClick($event, 'support')"
+                      ></canvas>
+                      @if (!doughnutChartSupportCategoryData.datasets.length) {
+                        <div>No Data Available</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div> <!-- row -->
+            </div> <!-- col-12 -->
+          </div> <!-- row -->
+        </div> <!-- dashboard-wrapper -->
+      }
+    }
+  </div>
+</ng-template>

@@ -1,5 +1,7 @@
 <div class="header">
   <!-- Portal selector (left) -->
+  <img src="SNSOP_logo.png" style="height: 30px; width: auto;" /> &nbsp;&nbsp;&nbsp;
+
   <div class="portals" (click)="showPortalOptions = !showPortalOptions">
     <i class="fas fa-braille hand"></i>
     <div>
@@ -8,6 +10,7 @@
     </div>
     <i class="fas fa-angle-{{ showPortalOptions ? 'down' : 'right' }} hand"></i>
     <span class="vertical-line"></span>
+
   </div>
   <div class="menues">
     <p-menubar [model]="menuList"></p-menubar>
@@ -26,6 +29,8 @@
       }
     </div>
   </div>
+
+
 
   <p-button
     [text]="true"

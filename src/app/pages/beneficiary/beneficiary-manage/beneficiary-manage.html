@@ -177,6 +177,29 @@
                   </p-floatlabel>
                 </div>
 
+                  <div class="col-md-4 mb-3">
+                    <label>Support Type</label><br />
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" value="Public Works" formControlName="supportType" /> Public Works
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" value="Direct Income Support" formControlName="supportType" /> Direct Income Support
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3" *ngIf="filteredReasons.length > 0">
+                    <label>Selection Reasons</label>
+                    <div *ngFor="let reason of filteredReasons" class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        [value]="reason.value"
+                        (change)="onReasonChange($event, reason.value)"
+                        [checked]="isReasonSelected(reason.value)"/>
+                      <label class="form-check-label">{{ reason.label }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
                 <div class="col-md-4 mb-3">
                   <label>Support Type</label><br />
                   <div class="form-check form-check-inline">
@@ -260,8 +283,6 @@
               <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid" icon="fas fa-save"
                 label="Update" />
             </div>
-          </div>
-        </div>
       </p-tabpanel>
 
       <!-- ===========================

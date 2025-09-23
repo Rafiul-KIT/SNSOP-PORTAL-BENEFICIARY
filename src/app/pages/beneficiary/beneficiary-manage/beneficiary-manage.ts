@@ -44,6 +44,9 @@ export class BeneficiaryManage implements OnInit {
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
   occupationOptions: any[] = [];
+  allReasons: any[] = [];
+  filteredReasons: any[] = [];
+
 
   ageGroups = [
     { label: '0-2 yrs', maleTotal: 'm0_2_total', maleDisable: 'm0_2_disable', maleChronicalIll: 'm0_2_chronic', maleBoth: 'm0_2_both', femaleTotal: 'f0_2_total', femaleDisable: 'f0_2_disable', femaleChronicalIll: 'f0_2_chronic', femaleBoth: 'f0_2_both' },
@@ -95,6 +98,10 @@ export class BeneficiaryManage implements OnInit {
       this.loadBeneficiary(applicationId);
     }
 
+    this.beneficiaryForm.get('supportType')?.valueChanges.subscribe(val => {
+      this.filterReasons(val);
+    });
+
     this.isLoading = false;
     this.cdr.detectChanges();
   }
@@ -121,6 +128,7 @@ export class BeneficiaryManage implements OnInit {
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],
       supportType: [''],
+      selectionReasons: this.fb.control([]),
       canReadWrite: [''],
       literate1835Count: [''],
       householdSize: [''],
@@ -176,10 +184,12 @@ export class BeneficiaryManage implements OnInit {
           otherIncomeSource: dto.incomeSourceOther,
           avgMonthlyIncome: dto.householdMonthlyAvgIncome,
           supportType: dto.selectionCriteria === 'LIPW' ? 'Public Works' : 'Direct Income Support',
+          selectionReasons: Array.isArray(dto.selectionReason) ? dto.selectionReason : [dto.selectionReason],
           canReadWrite: dto.isReadWrite ? 'Yes' : 'No',
           literate1835Count: dto.memberReadWrite,
           householdSize: dto.householdSize,
         });
+        this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
 
         // ✅ Patch household member age group data
         if (dto.householdMember2) {
@@ -317,6 +327,7 @@ export class BeneficiaryManage implements OnInit {
     payload.incomeSourceOther = formValue.otherIncomeSource;
     payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
     payload.selectionCriteria = formValue.supportType === 'Public Works' ? 'LIPW' : 'DIS';
+    payload.selectionReason = formValue.selectionReasons;
     payload.isReadWrite = formValue.canReadWrite === 'Yes';
     payload.memberReadWrite = formValue.literate1835Count;
     payload.householdSize = formValue.householdSize;
@@ -472,6 +483,30 @@ export class BeneficiaryManage implements OnInit {
         console.error('Update failed:', err);
         alert('Failed to update beneficiary');
       });
+  }
+
+  onReasonChange(event: any, value: string) {
+    const reasons = this.beneficiaryForm.get('selectionReasons')?.value || [];
+    if (event.target.checked) {
+      if (!reasons.includes(value)) reasons.push(value);
+    } else {
+      const index = reasons.indexOf(value);
+      if (index >= 0) reasons.splice(index, 1);
+    }
+    this.beneficiaryForm.patchValue({ selectionReasons: reasons });
+  }
+  filterReasons(supportType: string) {
+    if (supportType === 'Public Works') {
+      this.filteredReasons = this.allReasons.filter(r => r.value.startsWith('LIPW_REASON'));
+    } else if (supportType === 'Direct Income Support') {
+      this.filteredReasons = this.allReasons.filter(r => r.value.startsWith('DIS_REASON'));
+    } else {
+      this.filteredReasons = [];
+    }
+  }
+  isReasonSelected(value: string): boolean {
+    const reasons = this.beneficiaryForm.get('selectionReasons')?.value || [];
+    return reasons.includes(value);
   }
 
   get nominees(): FormArray {
