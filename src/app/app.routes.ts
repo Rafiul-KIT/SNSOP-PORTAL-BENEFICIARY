@@ -9,16 +9,17 @@ import { BeneficiaryArchiveApprovalList } from './pages/approval-list/beneficiar
 import { BeneficiaryEditApprovalList } from './pages/approval-list/beneficiary-edit-approval-list/beneficiary-edit-approval-list';
 import { BeneficiaryMigrateApprovalList } from './pages/approval-list/beneficiary-migrate-approval-list/beneficiary-migrate-approval-list';
 import { BeneficiaryEditApprovalDetails } from './pages/approval-details/beneficiary-edit-approval-details/beneficiary-edit-approval-details';
+import { routeGuard } from './route.guard';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
+    canActivate: [routeGuard],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-
   {
     path: 'beneficiary',
+    canActivate: [routeGuard],
     children: [
       {
         path: 'list',
@@ -38,6 +39,7 @@ export const routes: Routes = [
   },
   {
     path: 'beneficiary-approval-list',
+    canActivate: [routeGuard],
     children: [
       { path: 'edit', component: BeneficiaryEditApprovalList },
       {
@@ -51,10 +53,12 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
-
-  {path:'beneficiary-edit-details/:id',
-    component: BeneficiaryEditApprovalDetails
+  {
+    path: 'beneficiary-edit-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryEditApprovalDetails,
   },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,
     path: '**',

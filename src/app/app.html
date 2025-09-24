@@ -1,4 +1,8 @@
+@if(isLoading){
+<app-loader [MESSAGE]="'Working on Something Important, Stay Tuned!'" />
+}@else {
 <app-header />
 <div class="wrapper">
   <router-outlet />
 </div>
+}

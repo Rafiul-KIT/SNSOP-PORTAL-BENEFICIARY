@@ -10,4 +10,5 @@ export const environment = {
     grm: 'https://devportalmaster.southsudansafetynet.info/grm',
     report: 'https://devportalmaster.southsudansafetynet.info/report',
   },
+  cookie_name:'mis_ta'
 };

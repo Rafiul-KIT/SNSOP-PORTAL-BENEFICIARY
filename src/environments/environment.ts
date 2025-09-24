@@ -10,4 +10,5 @@ export const environment = {
     grm: 'http://grm.snsopmis.com',
     report: 'http://report.snsopmis.com',
   },
+  cookie_name:'mis_ta'
 };

@@ -10,4 +10,5 @@ export const environment = {
     grm: 'https://localhost:4040',
     report: 'https://localhost:4050',
   },
+  cookie_name:'mis_ta'
 };

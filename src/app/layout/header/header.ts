@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, effect, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
 import { environment } from '../../../environments/environment';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-header',
@@ -17,8 +18,13 @@ export class Header {
   portalList: any = [];
   menuList: any = [];
   userMenuList: any = [];
+  userInfo: any = null;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private apiService: ApiService) {
+    effect(() => {
+      this.userInfo = this.apiService.loginState()?.user;
+    });
+
     this.portalList = [
       {
         label: 'Dashboard',
@@ -67,21 +73,21 @@ export class Header {
         // icon: 'fas fa-check-circle',
         // items: [
         //  {
-            label: 'Beneficiary Approval List',
-            icon: 'fas fa-user-check',
-            routerLink: 'beneficiary-approval-list/edit',
-          //},
-          // {
-          //   label: 'Migration Approval List',
-          //   icon: 'fas fa-right-left',
-          //   routerLink: 'beneficiary-approval-list/migrate',
-          // },
-          // {
-          //   label: 'Archiving Approval List',
-          //   icon: 'fas fa-archive',
-          //   routerLink: 'beneficiary-approval-list/archive',
-          // },
-       // ],
+        label: 'Beneficiary Approval List',
+        icon: 'fas fa-user-check',
+        routerLink: 'beneficiary-approval-list/edit',
+        //},
+        // {
+        //   label: 'Migration Approval List',
+        //   icon: 'fas fa-right-left',
+        //   routerLink: 'beneficiary-approval-list/migrate',
+        // },
+        // {
+        //   label: 'Archiving Approval List',
+        //   icon: 'fas fa-archive',
+        //   routerLink: 'beneficiary-approval-list/archive',
+        // },
+        // ],
       },
       // {
       //   label: 'Beneficiary Attendance',
@@ -122,17 +128,16 @@ export class Header {
 
   //logout = () => {};
   logout = () => {
-  // Clear the authentication token from cookies
-  document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the token cookie
-  document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
+    this.apiService.logout();
+    // // Clear the authentication token from cookies
+    // document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the token cookie
+    // document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear the expiry cookie
 
-  // Redirect based on routing strategy
-  const redirectUrl = environment.env === 'local'
-    ? `${environment.portals.master}/landing` // Use path-based routing for dev
-    : `${environment.portals.master}/#/landing`; // Use hash-based routing for production
-  
-  window.location.href = redirectUrl;  // Redirect to the correct landing page
-};
+    // // Redirect based on routing strategy
+    // const redirectUrl = environment.env === 'local'
+    //   ? `${environment.portals.master}/landing` // Use path-based routing for dev
+    //   : `${environment.portals.master}/#/landing`; // Use hash-based routing for production
 
-
+    // window.location.href = redirectUrl;  // Redirect to the correct landing page
+  };
 }

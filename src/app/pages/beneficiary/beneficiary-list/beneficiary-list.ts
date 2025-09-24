@@ -130,24 +130,28 @@ export class BeneficiaryList implements OnInit {
     this.initForm();
     this.initBreadcrumb();
 
-    // Preload all lookup lists first
-    Promise.all([
-      this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
-      this.lookup
-        .getCountyListByStateId('')
-        .then((list) => (this.counties = list)),
-      this.lookup
-        .getPayamListByCountyId('')
-        .then((list) => (this.payams = list)),
-      this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
-    ]).then(() => {
-      this.genderOptions = this.lookup.getGenderList();
-      this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+    // // Preload all lookup lists first
+    // Promise.all([
+    //   this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
+    //   this.lookup
+    //     .getCountyListByStateId('')
+    //     .then((list) => (this.counties = list)),
+    //   this.lookup
+    //     .getPayamListByCountyId('')
+    //     .then((list) => (this.payams = list)),
+    //   this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
+    // ]).then(() => {
+    this.states = this.lookup.getStateList();
+    this.counties = this.lookup.getAllCountyList();
+    this.payams = this.lookup.getAllPayamList();
+    this.bomas = this.lookup.getAllBomaList();
+    this.genderOptions = this.lookup.getGenderList();
+    this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
-      // ✅ Only fetch beneficiaries after lookup data is ready
-      this.fetchPage(this.currentPage, this.pageSize);
-      this.cdr.markForCheck();
-    });
+    // ✅ Only fetch beneficiaries after lookup data is ready
+    this.fetchPage(this.currentPage, this.pageSize);
+    this.cdr.markForCheck();
+    // });
   }
 
   initForm() {

@@ -5,6 +5,8 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
@@ -23,6 +25,10 @@
 
 /* Animation for spinning */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
