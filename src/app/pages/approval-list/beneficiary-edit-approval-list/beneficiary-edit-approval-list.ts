@@ -41,6 +41,7 @@ interface Beneficiary {
   county: string;
   payam: string;
   boma: string;
+  
 }
 
 @Component({
@@ -115,6 +116,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
       // boma: [null],
       taskType: [null],
       approvalStatus: [null],
+      applicationId: null,
     });
   }
 

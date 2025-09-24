@@ -18,7 +18,8 @@
     </div>
     @if (isLoading) {
     <app-loader />
-    } @else { @if (beneficiaryDetails) {
+    } @else {
+    @if (oldDetails || editedDetails) {
     <div class="mt-2 scroll-container">
         <p-tabs value="0">
             <p-tablist>
@@ -41,63 +42,63 @@
                                     Personal Information (Old)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="beneficiaryDetails.photo || '/images/dummyHuman.jpg'"
+                                    <img [src]="oldDetails?.photo || '/images/dummyHuman.jpg'"
                                         class="img-thumbnail mb-3" width="120" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
                                             <tr>
                                                 <th>Application ID</th>
-                                                <td>{{ beneficiaryDetails.applicationId }}</td>
+                                                <td>{{ oldDetails?.applicationId }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Name</th>
-                                                <td>{{ beneficiaryDetails.name }}</td>
+                                                <td>{{ oldDetails?.name }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                                <td>{{ beneficiaryDetails.age }}</td>
+                                                <td>{{ oldDetails?.age }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                                <td>{{ beneficiaryDetails.gender }}</td>
+                                                <td>{{ oldDetails?.gender }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Relationship</th>
-                                                <td>{{ beneficiaryDetails.relationshipWithHouseholdHead }}</td>
+                                                <td>{{ oldDetails?.relationshipWithHouseholdHead }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Marital Status</th>
-                                                <td>{{ beneficiaryDetails.respondentMaritalStatus }}</td>
+                                                <td>{{ oldDetails?.respondentMaritalStatus }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Spouse Name</th>
-                                                <td>{{ beneficiaryDetails.spouseName }}</td>
+                                                <td>{{ oldDetails?.spouseName }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Legal Status</th>
-                                                <td>{{ beneficiaryDetails.respondentLegalStatus }}</td>
+                                                <td>{{ oldDetails?.respondentLegalStatus }}</td>
                                             </tr>
                                             <tr>
                                                 <th>ID Number (Type)</th>
-                                                <td>{{ beneficiaryDetails.respondentId }} ({{
-                                                    lookup.getDocumentTypeEnumByValue(beneficiaryDetails.documentType)
+                                                <td>{{ oldDetails?.respondentId }} ({{
+                                                    lookup.getDocumentTypeEnumByValue(oldDetails?.documentType)
                                                     }})</td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Money Provider</th>
-                                                <td>{{ beneficiaryDetails.mobileMoneyProvider }}</td>
+                                                <td>{{ oldDetails?.mobileMoneyProvider }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Wallet Number</th>
-                                                <td>{{ beneficiaryDetails.mobileWalletNumber }}</td>
+                                                <td>{{ oldDetails?.mobileWalletNumber }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Registration Phase</th>
-                                                <td>{{ beneficiaryDetails.registrationPhase }}</td>
+                                                <td>{{ oldDetails?.registrationPhase }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Phone</th>
-                                                <td>{{ beneficiaryDetails.phone }}</td>
+                                                <td>{{ oldDetails?.phone }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -116,7 +117,7 @@
                                                     <th colspan="5">Right Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of rightFingers; track f) {
+                                                    @for (f of oldRightFingers; track f) {
                                                     <td>
                                                         <img [pTooltip]="f.tooltip" tooltipPosition="top"
                                                             [src]="f.image" height="40" /><br />
@@ -128,7 +129,7 @@
                                                     <th colspan="5">Left Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of leftFingers; track f) {
+                                                    @for (f of oldLeftFingers; track f) {
                                                     <td>
                                                         <img [pTooltip]="f.tooltip" tooltipPosition="top"
                                                             [src]="f.image" height="40" /><br />
@@ -159,7 +160,7 @@
                                                                 <th>Income Source</th>
                                                                 <td>
                                                                     {{
-                                                                    lookup.getOccupationEnumByValue(beneficiaryDetails.household?.incomeSource)
+                                                                    lookup.getOccupationEnumByValue(oldDetails?.household?.incomeSource)
                                                                     }}
                                                                 </td>
                                                             </tr>
@@ -167,7 +168,7 @@
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.household?.monthlyIncome
+                                                                    {{ oldDetails?.household?.monthlyIncome
                                                                     || '-' }}
                                                                 </td>
                                                             </tr>
@@ -175,7 +176,7 @@
                                                                 <th>Selection Criteria</th>
                                                                 <td>
                                                                     {{
-                                                                    beneficiaryDetails.household?.selectionCriteria
+                                                                    oldDetails?.household?.selectionCriteria
                                                                     || '-' }}
                                                                 </td>
                                                             </tr>
@@ -184,11 +185,11 @@
                                                                 <th>Selection Reasons</th>
                                                                 <td>
                                                                     @if
-                                                                    (beneficiaryDetails.household?.selectionReasons?.length)
+                                                                    (oldDetails?.household?.selectionReasons?.length)
                                                                     {
                                                                     <ul>
                                                                         @for (r of
-                                                                        beneficiaryDetails.household.selectionReasons;
+                                                                        oldDetails?.household.selectionReasons;
                                                                         track r; let i = $index) {
                                                                         <li>{{ i + 1 }}. {{ r }}</li>
                                                                         }
@@ -204,24 +205,24 @@
                                                             <tr>
                                                                 <th colspan="8"
                                                                     class="bg-secondary text-light text-center">
-                                                                    Total Member: {{ beneficiaryDetails.householdSize }}
+                                                                    Total Member: {{ oldDetails?.householdSize }}
                                                                 </th>
                                                             </tr>
                                                             <tr>
                                                                 <th class="table-label">Female Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.femaleTotal ||
+                                                                    (oldDetails?.householdMember2?.femaleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleTotal ||
+                                                                    (oldDetails?.householdMember5?.femaleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleTotal
+                                                                    (oldDetails?.householdMember17?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleTotal
+                                                                    (oldDetails?.householdMember35?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleTotal
+                                                                    (oldDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleTotal
+                                                                    (oldDetails?.householdMember65?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -229,17 +230,17 @@
                                                                 <th class="table-label">Male Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleTotal ||
+                                                                    (oldDetails?.householdMember2?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleTotal ||
+                                                                    (oldDetails?.householdMember5?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleTotal ||
+                                                                    (oldDetails?.householdMember17?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleTotal ||
+                                                                    (oldDetails?.householdMember35?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleTotal ||
+                                                                    (oldDetails?.householdMember64?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleTotal ||
+                                                                    (oldDetails?.householdMember65?.maleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -247,53 +248,53 @@
                                                                 <th class="table-label">Chronically ill Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleBoth || 0)
+                                                                    (oldDetails?.householdMember2?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember2?.maleChronicalIll
+                                                                    (oldDetails?.householdMember2?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleBoth ||
+                                                                    (oldDetails?.householdMember2?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember2?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleBoth || 0)
+                                                                    (oldDetails?.householdMember5?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember5?.maleChronicalIll
+                                                                    (oldDetails?.householdMember5?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleBoth ||
+                                                                    (oldDetails?.householdMember5?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember5?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleBoth ||
+                                                                    (oldDetails?.householdMember17?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleChronicalIll
+                                                                    (oldDetails?.householdMember17?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleBoth ||
+                                                                    (oldDetails?.householdMember17?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember17?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleBoth ||
+                                                                    (oldDetails?.householdMember35?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleChronicalIll
+                                                                    (oldDetails?.householdMember35?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleBoth ||
+                                                                    (oldDetails?.householdMember35?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember35?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleBoth ||
+                                                                    (oldDetails?.householdMember64?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleChronicalIll
+                                                                    (oldDetails?.householdMember64?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleBoth ||
+                                                                    (oldDetails?.householdMember64?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember64?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleBoth ||
+                                                                    (oldDetails?.householdMember65?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleChronicalIll
+                                                                    (oldDetails?.householdMember65?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleBoth ||
+                                                                    (oldDetails?.householdMember65?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleChronicalIll
+                                                                    (oldDetails?.householdMember65?.femaleChronicalIll
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -301,53 +302,53 @@
                                                                 <th class="table-label">Member with Disability</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleBoth || 0)
+                                                                    (oldDetails?.householdMember2?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember2?.maleDisable ||
+                                                                    (oldDetails?.householdMember2?.maleDisable ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleBoth ||
+                                                                    (oldDetails?.householdMember2?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleDisable
+                                                                    (oldDetails?.householdMember2?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleBoth || 0)
+                                                                    (oldDetails?.householdMember5?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember5?.maleDisable ||
+                                                                    (oldDetails?.householdMember5?.maleDisable ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleBoth ||
+                                                                    (oldDetails?.householdMember5?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleDisable
+                                                                    (oldDetails?.householdMember5?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleBoth ||
+                                                                    (oldDetails?.householdMember17?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleDisable
+                                                                    (oldDetails?.householdMember17?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleBoth ||
+                                                                    (oldDetails?.householdMember17?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleDisable
+                                                                    (oldDetails?.householdMember17?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleBoth ||
+                                                                    (oldDetails?.householdMember35?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleDisable
+                                                                    (oldDetails?.householdMember35?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleBoth ||
+                                                                    (oldDetails?.householdMember35?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleDisable
+                                                                    (oldDetails?.householdMember35?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleBoth ||
+                                                                    (oldDetails?.householdMember64?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleDisable
+                                                                    (oldDetails?.householdMember64?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleBoth ||
+                                                                    (oldDetails?.householdMember64?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleDisable
+                                                                    (oldDetails?.householdMember64?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleBoth ||
+                                                                    (oldDetails?.householdMember65?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleDisable
+                                                                    (oldDetails?.householdMember65?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleBoth ||
+                                                                    (oldDetails?.householdMember65?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleDisable
+                                                                    (oldDetails?.householdMember65?.femaleDisable
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -361,9 +362,9 @@
                                                                 <th class="table-label">0–2 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleTotal ||
+                                                                    (oldDetails?.householdMember2?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleTotal ||
+                                                                    (oldDetails?.householdMember2?.femaleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -371,9 +372,9 @@
                                                                 <th class="table-label">3–5 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember5?.maleTotal ||
+                                                                    (oldDetails?.householdMember5?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleTotal ||
+                                                                    (oldDetails?.householdMember5?.femaleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -381,9 +382,9 @@
                                                                 <th class="table-label">6–17 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember17?.maleTotal ||
+                                                                    (oldDetails?.householdMember17?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleTotal
+                                                                    (oldDetails?.householdMember17?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -392,9 +393,9 @@
                                                                 <th class="table-label">18–35 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember35?.maleTotal ||
+                                                                    (oldDetails?.householdMember35?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleTotal
+                                                                    (oldDetails?.householdMember35?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -402,9 +403,9 @@
                                                                 <th class="table-label">36–64 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember64?.maleTotal ||
+                                                                    (oldDetails?.householdMember64?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleTotal
+                                                                    (oldDetails?.householdMember64?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -412,9 +413,9 @@
                                                                 <th class="table-label">64+ Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember65?.maleTotal ||
+                                                                    (oldDetails?.householdMember65?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleTotal
+                                                                    (oldDetails?.householdMember65?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -433,7 +434,7 @@
                                                                 </th>
                                                                 <td class="text-center">
                                                                     {{
-                                                                    beneficiaryDetails.household?.memberReadWrite
+                                                                    oldDetails?.household?.memberReadWrite
                                                                     ?? 0 }}
                                                                 </td>
                                                             </tr>
@@ -442,9 +443,9 @@
                                                                     Respondent Can read/Write (Any Language)
                                                                 </th>
                                                                 <td class="text-center">
-                                                                    {{ beneficiaryDetails.household?.isReadWrite
+                                                                    {{ oldDetails?.household?.isReadWrite
                                                                     === true ? 'Yes' :
-                                                                    beneficiaryDetails.household?.isReadWrite ===
+                                                                    oldDetails?.household?.isReadWrite ===
                                                                     false ? 'No' : '-' }}
                                                                 </td>
                                                             </tr>
@@ -466,38 +467,38 @@
                                                             <tr>
                                                                 <th style="width: 180px">State</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.state || '-' }}
+                                                                    {{ oldDetails?.address?.state || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>County</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.county || '-'
+                                                                    {{ oldDetails?.address?.county || '-'
                                                                     }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Payam</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.payam || '-' }}
+                                                                    {{ oldDetails?.address?.payam || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Boma</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.boma || '-' }}
+                                                                    {{ oldDetails?.address?.boma || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Latitude</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.lat || '-' }}
+                                                                    {{ oldDetails?.address?.lat || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Longitude</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.lon || '-' }}
+                                                                    {{ oldDetails?.address?.lon || '-' }}
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -515,63 +516,63 @@
                                     Personal Information (Edited)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="beneficiaryDetails.photo || '/images/dummyHuman.jpg'"
+                                    <img [src]="editedDetails?.photo || '/images/dummyHuman.jpg'"
                                         class="img-thumbnail mb-3" width="120" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
                                             <tr>
                                                 <th>Application ID</th>
-                                                <td>{{ beneficiaryDetails.applicationId }}</td>
+                                                <td>{{ editedDetails?.applicationId }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Name</th>
-                                                <td>{{ beneficiaryDetails.name }}</td>
+                                                <td>{{ editedDetails?.name }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                                <td>{{ beneficiaryDetails.age }}</td>
+                                                <td>{{ editedDetails?.age }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                                <td>{{ beneficiaryDetails.gender }}</td>
+                                                <td>{{ editedDetails?.gender }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Relationship</th>
-                                                <td>{{ beneficiaryDetails.relationshipWithHouseholdHead }}</td>
+                                                <td>{{ editedDetails?.relationshipWithHouseholdHead }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Marital Status</th>
-                                                <td>{{ beneficiaryDetails.respondentMaritalStatus }}</td>
+                                                <td>{{ editedDetails?.respondentMaritalStatus }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Spouse Name</th>
-                                                <td>{{ beneficiaryDetails.spouseName }}</td>
+                                                <td>{{ editedDetails?.spouseName }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Legal Status</th>
-                                                <td>{{ beneficiaryDetails.respondentLegalStatus }}</td>
+                                                <td>{{ editedDetails?.respondentLegalStatus }}</td>
                                             </tr>
                                             <tr>
                                                 <th>ID Number (Type)</th>
-                                                <td>{{ beneficiaryDetails.respondentId }} ({{
-                                                    lookup.getDocumentTypeEnumByValue(beneficiaryDetails.documentType)
+                                                <td>{{ editedDetails?.respondentId }} ({{
+                                                    lookup.getDocumentTypeEnumByValue(editedDetails?.documentType)
                                                     }})</td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Money Provider</th>
-                                                <td>{{ beneficiaryDetails.mobileMoneyProvider }}</td>
+                                                <td>{{ editedDetails?.mobileMoneyProvider }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Wallet Number</th>
-                                                <td>{{ beneficiaryDetails.mobileWalletNumber }}</td>
+                                                <td>{{ editedDetails?.mobileWalletNumber }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Registration Phase</th>
-                                                <td>{{ beneficiaryDetails.registrationPhase }}</td>
+                                                <td>{{ editedDetails?.registrationPhase }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Phone</th>
-                                                <td>{{ beneficiaryDetails.phone }}</td>
+                                                <td>{{ editedDetails?.phone }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -590,7 +591,7 @@
                                                     <th colspan="5">Right Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of rightFingers; track f) {
+                                                    @for (f of editedRightFingers; track f) {
                                                     <td>
                                                         <img [pTooltip]="f.tooltip" tooltipPosition="top"
                                                             [src]="f.image" height="40" /><br />
@@ -602,7 +603,7 @@
                                                     <th colspan="5">Left Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of leftFingers; track f) {
+                                                    @for (f of editedLeftFingers; track f) {
                                                     <td>
                                                         <img [pTooltip]="f.tooltip" tooltipPosition="top"
                                                             [src]="f.image" height="40" /><br />
@@ -633,7 +634,7 @@
                                                                 <th>Income Source</th>
                                                                 <td>
                                                                     {{
-                                                                    lookup.getOccupationEnumByValue(beneficiaryDetails.household?.incomeSource)
+                                                                    lookup.getOccupationEnumByValue(editedDetails?.household?.incomeSource)
                                                                     }}
                                                                 </td>
                                                             </tr>
@@ -641,7 +642,7 @@
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.household?.monthlyIncome
+                                                                    {{ editedDetails?.household?.monthlyIncome
                                                                     || '-' }}
                                                                 </td>
                                                             </tr>
@@ -649,7 +650,7 @@
                                                                 <th>Selection Criteria</th>
                                                                 <td>
                                                                     {{
-                                                                    beneficiaryDetails.household?.selectionCriteria
+                                                                    editedDetails?.household?.selectionCriteria
                                                                     || '-' }}
                                                                 </td>
                                                             </tr>
@@ -658,11 +659,11 @@
                                                                 <th>Selection Reasons</th>
                                                                 <td>
                                                                     @if
-                                                                    (beneficiaryDetails.household?.selectionReasons?.length)
+                                                                    (editedDetails?.household?.selectionReasons?.length)
                                                                     {
                                                                     <ul>
                                                                         @for (r of
-                                                                        beneficiaryDetails.household.selectionReasons;
+                                                                        editedDetails?.household.selectionReasons;
                                                                         track r; let i = $index) {
                                                                         <li>{{ i + 1 }}. {{ r }}</li>
                                                                         }
@@ -678,24 +679,24 @@
                                                             <tr>
                                                                 <th colspan="8"
                                                                     class="bg-secondary text-light text-center">
-                                                                    Total Member: {{ beneficiaryDetails.householdSize }}
+                                                                    Total Member: {{ editedDetails?.householdSize }}
                                                                 </th>
                                                             </tr>
                                                             <tr>
                                                                 <th class="table-label">Female Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.femaleTotal ||
+                                                                    (editedDetails?.householdMember2?.femaleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleTotal ||
+                                                                    (editedDetails?.householdMember5?.femaleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleTotal
+                                                                    (editedDetails?.householdMember17?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleTotal
+                                                                    (editedDetails?.householdMember35?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleTotal
+                                                                    (editedDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleTotal
+                                                                    (editedDetails?.householdMember65?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -703,17 +704,17 @@
                                                                 <th class="table-label">Male Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleTotal ||
+                                                                    (editedDetails?.householdMember2?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleTotal ||
+                                                                    (editedDetails?.householdMember5?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleTotal ||
+                                                                    (editedDetails?.householdMember17?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleTotal ||
+                                                                    (editedDetails?.householdMember35?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleTotal ||
+                                                                    (editedDetails?.householdMember64?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleTotal ||
+                                                                    (editedDetails?.householdMember65?.maleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -721,53 +722,53 @@
                                                                 <th class="table-label">Chronically ill Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleBoth || 0)
+                                                                    (editedDetails?.householdMember2?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember2?.maleChronicalIll
+                                                                    (editedDetails?.householdMember2?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleBoth ||
+                                                                    (editedDetails?.householdMember2?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember2?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleBoth || 0)
+                                                                    (editedDetails?.householdMember5?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember5?.maleChronicalIll
+                                                                    (editedDetails?.householdMember5?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleBoth ||
+                                                                    (editedDetails?.householdMember5?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember5?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleBoth ||
+                                                                    (editedDetails?.householdMember17?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleChronicalIll
+                                                                    (editedDetails?.householdMember17?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleBoth ||
+                                                                    (editedDetails?.householdMember17?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember17?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleBoth ||
+                                                                    (editedDetails?.householdMember35?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleChronicalIll
+                                                                    (editedDetails?.householdMember35?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleBoth ||
+                                                                    (editedDetails?.householdMember35?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember35?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleBoth ||
+                                                                    (editedDetails?.householdMember64?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleChronicalIll
+                                                                    (editedDetails?.householdMember64?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleBoth ||
+                                                                    (editedDetails?.householdMember64?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember64?.femaleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleBoth ||
+                                                                    (editedDetails?.householdMember65?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleChronicalIll
+                                                                    (editedDetails?.householdMember65?.maleChronicalIll
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleBoth ||
+                                                                    (editedDetails?.householdMember65?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleChronicalIll
+                                                                    (editedDetails?.householdMember65?.femaleChronicalIll
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -775,53 +776,53 @@
                                                                 <th class="table-label">Member with Disability</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleBoth || 0)
+                                                                    (editedDetails?.householdMember2?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember2?.maleDisable ||
+                                                                    (editedDetails?.householdMember2?.maleDisable ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleBoth ||
+                                                                    (editedDetails?.householdMember2?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleDisable
+                                                                    (editedDetails?.householdMember2?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember5?.maleBoth || 0)
+                                                                    (editedDetails?.householdMember5?.maleBoth || 0)
                                                                     +
-                                                                    (beneficiaryDetails.householdMember5?.maleDisable ||
+                                                                    (editedDetails?.householdMember5?.maleDisable ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleBoth ||
+                                                                    (editedDetails?.householdMember5?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleDisable
+                                                                    (editedDetails?.householdMember5?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleBoth ||
+                                                                    (editedDetails?.householdMember17?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.maleDisable
+                                                                    (editedDetails?.householdMember17?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleBoth ||
+                                                                    (editedDetails?.householdMember17?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleDisable
+                                                                    (editedDetails?.householdMember17?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleBoth ||
+                                                                    (editedDetails?.householdMember35?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.maleDisable
+                                                                    (editedDetails?.householdMember35?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleBoth ||
+                                                                    (editedDetails?.householdMember35?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleDisable
+                                                                    (editedDetails?.householdMember35?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleBoth ||
+                                                                    (editedDetails?.householdMember64?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.maleDisable
+                                                                    (editedDetails?.householdMember64?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleBoth ||
+                                                                    (editedDetails?.householdMember64?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleDisable
+                                                                    (editedDetails?.householdMember64?.femaleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleBoth ||
+                                                                    (editedDetails?.householdMember65?.maleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.maleDisable
+                                                                    (editedDetails?.householdMember65?.maleDisable
                                                                     || 0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleBoth ||
+                                                                    (editedDetails?.householdMember65?.femaleBoth ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleDisable
+                                                                    (editedDetails?.householdMember65?.femaleDisable
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -835,9 +836,9 @@
                                                                 <th class="table-label">0–2 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember2?.maleTotal ||
+                                                                    (editedDetails?.householdMember2?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember2?.femaleTotal ||
+                                                                    (editedDetails?.householdMember2?.femaleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -845,9 +846,9 @@
                                                                 <th class="table-label">3–5 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember5?.maleTotal ||
+                                                                    (editedDetails?.householdMember5?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember5?.femaleTotal ||
+                                                                    (editedDetails?.householdMember5?.femaleTotal ||
                                                                     0)
                                                                     }}
                                                                 </td>
@@ -855,9 +856,9 @@
                                                                 <th class="table-label">6–17 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember17?.maleTotal ||
+                                                                    (editedDetails?.householdMember17?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember17?.femaleTotal
+                                                                    (editedDetails?.householdMember17?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -866,9 +867,9 @@
                                                                 <th class="table-label">18–35 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember35?.maleTotal ||
+                                                                    (editedDetails?.householdMember35?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember35?.femaleTotal
+                                                                    (editedDetails?.householdMember35?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -876,9 +877,9 @@
                                                                 <th class="table-label">36–64 Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember64?.maleTotal ||
+                                                                    (editedDetails?.householdMember64?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember64?.femaleTotal
+                                                                    (editedDetails?.householdMember64?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -886,9 +887,9 @@
                                                                 <th class="table-label">64+ Yrs Old Member</th>
                                                                 <td width="75px" class="text-center">
                                                                     {{
-                                                                    (beneficiaryDetails.householdMember65?.maleTotal ||
+                                                                    (editedDetails?.householdMember65?.maleTotal ||
                                                                     0) +
-                                                                    (beneficiaryDetails.householdMember65?.femaleTotal
+                                                                    (editedDetails?.householdMember65?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -907,7 +908,7 @@
                                                                 </th>
                                                                 <td class="text-center">
                                                                     {{
-                                                                    beneficiaryDetails.household?.memberReadWrite
+                                                                    editedDetails?.household?.memberReadWrite
                                                                     ?? 0 }}
                                                                 </td>
                                                             </tr>
@@ -916,9 +917,9 @@
                                                                     Respondent Can read/Write (Any Language)
                                                                 </th>
                                                                 <td class="text-center">
-                                                                    {{ beneficiaryDetails.household?.isReadWrite
+                                                                    {{ editedDetails?.household?.isReadWrite
                                                                     === true ? 'Yes' :
-                                                                    beneficiaryDetails.household?.isReadWrite ===
+                                                                    editedDetails?.household?.isReadWrite ===
                                                                     false ? 'No' : '-' }}
                                                                 </td>
                                                             </tr>
@@ -940,38 +941,38 @@
                                                             <tr>
                                                                 <th style="width: 180px">State</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.state || '-' }}
+                                                                    {{ editedDetails?.address?.state || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>County</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.county || '-'
+                                                                    {{ editedDetails?.address?.county || '-'
                                                                     }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Payam</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.payam || '-' }}
+                                                                    {{ editedDetails?.address?.payam || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Boma</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.boma || '-' }}
+                                                                    {{ editedDetails?.address?.boma || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Latitude</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.lat || '-' }}
+                                                                    {{ editedDetails?.address?.lat || '-' }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Longitude</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.address?.lon || '-' }}
+                                                                    {{ editedDetails?.address?.lon || '-' }}
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1000,20 +1001,15 @@
       ========================== -->
                 <p-tabpanel value="1">
                     <div class="row g-3">
-                        @if (!beneficiaryDetails.alternates.length) {
-                        <div class="col-12">
+                        <!-- ===== Left Column: OLD ===== -->
+                        <div class="col-12 col-md-6">
+                            @if (!oldDetails?.alternates?.length) {
                             <div class="alert alert-gray text-center mb-0">
-                                No Alternate Payee Information Provided
+                                No Alternate Payee Information Provided (Old)
                             </div>
-                        </div>
-                        }
-
-                        <!-- Loop over the alternates and display them both on the left and right side -->
-                        @for (alt of beneficiaryDetails.alternates; track alt; let i = $index) {
-
-                        <!-- Left Side -->
-                        <div class="col-12 col-md-6"> <!-- Left side -->
-                            <div class="card shadow-sm rounded h-100">
+                            } @else {
+                            @for (alt of oldDetails!.alternates; track alt; let i = $index) {
+                            <div class="card shadow-sm rounded h-100 mb-3">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Old)
                                 </div>
@@ -1088,11 +1084,19 @@
                                     </table>
                                 </div>
                             </div>
+                            }
+                            }
                         </div>
 
-                        <!-- Right Side -->
-                        <div class="col-12 col-md-6"> <!-- Right side -->
-                            <div class="card shadow-sm rounded h-100">
+                        <!-- ===== Right Column: EDITED ===== -->
+                        <div class="col-12 col-md-6">
+                            @if (!editedDetails?.alternates?.length) {
+                            <div class="alert alert-gray text-center mb-0">
+                                No Alternate Payee Information Provided (Edited)
+                            </div>
+                            } @else {
+                            @for (alt of editedDetails!.alternates; track alt; let i = $index) {
+                            <div class="card shadow-sm rounded h-100 mb-3">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
@@ -1167,11 +1171,12 @@
                                     </table>
                                 </div>
                             </div>
+                            }
+                            }
                         </div>
-
-                        }
                     </div>
                 </p-tabpanel>
+
 
 
 
@@ -1181,18 +1186,21 @@
           ========================== -->
                 <p-tabpanel value="2">
                     <div class="row">
-                        @if (!beneficiaryDetails.nominees.length) {
+                        <!-- When both are empty -->
+                        @if (nomineeCount === 0) {
                         <div class="col-12">
                             <div class="alert alert-warning text-center">
                                 No Nominee Information Provided
                             </div>
                         </div>
-                        }
+                        } @else {
 
-                        @for (nominee of beneficiaryDetails.nominees; track nominee; let i = $index) {
+                        <!-- Build a paired grid by index -->
+                        @for (i of range(nomineeCount); track trackIndex($index, i)) {
 
-                        <!-- Left side: Nominee 1, 2, 3... -->
-                        <div class="col-12 col-md-6"> <!-- Left side -->
+                        <!-- Left: OLD -->
+                        <div class="col-12 col-md-6">
+                            @if (oldDetails?.nominees?.[i]) {
                             <div class="card shadow-sm rounded mb-3">
                                 <div class="card-header bg-gray text-black text-center">
                                     Nominee {{ i + 1 }} (Old)
@@ -1202,48 +1210,52 @@
                                         <tbody>
                                             <tr>
                                                 <th>Name</th>
-                                                <td>{{ nominee.name }}</td>
+                                                <td>{{ oldDetails!.nominees[i].name }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                                <td>{{ nominee.age }}</td>
+                                                <td>{{ oldDetails!.nominees[i].age }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                                <td>{{ nominee.gender }}</td>
+                                                <td>{{ oldDetails!.nominees[i].gender }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Relation</th>
                                                 <td>
-                                                    {{ lookup.getRelationshipEnumByValue(nominee.relation) }}
-                                                    {{ nominee.relation === 'OTHER' ? '(' + nominee.relationshipOther +
-                                                    ')' : '' }}
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(oldDetails!.nominees[i].relation)
+                                                    }}
+                                                    {{ oldDetails!.nominees[i].relation === 'OTHER'
+                                                    ? '(' + oldDetails!.nominees[i].relationshipOther + ')'
+                                                    : '' }}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>Occupation</th>
-                                                <td>{{ nominee.nomineeOccupation }}</td>
-
+                                                <td>{{ oldDetails!.nominees[i].nomineeOccupation }}</td>
                                             </tr>
                                             <tr>
-                                                <th>
-                                                    Can read/Write
-                                                </th>
+                                                <th>Can read/Write</th>
                                                 <td>
-                                                    {{ nominee.isReadWrite
-                                                    === true ? 'Yes' :
-                                                    nominee.isReadWrite ===
-                                                    false ? 'No' : '-' }}
+                                                    {{
+                                                    oldDetails!.nominees[i].isReadWrite === true ? 'Yes' :
+                                                    oldDetails!.nominees[i].isReadWrite === false ? 'No' : '-'
+                                                    }}
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+                            } @else {
+                            <div class="alert alert-gray text-center">No data (Old)</div>
+                            }
                         </div>
 
-                        <!-- Right side: Same nominee 1, 2, 3... -->
-                        <div class="col-12 col-md-6"> <!-- Right side -->
+                        <!-- Right: EDITED -->
+                        <div class="col-12 col-md-6">
+                            @if (editedDetails?.nominees?.[i]) {
                             <div class="card shadow-sm rounded mb-3">
                                 <div class="card-header bg-gray text-black text-center">
                                     Nominee {{ i + 1 }} (Edited)
@@ -1253,48 +1265,54 @@
                                         <tbody>
                                             <tr>
                                                 <th>Name</th>
-                                                <td>{{ nominee.name }}</td>
+                                                <td>{{ editedDetails!.nominees[i].name }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                                <td>{{ nominee.age }}</td>
+                                                <td>{{ editedDetails!.nominees[i].age }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                                <td>{{ nominee.gender }}</td>
+                                                <td>{{ editedDetails!.nominees[i].gender }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Relation</th>
                                                 <td>
-                                                    {{ lookup.getRelationshipEnumByValue(nominee.relation) }}
-                                                    {{ nominee.relation === 'OTHER' ? '(' + nominee.relationshipOther +
-                                                    ')' : '' }}
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(editedDetails!.nominees[i].relation)
+                                                    }}
+                                                    {{ editedDetails!.nominees[i].relation === 'OTHER'
+                                                    ? '(' + editedDetails!.nominees[i].relationshipOther + ')'
+                                                    : '' }}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>Occupation</th>
-                                                <td>{{ nominee.nomineeOccupation }}</td>
-
+                                                <td>{{ editedDetails!.nominees[i].nomineeOccupation }}</td>
                                             </tr>
                                             <tr>
-                                                <th>
-                                                    Can read/Write
-                                                </th>
+                                                <th>Can read/Write</th>
                                                 <td>
-                                                    {{ nominee.isReadWrite
-                                                    === true ? 'Yes' :
-                                                    nominee.isReadWrite ===
-                                                    false ? 'No' : '-' }}
+                                                    {{
+                                                    editedDetails!.nominees[i].isReadWrite === true ? 'Yes' :
+                                                    editedDetails!.nominees[i].isReadWrite === false ? 'No' : '-'
+                                                    }}
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+                            } @else {
+                            <div class="alert alert-gray text-center">No data (Edited)</div>
+                            }
                         </div>
+                        }
                         }
                     </div>
                 </p-tabpanel>
+
+
 
             </p-tabpanels>
         </p-tabs>
