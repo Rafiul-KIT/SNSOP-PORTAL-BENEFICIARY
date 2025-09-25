@@ -284,7 +284,7 @@ export class BeneficiaryEditApprovalDetails {
           // 1) set edited details
           const editedDto = edited.taskDetails as BeneficiaryDto;
           this.editedDetails = this.mapToVm(editedDto);
-          this.prepareFingerImages(editedDto.biometric, 'edited');
+          this.prepareFingerImages(editedDto.biometrics, 'edited');
 
           // 2) store differences
           this.setDifferences(edited.differences);
@@ -298,7 +298,7 @@ export class BeneficiaryEditApprovalDetails {
           if (this.householdId) {
             const oldDto = await this.loadBeneficiaryDetailsDto(this.householdId);
             this.oldDetails = this.mapToVm(oldDto);
-            this.prepareFingerImages(oldDto.biometric, 'old');
+            this.prepareFingerImages(oldDto.biometrics, 'old');
           } else {
             console.warn('Could not determine householdId from task details payload.');
           }
@@ -321,7 +321,7 @@ export class BeneficiaryEditApprovalDetails {
       .then((res: any) => {
         const dto = res?.data as BeneficiaryDto;
         this.oldDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometric, 'old');
+        this.prepareFingerImages(dto.biometrics, 'old');
       })
       .finally(() => { this.isLoading = false; this.cdr.detectChanges(); });
   }
@@ -332,7 +332,7 @@ export class BeneficiaryEditApprovalDetails {
       .then((res: any) => {
         const dto = res?.data?.taskDetails as BeneficiaryDto;
         this.editedDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometric, 'edited');
+        this.prepareFingerImages(dto.biometrics, 'edited');
       })
       .finally(() => { this.isLoading = false; this.cdr.detectChanges(); });
   }
@@ -373,7 +373,7 @@ export class BeneficiaryEditApprovalDetails {
       registrationPhase: dto.registrationPhase,
 
       phone: dto.respondentPhoneNo,
-      photo: normalizePhoto(dto.biometric?.photoData),
+      photo: normalizePhoto(dto.biometrics?.photoData),
 
       household: {
         incomeSource: dto.householdIncomeSource,
@@ -425,62 +425,62 @@ export class BeneficiaryEditApprovalDetails {
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
-          photo: normalizePhoto(alt.biometric?.photoData),
-          biometric: alt.biometric,
+          photo: normalizePhoto(alt.biometrics?.photoData),
+          biometric: alt.biometrics,
 
           // ✨ alternate-specific finger sets
           rightFingers: [
             {
               label: 'Thumb',
               tooltip: 'Right Thumb',
-              image: normalizeFinger(alt.biometric?.rtFingerData),
+              image: normalizeFinger(alt.biometrics?.rtFingerData),
             },
             {
               label: 'Index',
               tooltip: 'Right Index',
-              image: normalizeFinger(alt.biometric?.riFingerData),
+              image: normalizeFinger(alt.biometrics?.riFingerData),
             },
             {
               label: 'Middle',
               tooltip: 'Right Middle',
-              image: normalizeFinger(alt.biometric?.rmFingerData),
+              image: normalizeFinger(alt.biometrics?.rmFingerData),
             },
             {
               label: 'Ring',
               tooltip: 'Right Ring',
-              image: normalizeFinger(alt.biometric?.rrFingerData),
+              image: normalizeFinger(alt.biometrics?.rrFingerData),
             },
             {
               label: 'Little',
               tooltip: 'Right Little',
-              image: normalizeFinger(alt.biometric?.rsFingerData),
+              image: normalizeFinger(alt.biometrics?.rsFingerData),
             },
           ],
           leftFingers: [
             {
               label: 'Thumb',
               tooltip: 'Left Thumb',
-              image: normalizeFinger(alt.biometric?.ltFingerData),
+              image: normalizeFinger(alt.biometrics?.ltFingerData),
             },
             {
               label: 'Index',
               tooltip: 'Left Index',
-              image: normalizeFinger(alt.biometric?.liFingerData),
+              image: normalizeFinger(alt.biometrics?.liFingerData),
             },
             {
               label: 'Middle',
               tooltip: 'Left Middle',
-              image: normalizeFinger(alt.biometric?.lmFingerData),
+              image: normalizeFinger(alt.biometrics?.lmFingerData),
             },
             {
               label: 'Ring',
               tooltip: 'Left Ring',
-              image: normalizeFinger(alt.biometric?.lrFingerData),
+              image: normalizeFinger(alt.biometrics?.lrFingerData),
             },
             {
               label: 'Little',
               tooltip: 'Left Little',
-              image: normalizeFinger(alt.biometric?.lsFingerData),
+              image: normalizeFinger(alt.biometrics?.lsFingerData),
             },
           ],
         })),
@@ -503,54 +503,54 @@ export class BeneficiaryEditApprovalDetails {
         {
           label: 'Thumb',
           tooltip: 'Right Thumb',
-          image: normalizeFinger(dto.biometric?.rtFingerData),
+          image: normalizeFinger(dto.biometrics?.rtFingerData),
         },
         {
           label: 'Index',
           tooltip: 'Right Index',
-          image: normalizeFinger(dto.biometric?.riFingerData),
+          image: normalizeFinger(dto.biometrics?.riFingerData),
         },
         {
           label: 'Middle',
           tooltip: 'Right Middle',
-          image: normalizeFinger(dto.biometric?.rmFingerData),
+          image: normalizeFinger(dto.biometrics?.rmFingerData),
         },
         {
           label: 'Ring',
           tooltip: 'Right Ring',
-          image: normalizeFinger(dto.biometric?.rrFingerData),
+          image: normalizeFinger(dto.biometrics?.rrFingerData),
         },
         {
           label: 'Little',
           tooltip: 'Right Little',
-          image: normalizeFinger(dto.biometric?.rsFingerData),
+          image: normalizeFinger(dto.biometrics?.rsFingerData),
         },
       ],
       leftFingers: [
         {
           label: 'Thumb',
           tooltip: 'Left Thumb',
-          image: normalizeFinger(dto.biometric?.ltFingerData),
+          image: normalizeFinger(dto.biometrics?.ltFingerData),
         },
         {
           label: 'Index',
           tooltip: 'Left Index',
-          image: normalizeFinger(dto.biometric?.liFingerData),
+          image: normalizeFinger(dto.biometrics?.liFingerData),
         },
         {
           label: 'Middle',
           tooltip: 'Left Middle',
-          image: normalizeFinger(dto.biometric?.lmFingerData),
+          image: normalizeFinger(dto.biometrics?.lmFingerData),
         },
         {
           label: 'Ring',
           tooltip: 'Left Ring',
-          image: normalizeFinger(dto.biometric?.lrFingerData),
+          image: normalizeFinger(dto.biometrics?.lrFingerData),
         },
         {
           label: 'Little',
           tooltip: 'Left Little',
-          image: normalizeFinger(dto.biometric?.lsFingerData),
+          image: normalizeFinger(dto.biometrics?.lsFingerData),
         },
       ],
     };

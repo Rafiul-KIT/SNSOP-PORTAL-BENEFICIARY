@@ -63,62 +63,53 @@ export class Header {
         routerLinkActiveOptions: 'active',
       },
       {
-        label: 'Beneficiary List',
+        label: 'Beneficiary',
         icon: 'fas fa-list',
-        routerLink: '/beneficiary/list',
+        items: [
+          {
+            label: 'Beneficiary List',
+            icon: 'fas fa-list',
+            routerLink: '/beneficiary/list',
+          },
+          {
+            label: 'Approval List',
+            icon: 'fas fa-user-check',
+            routerLink: 'beneficiary-approval-list/edit',
+          },
+
+        ],
+      },
+      {
+        label: 'Beneficiary ID Cards',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
       {
-        // label: 'Approval',
-        // icon: 'fas fa-check-circle',
-        // items: [
-        //  {
-        label: 'Beneficiary Approval List',
-        icon: 'fas fa-user-check',
-        routerLink: 'beneficiary-approval-list/edit',
-        //},
-        // {
-        //   label: 'Migration Approval List',
-        //   icon: 'fas fa-right-left',
-        //   routerLink: 'beneficiary-approval-list/migrate',
-        // },
-        // {
-        //   label: 'Archiving Approval List',
-        //   icon: 'fas fa-archive',
-        //   routerLink: 'beneficiary-approval-list/archive',
-        // },
-        // ],
+        label: 'Beneficiary Attendance',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
       },
-      // {
-      //   label: 'Beneficiary Attendance',
-      //   icon: 'fas fa-list',
-      //   routerLink: 'beneficiary/attendance',
-      //   routerLinkActiveOptions: 'active',
-      // },
-      // {
-      //   label: 'Beneficiary ID Cards',
-      //   icon: 'fas fa-list',
-      //   routerLink: 'beneficiary/id-card',
-      //   routerLinkActiveOptions: 'active',
-      // },
-      // {
-      //   label: 'Job Card',
-      //   icon: 'fas fa-list',
-      //   routerLink: 'beneficiary/job-card',
-      //   routerLinkActiveOptions: 'active',
-      // },
-      // {
-      //   label: 'Work Progress',
-      //   icon: 'fas fa-list',
-      //   routerLink: 'beneficiary/work-progress',
-      //   routerLinkActiveOptions: 'active',
-      // },
-      // {
-      //   label: 'LIPW Export',
-      //   icon: 'fas fa-list',
-      //   routerLink: 'beneficiary/lipw-export',
-      //   routerLinkActiveOptions: 'active',
-      // },
+      
+      {
+        label: 'Job Card',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
+      },
+      {
+        label: 'Work Progress',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
+      },
+      {
+        label: 'LIPW Export',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
+      },
     ];
   }
 

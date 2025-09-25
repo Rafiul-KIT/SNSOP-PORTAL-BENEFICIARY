@@ -8,11 +8,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Loader } from '../../../components/loader/loader';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
-
+import { Toast } from "primeng/toast";
 import { BeneficiaryDto } from '../../../models/beneficiary';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-beneficiary-migration',
@@ -26,6 +27,7 @@ import { BeneficiaryDto } from '../../../models/beneficiary';
     SelectModule,
     Loader,
     ButtonModule,
+    Toast
   ],
   templateUrl: './beneficiary-migration.html',
   styleUrl: './beneficiary-migration.scss',
@@ -57,7 +59,9 @@ export class BeneficiaryMigration implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private lookup: LookupService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -145,9 +149,9 @@ export class BeneficiaryMigration implements OnInit {
       const dto = res?.data as BeneficiaryDto;
       this.beneficiaryDetails = dto;
 
-      if (dto.biometric?.photoData) {
+      if (dto.biometrics?.photoData) {
         this.beneficiaryPhoto =
-          'data:image/png;base64,' + dto.biometric.photoData;
+          'data:image/png;base64,' + dto.biometrics.photoData;
       }
 
       if (dto.address) {
@@ -236,18 +240,31 @@ export class BeneficiaryMigration implements OnInit {
       beneficiaries: [beneficiary],
     };
 
-    this.isSubmitting = true;
+    this.isLoading = true;
     this.api
       .POST('api/beneficiary/update/batch', payload)
       .then(() => {
-        alert('Beneficiary updated successfully!');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Update Successful',
+          detail: 'Beneficiary updated successfully!'
+        });
+        setTimeout(() => {
+          this.router.navigate(['/beneficiary/list']);
+        }, 3000);
+
       })
       .catch((err) => {
         console.error('Update failed:', err);
-        alert('Failed to update beneficiary');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Failed to update beneficiary'
+        });
       })
       .finally(() => {
-        this.isSubmitting = false;
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
   }
 

@@ -14,5 +14,5 @@ export interface AlternatePayeeDto {
   documentTypeOther?: string;
   nationalId: string;
   payeePhoneNo: string;
-  biometric?: BiometricDto;
+  biometrics?: BiometricDto;
 }
