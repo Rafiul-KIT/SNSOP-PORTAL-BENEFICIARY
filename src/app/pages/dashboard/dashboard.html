@@ -66,7 +66,7 @@
                 <!-- Total Registered Households & Daily Counts -->
                 <div class="col-12 col-md-2">
                   <div
-                    class="alert alert-primary d-flex align-items-center justify-content-between mb-2"
+                    class="alert alert-primary d-flex flex-column align-items-center justify-content-center gap-2 mb-2"
                     role="button"
                     tabindex="0"
                     style="cursor: pointer"
@@ -74,7 +74,7 @@
                     (keydown.enter)="gotoBeneficiaryList()"
                     (keydown.space)="gotoBeneficiaryList()"
                   >
-                    <span class="fw-bold">Total Registered Households</span>
+                    <div class="fw-bold w-100 text-center">Total Registered Households</div>
                     <h3 class="mb-0"><kbd>{{ totalBeneficiaryCount }}</kbd></h3>
                   </div>
 

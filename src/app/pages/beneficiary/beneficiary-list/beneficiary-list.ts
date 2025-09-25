@@ -148,9 +148,11 @@ export class BeneficiaryList implements OnInit {
     this.genderOptions = this.lookup.getGenderList();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
+    // console.log(this.counties, this.payams, this.bomas);
+
     // ✅ Only fetch beneficiaries after lookup data is ready
     this.fetchPage(this.currentPage, this.pageSize);
-    this.cdr.markForCheck();
+    // this.cdr.markForCheck();
     // });
   }
 
@@ -347,6 +349,7 @@ export class BeneficiaryList implements OnInit {
       .POST('api/beneficiary/search', body)
       .then((res: any) => {
         const data = res?.data;
+        console.log(data);
         if (!data) throw new Error('Empty response');
         if (data.operationResult === false) {
           this.messageService.add({
@@ -407,12 +410,14 @@ export class BeneficiaryList implements OnInit {
   deleteBeneficiary(b: BeneficiaryVm) {
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${b.fullName}?`,
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
+      header: 'Confirmation',
+      icon: 'fas fa-exclamation-triangle text-warning',
       acceptLabel: 'Yes',
+      acceptIcon: 'fas fa-check',
       rejectLabel: 'No',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-success',
+      rejectIcon: 'fas fa-times',
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
       accept: () => {
         // Prepare the data for the API call
         const requestData = {
