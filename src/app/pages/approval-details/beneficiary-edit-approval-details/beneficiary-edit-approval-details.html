@@ -8,7 +8,7 @@
 
         <!-- Fixed buttons in the breadcrumb section -->
         @if (isOnTaskDetails && taskId) {
-        <div style="position: absolute; top: -10px; right: 20px; z-index: 99;">
+        <div style="position: absolute; top: -10px; right: 0; z-index: 99;">
             <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
                 size="small" severity="primary" class="me-1" label="Approve" (onClick)="approveTask()" />
             <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
@@ -146,7 +146,7 @@
 
                             <!-- Fingerprints -->
 
-                            <div class="card">
+                            <div class="card mt-2">
                                 <p-accordion value="0">
                                     <!-- Household -->
                                     <p-accordion-panel value="0">
@@ -644,7 +644,7 @@
 
                             <!-- Fingerprints -->
 
-                            <div class="card">
+                            <div class="card mt-2">
                                 <p-accordion value="0">
                                     <!-- Household -->
                                     <p-accordion-panel value="0">

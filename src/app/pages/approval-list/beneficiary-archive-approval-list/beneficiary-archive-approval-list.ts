@@ -245,12 +245,14 @@ export class BeneficiaryArchiveApprovalList implements OnInit {
   deleteBeneficiary(beneficiary: Beneficiary) {
     this.confirmationService.confirm({
       message: `Are you sure you want to archive ${beneficiary.firstName} ${beneficiary.lastName}?`,
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle', // optional
+      header: 'Confirmation',
+      icon: 'fas fa-exclamation-triangle text-warning',
       acceptLabel: 'Yes',
+      acceptIcon: 'fas fa-check',
       rejectLabel: 'No',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-success',
+      rejectIcon: 'fas fa-times',
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.beneficiaries = this.beneficiaries.filter(
           (b) => b.householdNumber !== beneficiary.householdNumber
