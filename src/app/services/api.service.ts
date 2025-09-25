@@ -42,9 +42,12 @@ export class ApiService {
   logout = () => {
     this.cookieService.deleteAll('/', environment.domain, false);
     this.loginState.set({ token: null, user: null });
-    // Redirect based on routing strategy
-    const redirectUrl = `${environment.portals.master}/#/landing`; // Use hash-based routing for production
-    window.location.href = redirectUrl; // Redirect to the correct landing page
+
+    // Build redirect URL dynamically
+    const landingPath = environment.useHash ? '/#/landing' : '/landing';
+    const redirectUrl = `${environment.portals.master}${landingPath}`;
+
+    window.location.href = redirectUrl;
   };
 
   // ================= Basic HTTP Functions =================

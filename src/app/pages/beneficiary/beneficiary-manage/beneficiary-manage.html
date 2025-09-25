@@ -1,7 +1,7 @@
 <div class="breadcrumb-wrapper">
   <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
 </div>
-
+<p-toast position="bottom-right" />
 @if(isLoading){
 <app-loader />
 }@else {
@@ -18,271 +18,262 @@
              TAB 1: Personal Information
         ============================ -->
       <p-tabpanel value="0">
-        <div style="height: calc(100vh - 210px); overflow-y: auto">
-          <div class="container user-form" style="padding-bottom: 100px">
-            <!-- Basic Information -->
-            <div class="card mt-2">
-              <h5 class="card-header">Basic Information</h5>
-              <br>
-              <div class="card-body row g-3">
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentFirstName" formControlName="respondentFirstName" class="w-100" />
-                    <label for="respondentFirstName">Respondent First Name</label>
-                  </p-floatlabel>
-                </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentMiddleName" formControlName="respondentMiddleName" class="w-100" />
-                    <label for="respondentMiddleName">Respondent Middle Name</label>
-                  </p-floatlabel>
-                </div>
+        <div class="container user-form" style="padding-bottom: 100px">
+          <!-- Basic Information -->
+          <div class="card mt-2">
+            <h5 class="card-header">Basic Information</h5>
+            <br>
+            <div class="card-body row g-3">
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentFirstName" formControlName="respondentFirstName" class="w-100" />
+                  <label for="respondentFirstName">Respondent First Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentLastName" formControlName="respondentLastName" class="w-100" />
-                    <label for="respondentLastName">Respondent Last Name</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentMiddleName" formControlName="respondentMiddleName" class="w-100" />
+                  <label for="respondentMiddleName">Respondent Middle Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentNickName" formControlName="respondentNickName" class="w-100" />
-                    <label for="respondentNickName">Respondent Nick Name</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentLastName" formControlName="respondentLastName" class="w-100" />
+                  <label for="respondentLastName">Respondent Last Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <p-select id="relationship" formControlName="relationship" class="w-100"
-                      [options]="relationshipOptions" optionLabel="label" optionValue="value">
-                    </p-select>
-                    <label for="relationship">Relationship</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentNickName" formControlName="respondentNickName" class="w-100" />
+                  <label for="respondentNickName">Respondent Nick Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentAge" formControlName="respondentAge" class="w-100" />
-                    <label for="respondentAge">Respondent Age</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <p-select id="relationship" formControlName="relationship" class="w-100"
+                    [options]="relationshipOptions" optionLabel="label" optionValue="value">
+                  </p-select>
+                  <label for="relationship">Relationship</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <p-select id="gender" formControlName="gender" class="w-100" [options]="genderOptions"
-                      optionLabel="name" optionValue="id">
-                    </p-select>
-                    <label for="gender">Gender</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentAge" formControlName="respondentAge" class="w-100" />
+                  <label for="respondentAge">Respondent Age</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <p-select id="maritalStatus" formControlName="maritalStatus" class="w-100"
-                      [options]="maritalStatusOptions" optionLabel="label" optionValue="value">
-                    </p-select>
-                    <label for="maritalStatus">Marital Status</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <p-select id="gender" formControlName="gender" class="w-100" [options]="genderOptions"
+                    optionLabel="name" optionValue="id">
+                  </p-select>
+                  <label for="gender">Gender</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="spouseFirstName" formControlName="spouseFirstName" class="w-100" />
-                    <label for="spouseFirstName">Spouse First Name</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <p-select id="maritalStatus" formControlName="maritalStatus" class="w-100"
+                    [options]="maritalStatusOptions" optionLabel="label" optionValue="value">
+                  </p-select>
+                  <label for="maritalStatus">Marital Status</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="spouseMiddleName" formControlName="spouseMiddleName" class="w-100" />
-                    <label for="spouseMiddleName">Spouse Middle Name</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="spouseFirstName" formControlName="spouseFirstName" class="w-100" />
+                  <label for="spouseFirstName">Spouse First Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="spouseLastName" formControlName="spouseLastName" class="w-100" />
-                    <label for="spouseLastName">Spouse Last Name</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="spouseMiddleName" formControlName="spouseMiddleName" class="w-100" />
+                  <label for="spouseMiddleName">Spouse Middle Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <p-select id="legalStatus" formControlName="legalStatus" class="w-100"
-                      [options]="legalStatusOptions" optionLabel="label" optionValue="value">
-                    </p-select>
-                    <label for="legalStatus">Legal Status</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="spouseLastName" formControlName="spouseLastName" class="w-100" />
+                  <label for="spouseLastName">Spouse Last Name</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <label>Do you have a national ID?</label><br />
-                  <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" /> Yes
-                  &nbsp;&nbsp;
-                  <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" /> No
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <p-select id="legalStatus" formControlName="legalStatus" class="w-100" [options]="legalStatusOptions"
+                    optionLabel="label" optionValue="value">
+                  </p-select>
+                  <label for="legalStatus">Legal Status</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <p-select id="idType" formControlName="idType" class="w-100" [options]="idTypeOptions"
-                      optionLabel="label" optionValue="value">
-                    </p-select>
-                    <label for="idType">ID Type</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <label>Do you have a national ID?</label><br />
+                <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" /> Yes
+                &nbsp;&nbsp;
+                <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" /> No
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentIdNumber" formControlName="respondentIdNumber" class="w-100" />
-                    <label for="respondentIdNumber">Respondent ID Number</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <p-select id="idType" formControlName="idType" class="w-100" [options]="idTypeOptions"
+                    optionLabel="label" optionValue="value">
+                  </p-select>
+                  <label for="idType">ID Type</label>
+                </p-floatlabel>
+              </div>
 
-                <div class="col-md-3 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="respondentPhone" formControlName="respondentPhone" class="w-100" />
-                    <label for="respondentPhone">Phone Number</label>
-                  </p-floatlabel>
-                </div>
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentIdNumber" formControlName="respondentIdNumber" class="w-100" />
+                  <label for="respondentIdNumber">Respondent ID Number</label>
+                </p-floatlabel>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="respondentPhone" formControlName="respondentPhone" class="w-100" />
+                  <label for="respondentPhone">Phone Number</label>
+                </p-floatlabel>
               </div>
             </div>
+          </div>
 
-            <!-- Selection Criteria -->
-            <div class="card mt-3">
-              <h5 class="card-header">Selection Criteria</h5>
-              <br>
-              <div class="card-body row g-3">
-                <div class="col-md-4 mb-3">
-                  <p-floatlabel>
-                    <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"
-                      [options]="occupationOptions" optionLabel="label" optionValue="value">
-                    </p-select>
-                    <label for="mainIncomeSource">Main Income Source</label>
-                  </p-floatlabel>
+          <!-- Selection Criteria -->
+          <div class="card mt-3">
+            <h5 class="card-header">Selection Criteria</h5>
+            <br>
+            <div class="card-body row g-3">
+              <div class="col-md-4 mb-3">
+                <p-floatlabel>
+                  <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"
+                    [options]="occupationOptions" optionLabel="label" optionValue="value">
+                  </p-select>
+                  <label for="mainIncomeSource">Main Income Source</label>
+                </p-floatlabel>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100" />
+                  <label for="otherIncomeSource">Other Income Source</label>
+                </p-floatlabel>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <p-floatlabel>
+                  <input pInputText id="avgMonthlyIncome" formControlName="avgMonthlyIncome" class="w-100" />
+                  <label for="avgMonthlyIncome">Household Monthly Average Income</label>
+                </p-floatlabel>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label>Support Type</label><br />
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" value="Public Works" formControlName="supportType" />
+                  Public Works
                 </div>
-
-                <div class="col-md-4 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100" />
-                    <label for="otherIncomeSource">Other Income Source</label>
-                  </p-floatlabel>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                  <p-floatlabel>
-                    <input pInputText id="avgMonthlyIncome" formControlName="avgMonthlyIncome" class="w-100" />
-                    <label for="avgMonthlyIncome">Household Monthly Average Income</label>
-                  </p-floatlabel>
-                </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label>Support Type</label><br />
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="Public Works" formControlName="supportType" /> Public Works
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="Direct Income Support" formControlName="supportType" /> Direct Income Support
-                    </div>
-                  </div>
-                  <div class="col-md-12 mb-3" *ngIf="filteredReasons.length > 0">
-                    <label>Selection Reasons</label>
-                    <div *ngFor="let reason of filteredReasons" class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        [value]="reason.value"
-                        (change)="onReasonChange($event, reason.value)"
-                        [checked]="isReasonSelected(reason.value)"/>
-                      <label class="form-check-label">{{ reason.label }}</label>
-                    </div>
-                  </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" value="Direct Income Support"
+                    formControlName="supportType" /> Direct Income Support
                 </div>
               </div>
-                <div class="col-md-4 mb-3">
-                  <label>Support Type</label><br />
+              <div class="col-md-12 mb-3">
+                @if (filteredReasons.length > 0) {
+                <label>Selection Reasons</label>
+                @for (reason of filteredReasons; track reason.value) {
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" [value]="reason.value"
+                    (change)="onReasonChange($event, reason.value)" [checked]="isReasonSelected(reason.value)" />
+                  <label class="form-check-label">{{ reason.label }}</label>
+                </div>
+                }
+                }
+              </div>
+            </div>
+          </div>
+          <div class="card mt-3">
+            <h5 class="card-header">Household Information</h5>
+            <div class="card-body">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th rowspan="2">Age Group</th>
+                    <th colspan="4">Male</th>
+                    <th colspan="4">Female</th>
+                  </tr>
+                  <tr>
+                    <th>Total</th>
+                    <th>With Disability</th>
+                    <th>With Chronic Illness</th>
+                    <th>Both</th>
+                    <th>Total</th>
+                    <th>With Disability</th>
+                    <th>With Chronic Illness</th>
+                    <th>Both</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ageGroup of ageGroups">
+                    <td>{{ ageGroup.label }}</td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.maleTotal" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.maleDisable" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.maleChronicalIll" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.maleBoth" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleTotal" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleDisable" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleChronicalIll" /></td>
+                    <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth" /></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-6 mb-3">
+                  <label>Do you read and write?</label><br />
                   <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" value="Public Works" formControlName="supportType" />
-                    Public Works
+                    <input class="form-check-input" type="radio" value="Yes" formControlName="canReadWrite" /> Yes
                   </div>
                   <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" value="Direct Income Support"
-                      formControlName="supportType" /> Direct Income Support
+                    <input class="form-check-input" type="radio" value="No" formControlName="canReadWrite" /> No
                   </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <p-floatlabel>
+                    <input pInputText id="literate1835Count" formControlName="literate1835Count" class="w-100" />
+                    <label for="literate1835Count">18-35 yr literate members</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <p-floatlabel>
+                    <input pInputText id="householdSize" formControlName="householdSize" class="w-100" />
+                    <label for="householdSize">Household Size</label>
+                  </p-floatlabel>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Household Information -->
-            <div class="card mt-3">
-              <h5 class="card-header">Household Information</h5>
-              <div class="card-body">
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th rowspan="2">Age Group</th>
-                      <th colspan="4">Male</th>
-                      <th colspan="4">Female</th>
-                    </tr>
-                    <tr>
-                      <th>Total</th>
-                      <th>With Disability</th>
-                      <th>With Chronic Illness</th>
-                      <th>Both</th>
-                      <th>Total</th>
-                      <th>With Disability</th>
-                      <th>With Chronic Illness</th>
-                      <th>Both</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let ageGroup of ageGroups">
-                      <td>{{ ageGroup.label }}</td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleTotal" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleDisable" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleChronicalIll" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleBoth" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleTotal" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleDisable" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleChronicalIll" /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth" /></td>
-                    </tr>
-                  </tbody>
-                </table>
+        <!-- Household Information -->
 
-                <div class="row g-3 mt-2">
-                  <div class="col-md-6 mb-3">
-                    <label>Do you read and write?</label><br />
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="Yes" formControlName="canReadWrite" /> Yes
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="No" formControlName="canReadWrite" /> No
-                    </div>
-                  </div>
 
-                  <div class="col-md-6 mb-3">
-                    <p-floatlabel>
-                      <input pInputText id="literate1835Count" formControlName="literate1835Count" class="w-100" />
-                      <label for="literate1835Count">18-35 yr literate members</label>
-                    </p-floatlabel>
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <p-floatlabel>
-                      <input pInputText id="householdSize" formControlName="householdSize" class="w-100" />
-                      <label for="householdSize">Household Size</label>
-                    </p-floatlabel>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-3 d-flex justify-content-end">
-              <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid" icon="fas fa-save"
-                label="Update" />
-            </div>
+        <div class="mt-3 d-flex justify-content-end">
+          <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid" icon="fas fa-save"
+            label="Update" />
+        </div>
       </p-tabpanel>
 
       <!-- ===========================
