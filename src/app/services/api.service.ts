@@ -37,6 +37,30 @@ export class ApiService {
         'Authorization'
       ] = `Bearer ${accessToken}`;
     }
+
+    // ✅ Request interceptor → always attach fresh token
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const token = this.cookieService.get(this.ACCESS_TOKEN);
+        if (token) {
+          config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // ✅ Response interceptor → handle 401 globally
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          console.warn('401 Unauthorized → redirecting to login...');
+          this.logout(); // reuse your existing logout
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   logout = () => {

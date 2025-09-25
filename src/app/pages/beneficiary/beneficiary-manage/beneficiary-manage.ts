@@ -16,6 +16,7 @@ import { LookupService, LookupItem } from '../../../services/lookup.service';
 import { FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Toast } from "primeng/toast";
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -74,7 +75,8 @@ export class BeneficiaryManage implements OnInit {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -512,6 +514,10 @@ export class BeneficiaryManage implements OnInit {
           summary: 'Update Successful',
           detail: 'Beneficiary updated successfully!'
         });
+        setTimeout(() => {
+          this.router.navigate(['/beneficiary/list']);
+        }, 3000);
+
       })
       .catch((err) => {
         console.error('Update failed:', err);
