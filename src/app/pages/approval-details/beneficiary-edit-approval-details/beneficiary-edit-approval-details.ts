@@ -92,6 +92,10 @@ interface BeneficiaryVm {
   leftFingers: FingerVm[];
 }
 
+interface ApprovalDetailsResponse {
+  taskDetails: BeneficiaryDto;
+  differences?: Record<string, string>; // keys = field paths, values = "Old:..., New:..." or any message
+}
 
 @Component({
   selector: 'app-beneficiary-edit-approval-details',
@@ -240,7 +244,7 @@ export class BeneficiaryEditApprovalDetails {
 
   /*ngOnInit() {
     const applicationId = this.route.snapshot.paramMap.get('applicationId');
- 
+
     if (applicationId) {
       // 1. preload geo lookup data first
       Promise.all([
@@ -275,15 +279,21 @@ export class BeneficiaryEditApprovalDetails {
     ])
       .then(async () => {
         if (isTaskMode && this.taskId) {
-          const editedDto = await this.loadTaskDetailsDto(this.taskId);
+          const edited = await this.loadTaskDetails(this.taskId);
+
+          // 1) set edited details
+          const editedDto = edited.taskDetails as BeneficiaryDto;
           this.editedDetails = this.mapToVm(editedDto);
           this.prepareFingerImages(editedDto.biometric, 'edited');
 
-          // Derive the id to load OLD
+          // 2) store differences
+          this.setDifferences(edited.differences);
+
+          // 3) derive householdId and load old
           this.householdId =
             (editedDto as any).householdId ??
             (editedDto as any).beneficiaryId ??
-            editedDto.applicationId; // only if your old API accepts applicationId
+            editedDto.applicationId;
 
           if (this.householdId) {
             const oldDto = await this.loadBeneficiaryDetailsDto(this.householdId);
@@ -579,9 +589,9 @@ export class BeneficiaryEditApprovalDetails {
     return res?.data as BeneficiaryDto;
   }
 
-  private async loadTaskDetailsDto(taskId: string): Promise<BeneficiaryDto> {
+  private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
-    return res?.data?.taskDetails as BeneficiaryDto;
+    return (res?.data || {}) as ApprovalDetailsResponse;
   }
 
   get nomineeCount(): number {
@@ -597,5 +607,74 @@ export class BeneficiaryEditApprovalDetails {
 
   // (optional) trackBy to keep DOM stable
   trackIndex = (_: number, i: number) => i;
+
+
+  //--obaydur start--
+  differences: Record<string, string> = {};
+  private diffKeySet = new Set<string>();
+
+  /** Normalize a path to a few common candidates so we’re resilient to dot/bracket styles. */
+  private candidatesFor(path: string): string[] {
+    const dot = path.replace(/\[(\d+)\]/g, '.$1');
+    const bracket = path.replace(/\.([0-9]+)/g, '[$1]');
+    return [path, dot, bracket];
+  }
+
+  private setDifferences(d: Record<string, string> | undefined) {
+    this.differences = d || {};
+    this.diffKeySet = new Set(Object.keys(this.differences));
+  }
+
+  /** True if ANY of the given paths changed. */
+  isChanged(paths: string | string[]): boolean {
+    const arr = Array.isArray(paths) ? paths : [paths];
+    return arr.some(p => this.candidatesFor(p).some(c => this.diffKeySet.has(c)));
+  }
+
+  /** True if any key in differences starts with ANY of the given prefixes. */
+  isChangedPrefix(prefixes: string | string[]): boolean {
+    const arr = Array.isArray(prefixes) ? prefixes : [prefixes];
+    for (const k of this.diffKeySet) {
+      if (arr.some(p => k.startsWith(p))) return true;
+    }
+    return false;
+  }
+
+  /** Return a tooltip string (merged if multiple) for changed paths. */
+  diffTip(paths: string | string[]): string | undefined {
+    const arr = Array.isArray(paths) ? paths : [paths];
+    const msgs: string[] = [];
+    for (const p of arr) {
+      for (const c of this.candidatesFor(p)) {
+        const v = this.differences[c];
+        if (v) msgs.push(`${c}: ${v}`);
+      }
+    }
+    return msgs.length ? msgs.join('\n') : undefined;
+  }
+
+  /** Convenience for ngClass. */
+  changedClass(paths: string | string[]) {
+    return this.isChanged(paths) ? 'changed' : '';
+  }
+  changedClassPrefix(prefixes: string | string[]) {
+    return this.isChangedPrefix(prefixes) ? 'changed' : '';
+  }
+
+// Paths that depend on index
+  altPath(i: number, field: string) {
+    return `alternatePayee${i+1}.${field}`;
+  }
+
+  altFingerPath(i: number, hand: 'right'|'left', j: number) {
+    const mapRight = ['rtFingerData','riFingerData','rmFingerData','rrFingerData','rsFingerData'];
+    const mapLeft  = ['ltFingerData','liFingerData','lmFingerData','lrFingerData','lsFingerData'];
+    return `alternatePayee${i+1}.biometric.${hand === 'right' ? mapRight[j] : mapLeft[j]}`;
+  }
+
+  nomineePath(i: number, field: string) {
+    return `nominees[${i}].${field}`;
+  }
+
 
 }
