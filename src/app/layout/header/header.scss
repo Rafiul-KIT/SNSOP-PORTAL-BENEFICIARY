@@ -48,7 +48,7 @@
 
   .user-menu {
     position: fixed;
-    top: 65px;
+    top: 60px;
     right: -250px;
     z-index: 9999;
     padding: 10px;
@@ -65,7 +65,7 @@
     justify-content: flex-start;
 
     &.show {
-      right: 5px;
+      right: 0;
     }
     .item {
       width: 100%;

@@ -62,6 +62,7 @@ export class LookupService {
   fetchAllCountyList(): Promise<LookupItem[]> {
     if (this.allCountyList.length) return Promise.resolve(this.allCountyList);
     return this.fetchLookup({ lookupType: 'COUNTY', size: -1 }).then((list) => {
+      this.countyList = list;
       this.allCountyList = list;
       return list;
     });
@@ -70,6 +71,7 @@ export class LookupService {
   fetchAllPayamList(): Promise<LookupItem[]> {
     if (this.allPayamList.length) return Promise.resolve(this.allPayamList);
     return this.fetchLookup({ lookupType: 'PAYAM', size: -1 }).then((list) => {
+      this.payamList = list;
       this.allPayamList = list;
       return list;
     });
@@ -78,6 +80,7 @@ export class LookupService {
   fetchAllBomaList(): Promise<LookupItem[]> {
     if (this.allBomaList.length) return Promise.resolve(this.allBomaList);
     return this.fetchLookup({ lookupType: 'BOMA', size: -1 }).then((list) => {
+      this.bomaList = list;
       this.allBomaList = list;
       return list;
     });

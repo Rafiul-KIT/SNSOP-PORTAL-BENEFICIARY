@@ -3,33 +3,33 @@
 </div>
 
 @if(isLoading){
-  <app-loader />
+<app-loader />
 }@else {
-  <p-tabs value="0">
-    <p-tablist>
-      <p-tab value="0">Beneficiary's GEO location</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-      <p-tabpanel value="0">
-        <div style="height: calc(100vh - 210px); overflow-y: auto">
-          <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
-            <div class="container user-form">
-              <div class="row">
-                <!-- Left: Personal Info -->
-                <div class="col-md-6">
-                  <div class="card shadow-sm rounded">
-                    <div class="card-header bg-gray text-black">
-                      Personal Information
-                    </div>
-                    <div class="card-body text-center">
-                      <img
-                        [src]="beneficiaryPhoto"
-                        class="img-thumbnail mb-3"
-                        height="100"
-                      />
+<p-tabs value="0">
+  <p-tablist>
+    <p-tab value="0">Beneficiary's GEO location</p-tab>
+  </p-tablist>
+  <p-tabpanels>
+    <p-tabpanel value="0">
+      <div style="height: calc(100vh - 210px); overflow-y: auto">
+        <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+          <div class="container-fluid">
+            <div class="row g-3">
+              <!-- Left: Personal Info -->
+              <div class="col-md-6">
+                <div class="card shadow-sm rounded">
+                  <h5 class="card-header">Personal Information</h5>
+                  <div class="card-body text-center">
+                    <img
+                      [src]="beneficiaryPhoto"
+                      class="img-thumbnail mb-3"
+                      height="100"
+                    />
 
-                      <table class="table table-bordered table-sm text-start mb-0">
-                        <tbody>
+                    <table
+                      class="table table-bordered table-sm text-start mb-0"
+                    >
+                      <tbody>
                         <tr>
                           <th>Application ID</th>
                           <td>{{ beneficiaryDetails.applicationId }}</td>
@@ -37,11 +37,9 @@
                         <tr>
                           <th>Name</th>
                           <td>
-                            {{
-                              beneficiaryDetails.respondentFirstName
-                              + ' ' + (beneficiaryDetails.respondentMiddleName || '')
-                              + ' ' + beneficiaryDetails.respondentLastName
-                            }}
+                            {{ beneficiaryDetails.respondentFirstName + ' ' +
+                            (beneficiaryDetails.respondentMiddleName || '') + '
+                            ' + beneficiaryDetails.respondentLastName }}
                           </td>
                         </tr>
                         <tr>
@@ -56,17 +54,18 @@
                           <th>Phone</th>
                           <td>{{ beneficiaryDetails.respondentPhoneNo }}</td>
                         </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
+              </div>
 
-                <!-- Right: Geo Location -->
-                <div class="col-md-6">
-                  <div class="card shadow-sm rounded mt-3 mt-md-0">
-                    <h5 class="card-header">GEO location</h5>
-                    <div class="card-body row">
+              <!-- Right: Geo Location -->
+              <div class="col-md-6">
+                <div class="card shadow-sm rounded mt-3 mt-md-0">
+                  <h5 class="card-header">GEO location</h5>
+                  <div class="card-body">
+                    <div class="row">
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
                           <p-select
@@ -140,6 +139,7 @@
                   </div>
                 </div>
               </div>
+              <!-- </div> -->
 
               <!-- ===== Comment + Approve/Reject ===== -->
               <!-- <div class="card shadow-sm rounded mt-3">
@@ -180,19 +180,25 @@
               </div> -->
 
               <!-- Submit Button -->
-              <div class="mt-3 d-flex justify-content-end">
-                <p-button
-                  severity="info"
-                  type="submit"
-                  [disabled]="beneficiaryForm.invalid || isSubmitting"
-                  icon="fas fa-save"
-                  label="Update"
-                />
+              <div class="col-12">
+                <div class="card card-body p-2">
+                  <div class="d-flex justify-content-end">
+                    <p-button
+                      severity="info"
+                      type="submit"
+                      [disabled]="beneficiaryForm.invalid || isSubmitting"
+                      icon="fas fa-save"
+                      label="Update"
+                      size="small"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </form>
-        </div>
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
+          </div>
+        </form>
+      </div>
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>
 }
