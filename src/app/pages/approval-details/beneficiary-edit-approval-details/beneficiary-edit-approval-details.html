@@ -715,14 +715,14 @@
                                                     <table class="table table-bordered mb-0">
                                                         <tbody>
                                                             <tr>
-                                                                <th colspan="8"
-                                                                    class="bg-secondary text-light text-center">
-                                                                    Total Member: <span
-                                                                        [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
-                                                                        [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
-                                                                        {{ editedDetails?.householdSize }}
-                                                                    </span>
-                                                                </th>
+                                                              <th colspan="8"
+                                                                  class="bg-secondary text-center"
+                                                                  [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
+                                                                  [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
+                                                                  <span class="text-light">
+                                                                    Total Member: {{ editedDetails?.householdSize }}
+                                                                  </span>
+                                                              </th>
                                                             </tr>
                                                             <tr>
                                                                 <th class="table-label">Female Member</th>
@@ -1056,7 +1056,7 @@
                             </div>
                             } @else {
                             @for (alt of oldDetails!.alternates; track alt; let i = $index) {
-                            <div class="card shadow-sm rounded h-100 mb-3">
+                              <div class="card shadow-sm rounded mb-3" style="height:auto;">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Old)
                                 </div>
@@ -1143,7 +1143,7 @@
                             </div>
                             } @else {
                             @for (alt of editedDetails!.alternates; track alt; let i = $index) {
-                            <div class="card shadow-sm rounded h-100 mb-3">
+                              <div class="card shadow-sm rounded mb-3" style="height:auto;">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
@@ -1161,7 +1161,7 @@
                                                     <th colspan="5">Right Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of alt.rightFingers; track f) {
+
                                                     <td>
                                                     <td *ngFor="let f of alt.rightFingers; let j = index"
                                                         [ngClass]="changedClass(altFingerPath(i,'right',j))"
@@ -1169,13 +1169,13 @@
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
-                                                    }
+
                                                 </tr>
                                                 <tr>
                                                     <th colspan="5">Left Hand Finger</th>
                                                 </tr>
                                                 <tr>
-                                                    @for (f of alt.leftFingers; track f) {
+
                                                     <td>
                                                     <td *ngFor="let f of alt.leftFingers; let j = index"
                                                         [ngClass]="changedClass(altFingerPath(i,'left',j))"
@@ -1183,7 +1183,7 @@
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
-                                                    }
+
                                                 </tr>
                                             </tbody>
                                         </table>

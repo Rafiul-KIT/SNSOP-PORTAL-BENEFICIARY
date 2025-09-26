@@ -643,14 +643,14 @@ export class BeneficiaryEditApprovalDetails {
   /** Return a tooltip string (merged if multiple) for changed paths. */
   diffTip(paths: string | string[]): string | undefined {
     const arr = Array.isArray(paths) ? paths : [paths];
-    const msgs: string[] = [];
+    const msgs = new Set<string>();   // ✅ avoid duplicates
     for (const p of arr) {
       for (const c of this.candidatesFor(p)) {
         const v = this.differences[c];
-        if (v) msgs.push(`${c}: ${v}`);
+        if (v) msgs.add(`${c}: ${v}`);
       }
     }
-    return msgs.length ? msgs.join('\n') : undefined;
+    return msgs.size ? Array.from(msgs).join('\n') : undefined;
   }
 
   /** Convenience for ngClass. */
