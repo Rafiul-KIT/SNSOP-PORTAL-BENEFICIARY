@@ -126,6 +126,15 @@ export class BeneficiaryList implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+
+  private loadLookups() {
+  this.states = this.lookup.getStateList();
+  this.counties = this.lookup.getAllCountyList();
+  this.payams = this.lookup.getAllPayamList();
+  this.bomas = this.lookup.getAllBomaList();
+  this.genderOptions = this.lookup.getGenderList();
+  this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+}
   ngOnInit() {
     this.initForm();
     this.initBreadcrumb();
@@ -141,12 +150,7 @@ export class BeneficiaryList implements OnInit {
     //     .then((list) => (this.payams = list)),
     //   this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
     // ]).then(() => {
-    this.states = this.lookup.getStateList();
-    this.counties = this.lookup.getAllCountyList();
-    this.payams = this.lookup.getAllPayamList();
-    this.bomas = this.lookup.getAllBomaList();
-    this.genderOptions = this.lookup.getGenderList();
-    this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+    this.loadLookups();
 
     // console.log(this.counties, this.payams, this.bomas);
 
@@ -391,6 +395,7 @@ export class BeneficiaryList implements OnInit {
     this.counties = [];
     this.payams = [];
     this.bomas = [];
+    this.loadLookups();
     this.searchBeneficiaries();
   }
 
