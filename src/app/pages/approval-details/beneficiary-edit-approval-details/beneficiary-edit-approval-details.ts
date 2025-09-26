@@ -134,9 +134,9 @@ export class BeneficiaryEditApprovalDetails {
 
   items = [
     {
-      label: 'Beneficiary List',
+      label: 'Approval List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary/list',
+      routerLink: '/beneficiary-approval-list/edit',
     },
     { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
   ];

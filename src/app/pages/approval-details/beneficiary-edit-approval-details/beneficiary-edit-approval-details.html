@@ -39,7 +39,7 @@
                         <div class="col-12 col-md-6">
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
-                                    Personal Information (Old)
+                                   <strong> Personal Information (Old) </strong>
                                 </div>
                                 <div class="card-body text-center">
                                     <img [src]="oldDetails?.photo || '/images/dummyHuman.jpg'"
@@ -513,7 +513,7 @@
                         <div class="col-12 col-md-6">
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
-                                    Personal Information (Edited)
+                                   <strong>Personal Information (Edited)</strong>
                                     <span style="color: red; margin-left: 10px;">Marked/Highlighted fields have been
                                         edited*</span>
                                 </div>
@@ -1148,7 +1148,7 @@
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" width="100"
+                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3" height="80"
                                         [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
                                         [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
 

@@ -491,24 +491,42 @@ export class BeneficiaryManage implements OnInit {
   }
 
 
-  onSubmit() {
-    if (!this.beneficiaryForm.valid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Please fill out all required fields.'
-      });
-      return;
-    }
+onSubmit() {
+  if (!this.beneficiaryForm.valid) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validation',
+      detail: 'Please fill out all required fields.'
+    });
+    return;
+  }
 
-    const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
-    const payload = { beneficiaries: [beneficiary] };
+  const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
+  const payload = { beneficiaries: [beneficiary] };
 
-    this.isLoading = true;
+  this.isLoading = true;
 
-    this.api
-      .POST('api/beneficiary/update/batch', payload)
-      .then(() => {
+  this.api
+    .POST('api/beneficiary/update/batch', payload)
+    .then((res: any) => {
+      console.log('API raw response:', res);
+
+      // Handle both axios-style (res.data) and fetch-style (res directly)
+      const responses = res?.bulkResponse || res?.data?.bulkResponse || [];
+
+      if (!responses.length) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'No response returned from server.'
+        });
+        return;
+      }
+
+      // Assuming one beneficiary per request
+      const first = responses[0];
+
+      if (first.result === 'SUCCESS') {
         this.messageService.add({
           severity: 'success',
           summary: 'Update Successful',
@@ -517,21 +535,34 @@ export class BeneficiaryManage implements OnInit {
         setTimeout(() => {
           this.router.navigate(['/beneficiary/list']);
         }, 3000);
-
-      })
-      .catch((err) => {
-        console.error('Update failed:', err);
+      } else if (first.result === 'FAILED') {
         this.messageService.add({
           severity: 'error',
           summary: 'Update Failed',
-          detail: 'Failed to edit request sent'
+          detail: first.errorMessage || 'Unknown error occurred'
         });
-      })
-      .finally(() => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
+      } else {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Update Status',
+          detail: `Unexpected result: ${first.result}`
+        });
+      }
+    })
+    .catch((err) => {
+      console.error('Update failed:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: 'Request could not be processed'
       });
-  }
+    })
+    .finally(() => {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    });
+}
+
 
 
 
