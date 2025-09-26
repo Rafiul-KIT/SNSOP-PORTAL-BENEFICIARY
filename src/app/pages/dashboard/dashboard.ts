@@ -73,17 +73,28 @@ export class Dashboard implements OnInit {
 
     // 👉 Fetching real-time data or mock data immediately
     this.dashboardSummary = {
-      countyWiseBeneficiary: { '101': 120, '102': 90, '103': 150 },
-      countyWiseDeduplicate: { '101': 5, '102': 3, '103': 8 },
-      lipwCount: 200,
-      disCount: 150,
-      maleCount: 220,
-      femaleCount: 130,
-      totalBeneficiary: 350,
+      countyWiseBeneficiary: {
+        '101': 120, '102': 90, '103': 150,
+        '104': 110, '105': 130, '106': 140, '107': 95, '108': 160
+      },
+      countyWiseDeduplicate: {
+        '101': 5, '102': 3, '103': 8,
+        '104': 6, '105': 4, '106': 7, '107': 2, '108': 9
+      },
+      lipwCount: 400,
+      disCount: 350,
+      maleCount: 420,
+      femaleCount: 330,
+      totalBeneficiary: 750,
       countyWiseNominee: [
         { county: '101', maleNominee: 50, femaleNominee: 70 },
         { county: '102', maleNominee: 30, femaleNominee: 60 },
-        { county: '103', maleNominee: 40, femaleNominee: 80 }
+        { county: '103', maleNominee: 40, femaleNominee: 80 },
+        { county: '104', maleNominee: 45, femaleNominee: 65 },
+        { county: '105', maleNominee: 60, femaleNominee: 70 },
+        { county: '106', maleNominee: 55, femaleNominee: 85 },
+        { county: '107', maleNominee: 35, femaleNominee: 60 },
+        { county: '108', maleNominee: 70, femaleNominee: 90 }
       ],
       dayWiseCount: {
         '2025-09-16': 20,
@@ -112,7 +123,12 @@ export class Dashboard implements OnInit {
     const counties = [
       { id: '101', name: 'JUBA', target: 200 },
       { id: '102', name: 'PARIANG', target: 150 },
-      { id: '103', name: 'MELUTH', target: 180 }
+      { id: '103', name: 'MELUTH', target: 180 },
+      { id: '104', name: 'YAMBIO', target: 160 },
+      { id: '105', name: 'TORIT', target: 190 },
+      { id: '106', name: 'BOR', target: 170 },
+      { id: '107', name: 'KAJO-KEJI', target: 140 },
+      { id: '108', name: 'WAU', target: 210 }
     ];
 
     counties.forEach((c) => {
@@ -164,7 +180,16 @@ export class Dashboard implements OnInit {
   // simple mock lookup
   lookupService = {
     getCountyNameById: (id: string) => {
-      const names: any = { '101': 'JUBA', '102': 'PARIANG', '103': 'MELUTH' };
+      const names: any = {
+        '101': 'JUBA',
+        '102': 'PARIANG',
+        '103': 'MELUTH',
+        '104': 'YAMBIO',
+        '105': 'TORIT',
+        '106': 'BOR',
+        '107': 'KAJO-KEJI',
+        '108': 'WAU'
+      };
       return names[id] || id;
     }
   };
