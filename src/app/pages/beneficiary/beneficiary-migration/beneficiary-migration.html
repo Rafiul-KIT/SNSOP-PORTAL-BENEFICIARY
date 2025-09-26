@@ -2,6 +2,8 @@
   <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
 </div>
 
+
+<p-toast position="bottom-right" />
 @if(isLoading){
 <app-loader />
 }@else {
@@ -13,6 +15,15 @@
     <p-tabpanel value="0">
       <div style="height: calc(100vh - 210px); overflow-y: auto">
         <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+          <div class="col-12">
+            <div class="card card-body p-2">
+              <div class="d-flex justify-content-end">
+                <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid || isLoading"
+                  [loading]="isLoading" icon="fas fa-save" label="Update" size="small">
+                </p-button>
+              </div>
+            </div>
+          </div>
           <div class="container-fluid">
             <div class="row g-3">
               <!-- Left: Personal Info -->
@@ -20,15 +31,9 @@
                 <div class="card shadow-sm rounded">
                   <h5 class="card-header">Personal Information</h5>
                   <div class="card-body text-center">
-                    <img
-                      [src]="beneficiaryPhoto"
-                      class="img-thumbnail mb-3"
-                      height="100"
-                    />
+                    <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" height="100" />
 
-                    <table
-                      class="table table-bordered table-sm text-start mb-0"
-                    >
+                    <table class="table table-bordered table-sm text-start mb-0">
                       <tbody>
                         <tr>
                           <th>Application ID</th>
@@ -68,72 +73,38 @@
                     <div class="row">
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
-                          <p-select
-                            formControlName="state"
-                            [options]="stateList"
-                            optionLabel="name"
-                            optionValue="id"
-                            placeholder="Select State"
-                            class="w-100"
-                          ></p-select>
+                          <p-select formControlName="state" [options]="stateList" optionLabel="name" optionValue="id"
+                            placeholder="Select State" class="w-100"></p-select>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
-                          <p-select
-                            formControlName="county"
-                            [options]="countyList"
-                            optionLabel="name"
-                            optionValue="id"
-                            [disabled]="!beneficiaryForm.get('state')?.value"
-                            placeholder="Select County"
-                            class="w-100"
-                          ></p-select>
+                          <p-select formControlName="county" [options]="countyList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('state')?.value" placeholder="Select County"
+                            class="w-100"></p-select>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
-                          <p-select
-                            formControlName="payam"
-                            [options]="payamList"
-                            optionLabel="name"
-                            optionValue="id"
-                            [disabled]="!beneficiaryForm.get('county')?.value"
-                            placeholder="Select Payam"
-                            class="w-100"
-                          ></p-select>
+                          <p-select formControlName="payam" [options]="payamList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('county')?.value" placeholder="Select Payam"
+                            class="w-100"></p-select>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
-                          <p-select
-                            formControlName="boma"
-                            [options]="bomaList"
-                            optionLabel="name"
-                            optionValue="id"
-                            [disabled]="!beneficiaryForm.get('payam')?.value"
-                            placeholder="Select Boma"
-                            class="w-100"
-                          ></p-select>
+                          <p-select formControlName="boma" [options]="bomaList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('payam')?.value" placeholder="Select Boma"
+                            class="w-100"></p-select>
                         </div>
                       </div>
                       <div class="col-md-6">
-                        <input
-                          class="w-100"
-                          pInputText
-                          placeholder="GPS Coordinates (Lat)"
-                          formControlName="gpsLat"
-                          readonly
-                        />
+                        <input class="w-100" pInputText placeholder="GPS Coordinates (Lat)" formControlName="gpsLat"
+                          readonly />
                       </div>
                       <div class="col-md-6">
-                        <input
-                          class="w-100"
-                          pInputText
-                          placeholder="GPS Coordinates (Long)"
-                          formControlName="gpsLong"
-                          readonly
-                        />
+                        <input class="w-100" pInputText placeholder="GPS Coordinates (Long)" formControlName="gpsLong"
+                          readonly />
                       </div>
                     </div>
                   </div>
@@ -180,7 +151,7 @@
               </div> -->
 
               <!-- Submit Button -->
-              <div class="col-12">
+              <!-- <div class="col-12">
                 <div class="card card-body p-2">
                   <div class="d-flex justify-content-end">
                     <p-button
@@ -193,7 +164,7 @@
                     />
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
         </form>

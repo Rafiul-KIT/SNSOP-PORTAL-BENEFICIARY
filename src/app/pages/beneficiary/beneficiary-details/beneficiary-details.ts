@@ -71,7 +71,7 @@ interface BeneficiaryVm {
     phone: string;
     documentType: string;
     photo?: string;
-    biometric?: BiometricDto;
+    biometrics?: BiometricDto;
     rightFingers: FingerVm[];
     leftFingers: FingerVm[];
   }[];
@@ -272,7 +272,7 @@ export class BeneficiaryDetails implements OnInit {
       .then((res: any) => {
         const dto = res?.data as BeneficiaryDto;
         this.beneficiaryDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometric);
+        this.prepareFingerImages(dto.biometrics);
       })
       .catch((err) => console.error('Error loading beneficiary details:', err))
       .finally(() => {
@@ -288,7 +288,7 @@ export class BeneficiaryDetails implements OnInit {
       .then((res: any) => {
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometric);
+        this.prepareFingerImages(dto.biometrics);
       })
       .catch((err) => console.error('Error loading task details:', err))
       .finally(() => {
@@ -333,7 +333,7 @@ export class BeneficiaryDetails implements OnInit {
       registrationPhase: dto.registrationPhase,
 
       phone: dto.respondentPhoneNo,
-      photo: normalizePhoto(dto.biometric?.photoData),
+      photo: normalizePhoto(dto.biometrics?.photoData),
 
       household: {
         incomeSource: dto.householdIncomeSource,
@@ -385,62 +385,62 @@ export class BeneficiaryDetails implements OnInit {
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
-          photo: normalizePhoto(alt.biometric?.photoData),
-          biometric: alt.biometric,
+          photo: normalizePhoto(alt.biometrics?.photoData),
+          biometrics: alt.biometrics,
 
           // ✨ alternate-specific finger sets
           rightFingers: [
             {
               label: 'Thumb',
               tooltip: 'Right Thumb',
-              image: normalizeFinger(alt.biometric?.rtFingerData),
+              image: normalizeFinger(alt.biometrics?.rtFingerData),
             },
             {
               label: 'Index',
               tooltip: 'Right Index',
-              image: normalizeFinger(alt.biometric?.riFingerData),
+              image: normalizeFinger(alt.biometrics?.riFingerData),
             },
             {
               label: 'Middle',
               tooltip: 'Right Middle',
-              image: normalizeFinger(alt.biometric?.rmFingerData),
+              image: normalizeFinger(alt.biometrics?.rmFingerData),
             },
             {
               label: 'Ring',
               tooltip: 'Right Ring',
-              image: normalizeFinger(alt.biometric?.rrFingerData),
+              image: normalizeFinger(alt.biometrics?.rrFingerData),
             },
             {
               label: 'Little',
               tooltip: 'Right Little',
-              image: normalizeFinger(alt.biometric?.rsFingerData),
+              image: normalizeFinger(alt.biometrics?.rsFingerData),
             },
           ],
           leftFingers: [
             {
               label: 'Thumb',
               tooltip: 'Left Thumb',
-              image: normalizeFinger(alt.biometric?.ltFingerData),
+              image: normalizeFinger(alt.biometrics?.ltFingerData),
             },
             {
               label: 'Index',
               tooltip: 'Left Index',
-              image: normalizeFinger(alt.biometric?.liFingerData),
+              image: normalizeFinger(alt.biometrics?.liFingerData),
             },
             {
               label: 'Middle',
               tooltip: 'Left Middle',
-              image: normalizeFinger(alt.biometric?.lmFingerData),
+              image: normalizeFinger(alt.biometrics?.lmFingerData),
             },
             {
               label: 'Ring',
               tooltip: 'Left Ring',
-              image: normalizeFinger(alt.biometric?.lrFingerData),
+              image: normalizeFinger(alt.biometrics?.lrFingerData),
             },
             {
               label: 'Little',
               tooltip: 'Left Little',
-              image: normalizeFinger(alt.biometric?.lsFingerData),
+              image: normalizeFinger(alt.biometrics?.lsFingerData),
             },
           ],
         })),
@@ -463,54 +463,54 @@ export class BeneficiaryDetails implements OnInit {
         {
           label: 'Thumb',
           tooltip: 'Right Thumb',
-          image: normalizeFinger(dto.biometric?.rtFingerData),
+          image: normalizeFinger(dto.biometrics?.rtFingerData),
         },
         {
           label: 'Index',
           tooltip: 'Right Index',
-          image: normalizeFinger(dto.biometric?.riFingerData),
+          image: normalizeFinger(dto.biometrics?.riFingerData),
         },
         {
           label: 'Middle',
           tooltip: 'Right Middle',
-          image: normalizeFinger(dto.biometric?.rmFingerData),
+          image: normalizeFinger(dto.biometrics?.rmFingerData),
         },
         {
           label: 'Ring',
           tooltip: 'Right Ring',
-          image: normalizeFinger(dto.biometric?.rrFingerData),
+          image: normalizeFinger(dto.biometrics?.rrFingerData),
         },
         {
           label: 'Little',
           tooltip: 'Right Little',
-          image: normalizeFinger(dto.biometric?.rsFingerData),
+          image: normalizeFinger(dto.biometrics?.rsFingerData),
         },
       ],
       leftFingers: [
         {
           label: 'Thumb',
           tooltip: 'Left Thumb',
-          image: normalizeFinger(dto.biometric?.ltFingerData),
+          image: normalizeFinger(dto.biometrics?.ltFingerData),
         },
         {
           label: 'Index',
           tooltip: 'Left Index',
-          image: normalizeFinger(dto.biometric?.liFingerData),
+          image: normalizeFinger(dto.biometrics?.liFingerData),
         },
         {
           label: 'Middle',
           tooltip: 'Left Middle',
-          image: normalizeFinger(dto.biometric?.lmFingerData),
+          image: normalizeFinger(dto.biometrics?.lmFingerData),
         },
         {
           label: 'Ring',
           tooltip: 'Left Ring',
-          image: normalizeFinger(dto.biometric?.lrFingerData),
+          image: normalizeFinger(dto.biometrics?.lrFingerData),
         },
         {
           label: 'Little',
           tooltip: 'Left Little',
-          image: normalizeFinger(dto.biometric?.lsFingerData),
+          image: normalizeFinger(dto.biometrics?.lsFingerData),
         },
       ],
     };

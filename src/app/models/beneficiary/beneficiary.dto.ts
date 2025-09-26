@@ -80,7 +80,7 @@ export interface BeneficiaryDto {
   alternatePayee1?: AlternatePayeeDto;
   alternatePayee2?: AlternatePayeeDto;
 
-  biometric?: BiometricDto;
+  biometrics?: BiometricDto;
 
   createdBy: number;
   updatedBy: number;

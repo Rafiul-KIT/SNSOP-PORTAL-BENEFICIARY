@@ -14,6 +14,9 @@ import { BeneficiaryDto } from '../../../models/beneficiary';
 import { FloatLabel } from 'primeng/floatlabel';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
 import { FormArray } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { Toast } from "primeng/toast";
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -29,6 +32,7 @@ import { FormArray } from '@angular/forms';
     ButtonModule,
     Loader,
     FloatLabel,
+    Toast
   ],
   templateUrl: './beneficiary-manage.html',
   styleUrls: ['./beneficiary-manage.scss'],
@@ -70,7 +74,9 @@ export class BeneficiaryManage implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private lookup: LookupService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private messageService: MessageService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -95,14 +101,17 @@ export class BeneficiaryManage implements OnInit {
 
     const applicationId = this.route.snapshot.paramMap.get('applicationId');
     if (applicationId) {
+      this.isLoading = true;
       this.loadBeneficiary(applicationId);
+    }
+    else {
+      this.isLoading = false;
     }
 
     this.beneficiaryForm.get('supportType')?.valueChanges.subscribe(val => {
       this.filterReasons(val);
     });
 
-    this.isLoading = false;
     this.cdr.detectChanges();
   }
 
@@ -442,9 +451,29 @@ export class BeneficiaryManage implements OnInit {
       payload.alternatePayee2.payeePhoneNo = formValue.alt2Phone;
     }
 
+    // if (!payload.address) {
+    //   payload.address = {
+    //     stateId: 0,
+    //     countyId: 0,
+    //     payam: 0,
+    //     boma: '',
+    //     location: { lat: 0, lon: 0 }
+    //   };
+    // }
+
+    // // ✅ Preserve or update lat/lon
+    // payload.address = {
+    //   ...payload.address,
+    //   location: {
+    //     lat: formValue.latitude ?? payload.address.location?.lat ?? 0,
+    //     lon: formValue.longitude ?? payload.address.location?.lon ?? 0
+    //   }
+    // };
+
     // ✅ Nominees
     payload.nominees = this.nominees.value.map((n: any) => ({
       id: n.id,
+      applicationId: n.applicationId,
       nomineeFirstName: n.nomineeFirstName,
       nomineeMiddleName: n.nomineeMiddleName,
       nomineeLastName: n.nomineeLastName,
@@ -464,26 +493,47 @@ export class BeneficiaryManage implements OnInit {
 
   onSubmit() {
     if (!this.beneficiaryForm.valid) {
-      alert('Please fill out all required fields.');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: 'Please fill out all required fields.'
+      });
       return;
     }
 
     const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
+    const payload = { beneficiaries: [beneficiary] };
 
-    const payload = {
-      beneficiaries: [beneficiary]
-    };
+    this.isLoading = true;
 
     this.api
       .POST('api/beneficiary/update/batch', payload)
       .then(() => {
-        alert('Beneficiary updated successfully!');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Update Successful',
+          detail: 'Beneficiary updated successfully!'
+        });
+        setTimeout(() => {
+          this.router.navigate(['/beneficiary/list']);
+        }, 3000);
+
       })
       .catch((err) => {
         console.error('Update failed:', err);
-        alert('Failed to update beneficiary');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Failed to update beneficiary'
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
   }
+
+
 
   onReasonChange(event: any, value: string) {
     const reasons = this.beneficiaryForm.get('selectionReasons')?.value || [];

@@ -10,6 +10,7 @@ import { BeneficiaryEditApprovalList } from './pages/approval-list/beneficiary-e
 import { BeneficiaryMigrateApprovalList } from './pages/approval-list/beneficiary-migrate-approval-list/beneficiary-migrate-approval-list';
 import { BeneficiaryEditApprovalDetails } from './pages/approval-details/beneficiary-edit-approval-details/beneficiary-edit-approval-details';
 import { routeGuard } from './route.guard';
+import { BeneficiaryIdCard } from './pages/beneficiary/beneficiary-id-card/beneficiary-id-card';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
+      },
+      {
+        path: 'id-card',
+        component: BeneficiaryIdCard,
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
