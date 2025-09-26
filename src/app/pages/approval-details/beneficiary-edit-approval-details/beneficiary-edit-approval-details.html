@@ -514,6 +514,8 @@
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
                                     Personal Information (Edited)
+                                    <span style="color: red; margin-left: 10px;">Marked/Highlighted fields have been
+                                        edited*</span>
                                 </div>
                                 <div class="card-body text-center">
                                     <img [src]="editedDetails?.photo || '/images/dummyHuman.jpg'"
@@ -526,120 +528,130 @@
                                             </tr>
                                             <tr>
                                                 <th>Name</th>
-                                              <td [ngClass]="changedClass(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
-                                                  [pTooltip]="diffTip(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
-                                                  tooltipPosition="top">
-                                                {{ editedDetails?.name }}
-                                              </td>
+                                                <td [ngClass]="changedClass(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
+                                                    [pTooltip]="diffTip(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
+                                                    tooltipPosition="top">
+                                                    {{ editedDetails?.name }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                              <td [ngClass]="changedClass('respondentAge')" [pTooltip]="diffTip('respondentAge')">
-                                                {{ editedDetails?.age }}
-                                              </td>
+                                                <td [ngClass]="changedClass('respondentAge')"
+                                                    [pTooltip]="diffTip('respondentAge')">
+                                                    {{ editedDetails?.age }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                              <td [ngClass]="changedClass('respondentGender')" [pTooltip]="diffTip('respondentGender')">
-                                                {{ editedDetails?.gender }}
-                                              </td>
+                                                <td [ngClass]="changedClass('respondentGender')"
+                                                    [pTooltip]="diffTip('respondentGender')">
+                                                    {{ editedDetails?.gender }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Relationship</th>
-                                              <td [ngClass]="changedClass('relationshipWithHouseholdHead')" [pTooltip]="diffTip('relationshipWithHouseholdHead')">
-                                                {{ editedDetails?.relationshipWithHouseholdHead }}
-                                              </td>
+                                                <td [ngClass]="changedClass('relationshipWithHouseholdHead')"
+                                                    [pTooltip]="diffTip('relationshipWithHouseholdHead')">
+                                                    {{ editedDetails?.relationshipWithHouseholdHead }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Marital Status</th>
-                                              <td [ngClass]="changedClass('respondentMaritalStatus')" [pTooltip]="diffTip('respondentMaritalStatus')">
-                                                {{ editedDetails?.respondentMaritalStatus }}
-                                              </td>
+                                                <td [ngClass]="changedClass('respondentMaritalStatus')"
+                                                    [pTooltip]="diffTip('respondentMaritalStatus')">
+                                                    {{ editedDetails?.respondentMaritalStatus }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Spouse Name</th>
-                                              <td [ngClass]="changedClass(['spouseFirstName','spouseMiddleName','spouseLastName'])"
-                                                  [pTooltip]="diffTip(['spouseFirstName','spouseMiddleName','spouseLastName'])">
-                                                {{ editedDetails?.spouseName }}
-                                              </td>
+                                                <td [ngClass]="changedClass(['spouseFirstName','spouseMiddleName','spouseLastName'])"
+                                                    [pTooltip]="diffTip(['spouseFirstName','spouseMiddleName','spouseLastName'])">
+                                                    {{ editedDetails?.spouseName }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Legal Status</th>
-                                              <td [ngClass]="changedClass('respondentLegalStatus')" [pTooltip]="diffTip('respondentLegalStatus')">
-                                                {{ editedDetails?.respondentLegalStatus }}
-                                              </td>
+                                                <td [ngClass]="changedClass('respondentLegalStatus')"
+                                                    [pTooltip]="diffTip('respondentLegalStatus')">
+                                                    {{ editedDetails?.respondentLegalStatus }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>ID Number (Type)</th>
-                                              <td [ngClass]="changedClass(['respondentId','documentType'])"
-                                                  [pTooltip]="diffTip(['respondentId','documentType'])">
-                                                {{ editedDetails?.respondentId }} ({{ lookup.getDocumentTypeEnumByValue(editedDetails?.documentType) }})
-                                              </td>
+                                                <td [ngClass]="changedClass(['respondentId','documentType'])"
+                                                    [pTooltip]="diffTip(['respondentId','documentType'])">
+                                                    {{ editedDetails?.respondentId }} ({{
+                                                    lookup.getDocumentTypeEnumByValue(editedDetails?.documentType) }})
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Money Provider</th>
-                                              <td [ngClass]="changedClass('mobileMoneyProvider')" [pTooltip]="diffTip('mobileMoneyProvider')">
-                                                {{ editedDetails?.mobileMoneyProvider }}
-                                              </td>
+                                                <td [ngClass]="changedClass('mobileMoneyProvider')"
+                                                    [pTooltip]="diffTip('mobileMoneyProvider')">
+                                                    {{ editedDetails?.mobileMoneyProvider }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Mobile Wallet Number</th>
-                                              <td [ngClass]="changedClass('mobileWalletNumber')" [pTooltip]="diffTip('mobileWalletNumber')">
-                                                {{ editedDetails?.mobileWalletNumber }}
-                                              </td>
+                                                <td [ngClass]="changedClass('mobileWalletNumber')"
+                                                    [pTooltip]="diffTip('mobileWalletNumber')">
+                                                    {{ editedDetails?.mobileWalletNumber }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Registration Phase</th>
-                                              <td [ngClass]="changedClass('registrationPhase')" [pTooltip]="diffTip('registrationPhase')">
-                                                {{ editedDetails?.registrationPhase }}
-                                              </td>
+                                                <td [ngClass]="changedClass('registrationPhase')"
+                                                    [pTooltip]="diffTip('registrationPhase')">
+                                                    {{ editedDetails?.registrationPhase }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Phone</th>
-                                              <td [ngClass]="changedClass('respondentPhoneNo')" [pTooltip]="diffTip('respondentPhoneNo')">
-                                                {{ editedDetails?.phone }}
-                                              </td>
+                                                <td [ngClass]="changedClass('respondentPhoneNo')"
+                                                    [pTooltip]="diffTip('respondentPhoneNo')">
+                                                    {{ editedDetails?.phone }}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
-                          <div class="card shadow-sm rounded mt-2">
-                            <div class="card-header bg-gray text-black">
-                              Biometric Fingerprints
+                            <div class="card shadow-sm rounded mt-2">
+                                <div class="card-header bg-gray text-black">
+                                    Biometric Fingerprints
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered text-center mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <th colspan="5">Right Hand Finger</th>
+                                                </tr>
+                                                <tr>
+                                                    <td *ngFor="let f of editedRightFingers; let i = index"
+                                                        [ngClass]="changedClass(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])"
+                                                        [pTooltip]="diffTip(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])">
+                                                        <img [src]="f.image" height="40" /><br />
+                                                        <kbd>{{ f.label }}</kbd>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="5">Left Hand Finger</th>
+                                                </tr>
+                                                <tr>
+                                                    <td *ngFor="let f of editedLeftFingers; let i = index"
+                                                        [ngClass]="changedClass(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])"
+                                                        [pTooltip]="diffTip(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])">
+                                                        <img [src]="f.image" height="40" /><br />
+                                                        <kbd>{{ f.label }}</kbd>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                              <div class="table-responsive">
-                                <table class="table table-bordered text-center mb-0">
-                                  <tbody>
-                                  <tr>
-                                    <th colspan="5">Right Hand Finger</th>
-                                  </tr>
-                                  <tr>
-                                    <td *ngFor="let f of editedRightFingers; let i = index"
-                                        [ngClass]="changedClass(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])"
-                                        [pTooltip]="diffTip(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])">
-                                      <img [src]="f.image" height="40" /><br />
-                                      <kbd>{{ f.label }}</kbd>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <th colspan="5">Left Hand Finger</th>
-                                  </tr>
-                                  <tr>
-                                    <td *ngFor="let f of editedLeftFingers; let i = index"
-                                        [ngClass]="changedClass(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])"
-                                        [pTooltip]="diffTip(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])">
-                                      <img [src]="f.image" height="40" /><br />
-                                      <kbd>{{ f.label }}</kbd>
-                                    </td>
-                                  </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>
 
 
                             <!-- Fingerprints -->
@@ -656,31 +668,34 @@
                                                         <tbody>
                                                             <tr>
                                                                 <th>Income Source</th>
-                                                              <td [ngClass]="changedClass('householdIncomeSource')"
-                                                                  [pTooltip]="diffTip('householdIncomeSource')">
-                                                                {{ lookup.getOccupationEnumByValue(editedDetails?.household?.incomeSource) }}
-                                                              </td>
+                                                                <td [ngClass]="changedClass('householdIncomeSource')"
+                                                                    [pTooltip]="diffTip('householdIncomeSource')">
+                                                                    {{
+                                                                    lookup.getOccupationEnumByValue(editedDetails?.household?.incomeSource)
+                                                                    }}
+                                                                </td>
                                                             </tr>
 
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
-                                                              <td [ngClass]="changedClass('householdMonthlyAvgIncome')"
-                                                                  [pTooltip]="diffTip('householdMonthlyAvgIncome')">
-                                                                {{ editedDetails?.household?.monthlyIncome || '-' }}
-                                                              </td>
+                                                                <td [ngClass]="changedClass('householdMonthlyAvgIncome')"
+                                                                    [pTooltip]="diffTip('householdMonthlyAvgIncome')">
+                                                                    {{ editedDetails?.household?.monthlyIncome || '-' }}
+                                                                </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Selection Criteria</th>
-                                                              <td [ngClass]="changedClass('selectionCriteria')"
-                                                                  [pTooltip]="diffTip('selectionCriteria')">
-                                                                {{ editedDetails?.household?.selectionCriteria || '-' }}
-                                                              </td>
+                                                                <td [ngClass]="changedClass('selectionCriteria')"
+                                                                    [pTooltip]="diffTip('selectionCriteria')">
+                                                                    {{ editedDetails?.household?.selectionCriteria ||
+                                                                    '-' }}
+                                                                </td>
                                                             </tr>
 
                                                             <tr>
                                                                 <th>Selection Reasons</th>
-                                                              <td [ngClass]="changedClass('selectionReason')"
-                                                                  [pTooltip]="diffTip('selectionReason')">
+                                                                <td [ngClass]="changedClass('selectionReason')"
+                                                                    [pTooltip]="diffTip('selectionReason')">
                                                                     @if
                                                                     (editedDetails?.household?.selectionReasons?.length)
                                                                     {
@@ -701,11 +716,12 @@
                                                         <tbody>
                                                             <tr>
                                                                 <th colspan="8"
-                                                                    class="bg-secondary text-light text-center" >
-                                                                    Total Member: <span [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
-                                                                                        [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
-                                                                                    {{ editedDetails?.householdSize }}
-                                                                                  </span>
+                                                                    class="bg-secondary text-light text-center">
+                                                                    Total Member: <span
+                                                                        [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
+                                                                        [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
+                                                                        {{ editedDetails?.householdSize }}
+                                                                    </span>
                                                                 </th>
                                                             </tr>
                                                             <tr>
@@ -957,57 +973,61 @@
                                     </p-accordion-panel>
 
                                     <!-- Address -->
-                                  <p-accordion-panel value="1">
-                                    <p-accordion-header>Address Information (Edited)</p-accordion-header>
-                                    <p-accordion-content>
-                                      <div class="card shadow-sm rounded">
-                                        <div class="card-body">
-                                          <table class="table table-sm table-bordered mb-0">
-                                            <tbody>
-                                            <tr>
-                                              <th>State</th>
-                                              <td [ngClass]="changedClass('address.stateId')" [pTooltip]="diffTip('address.stateId')">
-                                                {{ editedDetails?.address?.state || '-' }}
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <th>County</th>
-                                              <td [ngClass]="changedClass('address.countyId')" [pTooltip]="diffTip('address.countyId')">
-                                                {{ editedDetails?.address?.county || '-' }}
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <th>Payam</th>
-                                              <td [ngClass]="changedClass('address.payam')" [pTooltip]="diffTip('address.payam')">
-                                                {{ editedDetails?.address?.payam || '-' }}
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <th>Boma</th>
-                                              <td [ngClass]="changedClass('address.boma')" [pTooltip]="diffTip('address.boma')">
-                                                {{ editedDetails?.address?.boma || '-' }}
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <th>Latitude</th>
-                                              <td [ngClass]="changedClass(['address.location.lat','address.lat'])"
-                                                  [pTooltip]="diffTip(['address.location.lat','address.lat'])">
-                                                {{ editedDetails?.address?.lat || '-' }}
-                                              </td>
-                                            </tr>
-                                            <tr>
-                                              <th>Longitude</th>
-                                              <td [ngClass]="changedClass(['address.location.lon','address.lon'])"
-                                                  [pTooltip]="diffTip(['address.location.lon','address.lon'])">
-                                                {{ editedDetails?.address?.lon || '-' }}
-                                              </td>
-                                            </tr>
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      </div>
-                                    </p-accordion-content>
-                                  </p-accordion-panel>
+                                    <p-accordion-panel value="1">
+                                        <p-accordion-header>Address Information (Edited)</p-accordion-header>
+                                        <p-accordion-content>
+                                            <div class="card shadow-sm rounded">
+                                                <div class="card-body">
+                                                    <table class="table table-sm table-bordered mb-0">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>State</th>
+                                                                <td [ngClass]="changedClass('address.stateId')"
+                                                                    [pTooltip]="diffTip('address.stateId')">
+                                                                    {{ editedDetails?.address?.state || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>County</th>
+                                                                <td [ngClass]="changedClass('address.countyId')"
+                                                                    [pTooltip]="diffTip('address.countyId')">
+                                                                    {{ editedDetails?.address?.county || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Payam</th>
+                                                                <td [ngClass]="changedClass('address.payam')"
+                                                                    [pTooltip]="diffTip('address.payam')">
+                                                                    {{ editedDetails?.address?.payam || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Boma</th>
+                                                                <td [ngClass]="changedClass('address.boma')"
+                                                                    [pTooltip]="diffTip('address.boma')">
+                                                                    {{ editedDetails?.address?.boma || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Latitude</th>
+                                                                <td [ngClass]="changedClass(['address.location.lat','address.lat'])"
+                                                                    [pTooltip]="diffTip(['address.location.lat','address.lat'])">
+                                                                    {{ editedDetails?.address?.lat || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Longitude</th>
+                                                                <td [ngClass]="changedClass(['address.location.lon','address.lon'])"
+                                                                    [pTooltip]="diffTip(['address.location.lon','address.lon'])">
+                                                                    {{ editedDetails?.address?.lon || '-' }}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </p-accordion-content>
+                                    </p-accordion-panel>
                                 </p-accordion>
                             </div>
                         </div>
@@ -1128,12 +1148,12 @@
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
                                 <div class="card-body text-center">
-                                  <img [src]="alt.photo || '/images/dummyHuman.jpg'" width="100"
-                                       [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
-                                       [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
+                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" width="100"
+                                        [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
+                                        [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
 
 
-                                  @if (alt.biometric) {
+                                    @if (alt.biometric) {
                                     <div class="table-responsive mb-3">
                                         <table class="table table-bordered text-center">
                                             <tbody>
@@ -1143,9 +1163,9 @@
                                                 <tr>
                                                     @for (f of alt.rightFingers; track f) {
                                                     <td>
-                                                      <td *ngFor="let f of alt.rightFingers; let j = index"
-                                                          [ngClass]="changedClass(altFingerPath(i,'right',j))"
-                                                          [pTooltip]="diffTip(altFingerPath(i,'right',j))">
+                                                    <td *ngFor="let f of alt.rightFingers; let j = index"
+                                                        [ngClass]="changedClass(altFingerPath(i,'right',j))"
+                                                        [pTooltip]="diffTip(altFingerPath(i,'right',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
@@ -1157,9 +1177,9 @@
                                                 <tr>
                                                     @for (f of alt.leftFingers; track f) {
                                                     <td>
-                                                      <td *ngFor="let f of alt.leftFingers; let j = index"
-                                                          [ngClass]="changedClass(altFingerPath(i,'left',j))"
-                                                          [pTooltip]="diffTip(altFingerPath(i,'left',j))">
+                                                    <td *ngFor="let f of alt.leftFingers; let j = index"
+                                                        [ngClass]="changedClass(altFingerPath(i,'left',j))"
+                                                        [pTooltip]="diffTip(altFingerPath(i,'left',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
@@ -1174,47 +1194,54 @@
                                         <tbody>
                                             <tr>
                                                 <th style="width: 160px">Name</th>
-                                              <td [ngClass]="changedClass([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])"
-                                                  [pTooltip]="diffTip([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])">
-                                                {{ alt.name || '-' }}
-                                              </td>
+                                                <td [ngClass]="changedClass([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])"
+                                                    [pTooltip]="diffTip([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])">
+                                                    {{ alt.name || '-' }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                              <td [ngClass]="changedClass(altPath(i,'payeeAge'))" [pTooltip]="diffTip(altPath(i,'payeeAge'))">
-                                                {{ alt.age }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'payeeAge'))"
+                                                    [pTooltip]="diffTip(altPath(i,'payeeAge'))">
+                                                    {{ alt.age }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                              <td [ngClass]="changedClass(altPath(i,'payeeGender'))" [pTooltip]="diffTip(altPath(i,'payeeGender'))">
-                                                {{ alt.gender || '-' }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'payeeGender'))"
+                                                    [pTooltip]="diffTip(altPath(i,'payeeGender'))">
+                                                    {{ alt.gender || '-' }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Alternate Relationship</th>
-                                              <td [ngClass]="changedClass(altPath(i,'relationshipWithHouseholdHead'))"
-                                                  [pTooltip]="diffTip(altPath(i,'relationshipWithHouseholdHead'))">
-                                                {{ lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead) }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'relationshipWithHouseholdHead'))"
+                                                    [pTooltip]="diffTip(altPath(i,'relationshipWithHouseholdHead'))">
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
+                                                    }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>ID</th>
-                                              <td [ngClass]="changedClass(altPath(i,'nationalId'))" [pTooltip]="diffTip(altPath(i,'nationalId'))">
-                                                {{ alt.nationalId || '-' }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'nationalId'))"
+                                                    [pTooltip]="diffTip(altPath(i,'nationalId'))">
+                                                    {{ alt.nationalId || '-' }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Document Type</th>
-                                              <td [ngClass]="changedClass(altPath(i,'documentType'))" [pTooltip]="diffTip(altPath(i,'documentType'))">
-                                                {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'documentType'))"
+                                                    [pTooltip]="diffTip(altPath(i,'documentType'))">
+                                                    {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Phone</th>
-                                              <td [ngClass]="changedClass(altPath(i,'payeePhoneNo'))" [pTooltip]="diffTip(altPath(i,'payeePhoneNo'))">
-                                                {{ alt.phone || '-' }}
-                                              </td>
+                                                <td [ngClass]="changedClass(altPath(i,'payeePhoneNo'))"
+                                                    [pTooltip]="diffTip(altPath(i,'payeePhoneNo'))">
+                                                    {{ alt.phone || '-' }}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1314,42 +1341,50 @@
                                         <tbody>
                                             <tr>
                                                 <th>Name</th>
-                                              <td [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])"
-                                                  [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])">
-                                                {{ editedDetails!.nominees[i].name }}
-                                              </td>
+                                                <td [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])"
+                                                    [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])">
+                                                    {{ editedDetails!.nominees[i].name }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                              <td [ngClass]="changedClass(nomineePath(i,'nomineeAge'))" [pTooltip]="diffTip(nomineePath(i,'nomineeAge'))">
-                                                {{ editedDetails!.nominees[i].age }}
-                                              </td>
+                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeAge'))"
+                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeAge'))">
+                                                    {{ editedDetails!.nominees[i].age }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Gender</th>
-                                              <td [ngClass]="changedClass(nomineePath(i,'nomineeGender'))" [pTooltip]="diffTip(nomineePath(i,'nomineeGender'))">
-                                                {{ editedDetails!.nominees[i].gender }}
-                                              </td>
+                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeGender'))"
+                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeGender'))">
+                                                    {{ editedDetails!.nominees[i].gender }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Relation</th>
-                                              <td [ngClass]="changedClass([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])"
-                                                  [pTooltip]="diffTip([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])">
-                                                {{ lookup.getRelationshipEnumByValue(editedDetails!.nominees[i].relation) }}
-                                                {{ editedDetails!.nominees[i].relation === 'OTHER' ? '(' + editedDetails!.nominees[i].relationshipOther + ')' : '' }}
-                                              </td>
+                                                <td [ngClass]="changedClass([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])"
+                                                    [pTooltip]="diffTip([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])">
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(editedDetails!.nominees[i].relation)
+                                                    }}
+                                                    {{ editedDetails!.nominees[i].relation === 'OTHER' ? '(' +
+                                                    editedDetails!.nominees[i].relationshipOther + ')' : '' }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Occupation</th>
-                                              <td [ngClass]="changedClass(nomineePath(i,'nomineeOccupation'))" [pTooltip]="diffTip(nomineePath(i,'nomineeOccupation'))">
-                                                {{ editedDetails!.nominees[i].nomineeOccupation }}
-                                              </td>
+                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeOccupation'))"
+                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeOccupation'))">
+                                                    {{ editedDetails!.nominees[i].nomineeOccupation }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Can read/Write</th>
-                                              <td [ngClass]="changedClass(nomineePath(i,'isReadWrite'))" [pTooltip]="diffTip(nomineePath(i,'isReadWrite'))">
-                                                {{ editedDetails!.nominees[i].isReadWrite === true ? 'Yes' : editedDetails!.nominees[i].isReadWrite === false ? 'No' : '-' }}
-                                              </td>
+                                                <td [ngClass]="changedClass(nomineePath(i,'isReadWrite'))"
+                                                    [pTooltip]="diffTip(nomineePath(i,'isReadWrite'))">
+                                                    {{ editedDetails!.nominees[i].isReadWrite === true ? 'Yes' :
+                                                    editedDetails!.nominees[i].isReadWrite === false ? 'No' : '-' }}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

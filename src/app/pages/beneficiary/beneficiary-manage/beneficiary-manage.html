@@ -8,16 +8,15 @@
 }@else {
 <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
   <div class="card mt-2">
-    <div class="p-2 d-flex justify-content-end">
-      <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid" icon="fas fa-save" size="small"
-        label="Update" />
-    </div>
+    
   </div>
   <p-tabs value="0">
     <p-tablist value="0">
       <p-tab value="0">Personal Information</p-tab>
       <p-tab value="1">Alternate Payee Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
+      <p-button class="ms-auto p-2" severity="info" type="submit" [disabled]="beneficiaryForm.invalid" icon="fas fa-save" size="small"
+        label="Update" />
     </p-tablist>
 
     <p-tabpanels>

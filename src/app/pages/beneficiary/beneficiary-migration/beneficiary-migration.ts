@@ -242,7 +242,7 @@ export class BeneficiaryMigration implements OnInit {
 
     this.isLoading = true;
     this.api
-      .POST('api/beneficiary/update/batch', payload)
+      .POST('api/beneficiary/migration/batch', payload)
       .then(() => {
         this.messageService.add({
           severity: 'success',

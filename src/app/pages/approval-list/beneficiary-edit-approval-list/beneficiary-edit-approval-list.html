@@ -9,11 +9,7 @@
   <form [formGroup]="searchForm" class="row g-3">
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <input
-          pInputText
-          class="form-control"
-          formControlName="applicationId"
-        />
+        <input pInputText class="form-control" formControlName="applicationId" />
         <label>Application ID</label>
       </p-floatlabel>
     </div>
@@ -34,6 +30,7 @@
       <p-floatlabel variant="on" class="w-100">
         <p-select formControlName="taskType" [options]="[
         { label: 'Edit', value: 'BENEFICIARY_EDIT' },
+        { label: 'Migrate', value: 'BENEFICIARY_MIGRATION' },
         { label: 'Delete', value: 'BENEFICIARY_DELETE' }
       ]" optionLabel="label" optionValue="value" class="w-100">
         </p-select>
@@ -98,15 +95,13 @@
 
   </form>
 </div>
-<p-table [value]="beneficiaries" [scrollable]="true"
-  [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
+<p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
   [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }">
   <ng-template pTemplate="header">
     <tr>
       <th>ID</th>
-      <th>Household Number</th>
+      <th style="width:500px;">Household Number</th>
       <th>Status</th>
-      <th>Approvar Role</th>
       <th>Task Type</th>
       <th class="text-center" [style]="{ width: '100px' }">Action</th>
     </tr>
@@ -116,8 +111,13 @@
       <td>{{ b.id }}</td>
       <td>{{ b.applicationId }}</td>
       <td>{{ b.approvalStatus }}</td>
-      <td>{{ b.approverRole }}</td>
-      <td>{{ b.taskType }}</td>
+      <td style="max-width:500px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+        {{ b.taskType === 'BENEFICIARY_EDIT' ? 'Edit'
+        : b.taskType === 'BENEFICIARY_MIGRATION' ? 'Migrate'
+        : b.taskType === 'BENEFICIARY_DELETE' ? 'Delete'
+        : b.taskType }}
+      </td>
+
       <td class="text-center">
         <p-button type="button" icon="fas fa-eye" pTooltip="View" tooltipPosition="top" appendTo="body" size="small"
           outlined="true" severity="info" (onClick)="viewTask(b)" class="me-2" />
@@ -126,22 +126,16 @@
   </ng-template>
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="6" class="text-center text-danger">
+      <td colspan="5" class="text-center text-danger">
         <b>No tasks found!</b>
       </td>
     </tr>
   </ng-template>
 </p-table>
 
-<p-paginator
-  class="paginator-sticky"
-  [rows]="pageSize"
-  [totalRecords]="totalRecords"
-  [rowsPerPageOptions]="[10, 25, 50]"
-  (onPageChange)="onPageChange($event)"
-  [first]="(currentPage) * pageSize"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
->
+<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
+  [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="(currentPage) * pageSize"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 </p-paginator>
 
 }

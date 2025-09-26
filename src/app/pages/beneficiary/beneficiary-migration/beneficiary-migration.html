@@ -15,15 +15,6 @@
     <p-tabpanel value="0">
       <div style="height: calc(100vh - 210px); overflow-y: auto">
         <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
-          <div class="col-12">
-            <div class="card card-body p-2">
-              <div class="d-flex justify-content-end">
-                <p-button severity="info" type="submit" [disabled]="beneficiaryForm.invalid || isLoading"
-                  [loading]="isLoading" icon="fas fa-save" label="Update" size="small">
-                </p-button>
-              </div>
-            </div>
-          </div>
           <div class="container-fluid">
             <div class="row g-3">
               <!-- Left: Personal Info -->
@@ -151,10 +142,8 @@
               </div> -->
 
               <!-- Submit Button -->
-              <!-- <div class="col-12">
-                <div class="card card-body p-2">
-                  <div class="d-flex justify-content-end">
                     <p-button
+                    class="d-flex justify-content-end"
                       severity="info"
                       type="submit"
                       [disabled]="beneficiaryForm.invalid || isSubmitting"
@@ -162,11 +151,8 @@
                       label="Update"
                       size="small"
                     />
-                  </div>
-                </div>
-              </div> -->
+              </div>
             </div>
-          </div>
         </form>
       </div>
     </p-tabpanel>

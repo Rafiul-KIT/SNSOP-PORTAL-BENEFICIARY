@@ -100,7 +100,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     this.initForm();
     this.loadBeneficiaries(this.currentPage, this.pageSize);
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Approval List' }];
   }
 
   initForm() {

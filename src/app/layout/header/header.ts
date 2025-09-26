@@ -26,11 +26,11 @@ export class Header {
     });
 
     this.portalList = [
-      {
-        label: 'Dashboard',
-        link: environment.portals.master,
-        icon: 'fas fa-dashboard',
-      },
+      // {
+      //   label: 'Dashboard',
+      //   link: environment.portals.master,
+      //   icon: 'fas fa-dashboard',
+      // },
       {
         label: 'Beneficiary',
         link: environment.portals.beneficiary,
@@ -46,6 +46,14 @@ export class Header {
         label: 'Report',
         link: environment.portals.report,
         icon: 'fas fa-chart-line',
+      },
+      {
+        label: 'Settings',
+        icon: 'fas fa-cog',
+      },
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
       },
     ];
 
@@ -86,13 +94,6 @@ export class Header {
         routerLinkActiveOptions: 'active',
       },
       {
-        label: 'Beneficiary Attendance',
-        icon: 'fas fa-list',
-        routerLink: '/beneficiary/id-card',
-        routerLinkActiveOptions: 'active',
-      },
-      
-      {
         label: 'Job Card',
         icon: 'fas fa-list',
         routerLink: '/beneficiary/id-card',
@@ -106,6 +107,12 @@ export class Header {
       },
       {
         label: 'LIPW Export',
+        icon: 'fas fa-list',
+        routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
+      },
+      {
+        label: 'Report',
         icon: 'fas fa-list',
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',

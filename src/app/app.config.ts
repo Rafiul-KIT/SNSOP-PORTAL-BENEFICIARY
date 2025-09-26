@@ -11,7 +11,6 @@ import Aura from '@primeuix/themes/aura';
 
 // 👇 Import HttpClient + interceptor
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from './interceptors/auth.interceptor';
 import { MessageService } from 'primeng/api';
 
 
@@ -27,8 +26,7 @@ export const appConfig: ApplicationConfig = {
         preset: Aura,
       }
     }),
-
-    provideHttpClient(withInterceptors([authInterceptor])),
+    
     MessageService
   ],
 };

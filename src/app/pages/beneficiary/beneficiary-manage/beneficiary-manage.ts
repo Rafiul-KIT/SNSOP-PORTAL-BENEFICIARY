@@ -512,7 +512,7 @@ export class BeneficiaryManage implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Update Successful',
-          detail: 'Beneficiary updated successfully!'
+          detail: 'Beneficiary edit request sent successfully!'
         });
         setTimeout(() => {
           this.router.navigate(['/beneficiary/list']);
@@ -524,7 +524,7 @@ export class BeneficiaryManage implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Update Failed',
-          detail: 'Failed to update beneficiary'
+          detail: 'Failed to edit request sent'
         });
       })
       .finally(() => {
