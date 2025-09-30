@@ -2,6 +2,7 @@ import { BiometricDto } from './biometric.dto';
 import { DocumentType, Gender, RelationshipWithHead } from './enums';
 
 export interface AlternatePayeeDto {
+  id: number;
   payeeFirstName: string;
   payeeMiddleName?: string;
   payeeLastName: string;

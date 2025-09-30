@@ -451,40 +451,21 @@ export class BeneficiaryManage implements OnInit {
       payload.alternatePayee2.payeePhoneNo = formValue.alt2Phone;
     }
 
-    // if (!payload.address) {
-    //   payload.address = {
-    //     stateId: 0,
-    //     countyId: 0,
-    //     payam: 0,
-    //     boma: '',
-    //     location: { lat: 0, lon: 0 }
-    //   };
-    // }
-
-    // // ✅ Preserve or update lat/lon
-    // payload.address = {
-    //   ...payload.address,
-    //   location: {
-    //     lat: formValue.latitude ?? payload.address.location?.lat ?? 0,
-    //     lon: formValue.longitude ?? payload.address.location?.lon ?? 0
-    //   }
-    // };
-
     // ✅ Nominees
     payload.nominees = this.nominees.value.map((n: any) => ({
       id: n.id,
-      applicationId: n.applicationId,
+      applicationId: payload.applicationId,
       nomineeFirstName: n.nomineeFirstName,
       nomineeMiddleName: n.nomineeMiddleName,
       nomineeLastName: n.nomineeLastName,
-      nomineeNickName: n.nomineeNickName,
+      nomineeNickName: n.nomineeNickName?.trim() ? n.nomineeNickName : null,
       relationshipWithHouseholdHead: n.relationshipWithHouseholdHead,
-      relationshipOther: n.relationshipOther,
+      relationshipOther: n.relationshipOther?.trim() ? n.relationshipOther : null,
       nomineeAge: n.nomineeAge,
       nomineeGender: n.nomineeGender,
       isReadWrite: n.isReadWrite,
       nomineeOccupation: n.nomineeOccupation,
-      otherOccupation: n.otherOccupation,
+      otherOccupation: n.otherOccupation?.trim() ? n.otherOccupation : null,
     }));
 
     return payload;

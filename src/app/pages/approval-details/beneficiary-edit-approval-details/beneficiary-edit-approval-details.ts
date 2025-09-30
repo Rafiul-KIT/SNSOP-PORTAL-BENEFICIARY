@@ -93,6 +93,7 @@ interface BeneficiaryVm {
 }
 
 interface ApprovalDetailsResponse {
+  oldBeneficiary: BeneficiaryDto;
   taskDetails: BeneficiaryDto;
   differences?: Record<string, string>; // keys = field paths, values = "Old:..., New:..." or any message
 }
@@ -260,9 +261,62 @@ export class BeneficiaryEditApprovalDetails {
     }
   }*/
 
-  ngOnInit() {
+  // ngOnInit() {
+  //   const id = this.route.snapshot.paramMap.get('id');
+  //   const isTaskMode = this.route.snapshot.queryParamMap.get('taskMode') === 'true';
+  //   this.isOnTaskDetails = isTaskMode;
+
+  //   if (isTaskMode) this.taskId = id!;
+  //   else this.householdId = id!;
+
+  //   if (!id) return;
+
+  //   this.isLoading = true;
+  //   Promise.all([
+  //     this.lookup.getOrFetchStateList(),
+  //     this.lookup.getCountyListByStateId(''),
+  //     this.lookup.getPayamListByCountyId(''),
+  //     this.lookup.getBomaListByPayamId(''),
+  //   ])
+  //     .then(async () => {
+  //       if (isTaskMode && this.taskId) {
+  //         const edited = await this.loadTaskDetails(this.taskId);
+
+  //         // 1) set edited details
+  //         const editedDto = edited.taskDetails as BeneficiaryDto;
+  //         this.editedDetails = this.mapToVm(editedDto);
+  //         this.prepareFingerImages(editedDto.biometrics, 'edited');
+
+  //         // 2) store differences
+  //         this.setDifferences(edited.differences);
+
+  //         // 3) derive householdId and load old
+  //         this.householdId =
+  //           (editedDto as any).householdId ??
+  //           (editedDto as any).beneficiaryId ??
+  //           editedDto.applicationId;
+
+  //         if (this.householdId) {
+  //           const oldDto = await this.loadBeneficiaryDetailsDto(this.householdId);
+  //           this.oldDetails = this.mapToVm(oldDto);
+  //           this.prepareFingerImages(oldDto.biometrics, 'old');
+  //         } else {
+  //           console.warn('Could not determine householdId from task details payload.');
+  //         }
+  //       } else if (this.householdId) {
+  //         await this.fetchBeneficiaryDetails(this.householdId);
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  //     .finally(() => {
+  //       this.isLoading = false;
+  //       this.cdr.detectChanges();
+  //     });
+  // }
+
+  async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    const isTaskMode = this.route.snapshot.queryParamMap.get('taskMode') === 'true';
+    const isTaskMode = (this.route.snapshot.queryParamMap.get('taskMode') || '').toLowerCase() === 'true';
     this.isOnTaskDetails = isTaskMode;
 
     if (isTaskMode) this.taskId = id!;
@@ -271,70 +325,46 @@ export class BeneficiaryEditApprovalDetails {
     if (!id) return;
 
     this.isLoading = true;
-    Promise.all([
-      this.lookup.getOrFetchStateList(),
-      this.lookup.getCountyListByStateId(''),
-      this.lookup.getPayamListByCountyId(''),
-      this.lookup.getBomaListByPayamId(''),
-    ])
-      .then(async () => {
-        if (isTaskMode && this.taskId) {
-          const edited = await this.loadTaskDetails(this.taskId);
+    try {
+      // preload lookups
+      await Promise.all([
+        this.lookup.getOrFetchStateList(),
+        this.lookup.getCountyListByStateId(''),
+        this.lookup.getPayamListByCountyId(''),
+        this.lookup.getBomaListByPayamId(''),
+      ]);
 
-          // 1) set edited details
-          const editedDto = edited.taskDetails as BeneficiaryDto;
-          this.editedDetails = this.mapToVm(editedDto);
-          this.prepareFingerImages(editedDto.biometrics, 'edited');
+      // 🔑 Single API call for both modes
+      const approval = await this.loadTaskDetails(id);
 
-          // 2) store differences
-          this.setDifferences(edited.differences);
+      if (isTaskMode && approval.taskDetails) {
+        const editedDto = approval.taskDetails as BeneficiaryDto;
+        this.editedDetails = this.mapToVm(editedDto);
+        this.prepareFingerImages(editedDto.biometrics, 'edited');
 
-          // 3) derive householdId and load old
-          this.householdId =
-            (editedDto as any).householdId ??
-            (editedDto as any).beneficiaryId ??
-            editedDto.applicationId;
+        this.setDifferences(approval.differences);
 
-          if (this.householdId) {
-            const oldDto = await this.loadBeneficiaryDetailsDto(this.householdId);
-            this.oldDetails = this.mapToVm(oldDto);
-            this.prepareFingerImages(oldDto.biometrics, 'old');
-          } else {
-            console.warn('Could not determine householdId from task details payload.');
-          }
-        } else if (this.householdId) {
-          await this.fetchBeneficiaryDetails(this.householdId);
-        }
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      });
-  }
+        // derive householdId from task details
+        this.householdId =
+          (editedDto as any).householdId ??
+          (editedDto as any).beneficiaryId ??
+          editedDto.applicationId;
+      }
 
+      if (approval.oldBeneficiary) {
+        const oldDto = approval.oldBeneficiary as BeneficiaryDto;
+        this.oldDetails = this.mapToVm(oldDto);
+        this.prepareFingerImages(oldDto.biometrics, 'old');
+      } else {
+        console.warn('No oldBeneficiary found in approval/details payload.');
+      }
 
-
-  fetchBeneficiaryDetails(householdId: string) {
-    this.isLoading = true;
-    this.api.GET(`api/beneficiary/details/${householdId}`)
-      .then((res: any) => {
-        const dto = res?.data as BeneficiaryDto;
-        this.oldDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometrics, 'old');
-      })
-      .finally(() => { this.isLoading = false; this.cdr.detectChanges(); });
-  }
-
-  fetchTaskDetails(taskId: string) {
-    this.isLoading = true;
-    this.api.GET(`api/approval/details/${taskId}`)
-      .then((res: any) => {
-        const dto = res?.data?.taskDetails as BeneficiaryDto;
-        this.editedDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometrics, 'edited');
-      })
-      .finally(() => { this.isLoading = false; this.cdr.detectChanges(); });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
@@ -583,12 +613,6 @@ export class BeneficiaryEditApprovalDetails {
     }
   }
 
-
-  private async loadBeneficiaryDetailsDto(householdId: string): Promise<BeneficiaryDto> {
-    const res: any = await this.api.GET(`api/beneficiary/details/${householdId}`);
-    return res?.data as BeneficiaryDto;
-  }
-
   private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
     return (res?.data || {}) as ApprovalDetailsResponse;
@@ -661,15 +685,15 @@ export class BeneficiaryEditApprovalDetails {
     return this.isChangedPrefix(prefixes) ? 'changed' : '';
   }
 
-// Paths that depend on index
+  // Paths that depend on index
   altPath(i: number, field: string) {
-    return `alternatePayee${i+1}.${field}`;
+    return `alternatePayee${i + 1}.${field}`;
   }
 
-  altFingerPath(i: number, hand: 'right'|'left', j: number) {
-    const mapRight = ['rtFingerData','riFingerData','rmFingerData','rrFingerData','rsFingerData'];
-    const mapLeft  = ['ltFingerData','liFingerData','lmFingerData','lrFingerData','lsFingerData'];
-    return `alternatePayee${i+1}.biometric.${hand === 'right' ? mapRight[j] : mapLeft[j]}`;
+  altFingerPath(i: number, hand: 'right' | 'left', j: number) {
+    const mapRight = ['rtFingerData', 'riFingerData', 'rmFingerData', 'rrFingerData', 'rsFingerData'];
+    const mapLeft = ['ltFingerData', 'liFingerData', 'lmFingerData', 'lrFingerData', 'lsFingerData'];
+    return `alternatePayee${i + 1}.biometric.${hand === 'right' ? mapRight[j] : mapLeft[j]}`;
   }
 
   nomineePath(i: number, field: string) {
