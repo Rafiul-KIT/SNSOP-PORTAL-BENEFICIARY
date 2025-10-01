@@ -2,48 +2,52 @@
 
 
 
-    <div class="breadcrumb-wrapper" style="position: relative;">
+    <div class="breadcrumb-wrapper">
         <!-- Breadcrumb content -->
         <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
 
         <!-- Fixed buttons in the breadcrumb section -->
-        @if (isOnTaskDetails && taskId) {
-        <div style="position: absolute; top: -10px; right: 0; z-index: 99;">
-            <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
-                size="small" severity="primary" class="me-1" label="Approve" (onClick)="approveTask()" />
-            <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
-                size="small" severity="danger" label="Reject" (onClick)="rejectTask()" />
-        </div>
-        }
+
     </div>
     @if (isLoading) {
     <app-loader />
     } @else {
     @if (oldDetails || editedDetails) {
-    <div class="mt-2 scroll-container">
-        <p-tabs value="0">
-            <p-tablist>
-                <p-tab value="0">Beneficiary Information</p-tab>
-                <p-tab value="1">Alternate Information</p-tab>
-                <p-tab value="2">Nominee Information</p-tab>
 
-            </p-tablist>
+    <p-tabs value="0">
+        <p-tablist>
+            <p-tab value="0">Beneficiary Information</p-tab>
+            <p-tab value="1">Alternate Information</p-tab>
+            <p-tab value="2">Nominee Information</p-tab>
+            @if (isOnTaskDetails && taskId) {
+            <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
+                <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
+                    size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
 
-            <p-tabpanels>
-                <!-- =========================
+                <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
+                    size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
+
+            </div>
+            }
+
+        </p-tablist>
+
+        <p-tabpanels>
+            <!-- =========================
                TAB: Beneficiary Information
           ========================== -->
-                <p-tabpanel value="0">
+            <p-tabpanel value="0">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row g-2">
                         <!-- Personal Info -->
                         <div class="col-12 col-md-6">
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
-                                   <strong> Personal Information (Old) </strong>
+                                    <strong> Personal Information (Old) </strong>
                                 </div>
                                 <div class="card-body text-center">
                                     <img [src]="oldDetails?.photo || '/images/dummyHuman.jpg'"
-                                        class="img-thumbnail mb-3" width="120" />
+                                        class="img-thumbnail mb-3" width="200" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
                                             <tr>
@@ -513,13 +517,13 @@
                         <div class="col-12 col-md-6">
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
-                                   <strong>Personal Information (Edited)</strong>
+                                    <strong>Personal Information (Edited)</strong>
                                     <span style="color: red; margin-left: 10px;">Marked/Highlighted fields have been
                                         edited*</span>
                                 </div>
                                 <div class="card-body text-center">
                                     <img [src]="editedDetails?.photo || '/images/dummyHuman.jpg'"
-                                        class="img-thumbnail mb-3" width="120" />
+                                        class="img-thumbnail mb-3" width="200" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
                                             <tr>
@@ -715,14 +719,13 @@
                                                     <table class="table table-bordered mb-0">
                                                         <tbody>
                                                             <tr>
-                                                              <th colspan="8"
-                                                                  class="bg-secondary text-center"
-                                                                  [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
-                                                                  [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
-                                                                  <span class="text-light">
-                                                                    Total Member: {{ editedDetails?.householdSize }}
-                                                                  </span>
-                                                              </th>
+                                                                <th colspan="8" class="bg-secondary text-center"
+                                                                    [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
+                                                                    [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
+                                                                    <span class="text-light">
+                                                                        Total Member: {{ editedDetails?.householdSize }}
+                                                                    </span>
+                                                                </th>
                                                             </tr>
                                                             <tr>
                                                                 <th class="table-label">Female Member</th>
@@ -1041,12 +1044,14 @@
                     <!-- <div class="mt-3">
 
         </div> -->
-                </p-tabpanel>
+                </div>
+            </p-tabpanel>
 
-                <!-- =========================
+            <!-- =========================
            TAB: Alternate Information
       ========================== -->
-                <p-tabpanel value="1">
+            <p-tabpanel value="1">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row g-3">
                         <!-- ===== Left Column: OLD ===== -->
                         <div class="col-12 col-md-6">
@@ -1056,13 +1061,13 @@
                             </div>
                             } @else {
                             @for (alt of oldDetails!.alternates; track alt; let i = $index) {
-                              <div class="card shadow-sm rounded mb-3" style="height:auto;">
+                            <div class="card shadow-sm rounded mb-3" style="height:auto;">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Old)
                                 </div>
                                 <div class="card-body text-center">
                                     <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3"
-                                        height="80" />
+                                        width="200" />
 
                                     @if (alt.biometric) {
                                     <div class="table-responsive mb-3">
@@ -1143,13 +1148,13 @@
                             </div>
                             } @else {
                             @for (alt of editedDetails!.alternates; track alt; let i = $index) {
-                              <div class="card shadow-sm rounded mb-3" style="height:auto;">
+                            <div class="card shadow-sm rounded mb-3" style="height:auto;">
                                 <div class="card-header bg-gray text-black text-center">
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3" height="80"
-                                        [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
+                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3"
+                                        width="200" [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
                                         [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
 
 
@@ -1251,16 +1256,18 @@
                             }
                         </div>
                     </div>
-                </p-tabpanel>
+                </div>
+            </p-tabpanel>
 
 
 
 
 
-                <!-- =========================
+            <!-- =========================
                TAB: Nominee Information
           ========================== -->
-                <p-tabpanel value="2">
+            <p-tabpanel value="2">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row">
                         <!-- When both are empty -->
                         @if (nomineeCount === 0) {
@@ -1397,15 +1404,16 @@
                         }
                         }
                     </div>
-                </p-tabpanel>
+                </div>
+            </p-tabpanel>
 
 
 
-            </p-tabpanels>
-        </p-tabs>
+        </p-tabpanels>
+    </p-tabs>
 
-        <!-- ===== Actions: Comment + Approve/Reject ===== -->
-        <!--<hr class="my-4" />
+    <!-- ===== Actions: Comment + Approve/Reject ===== -->
+    <!--<hr class="my-4" />
   <div class="card shadow-sm rounded">
     <div class="card-header bg-gray text-black">Approval Comment</div>
     <div class="card-body">
@@ -1421,9 +1429,29 @@
       </div>
     </div>
   </div>-->
-    </div>
     } }
-</div>
 
-<p-toast position="bottom-right" />
-<p-confirmDialog [style]="{ width: '450px' }" />
+
+    <p-toast position="bottom-right" />
+    <!-- <p-confirmDialog [style]="{ width: '450px' }" /> -->
+    <p-confirmDialog #cd key="approvalDialog" [style]="{width: '500px'}">
+        <ng-template pTemplate="message">
+            <div>
+                <p>
+                    Are you sure you want to
+                    <strong [ngStyle]="{ color: isApprove ? 'green' : 'red' }">
+                        {{ isApprove ? 'approve' : 'reject' }}
+                    </strong>
+                    task #{{ taskId }}?
+                </p>
+                <textarea rows="3" [(ngModel)]="approvalComment" class="form-control mt-2"
+                    placeholder="Enter comment : ">
+      </textarea>
+            </div>
+        </ng-template>
+    </p-confirmDialog>
+
+
+
+
+</div>

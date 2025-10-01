@@ -143,20 +143,7 @@ export class BeneficiaryManage implements OnInit {
       householdSize: [''],
 
       // Alternate Payees
-      alt1Name: [''],
-      alt1Gender: [''],
-      alt1Age: [''],
-      alt1HasNationalId: [''],
-      alt1IdType: [''],
-      alt1IdNumber: [''],
-      alt1Phone: [''],
-      alt2Name: [''],
-      alt2Gender: [''],
-      alt2Age: [''],
-      alt2HasNationalId: [''],
-      alt2IdType: [''],
-      alt2IdNumber: [''],
-      alt2Phone: [''],
+      alternates: this.fb.array([]),
 
       nominees: this.fb.array([])
     });
@@ -274,30 +261,15 @@ export class BeneficiaryManage implements OnInit {
           });
         }
 
-
+        this.alternates.clear();
         // ✅ Patch alternates
         if (dto.alternatePayee1) {
-          this.beneficiaryForm.patchValue({
-            alt1Name: `${dto.alternatePayee1.payeeFirstName} ${dto.alternatePayee1.payeeLastName}`.trim(),
-            alt1Gender: dto.alternatePayee1.payeeGender,
-            alt1Age: dto.alternatePayee1.payeeAge,
-            alt1HasNationalId: dto.alternatePayee1.documentType !== 'NONE' ? 'Yes' : 'No',
-            alt1IdType: dto.alternatePayee1.documentType,
-            alt1IdNumber: dto.alternatePayee1.nationalId,
-            alt1Phone: dto.alternatePayee1.payeePhoneNo,
-          });
+          this.alternates.push(this.createAlternateGroup(dto.alternatePayee1));
         }
         if (dto.alternatePayee2) {
-          this.beneficiaryForm.patchValue({
-            alt2Name: `${dto.alternatePayee2.payeeFirstName} ${dto.alternatePayee2.payeeLastName}`.trim(),
-            alt2Gender: dto.alternatePayee2.payeeGender,
-            alt2Age: dto.alternatePayee2.payeeAge,
-            alt2HasNationalId: dto.alternatePayee2.documentType !== 'NONE' ? 'Yes' : 'No',
-            alt2IdType: dto.alternatePayee2.documentType,
-            alt2IdNumber: dto.alternatePayee2.nationalId,
-            alt2Phone: dto.alternatePayee2.payeePhoneNo,
-          });
+          this.alternates.push(this.createAlternateGroup(dto.alternatePayee2));
         }
+
         if (dto.nominees && Array.isArray(dto.nominees)) {
           this.nominees.clear(); // reset before patching
           dto.nominees.forEach((n: any) => {
@@ -427,29 +399,34 @@ export class BeneficiaryManage implements OnInit {
     }
 
     // ✅ Alternates
-    if (payload.alternatePayee1) {
-      payload.alternatePayee1.payeeFirstName =
-        formValue.alt1Name?.split(' ')[0] || '';
-      payload.alternatePayee1.payeeLastName =
-        formValue.alt1Name?.split(' ')[1] || '';
-      payload.alternatePayee1.payeeGender = formValue.alt1Gender;
-      payload.alternatePayee1.payeeAge = formValue.alt1Age;
-      payload.alternatePayee1.documentType = formValue.alt1IdType;
-      payload.alternatePayee1.nationalId = formValue.alt1IdNumber;
-      payload.alternatePayee1.payeePhoneNo = formValue.alt1Phone;
+    if (formValue.alternates && formValue.alternates.length) {
+      if (payload.alternatePayee1 && formValue.alternates[0]) {
+        const alt1 = formValue.alternates[0];
+        payload.alternatePayee1.payeeFirstName = alt1.payeeFirstName;
+        payload.alternatePayee1.payeeMiddleName = alt1.payeeMiddleName;
+        payload.alternatePayee1.payeeLastName = alt1.payeeLastName;
+        payload.alternatePayee1.payeeNickName = alt1.payeeNickName;
+        payload.alternatePayee1.payeeGender = alt1.payeeGender;
+        payload.alternatePayee1.payeeAge = alt1.payeeAge;
+        payload.alternatePayee1.documentType = alt1.documentType;
+        payload.alternatePayee1.nationalId = alt1.nationalId;
+        payload.alternatePayee1.payeePhoneNo = alt1.payeePhoneNo;
+      }
+
+      if (payload.alternatePayee2 && formValue.alternates[1]) {
+        const alt2 = formValue.alternates[1];
+        payload.alternatePayee2.payeeFirstName = alt2.payeeFirstName;
+        payload.alternatePayee2.payeeMiddleName = alt2.payeeMiddleName;
+        payload.alternatePayee2.payeeLastName = alt2.payeeLastName;
+        payload.alternatePayee2.payeeNickName = alt2.payeeNickName;
+        payload.alternatePayee2.payeeGender = alt2.payeeGender;
+        payload.alternatePayee2.payeeAge = alt2.payeeAge;
+        payload.alternatePayee2.documentType = alt2.documentType;
+        payload.alternatePayee2.nationalId = alt2.nationalId;
+        payload.alternatePayee2.payeePhoneNo = alt2.payeePhoneNo;
+      }
     }
 
-    if (payload.alternatePayee2) {
-      payload.alternatePayee2.payeeFirstName =
-        formValue.alt2Name?.split(' ')[0] || '';
-      payload.alternatePayee2.payeeLastName =
-        formValue.alt2Name?.split(' ')[1] || '';
-      payload.alternatePayee2.payeeGender = formValue.alt2Gender;
-      payload.alternatePayee2.payeeAge = formValue.alt2Age;
-      payload.alternatePayee2.documentType = formValue.alt2IdType;
-      payload.alternatePayee2.nationalId = formValue.alt2IdNumber;
-      payload.alternatePayee2.payeePhoneNo = formValue.alt2Phone;
-    }
 
     // ✅ Nominees
     payload.nominees = this.nominees.value.map((n: any) => ({
@@ -589,6 +566,26 @@ export class BeneficiaryManage implements OnInit {
       isReadWrite: [nominee.isReadWrite || false],
       nomineeOccupation: [nominee.nomineeOccupation || ''],
       otherOccupation: [nominee.otherOccupation || '']
+    });
+  }
+
+  get alternates(): FormArray {
+    return this.beneficiaryForm.get('alternates') as FormArray;
+  }
+
+  private createAlternateGroup(alt: any = {}): FormGroup {
+    return this.fb.group({
+      id: [alt.id || null],
+      payeeFirstName: [alt.payeeFirstName || ''],
+      payeeMiddleName: [alt.payeeMiddleName || ''],
+      payeeLastName: [alt.payeeLastName || ''],
+      payeeNickName: [alt.payeeNickName || ''],
+      payeeGender: [alt.payeeGender || ''],
+      payeeAge: [alt.payeeAge || ''],
+      documentType: [alt.documentType || ''],
+      nationalId: [alt.nationalId || ''],
+      payeePhoneNo: [alt.payeePhoneNo || ''],
+      hasNationalId: [alt.documentType && alt.documentType !== 'NONE' ? 'Yes' : 'No']
     });
   }
 

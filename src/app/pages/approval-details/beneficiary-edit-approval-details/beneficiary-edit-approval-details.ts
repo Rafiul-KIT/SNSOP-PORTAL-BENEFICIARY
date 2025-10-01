@@ -25,6 +25,7 @@ import {
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { FormsModule } from '@angular/forms';
 
 export interface FingerVm {
   label: string;
@@ -112,6 +113,7 @@ interface ApprovalDetailsResponse {
     ConfirmDialogModule,
     Loader,
     ButtonModule,
+    FormsModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './beneficiary-edit-approval-details.html',
@@ -132,6 +134,8 @@ export class BeneficiaryEditApprovalDetails {
 
   taskId: string | null = null;
   householdId: string | null = null; // helpful when in task mode
+  currentTaskId?: number;
+  isApprove: boolean = true;
 
   items = [
     {
@@ -153,95 +157,159 @@ export class BeneficiaryEditApprovalDetails {
     private router: Router
   ) { }
 
-  approveTask() {
-    if (!this.taskId) {
-      console.error('Approve clicked, but task id is missing:', this.taskId);
-      return;
-    }
+  // approveTask() {
+  //   if (!this.taskId) {
+  //     console.error('Approve clicked, but task id is missing:', this.taskId);
+  //     return;
+  //   }
 
-    this.confirmationService.confirm({
-      message: `Are you sure you want to approve task #${this.taskId}?`,
-      header: 'Confirm Approval',
-      icon: 'fas fa-check-circle',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: true,
-        };
+  //   this.confirmationService.confirm({
+  //     message: `Are you sure you want to approve task #${this.taskId}?`,
+  //     header: 'Confirm Approval',
+  //     icon: 'fas fa-check-circle',
+  //     rejectButtonProps: {
+  //       severity: 'danger',
+  //     },
+  //     accept: () => {
+  //       const payload = {
+  //         approvalTaskId: this.taskId,
+  //         approved: true,
+  //       };
 
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            const life = 1200;
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Approved',
-              detail: `Task #${this.taskId} approved successfully.`,
-              life,
-            });
-            setTimeout(() => {
-              this.router.navigate(['/beneficiary-approval-list/edit']);
-            }, life);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to approve task',
-            });
-          });
-      },
-    });
+  //       this.api
+  //         .POST('/api/approval/doApprove', payload)
+  //         .then(() => {
+  //           const life = 1200;
+  //           this.messageService.add({
+  //             severity: 'success',
+  //             summary: 'Approved',
+  //             detail: `Task #${this.taskId} approved successfully.`,
+  //             life,
+  //           });
+  //           setTimeout(() => {
+  //             this.router.navigate(['/beneficiary-approval-list/edit']);
+  //           }, life);
+  //         })
+  //         .catch((err: any) => {
+  //           console.error(err);
+  //           this.messageService.add({
+  //             severity: 'error',
+  //             summary: 'Error',
+  //             detail: 'Failed to approve task',
+  //           });
+  //         });
+  //     },
+  //   });
+  // }
+
+  // rejectTask() {
+  //   if (!this.taskId) {
+  //     console.error('Reject clicked, but task id is missing:', this.taskId);
+  //     return;
+  //   }
+
+  //   this.confirmationService.confirm({
+  //     message: `Are you sure you want to reject task #${this.taskId}?`,
+  //     header: 'Confirm Rejection',
+  //     icon: 'fas fa-ban',
+  //     rejectButtonProps: {
+  //       severity: 'danger',
+  //     },
+  //     accept: () => {
+  //       const payload = {
+  //         approvalTaskId: this.taskId,
+  //         approved: false,
+  //       };
+
+  //       this.api
+  //         .POST('/api/approval/doApprove', payload)
+  //         .then(() => {
+  //           const life = 1200;
+  //           this.messageService.add({
+  //             severity: 'warn',
+  //             summary: 'Rejected',
+  //             detail: `Task #${this.taskId} rejected successfully.`,
+  //             life,
+  //           });
+  //           setTimeout(() => {
+  //             this.router.navigate(['/beneficiary-approval-list/edit']); // note the leading slash
+  //           }, life);
+  //         })
+  //         .catch((err: any) => {
+  //           console.error(err);
+  //           this.messageService.add({
+  //             severity: 'error',
+  //             summary: 'Error',
+  //             detail: 'Failed to reject task',
+  //           });
+  //         });
+  //     },
+  //   });
+  // }
+
+openApprovalDialog(isApprove: boolean) {
+  if (!this.taskId) {
+    console.error('Task id missing');
+    return;
   }
 
-  rejectTask() {
-    if (!this.taskId) {
-      console.error('Reject clicked, but task id is missing:', this.taskId);
-      return;
-    }
+  this.isApprove = isApprove;
+  this.approvalComment = '';
 
-    this.confirmationService.confirm({
-      message: `Are you sure you want to reject task #${this.taskId}?`,
-      header: 'Confirm Rejection',
-      icon: 'fas fa-ban',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: false,
-        };
+  this.confirmationService.confirm({
+    key: 'approvalDialog',
+    header: isApprove ? 'Confirm Approval' : 'Confirm Rejection',
+    icon: isApprove ? 'fas fa-check-circle' : 'fas fa-ban',
+    acceptButtonProps: { label: 'Yes', severity: 'success', disabled: this.isLoading },
+    rejectButtonProps: { label: 'No', severity: 'danger', disabled: this.isLoading },
+    accept: () => this.handleApproval()
+  });
+}
 
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            const life = 1200;
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Rejected',
-              detail: `Task #${this.taskId} rejected successfully.`,
-              life,
-            });
-            setTimeout(() => {
-              this.router.navigate(['/beneficiary-approval-list/edit']); // note the leading slash
-            }, life);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to reject task',
-            });
-          });
-      },
+private handleApproval() {
+  
+  if (!this.isApprove && (!this.approvalComment || !this.approvalComment.trim())) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Comment Required',
+      detail: 'Please provide a reason for rejection before proceeding.'
     });
+    return;
   }
+
+  this.isLoading = true;
+
+  const payload = {
+    approvalTaskId: this.taskId,
+    approved: this.isApprove,
+    comment: this.approvalComment
+  };
+
+  this.api.POST('/api/approval/doApprove', payload)
+    .then(() => {
+      const life = 1200;
+      this.messageService.add({
+        severity: this.isApprove ? 'success' : 'warn',
+        summary: this.isApprove ? 'Approved' : 'Rejected',
+        detail: `Task #${this.taskId} ${this.isApprove ? 'approved' : 'rejected'} successfully.`,
+        life,
+      });
+      this.isLoading = false;
+      setTimeout(() => {
+        this.router.navigate(['/beneficiary-approval-list/edit']);
+      }, life);
+    })
+    .catch((err: any) => {
+      console.error(err);
+      this.isLoading = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: `Failed to ${this.isApprove ? 'approve' : 'reject'} task`,
+      });
+    });
+}
+
 
   /*ngOnInit() {
     const applicationId = this.route.snapshot.paramMap.get('applicationId');
