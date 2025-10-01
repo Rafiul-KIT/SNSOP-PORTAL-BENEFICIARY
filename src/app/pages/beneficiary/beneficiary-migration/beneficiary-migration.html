@@ -7,14 +7,17 @@
 @if(isLoading){
 <app-loader />
 }@else {
-<p-tabs value="0">
-  <p-tablist>
-    <p-tab value="0">Beneficiary's GEO location</p-tab>
-  </p-tablist>
-  <p-tabpanels>
-    <p-tabpanel value="0">
-      <div style="height: calc(100vh - 210px); overflow-y: auto">
-        <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Beneficiary's GEO location</p-tab>
+      <p-button class="ms-auto p-2" severity="info" type="submit" [disabled]="beneficiaryForm.invalid || isSubmitting"
+        icon="fas fa-save" label="Update" size="small" />
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div style="height: calc(100vh - 210px); overflow-y: auto">
           <div class="container-fluid">
             <div class="row g-3">
               <!-- Left: Personal Info -->
@@ -22,7 +25,7 @@
                 <div class="card shadow-sm rounded">
                   <h5 class="card-header">Personal Information</h5>
                   <div class="card-body text-center">
-                    <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" height="100" />
+                    <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" width="200" />
 
                     <table class="table table-bordered table-sm text-start mb-0">
                       <tbody>
@@ -142,20 +145,13 @@
               </div> -->
 
               <!-- Submit Button -->
-                    <p-button
-                    class="d-flex justify-content-end"
-                      severity="info"
-                      type="submit"
-                      [disabled]="beneficiaryForm.invalid || isSubmitting"
-                      icon="fas fa-save"
-                      label="Update"
-                      size="small"
-                    />
-              </div>
+
             </div>
-        </form>
-      </div>
-    </p-tabpanel>
-  </p-tabpanels>
-</p-tabs>
+          </div>
+
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</form>
 }
