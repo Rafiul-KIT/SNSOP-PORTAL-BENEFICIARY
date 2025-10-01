@@ -21,7 +21,7 @@
              TAB 1: Personal Information
         ============================ -->
       <p-tabpanel value="0">
-
+      <div style="height: calc(100vh - 210px); overflow-y: auto">
         <div class="container user-form" style="padding-bottom: 100px">
           <!-- Basic Information -->
           <div class="card mt-2">
@@ -327,6 +327,7 @@
             </div> -->
         </div>
 
+      </div>
       </p-tabpanel>
 
       <!-- ===========================
@@ -441,7 +442,7 @@
         ============================ -->
 
       <p-tabpanel value="2">
-
+        <div style="height: calc(100vh - 210px); overflow-y: auto">
         <div class="container-fluid user-form">
           <div class="row justify-content-center g-3" formArrayName="nominees">
             @for(nominee of nominees.controls; track nominee; let i = $index){
@@ -557,6 +558,7 @@
             </div> -->
         </div>
 
+      </div>
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
