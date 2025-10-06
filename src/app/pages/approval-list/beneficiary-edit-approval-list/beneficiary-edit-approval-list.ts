@@ -41,7 +41,7 @@ interface Beneficiary {
   county: string;
   payam: string;
   boma: string;
-  
+
 }
 
 @Component({
@@ -121,58 +121,58 @@ export class BeneficiaryEditApprovalList implements OnInit {
   }
 
 
-loadBeneficiaries(page: number, size: number) {
-  this.isLoading = true;
+  loadBeneficiaries(page: number, size: number) {
+    this.isLoading = true;
 
-  const payload = {
-    ...this.searchForm.value,
-    approvalStatus: this.searchForm.value.approvalStatus ?? null,
-    page: page,  // Correct page number
-    size: size,  // Correct page size
-  };
+    const payload = {
+      ...this.searchForm.value,
+      approvalStatus: this.searchForm.value.approvalStatus ?? null,
+      page: page,  // Correct page number
+      size: size,  // Correct page size
+    };
 
-  this.apiService
-    .POST('/api/approval/taskList', payload)
-    .then((res: any) => {
-      this.beneficiaries = res.data?.approvalTaskList || [];
-      this.totalRecords = res.data?.total || 0;
-    })
-    .catch((err: any) => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to load beneficiaries',
+    this.apiService
+      .POST('/api/approval/taskList', payload)
+      .then((res: any) => {
+        this.beneficiaries = res.data?.approvalTaskList || [];
+        this.totalRecords = res.data?.total || 0;
+      })
+      .catch((err: any) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load beneficiaries',
+        });
+        console.error(err);
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
-      console.error(err);
-    })
-    .finally(() => {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    });
-}
+  }
 
 
- 
 
-onPageChange(event: any) {
-  this.currentPage = event.page; // Set the current page to the new page (0-based index)
-  this.pageSize = event.rows;    // Set the page size
-  console.log('Page Changed:', this.currentPage, this.pageSize);
-  this.loadBeneficiaries(this.currentPage, this.pageSize); // Reload data with new pagination
-}
+
+  onPageChange(event: any) {
+    this.currentPage = event.page; // Set the current page to the new page (0-based index)
+    this.pageSize = event.rows;    // Set the page size
+    console.log('Page Changed:', this.currentPage, this.pageSize);
+    this.loadBeneficiaries(this.currentPage, this.pageSize); // Reload data with new pagination
+  }
 
 
 
   searchBeneficiaries() {
-    this.loadBeneficiaries(this.currentPage, this.pageSize); 
+    this.loadBeneficiaries(this.currentPage, this.pageSize);
   }
 
 
-resetForm() {
-  this.searchForm.reset();
-  this.currentPage = 0;  // Reset to page 0 when form is reset
-  this.loadBeneficiaries(this.currentPage, this.pageSize);  // Load with the reset page
-}
+  resetForm() {
+    this.searchForm.reset();
+    this.currentPage = 0;  // Reset to page 0 when form is reset
+    this.loadBeneficiaries(this.currentPage, this.pageSize);  // Load with the reset page
+  }
 
 
   beneficiaryDetails(b: Beneficiary) {
@@ -281,8 +281,28 @@ resetForm() {
       return;
     }
 
-    this.router.navigate(['/beneficiary-edit-details', String(b.id)], {
+    let route: string = '';
+
+    // Check the taskType and determine the route accordingly
+    switch (b.taskType) {
+      case 'BENEFICIARY_EDIT':
+        route = '/beneficiary-edit-details';
+        break;
+      case 'BENEFICIARY_MIGRATION':
+        route = '/beneficiary-migrate-details';
+        break;
+      case 'BENEFICIARY_DELETE':
+        route = '/beneficiary-archive-details';
+        break;
+      default:
+        console.error('Unknown taskType:', b.taskType);
+        return;
+    }
+
+    // Navigate to the determined route
+    this.router.navigate([route, String(b.id)], {
       queryParams: { taskMode: true },
     });
   }
+
 }

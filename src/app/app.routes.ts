@@ -11,6 +11,8 @@ import { BeneficiaryMigrateApprovalList } from './pages/approval-list/beneficiar
 import { BeneficiaryEditApprovalDetails } from './pages/approval-details/beneficiary-edit-approval-details/beneficiary-edit-approval-details';
 import { routeGuard } from './route.guard';
 import { BeneficiaryIdCard } from './pages/beneficiary/beneficiary-id-card/beneficiary-id-card';
+import { BeneficiaryArchiveApprovalDetails } from './pages/approval-details/beneficiary-archive-approval-details/beneficiary-archive-approval-details';
+import { BeneficiaryMigrateApprovalDetails } from './pages/approval-details/beneficiary-migrate-approval-details/beneficiary-migrate-approval-details';
 
 export const routes: Routes = [
   {
@@ -62,6 +64,16 @@ export const routes: Routes = [
     path: 'beneficiary-edit-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryEditApprovalDetails,
+  },
+  {
+    path: 'beneficiary-migrate-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryMigrateApprovalDetails,
+  },
+  {
+    path: 'beneficiary-archive-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryArchiveApprovalDetails,
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
