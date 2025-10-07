@@ -438,10 +438,10 @@ private handleApproval() {
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     // helper: adds prefix if base64 exists, otherwise empty string (or placeholder if you want)
     const normalizePhoto = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/dummyHuman.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
 
     const normalizeFinger = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
 
     return {
       applicationId: dto.applicationId,
@@ -449,6 +449,7 @@ private handleApproval() {
         dto.respondentFirstName,
         dto.respondentMiddleName,
         dto.respondentLastName,
+        dto.respondentNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -456,6 +457,7 @@ private handleApproval() {
       spouseName: [dto.spouseFirstName,
       dto.spouseMiddleName,
       dto.spouseLastName,
+      dto.spouseNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -508,14 +510,14 @@ private handleApproval() {
         boma: dto.address?.boma
           ? this.lookup.getBomaNameById(dto.address.boma)
           : '',
-        lat: dto.address?.location?.lat,
-        lon: dto.address?.location?.lon,
+        lat: dto.address?.lat,
+        lon: dto.address?.lon,
       },
 
       alternates: [dto.alternatePayee1, dto.alternatePayee2]
         .filter((alt): alt is AlternatePayeeDto => !!alt)
         .map((alt) => ({
-          name: `${alt.payeeFirstName ?? ''} ${alt.payeeLastName ?? ''}`.trim(),
+          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
           age: alt.payeeAge ?? 0,
           gender: alt.payeeGender,
           relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
@@ -584,7 +586,7 @@ private handleApproval() {
         })),
 
       nominees: (dto.nominees || []).map((n: NomineeDto) => ({
-        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName]
+        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
           .filter(Boolean)
           .join(' '),
         age: n.nomineeAge,
@@ -655,7 +657,7 @@ private handleApproval() {
   }
 
   private prepareFingerImages(bio: BiometricDto | undefined, target: 'old' | 'edited') {
-    const nf = (img?: string) => (img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg');
+    const nf = (img?: string) => (img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg');
 
     const right = !bio ? [] : [
       { label: 'Thumb', image: nf(bio.rtFingerData), tooltip: 'Right Thumb' },

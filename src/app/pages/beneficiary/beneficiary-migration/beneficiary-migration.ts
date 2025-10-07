@@ -46,7 +46,7 @@ export class BeneficiaryMigration implements OnInit {
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
   beneficiaryForm!: FormGroup;
   beneficiaryDetails!: BeneficiaryDto;
-  beneficiaryPhoto = '/images/dummyHuman.jpg';
+  beneficiaryPhoto = 'images/dummyHuman.jpg';
 
   // Lookup dropdowns
   stateList: LookupItem[] = [];
@@ -62,7 +62,7 @@ export class BeneficiaryMigration implements OnInit {
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('bid'); // applicationId from route
@@ -155,10 +155,12 @@ export class BeneficiaryMigration implements OnInit {
       }
 
       if (dto.address) {
+        const lat = dto.address?.lat;
+        const lon = dto.address?.lon;
         this.beneficiaryForm.patchValue(
           {
-            gpsLat: dto.address.location?.lat ?? '',
-            gpsLong: dto.address.location?.lon ?? '',
+           gpsLat: lat !== undefined && lat !== null ? lat.toFixed(6) : '',
+           gpsLong: lon !== undefined && lon !== null ? lon.toFixed(6) : '',
           },
           { emitEvent: false }
         );
@@ -206,98 +208,89 @@ export class BeneficiaryMigration implements OnInit {
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
+      setTimeout(() => this.cdr.detectChanges(), 0);
     }
   }
-
-  private buildUpdatePayload(formValue: any): BeneficiaryDto {
-    const updatedGeo = formValue;
-
+  private buildUpdatePayload(formValue: any): any {
     return {
-      ...this.beneficiaryDetails,
+      applicationId: this.beneficiaryDetails.applicationId,
       address: {
-        ...this.beneficiaryDetails.address,
-        stateId: updatedGeo.state,
-        countyId: updatedGeo.county,
-        payam: updatedGeo.payam,
-        boma: updatedGeo.boma,
-        location: {
-          lat: updatedGeo.gpsLat,
-          lon: updatedGeo.gpsLong,
-        },
+        stateId: Number(formValue.state) || null,
+        countyId: Number(formValue.county) || null,
+        payam: Number(formValue.payam) || null,
+        boma: formValue.boma || null,
+        lat: formValue.gpsLat ? parseFloat(formValue.gpsLat) : formValue.gpsLat,
+        lon: formValue.gpsLong ? parseFloat(formValue.gpsLong) : formValue.gpsLong,
       },
     };
   }
-onSubmit() {
-  if (!this.beneficiaryForm.valid) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Validation',
-      detail: 'Please fill out all required fields.'
-    });
-    return;
-  }
 
-  const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
-  const payload = { beneficiaries: [beneficiary] };
+  onSubmit() {
+    if (!this.beneficiaryForm.valid) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: 'Please fill out all required fields.',
+      });
+      return;
+    }
 
-  this.isLoading = true;
+    const requestBody = {
+      beneficiaryMigrationRequests: [
+        this.buildUpdatePayload(this.beneficiaryForm.value)
+      ],
+    };
 
-  this.api
-    .POST('api/beneficiary/migration/batch', payload)
-    .then((res: any) => {
-      console.log('API raw response:', res);
+    this.isLoading = true;
 
-      // Handle both axios-style (res.data) and fetch-style (res directly)
-      const responses = res?.bulkResponse || res?.data?.bulkResponse || [];
+    this.api
+      .POST('api/beneficiary/migration/batch', requestBody)
+      .then((res: any) => {
+        console.log('API raw response:', res);
 
-      if (!responses.length) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Update Failed',
-          detail: 'No response returned from server.'
-        });
-        return;
-      }
+        const responses = res?.bulkResponse || res?.data?.bulkResponse || [];
 
-      // Assuming one beneficiary per request
-      const first = responses[0];
+        if (!responses.length) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Migration Failed',
+            detail: 'No response returned from server.',
+          });
+          return;
+        }
 
-      if (first.result === 'SUCCESS') {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Migration Successful',
-          detail: 'Beneficiary migration request sent successfully!'
-        });
-        setTimeout(() => {
-          this.router.navigate(['/beneficiary/list']);
-        }, 3000);
-      } else if (first.result === 'FAILED') {
+        const first = responses[0];
+
+        if (first.result === 'SUCCESS') {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Migration Successful',
+            detail: 'Beneficiary migration request sent successfully!',
+          });
+          setTimeout(() => {
+            this.router.navigate(['/beneficiary/list']);
+          }, 3000);
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Migration Failed',
+            detail: first.errorMessage || 'Unknown error occurred.',
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Migration failed:', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Migration Failed',
-          detail: first.errorMessage || 'Unknown error occurred'
+          detail: 'Request could not be processed.',
         });
-      } else {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Update Status',
-          detail: `Unexpected result: ${first.result}`
-        });
-      }
-    })
-    .catch((err) => {
-      console.error('Update failed:', err);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Migration Failed',
-        detail: 'Request could not be processed'
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
-    })
-    .finally(() => {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    });
-}
+  }
 
   // keep approve/reject stubs
   onApprove() {

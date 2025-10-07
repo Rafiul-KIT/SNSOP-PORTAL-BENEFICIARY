@@ -9,7 +9,8 @@
 <p-tabs value="0">
     <p-tablist>
         <p-tab value="0">Beneficiary's GEO location</p-tab>
-        <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
+        @if (taskId) {
+        <div style="position: absolute; top: 5px; right: 5px; z-index: 99;">
             <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
                 size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
 
@@ -17,6 +18,7 @@
                 size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
 
         </div>
+        }
     </p-tablist>
 
     <p-tabpanels>
@@ -29,7 +31,9 @@
                             <div class="card shadow-sm rounded">
                                 <h5 class="card-header">Personal Information</h5>
                                 <div class="card-body text-center">
-                                    <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" width="200" />
+                                    <img [src]="getPhotoSrc(oldDetails?.biometrics?.photoData)"
+                                        class="img-thumbnail mb-3" width="200" />
+
 
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
@@ -71,19 +75,19 @@
                                         <tbody>
                                             <tr>
                                                 <th style="width: 180px">State</th>
-                                                <td>{{ oldDetails?.address?.stateId || '-' }}</td>
+                                                <td>{{ getStateName(oldDetails?.address?.stateId) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>County</th>
-                                                <td>{{ oldDetails?.address?.countyId || '-' }}</td>
+                                                <td>{{ getCountyName(oldDetails?.address?.countyId) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Payam</th>
-                                                <td>{{ oldDetails?.address?.payam || '-' }}</td>
+                                                <td>{{ getPayamName(oldDetails?.address?.payam) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Boma</th>
-                                                <td>{{ oldDetails?.address?.boma || '-' }}</td>
+                                                <td>{{ getBomaName(oldDetails?.address?.boma) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Latitude</th>
@@ -94,40 +98,67 @@
                                                 <td>{{ oldDetails?.address?.lon || '-' }}</td>
                                             </tr>
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
-                            <br/>
+                            <br />
                             <div class="card shadow-sm rounded mt-3 mt-md-0">
-                                <h5 class="card-header">GEO location (New)</h5>
+                                <h5 class="card-header">GEO location (New) <span
+                                        style="color: red; font-size: 0.8rem; margin-left: 10px;">(Highlighted fields
+                                        have been edited)</span></h5>
                                 <div class="card-body">
                                     <table class="table table-sm table-bordered mb-0">
                                         <tbody>
                                             <tr>
                                                 <th style="width: 180px">State</th>
-                                                <td>{{ editedDetails?.address?.stateId || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.stateId')"
+                                                    [pTooltip]="diffTip('address.stateId')" tooltipPosition="top">
+                                                    {{ getStateName(editedDetails?.address?.stateId) }}
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>County</th>
-                                                <td>{{ editedDetails?.address?.countyId || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.countyId')"
+                                                    [pTooltip]="diffTip('address.countyId')" tooltipPosition="top">
+                                                    {{ getCountyName(editedDetails?.address?.countyId) }}
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Payam</th>
-                                                <td>{{ editedDetails?.address?.payam || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.payam')"
+                                                    [pTooltip]="diffTip('address.payam')" tooltipPosition="top">
+                                                    {{ getPayamName(editedDetails?.address?.payam) }}
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Boma</th>
-                                                <td>{{ editedDetails?.address?.boma || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.boma')"
+                                                    [pTooltip]="diffTip('address.boma')" tooltipPosition="top">
+                                                    {{ getBomaName(editedDetails?.address?.boma) }}
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Latitude</th>
-                                                <td>{{ editedDetails?.address?.lat || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.lat')"
+                                                    [pTooltip]="diffTip('address.lat')" tooltipPosition="top">
+                                                    {{ editedDetails?.address?.lat || '-' }}
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Longitude</th>
-                                                <td>{{ editedDetails?.address?.lon || '-' }}</td>
+                                                <td [ngClass]="changedClass('address.lon')"
+                                                    [pTooltip]="diffTip('address.lon')" tooltipPosition="top">
+                                                    {{ editedDetails?.address?.lon || '-' }}
+                                                </td>
                                             </tr>
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -138,4 +169,27 @@
         </p-tabpanel>
     </p-tabpanels>
 </p-tabs>
+
+<p-confirmDialog #cd key="approvalDialog" [style]="{width: '500px'}">
+    <ng-template pTemplate="message">
+        <div>
+            <p>
+                Are you sure you want to
+                <strong [ngStyle]="{ color: isApprove ? 'green' : 'red' }">
+                    {{ isApprove ? 'approve' : 'reject' }}
+                </strong>
+                task #{{ taskId }}?
+            </p>
+            @if (!isApprove) {
+            <div class="mt-2">
+                <textarea rows="3" [(ngModel)]="approvalComment" class="form-control"
+                    placeholder="Comment is required for rejection.">
+                </textarea>
+            </div>
+            }
+
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
 }

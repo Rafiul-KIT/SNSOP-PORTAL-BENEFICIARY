@@ -46,7 +46,7 @@
                                     <strong> Personal Information (Old) </strong>
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="oldDetails?.photo || '/images/dummyHuman.jpg'"
+                                    <img [src]="oldDetails?.photo || 'images/dummyHuman.jpg'"
                                         class="img-thumbnail mb-3" width="200" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
@@ -522,7 +522,7 @@
                                         edited*</span>
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="editedDetails?.photo || '/images/dummyHuman.jpg'"
+                                    <img [src]="editedDetails?.photo || 'images/dummyHuman.jpg'"
                                         class="img-thumbnail mb-3" width="200" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
@@ -1066,7 +1066,7 @@
                                     Alternate {{ i + 1 }} (Old)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3"
+                                    <img [src]="alt.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
                                         width="200" />
 
                                     @if (alt.biometric) {
@@ -1153,7 +1153,7 @@
                                     Alternate {{ i + 1 }} (Edited)
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="alt.photo || '/images/dummyHuman.jpg'" class="img-thumbnail mb-3"
+                                    <img [src]="alt.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
                                         width="200" [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
                                         [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
 
@@ -1348,8 +1348,8 @@
                                         <tbody>
                                             <tr>
                                                 <th>Name</th>
-                                                <td [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])"
-                                                    [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName')])">
+                                                <td [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'),nomineePath(i,'nomineeNickName')])"
+                                                    [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'), nomineePath(i,'nomineeNickName')])">
                                                     {{ editedDetails!.nominees[i].name }}
                                                 </td>
                                             </tr>

@@ -2,22 +2,14 @@
 <app-loader></app-loader>
 } @else {
 <div class="breadcrumb-wrapper">
-  <p-breadcrumb
-    [model]="breadcrumbItems"
-    [home]="breadcrumbHome"
-    class="w-100"
-  ></p-breadcrumb>
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
 </div>
 
 <div class="card p-3 mb-2">
   <form [formGroup]="searchForm" class="row g-3">
     <div class="col-md-3">
       <p-floatlabel variant="on">
-        <input
-          pInputText
-          class="form-control"
-          formControlName="applicationId"
-        />
+        <input pInputText class="form-control" formControlName="applicationId" />
         <label>Application ID</label>
       </p-floatlabel>
     </div>
@@ -56,12 +48,8 @@
     <!-- State -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="states"
-          optionLabel="name"
-          formControlName="state"
-          (onChange)="onStateChange($event.value)"
-        />
+        <p-select [options]="states" optionLabel="name" formControlName="state"
+          (onChange)="onStateChange($event.value)" />
         <label>State</label>
       </p-floatlabel>
     </div>
@@ -69,12 +57,8 @@
     <!-- County -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="counties"
-          optionLabel="name"
-          formControlName="county"
-          (onChange)="onCountyChange($event.value)"
-        />
+        <p-select [options]="counties" optionLabel="name" formControlName="county"
+          (onChange)="onCountyChange($event.value)" />
         <label>County</label>
       </p-floatlabel>
     </div>
@@ -82,12 +66,8 @@
     <!-- Payam -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="payams"
-          optionLabel="name"
-          formControlName="payam"
-          (onChange)="onPayamChange($event.value)"
-        />
+        <p-select [options]="payams" optionLabel="name" formControlName="payam"
+          (onChange)="onPayamChange($event.value)" />
         <label>Payam</label>
       </p-floatlabel>
     </div>
@@ -102,12 +82,7 @@
     <!-- Gender -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="genderOptions"
-          optionLabel="name"
-          optionValue="id"
-          formControlName="gender"
-        ></p-select>
+        <p-select [options]="genderOptions" optionLabel="name" optionValue="id" formControlName="gender"></p-select>
         <label>Gender</label>
       </p-floatlabel>
     </div>
@@ -115,12 +90,8 @@
     <!-- Registration Phase -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select
-          [options]="registrationPhaseOptions"
-          optionLabel="name"
-          optionValue="id"
-          formControlName="registrationPhase"
-        ></p-select>
+        <p-select [options]="registrationPhaseOptions" optionLabel="name" optionValue="id"
+          formControlName="registrationPhase"></p-select>
         <label>Registration Phase</label>
       </p-floatlabel>
     </div>
@@ -128,46 +99,22 @@
     }
 
     <div class="col-12 text-end">
-      <p-button
-        [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'"
-        icon="fas fa-filter"
-        severity="warn"
-        class="me-2"
-        size="small"
-        outlined="true"
-        (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"
-      ></p-button>
+      <p-button [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'" icon="fas fa-filter"
+        severity="warn" class="me-2" size="small" outlined="true"
+        (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"></p-button>
 
-      <p-button
-        label="Reset"
-        icon="fas fa-refresh"
-        severity="danger"
-        class="me-2"
-        size="small"
-        (onClick)="resetForm()"
-        outlined="true"
-      ></p-button>
+      <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small" (onClick)="resetForm()"
+        outlined="true"></p-button>
 
-      <p-button
-        label="Search"
-        icon="fas fa-search"
-        severity="primary"
-        size="small"
-        (onClick)="searchBeneficiaries()"
-      ></p-button>
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
+        (onClick)="searchBeneficiaries()"></p-button>
     </div>
   </form>
 </div>
 
-<p-table
-  [value]="beneficiaries"
-  [scrollable]="true"
-  [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
-  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
-  dataKey="applicationId"
-  [rowTrackBy]="trackByAppId"
-  size="small"
->
+<p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
+  [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="applicationId" [rowTrackBy]="trackByAppId"
+  size="small">
   <ng-template pTemplate="header">
     <tr>
       <th>Application ID</th>
@@ -198,53 +145,14 @@
       <td>{{ b.bomaName }}</td>
 
       <td class="text-center">
-        <p-button
-          type="button"
-          icon="fas fa-eye"
-          pTooltip="Details"
-          tooltipPosition="top"
-          appendTo="body"
-          (onClick)="beneficiaryDetails(b)"
-          size="small"
-          outlined="true"
-          severity="info"
-          class="me-2"
-        />
-        <p-button
-          type="button"
-          icon="fas fa-pencil"
-          pTooltip="Edit"
-          tooltipPosition="top"
-          appendTo="body"
-          (onClick)="editBeneficiary(b)"
-          size="small"
-          outlined="true"
-          severity="secondary"
-          class="me-2"
-        />
-        <p-button
-          type="button"
-          icon="fas fa-share"
-          pTooltip="Migrate"
-          tooltipPosition="top"
-          appendTo="body"
-          (onClick)="migrateBeneficiary(b)"
-          size="small"
-          outlined="true"
-          severity="warn"
-          class="me-2"
-        />
-        <p-button
-          type="button"
-          icon="fas fa-archive"
-          pTooltip="Archive"
-          tooltipPosition="top"
-          appendTo="body"
-          (onClick)="deleteBeneficiary(b)"
-          size="small"
-          outlined="true"
-          severity="danger"
-        />
+        <p-button type="button" icon="fas fa-eye" pTooltip="Details" tooltipPosition="top" appendTo="body"
+          (onClick)="beneficiaryDetails(b)" size="small" outlined="true" severity="info" class="me-2" />
+        <p-button type="button" icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body"
+          (onClick)="editBeneficiary(b)" size="small" outlined="true" severity="secondary" class="me-2" />
+        <p-button type="button" icon="fas fa-share" pTooltip="Migrate" tooltipPosition="top" appendTo="body"
+          (onClick)="migrateBeneficiary(b)" size="small" outlined="true" severity="warn" class="me-2" />
+        <p-button type="button" icon="fas fa-archive" pTooltip="Archive" tooltipPosition="top" appendTo="body"
+          (onClick)="deleteBeneficiary(b)" size="small" outlined="true" severity="danger" />
       </td>
     </tr>
   </ng-template>
@@ -258,18 +166,27 @@
   </ng-template>
 </p-table>
 
-<p-paginator
-  class="paginator-sticky"
-  [rows]="pageSize"
-  [totalRecords]="totalRecords"
-  [rowsPerPageOptions]="[10, 25, 50]"
-  (onPageChange)="onPageChange($event)"
-  [first]="(currentPage) * pageSize"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
->
+<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
+  [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="(currentPage) * pageSize"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 </p-paginator>
 
 }
 
 <p-toast position="bottom-right"></p-toast>
-<p-confirmdialog position="center"></p-confirmdialog>
+<p-confirmDialog key="archiveDialog" position="center" [style]="{ width: '500px' }">
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: red;">archive</strong>
+        {{ beneficiaryToDelete?.fullName }}?
+      </p>
+
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
+          placeholder="Comment is required for archiving."></textarea>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>
