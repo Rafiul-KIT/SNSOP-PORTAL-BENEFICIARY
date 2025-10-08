@@ -72,7 +72,7 @@ export class Header {
       },
       {
         label: 'Beneficiary',
-        icon: 'fas fa-list',
+        icon: 'fas fa-people-group',
         items: [
           {
             label: 'Beneficiary List',
@@ -89,32 +89,38 @@ export class Header {
       },
       {
         label: 'Beneficiary ID Cards',
-        icon: 'fas fa-list',
+        icon: 'fas fa-id-card',
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'Job Card',
-        icon: 'fas fa-list',
+        icon: 'fas fa-id-card',
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'Work Progress',
-        icon: 'fas fa-list',
+        icon: 'fas fa-line-chart',
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'LIPW Export',
-        icon: 'fas fa-list',
+        icon: 'fas fa-file-export',
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'Report',
-        icon: 'fas fa-list',
+        icon: 'fas fa-file-alt',
         routerLink: '/beneficiary/id-card',
+        routerLinkActiveOptions: 'active',
+      },
+      {
+        label: 'Archived Beneficiary',
+        icon: 'fas fa-trash-restore',
+        routerLink: '/beneficiary/restore',
         routerLinkActiveOptions: 'active',
       },
     ];

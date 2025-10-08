@@ -9,16 +9,35 @@
 <p-tabs value="0">
     <p-tablist>
         <p-tab value="0">Beneficiary's GEO location</p-tab>
-        @if (taskId) {
-        <div style="position: absolute; top: 5px; right: 5px; z-index: 99;">
-            <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
-                size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
+        @if (taskId && approvalStatus === 'PENDING') {
+  <div style="position: absolute; top: 5px; right: 5px; z-index: 99;">
+    <p-button
+      type="button"
+      icon="fas fa-check"
+      pTooltip="Approve"
+      tooltipPosition="bottom"
+      appendTo="body"
+      size="small"
+      severity="primary"
+      class="me-1"
+      label="Approve"
+      (onClick)="openApprovalDialog(true)"
+    />
 
-            <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
-                size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
+    <p-button
+      type="button"
+      icon="fas fa-ban"
+      pTooltip="Reject"
+      tooltipPosition="bottom"
+      appendTo="body"
+      size="small"
+      severity="danger"
+      label="Reject"
+      (onClick)="openApprovalDialog(false)"
+    />
+  </div>
+}
 
-        </div>
-        }
     </p-tablist>
 
     <p-tabpanels>

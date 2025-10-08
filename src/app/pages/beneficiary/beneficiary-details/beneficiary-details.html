@@ -1,12 +1,4 @@
 <div class="position-relative">
-  <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
-    @if(isOnTaskDetails && taskId){
-    <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body" size="small"
-      severity="primary" class="me-1" label="Approve" (onClick)="approveTask()" />
-    <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body" size="small"
-      severity="danger" label="Reject" (onClick)="rejectTask()" />
-    }
-  </div>
   <div class="breadcrumb-wrapper">
     <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
   </div>
@@ -19,6 +11,13 @@
       <p-tab value="0">Beneficiary Information</p-tab>
       <p-tab value="1">Alternate Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
+      @if(activeStatus !== null && activeStatus === 1){
+      <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
+
+        <p-button type="button" icon="fas fa-trash-restore" pTooltip="Restore" tooltipPosition="bottom" appendTo="body"
+          size="small" severity="primary" class="me-1" label="Restore" (onClick)="restoreBeneficiary()" />
+      </div>
+      }
 
     </p-tablist>
 
@@ -58,8 +57,21 @@
                       </tr>
                       <tr>
                         <th>Relationship</th>
-                        <td>{{ beneficiaryDetails.relationshipWithHouseholdHead }}</td>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(
+                          beneficiaryDetails.relationshipWithHouseholdHead
+                          )
+                          }}
+                          @if (
+                          beneficiaryDetails.relationshipWithHouseholdHead === 'OTHER' &&
+                          beneficiaryDetails.relationshipOther
+                          ) {
+                          ({{ beneficiaryDetails.relationshipOther }})
+                          }
+                        </td>
                       </tr>
+
                       <tr>
                         <th>Marital Status</th>
                         <td>{{ beneficiaryDetails.respondentMaritalStatus }}</td>
@@ -150,9 +162,20 @@
                               <tr>
                                 <th>Income Source</th>
                                 <td>
-                                  {{ lookup.getOccupationEnumByValue(beneficiaryDetails.household?.incomeSource) }}
+                                  {{
+                                  lookup.getIncomeSourceEnumByValue(
+                                  beneficiaryDetails.household?.incomeSource
+                                  )
+                                  }}
+                                  @if (
+                                  beneficiaryDetails.household?.incomeSource === 'OTHER' &&
+                                  beneficiaryDetails.household?.incomeSourceOther
+                                  ) {
+                                  ({{ beneficiaryDetails.household?.incomeSourceOther }})
+                                  }
                                 </td>
                               </tr>
+
 
                               <tr>
                                 <th>Monthly Avg Income</th>
@@ -506,8 +529,18 @@
                       </tr>
                       <tr>
                         <th>Alternate Relationship</th>
-                        <td>{{ lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead) }}</td>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
+                          }}
+                          @if (
+                          alt.relationshipWithHouseholdHead === 'OTHER' && alt.relationshipOther
+                          ) {
+                          ({{ alt.relationshipOther }})
+                          }
+                        </td>
                       </tr>
+
                       <tr>
                         <th>ID</th>
                         <td>{{ alt.nationalId || '-' }}</td>

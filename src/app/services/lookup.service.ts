@@ -192,6 +192,13 @@ export class LookupService {
     ];
   }
 
+    getGenderListbyId(): LookupItem[] {
+    return [
+      { id: '0', name: 'Male' },
+      { id: '1', name: 'Female' },
+    ];
+  }
+
   getRegistrationPhaseList(): LookupItem[] {
     return [
       { id: 'PARENT', name: 'Parent' },
@@ -571,6 +578,36 @@ export class LookupService {
       return '--';
     }
   };
+
+    IncomeSourceEnum = [
+    { id: 1, value: 'NONE', label: 'None' },
+    { id: 2, value: 'SELLING_OF_FARM', label: 'Selling of farm' },
+    { id: 3, value: 'SELLING_OF_NON_FARM', label: 'Selling of non farm' },
+    { id: 4, value: 'CAUSAL_LABOUR', label: 'Causal labour' },
+    { id: 5, value: 'FORMAL_EMPLOYMENT', label: 'Formal employment' },
+    { id: 6, value: 'REMITTANCES', label: 'Remittances' },
+    { id: 7, value: 'GIFT', label: 'Gift' },
+    { id: 8, value: 'FROM_GOVT', label: 'From govt' },
+    { id: 9, value: 'FROM_NGO', label: 'From ngo' },
+    { id: 10, value: 'PENSION', label: 'Pension' },
+    { id: 11, value: 'OTHER', label: 'Other' },
+  ];
+
+  getIncomeSourceEnum = () => {
+    return this.IncomeSourceEnum;
+  };
+
+  getIncomeSourceEnumByValue = (value: any) => {
+    const dataFound = this.IncomeSourceEnum.find(
+      (item: any) => item.value == value
+    );
+    if (dataFound) {
+      return dataFound.label;
+    } else {
+      return '--';
+    }
+  };
+
 
   NomineeOccupationEnum = [
     { id: 0, value: 'FORMAL_JOB', label: 'Employed in a formal job' },

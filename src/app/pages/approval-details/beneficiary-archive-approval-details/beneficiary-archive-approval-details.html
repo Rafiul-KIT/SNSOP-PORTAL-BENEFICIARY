@@ -12,14 +12,15 @@
             <p-tab value="0">Beneficiary Information</p-tab>
             <p-tab value="1">Alternate Information</p-tab>
             <p-tab value="2">Nominee Information</p-tab>
+            @if (isOnTaskDetails && taskId && approvalStatus === 'PENDING') {
             <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
-                @if(isOnTaskDetails && taskId){
                 <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
+
                 <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
-                }
             </div>
+            }
 
         </p-tablist>
         <div class="card mt-3">
@@ -163,7 +164,7 @@
                                                                 <th>Income Source</th>
                                                                 <td>
                                                                     {{
-                                                                    lookup.getOccupationEnumByValue(beneficiaryDetails.household?.incomeSource)
+                                                                    lookup.getIncomeSourceEnumByValue(beneficiaryDetails.household?.incomeSource)
                                                                     }}
                                                                 </td>
                                                             </tr>

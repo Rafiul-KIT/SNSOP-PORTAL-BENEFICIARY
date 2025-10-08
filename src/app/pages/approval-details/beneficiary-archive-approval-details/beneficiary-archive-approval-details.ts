@@ -128,6 +128,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
   rightFingers: any[] = [];
   leftFingers: any[] = [];
   isApprove: boolean = true;
+  approvalStatus: string = '';
 
   items = [
     {
@@ -145,9 +146,9 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     private cdr: ChangeDetectorRef,
     public lookup: LookupService,
     private messageService: MessageService,
-     private router: Router,
+    private router: Router,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   openApprovalDialog(isApprove: boolean) {
     if (!this.taskId) {
@@ -168,7 +169,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     });
   }
 
-    private handleApproval() {
+  private handleApproval() {
     if (!this.isApprove && (!this.approvalComment || !this.approvalComment.trim())) {
       this.messageService.add({
         severity: 'warn',
@@ -258,6 +259,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     this.api
       .GET(`api/approval/details/${taskId}`)
       .then((res: any) => {
+        this.approvalStatus = res?.data?.approvalStatus || '';
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
         this.beneficiaryDetails.comment = res?.data?.comment || dto?.comment || '';
@@ -289,10 +291,10 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
         .filter(Boolean)
         .join(' '),
 
-      spouseName: [ dto.spouseFirstName,
-        dto.spouseMiddleName,
-        dto.spouseLastName,
-        dto.spouseNickName,
+      spouseName: [dto.spouseFirstName,
+      dto.spouseMiddleName,
+      dto.spouseLastName,
+      dto.spouseNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -432,7 +434,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
         nomineeOccupation: n.nomineeOccupation,
         photo: normalizeFinger(n.biometric?.photoData),
         isReadWrite: n.isReadWrite
-        
+
       })),
 
       rightFingers: [
@@ -558,23 +560,4 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
       },
     ];
   }
-
-  /*onApprove(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with approval API
-    } finally {
-      this.isSubmitting = false;
-    }
-  }
-
-  onReject(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with reject API
-    } finally {
-      this.isSubmitting = false;
-    }
-  }*/
-
 }

@@ -40,6 +40,7 @@ export class BeneficiaryMigrateApprovalDetails {
   beneficiaryForm: any;
   oldDetails: any = {};
   editedDetails: any = {};
+  approvalStatus: string = '';
 
   items = [
     { label: 'Approval List', icon: 'fas fa-users me-2', routerLink: '/beneficiary-approval-list/edit' },
@@ -175,6 +176,7 @@ export class BeneficiaryMigrateApprovalDetails {
       ]);
 
       const response = await this.api.GET(`/api/approval/details/${id}`);
+      this.approvalStatus = response?.data?.approvalStatus || '';
       if (response.data) {
         this.oldDetails = response.data.oldBeneficiary;
         this.editedDetails = response.data.taskDetails || response.data.addressMigrationDetails || {};

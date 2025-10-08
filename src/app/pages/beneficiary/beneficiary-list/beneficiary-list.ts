@@ -135,7 +135,7 @@ export class BeneficiaryList implements OnInit {
     this.counties = this.lookup.getAllCountyList();
     this.payams = this.lookup.getAllPayamList();
     this.bomas = this.lookup.getAllBomaList();
-    this.genderOptions = this.lookup.getGenderList();
+    this.genderOptions = this.lookup.getGenderListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
   }
   ngOnInit() {

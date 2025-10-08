@@ -64,6 +64,13 @@
                     <label for="relationship">Relationship</label>
                   </p-floatlabel>
                 </div>
+                
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="relationshipOther" formControlName="relationshipOther" class="w-100" />
+                    <label for="relationshipOther">Relationship Other</label>
+                  </p-floatlabel>
+                </div>
 
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
@@ -121,14 +128,6 @@
                 </div>
 
                 <div class="col-md-3 mb-1">
-                  <label>Do you have a national ID?</label><br />
-                  <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" />
-                  Yes &nbsp;&nbsp;
-                  <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" />
-                  No
-                </div>
-
-                <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
                     <p-select id="idType" formControlName="idType" class="w-100" [options]="idTypeOptions"
                       optionLabel="label" optionValue="value">
@@ -145,10 +144,18 @@
                 </div>
 
                 <div class="col-md-3 mb-1">
-                  <p-floatlabel>
+                  <p-floatlabel variant="on">
                     <input pInputText id="respondentPhone" formControlName="respondentPhone" class="w-100" />
                     <label for="respondentPhone">Phone Number</label>
                   </p-floatlabel>
+                </div>
+
+                <div class="col-md-3 mb-1">
+                  <label>Do you have a national ID?</label><br />
+                  <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" />
+                  Yes &nbsp;&nbsp;
+                  <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" />
+                  No
                 </div>
               </div>
             </div>
@@ -161,7 +168,7 @@
                 <div class="col-md-4 mb-1">
                   <p-floatlabel variant="on">
                     <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"
-                      [options]="occupationOptions" optionLabel="label" optionValue="value">
+                      [options]="incomeSourceOptions" optionLabel="label" optionValue="value">
                     </p-select>
                     <label for="mainIncomeSource">Main Income Source</label>
                   </p-floatlabel>
@@ -396,6 +403,20 @@
                       </div>
 
                       <div class="col-md-12 mb-4">
+                        <p-floatlabel variant="on">
+                          <input pInputText formControlName="relationshipWithHouseholdHead" class="w-100" />
+                          <label>Relationship</label>
+                        </p-floatlabel>
+                      </div>
+
+                      <div class="col-md-12 mb-4">
+                        <p-floatlabel variant="on">
+                          <input pInputText formControlName="relationshipOther" class="w-100" />
+                          <label>Relationship Other</label>
+                        </p-floatlabel>
+                      </div>
+
+                      <div class="col-md-12 mb-4">
                         <label class="form-label">Do you have a national ID?</label><br />
                         <div class="form-check form-check-inline">
                           <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" />
@@ -412,6 +433,13 @@
                             formControlName="documentType" class="w-100">
                           </p-select>
                           <label>ID Type</label>
+                        </p-floatlabel>
+                      </div>
+
+                      <div class="col-md-12 mb-4">
+                        <p-floatlabel variant="on">
+                          <input pInputText formControlName="documentTypeOther" class="w-100" />
+                          <label>ID Type Other</label>
                         </p-floatlabel>
                       </div>
 

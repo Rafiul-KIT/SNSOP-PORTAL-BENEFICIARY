@@ -19,16 +19,16 @@
             <p-tab value="0">Beneficiary Information</p-tab>
             <p-tab value="1">Alternate Information</p-tab>
             <p-tab value="2">Nominee Information</p-tab>
-            @if (isOnTaskDetails && taskId) {
+            @if (isOnTaskDetails && taskId && approvalStatus === 'PENDING') {
             <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
                 <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
 
                 <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
-
             </div>
             }
+
 
         </p-tablist>
 
@@ -42,12 +42,12 @@
                         <!-- Personal Info -->
                         <div class="col-12 col-md-6">
                             <div class="card shadow-sm rounded">
-                                <div class="card-header bg-gray text-black">
+                                <div class="card-header bg-gray text-black ">
                                     <strong> Personal Information (Old) </strong>
                                 </div>
                                 <div class="card-body text-center">
-                                    <img [src]="oldDetails?.photo || 'images/dummyHuman.jpg'"
-                                        class="img-thumbnail mb-3" width="200" />
+                                    <img [src]="oldDetails?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
+                                        width="200" />
                                     <table class="table table-bordered table-sm text-start mb-0">
                                         <tbody>
                                             <tr>
@@ -68,8 +68,19 @@
                                             </tr>
                                             <tr>
                                                 <th>Relationship</th>
-                                                <td>{{ oldDetails?.relationshipWithHouseholdHead }}</td>
+                                                <td>
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(oldDetails?.relationshipWithHouseholdHead)
+                                                    }}
+                                                    @if (
+                                                    oldDetails?.relationshipWithHouseholdHead === 'OTHER' &&
+                                                    oldDetails?.relationshipOther
+                                                    ) {
+                                                    ({{ oldDetails?.relationshipOther }})
+                                                    }
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Marital Status</th>
                                                 <td>{{ oldDetails?.respondentMaritalStatus }}</td>
@@ -84,10 +95,20 @@
                                             </tr>
                                             <tr>
                                                 <th>ID Number (Type)</th>
-                                                <td>{{ oldDetails?.respondentId }} ({{
-                                                    lookup.getDocumentTypeEnumByValue(oldDetails?.documentType)
-                                                    }})</td>
+                                                <td>
+                                                    {{ oldDetails?.respondentId }}
+                                                    @if (oldDetails?.documentType) {
+                                                    ({{ lookup.getDocumentTypeEnumByValue(oldDetails?.documentType) }})
+                                                    @if (
+                                                    oldDetails?.documentType === 'OTHER' &&
+                                                    oldDetails?.documentTypeOther
+                                                    ) {
+                                                    ({{ oldDetails?.documentTypeOther }})
+                                                    }
+                                                    }
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Mobile Money Provider</th>
                                                 <td>{{ oldDetails?.mobileMoneyProvider }}</td>
@@ -164,10 +185,19 @@
                                                                 <th>Income Source</th>
                                                                 <td>
                                                                     {{
-                                                                    lookup.getOccupationEnumByValue(oldDetails?.household?.incomeSource)
+                                                                    lookup.getIncomeSourceEnumByValue(
+                                                                    oldDetails?.household?.incomeSource
+                                                                    )
                                                                     }}
+                                                                    @if (
+                                                                    oldDetails?.household?.incomeSource === 'OTHER' &&
+                                                                    oldDetails?.household?.incomeSourceOther
+                                                                    ) {
+                                                                    ({{ oldDetails?.household?.incomeSourceOther }})
+                                                                    }
                                                                 </td>
                                                             </tr>
+
 
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
@@ -518,9 +548,8 @@
                             <div class="card shadow-sm rounded">
                                 <div class="card-header bg-gray text-black">
                                     <strong>Personal Information (Edited)</strong>
-                                    <span style="color: red; margin-left: 10px;">Marked/Highlighted fields have been
-                                        edited*</span>
                                 </div>
+
                                 <div class="card-body text-center">
                                     <img [src]="editedDetails?.photo || 'images/dummyHuman.jpg'"
                                         class="img-thumbnail mb-3" width="200" />
@@ -556,9 +585,20 @@
                                                 <th>Relationship</th>
                                                 <td [ngClass]="changedClass('relationshipWithHouseholdHead')"
                                                     [pTooltip]="diffTip('relationshipWithHouseholdHead')">
-                                                    {{ editedDetails?.relationshipWithHouseholdHead }}
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(
+                                                    editedDetails?.relationshipWithHouseholdHead
+                                                    )
+                                                    }}
+                                                    @if (
+                                                    editedDetails?.relationshipWithHouseholdHead === 'OTHER' &&
+                                                    editedDetails?.relationshipOther
+                                                    ) {
+                                                    ({{ editedDetails?.relationshipOther }})
+                                                    }
                                                 </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Marital Status</th>
                                                 <td [ngClass]="changedClass('respondentMaritalStatus')"
@@ -584,10 +624,20 @@
                                                 <th>ID Number (Type)</th>
                                                 <td [ngClass]="changedClass(['respondentId','documentType'])"
                                                     [pTooltip]="diffTip(['respondentId','documentType'])">
-                                                    {{ editedDetails?.respondentId }} ({{
-                                                    lookup.getDocumentTypeEnumByValue(editedDetails?.documentType) }})
+                                                    {{ editedDetails?.respondentId }}
+                                                    @if (editedDetails?.documentType) {
+                                                    ({{ lookup.getDocumentTypeEnumByValue(editedDetails?.documentType)
+                                                    }})
+                                                    @if (
+                                                    editedDetails?.documentType === 'OTHER' &&
+                                                    editedDetails?.documentTypeOther
+                                                    ) {
+                                                    ({{ editedDetails?.documentTypeOther }})
+                                                    }
+                                                    }
                                                 </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Mobile Money Provider</th>
                                                 <td [ngClass]="changedClass('mobileMoneyProvider')"
@@ -675,10 +725,20 @@
                                                                 <td [ngClass]="changedClass('householdIncomeSource')"
                                                                     [pTooltip]="diffTip('householdIncomeSource')">
                                                                     {{
-                                                                    lookup.getOccupationEnumByValue(editedDetails?.household?.incomeSource)
+                                                                    lookup.getIncomeSourceEnumByValue(
+                                                                    editedDetails?.household?.incomeSource
+                                                                    )
                                                                     }}
+                                                                    @if (
+                                                                    editedDetails?.household?.incomeSource === 'OTHER'
+                                                                    &&
+                                                                    editedDetails?.household?.incomeSourceOther
+                                                                    ) {
+                                                                    ({{ editedDetails?.household?.incomeSourceOther }})
+                                                                    }
                                                                 </td>
                                                             </tr>
+
 
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
@@ -1116,18 +1176,35 @@
                                             </tr>
                                             <tr>
                                                 <th>Alternate Relationship</th>
-                                                <td>{{
-                                                    lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
-                                                    }}</td>
+                                                <td>
+                                                    {{
+                                                    lookup.getRelationshipEnumByValue(
+                                                    alt.relationshipWithHouseholdHead
+                                                    )
+                                                    }}
+                                                    @if (
+                                                    alt.relationshipWithHouseholdHead === 'OTHER' &&
+                                                    alt.relationshipOther
+                                                    ) {
+                                                    ({{ alt.relationshipOther }})
+                                                    }
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>ID</th>
                                                 <td>{{ alt.nationalId || '-' }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Document Type</th>
-                                                <td>{{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}</td>
+                                                <td>
+                                                    {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
+                                                    @if (alt.documentType === 'OTHER' && alt.documentTypeOther) {
+                                                    ({{ alt.documentTypeOther }})
+                                                    }
+                                                </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Phone</th>
                                                 <td>{{ alt.phone || '-' }}</td>
@@ -1220,13 +1297,20 @@
                                             </tr>
                                             <tr>
                                                 <th>Alternate Relationship</th>
-                                                <td [ngClass]="changedClass(altPath(i,'relationshipWithHouseholdHead'))"
-                                                    [pTooltip]="diffTip(altPath(i,'relationshipWithHouseholdHead'))">
+                                                <td [ngClass]="changedClass(altPath(i, 'relationshipWithHouseholdHead'))"
+                                                    [pTooltip]="diffTip(altPath(i, 'relationshipWithHouseholdHead'))">
                                                     {{
                                                     lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
                                                     }}
+                                                    @if (
+                                                    alt.relationshipWithHouseholdHead === 'OTHER' &&
+                                                    alt.relationshipOther
+                                                    ) {
+                                                    ({{ alt.relationshipOther }})
+                                                    }
                                                 </td>
                                             </tr>
+
                                             <tr>
                                                 <th>ID</th>
                                                 <td [ngClass]="changedClass(altPath(i,'nationalId'))"
@@ -1236,11 +1320,15 @@
                                             </tr>
                                             <tr>
                                                 <th>Document Type</th>
-                                                <td [ngClass]="changedClass(altPath(i,'documentType'))"
-                                                    [pTooltip]="diffTip(altPath(i,'documentType'))">
+                                                <td [ngClass]="changedClass(altPath(i, 'documentType'))"
+                                                    [pTooltip]="diffTip(altPath(i, 'documentType'))">
                                                     {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
+                                                    @if (alt.documentType === 'OTHER' && alt.documentTypeOther) {
+                                                    ({{ alt.documentTypeOther }})
+                                                    }
                                                 </td>
                                             </tr>
+
                                             <tr>
                                                 <th>Phone</th>
                                                 <td [ngClass]="changedClass(altPath(i,'payeePhoneNo'))"

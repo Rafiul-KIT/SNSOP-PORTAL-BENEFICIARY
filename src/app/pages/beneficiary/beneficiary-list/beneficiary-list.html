@@ -115,7 +115,16 @@
 <p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
   [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="applicationId" [rowTrackBy]="trackByAppId"
   size="small">
+
   <ng-template pTemplate="header">
+    <tr>
+      <th colspan="11" class="text-end">
+        <p class="fw-bold mb-2">
+          Showing <kbd>{{ beneficiaries.length }}</kbd> of
+          <kbd>{{ totalRecords }}</kbd> beneficiaries
+        </p>
+      </th>
+    </tr>
     <tr>
       <th>Application ID</th>
       <th>Name</th>

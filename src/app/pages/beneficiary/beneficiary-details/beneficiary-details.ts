@@ -10,7 +10,7 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { Loader } from '../../../components/loader/loader';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../services/api.service';
-import { LookupService, LookupItem } from '../../../services/lookup.service';
+import { LookupService } from '../../../services/lookup.service';
 
 import {
   BeneficiaryDto,
@@ -39,6 +39,7 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
+  relationshipOther?: string;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
   respondentId: string;
@@ -120,6 +121,10 @@ export class BeneficiaryDetails implements OnInit {
   beneficiaryDetails!: BeneficiaryVm | null;
   rightFingers: any[] = [];
   leftFingers: any[] = [];
+  activeStatus: number | null = null;
+  restoreComment: string = '';
+
+
 
   items = [
     {
@@ -140,105 +145,6 @@ export class BeneficiaryDetails implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  approveTask() {
-    if (!this.taskId) {
-      console.error('Approve clicked, but task id is missing:', this.taskId);
-      return;
-    }
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to approve task #${this.taskId}?`,
-      header: 'Confirm Approval',
-      icon: 'fas fa-check-circle',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: true,
-        };
-
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Approved',
-              detail: `Task #${this.taskId} approved successfully.`,
-            });
-            this.fetchTaskDetails(this.taskId);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to approve task',
-            });
-          });
-      },
-    });
-  }
-
-  rejectTask() {
-    if (!this.taskId) {
-      console.error('Reject clicked, but task id is missing:', this.taskId);
-      return;
-    }
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to reject task #${this.taskId}?`,
-      header: 'Confirm Rejection',
-      icon: 'fas fa-ban',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: false,
-        };
-
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Rejected',
-              detail: `Task #${this.taskId} rejected successfully.`,
-            });
-            this.fetchTaskDetails(this.taskId);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to reject task',
-            });
-          });
-      },
-    });
-  }
-
-  /*ngOnInit() {
-    const applicationId = this.route.snapshot.paramMap.get('applicationId');
-
-    if (applicationId) {
-      // 1. preload geo lookup data first
-      Promise.all([
-        this.lookup.getOrFetchStateList(),
-        this.lookup.getCountyListByStateId(''),
-        this.lookup.getPayamListByCountyId(''),
-        this.lookup.getBomaListByPayamId('')
-      ])
-        .then(() => {
-          // 2. only then fetch beneficiary details
-          this.fetchBeneficiaryDetails(applicationId);
-        });
-    }
-  }*/
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -286,6 +192,7 @@ export class BeneficiaryDetails implements OnInit {
     this.api
       .GET(`api/approval/details/${taskId}`)
       .then((res: any) => {
+        this.activeStatus = res?.data?.activeStatus ?? null;
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
         this.prepareFingerImages(dto.biometrics);
@@ -326,6 +233,7 @@ export class BeneficiaryDetails implements OnInit {
       age: dto.respondentAge,
       gender: dto.respondentGender,
       relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      relationshipOther: dto.relationshipOther,
       respondentMaritalStatus: dto.respondentMaritalStatus,
       respondentLegalStatus: dto.respondentLegalStatus,
       respondentId: dto.respondentId,
@@ -339,6 +247,7 @@ export class BeneficiaryDetails implements OnInit {
 
       household: {
         incomeSource: dto.householdIncomeSource,
+        incomeSourceOther: dto.incomeSourceOther,
         monthlyIncome: dto.householdMonthlyAvgIncome,
         selectionCriteria: dto.selectionCriteria,
         selectionReasons: (dto.selectionReason || []).map((r: string) =>
@@ -585,21 +494,79 @@ export class BeneficiaryDetails implements OnInit {
     ];
   }
 
-  /*onApprove(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with approval API
-    } finally {
-      this.isSubmitting = false;
-    }
-  }
+restoreBeneficiary() {
+  if (!this.beneficiaryDetails?.applicationId) return;
 
-  onReject(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with reject API
-    } finally {
-      this.isSubmitting = false;
-    }
-  }*/
+  // Reset previous comment before opening dialog
+  this.restoreComment = '';
+
+  this.confirmationService.confirm({
+    key: 'restoreDialog',
+    header: 'Confirm Restore',
+    message: `
+      <div style="margin-bottom: 10px;">
+        <strong>Please provide a comment before restoring:</strong>
+      </div>
+      <textarea rows="3" style="width:100%;" pInputTextarea [(ngModel)]="restoreComment"
+        placeholder="Enter your comment..."></textarea>
+    `,
+    icon: 'fas fa-trash-restore text-primary',
+    acceptLabel: 'Yes',
+    rejectLabel: 'No',
+    acceptButtonStyleClass: 'p-button-success',
+    rejectButtonStyleClass: 'p-button-danger',
+
+    accept: () => {
+      // ✅ Validate comment
+      if (!this.restoreComment.trim()) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Comment Required',
+          detail: 'Please write a reason for restoring this beneficiary.',
+        });
+        return;
+      }
+
+      const payload = {
+        householdId: this.beneficiaryDetails!.applicationId,
+        comment: this.restoreComment.trim(),
+      };
+
+      this.isLoading = true;
+
+      this.api
+        .POST('/api/beneficiary/archive', payload)
+        .then((res: any) => {
+          if (res?.data?.operationResult) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Restored',
+              detail: 'Beneficiary restored successfully.',
+            });
+            // optionally refresh data or redirect
+            this.activeStatus = 0; // mark as active again
+            this.cdr.markForCheck();
+          } else {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Restore Failed',
+              detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
+            });
+          }
+        })
+        .catch((err) => {
+          console.error('Restore API error:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to restore beneficiary.',
+          });
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+  });
+}
+
 }
