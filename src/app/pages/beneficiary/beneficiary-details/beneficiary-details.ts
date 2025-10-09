@@ -24,8 +24,6 @@ import {
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 
 export interface FingerVm {
@@ -149,7 +147,7 @@ export class BeneficiaryDetails implements OnInit {
     public lookup: LookupService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
 
   ngOnInit() {
@@ -232,10 +230,10 @@ export class BeneficiaryDetails implements OnInit {
         .filter(Boolean)
         .join(' '),
 
-      spouseName: [ dto.spouseFirstName,
-        dto.spouseMiddleName,
-        dto.spouseLastName,
-        dto.spouseNickName,
+      spouseName: [dto.spouseFirstName,
+      dto.spouseMiddleName,
+      dto.spouseLastName,
+      dto.spouseNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -376,7 +374,7 @@ export class BeneficiaryDetails implements OnInit {
         nomineeOccupation: n.nomineeOccupation,
         photo: normalizeFinger(n.biometric?.photoData),
         isReadWrite: n.isReadWrite
-        
+
       })),
 
       rightFingers: [
@@ -437,8 +435,7 @@ export class BeneficiaryDetails implements OnInit {
   }
 
   private prepareFingerImages(bio?: BiometricDto) {
-    const normalizeFinger = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
+    const checkForWsq = (wsqField: string | undefined): boolean => wsqField != null;
 
     if (!bio) {
       this.rightFingers = [];
@@ -446,125 +443,128 @@ export class BeneficiaryDetails implements OnInit {
       return;
     }
 
+    // Right Fingers
     this.rightFingers = [
       {
         label: 'Thumb',
-        image: normalizeFinger(bio.rtFingerData),
+        image: checkForWsq(bio.wsqRt) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Right Thumb',
       },
       {
         label: 'Index',
-        image: normalizeFinger(bio.riFingerData),
+        image: checkForWsq(bio.wsqRi) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Right Index',
       },
       {
         label: 'Middle',
-        image: normalizeFinger(bio.rmFingerData),
+        image: checkForWsq(bio.wsqRm) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Right Middle',
       },
       {
         label: 'Ring',
-        image: normalizeFinger(bio.rrFingerData),
+        image: checkForWsq(bio.wsqRr) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Right Ring',
       },
       {
         label: 'Little',
-        image: normalizeFinger(bio.rsFingerData),
+        image: checkForWsq(bio.wsqRs) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Right Little',
       },
     ];
 
+    // Left Fingers
     this.leftFingers = [
       {
         label: 'Thumb',
-        image: normalizeFinger(bio.ltFingerData),
+        image: checkForWsq(bio.wsqLt) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Left Thumb',
       },
       {
         label: 'Index',
-        image: normalizeFinger(bio.liFingerData),
+        image: checkForWsq(bio.wsqLi) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Left Index',
       },
       {
         label: 'Middle',
-        image: normalizeFinger(bio.lmFingerData),
+        image: checkForWsq(bio.wsqLm) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Left Middle',
       },
       {
         label: 'Ring',
-        image: normalizeFinger(bio.lrFingerData),
+        image: checkForWsq(bio.wsqLr) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Left Ring',
       },
       {
         label: 'Little',
-        image: normalizeFinger(bio.lsFingerData),
+        image: checkForWsq(bio.wsqLs) ? 'images/tick.jpg' : 'images/no-finger.png',
         tooltip: 'Left Little',
       },
     ];
   }
 
-restoreBeneficiary() {
-  if (!this.beneficiaryDetails?.applicationId) return;
-  this.restoreComment = ''; // Reset comment before showing dialog
-  this.isRestoreDialogVisible = true;
-}
 
-cancelRestore() {
-  this.isRestoreDialogVisible = false;
-}
-
-confirmRestore() {
-  // ✅ Validate comment
-  if (!this.restoreComment.trim()) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Comment Required',
-      detail: 'Please write a reason for restoring this beneficiary.',
-    });
-    return;
+  restoreBeneficiary() {
+    if (!this.beneficiaryDetails?.applicationId) return;
+    this.restoreComment = ''; // Reset comment before showing dialog
+    this.isRestoreDialogVisible = true;
   }
 
-  const payload = {
-    householdId: this.beneficiaryDetails!.applicationId,
-    comment: this.restoreComment.trim(),
-  };
+  cancelRestore() {
+    this.isRestoreDialogVisible = false;
+  }
 
-  this.isLoading = true;
-  this.isRestoreDialogVisible = false; // Hide dialog
-
-  this.api
-    .POST('/api/beneficiary/archive', payload)
-    .then((res: any) => {
-      if (res?.data?.operationResult) {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Restored',
-          detail: 'Beneficiary restored successfully.',
-        });
-
-        // Redirect after a short delay to allow user to see the message
-        setTimeout(() => {
-          this.router.navigate(['/beneficiary/restore']);
-        }, 1500);
-      } else {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Restore Failed',
-          detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
-        });
-      }
-    })
-    .catch((err) => {
-      console.error('Restore API error:', err);
+  confirmRestore() {
+    // ✅ Validate comment
+    if (!this.restoreComment.trim()) {
       this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to restore beneficiary.',
+        severity: 'warn',
+        summary: 'Comment Required',
+        detail: 'Please write a reason for restoring this beneficiary.',
       });
-    })
-    .finally(() => {
-      this.isLoading = false;
-    });
-}
+      return;
+    }
+
+    const payload = {
+      householdId: this.beneficiaryDetails!.applicationId,
+      comment: this.restoreComment.trim(),
+    };
+
+    this.isLoading = true;
+    this.isRestoreDialogVisible = false; // Hide dialog
+
+    this.api
+      .POST('/api/beneficiary/archive', payload)
+      .then((res: any) => {
+        if (res?.data?.operationResult) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Restored',
+            detail: 'Beneficiary restored successfully.',
+          });
+
+          // Redirect after a short delay to allow user to see the message
+          setTimeout(() => {
+            this.router.navigate(['/beneficiary/restore']);
+          }, 1500);
+        } else {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Restore Failed',
+            detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Restore API error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to restore beneficiary.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  }
 
 }

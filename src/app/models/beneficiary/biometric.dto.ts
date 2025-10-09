@@ -18,4 +18,26 @@ export interface BiometricDto {
   rmFingerData?: string;
   rrFingerData?: string;
   rsFingerData?: string;
+
+  wsqLt?: string;
+  wsqLi?: string;
+  wsqLm?: string;
+  wsqLr?: string;
+  wsqLs?: string;
+  wsqRt?: string;
+  wsqRi?: string;
+  wsqRm?: string;
+  wsqRr?: string;
+  wsqRs?: string;
+
+  tickImageForLt?: boolean;
+  tickImageForLi?: boolean;
+  tickImageForLm?: boolean;
+  tickImageForLr?: boolean;
+  tickImageForLs?: boolean;
+  tickImageForRt?: boolean;
+  tickImageForRi?: boolean;
+  tickImageForRm?: boolean;
+  tickImageForRr?: boolean;
+  tickImageForRs?: boolean;
 }
