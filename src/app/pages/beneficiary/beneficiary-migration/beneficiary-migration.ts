@@ -46,7 +46,7 @@ export class BeneficiaryMigration implements OnInit {
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
   beneficiaryForm!: FormGroup;
   beneficiaryDetails!: BeneficiaryDto;
-  beneficiaryPhoto = '/images/dummyHuman.jpg';
+  beneficiaryPhoto = 'dummyHuman.jpg';
 
   // Lookup dropdowns
   stateList: LookupItem[] = [];

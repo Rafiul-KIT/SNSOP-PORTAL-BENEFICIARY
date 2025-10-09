@@ -68,13 +68,13 @@
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
                           <p-select formControlName="state" [options]="stateList" optionLabel="name" optionValue="id"
-                            placeholder="Select State" class="w-100"></p-select>
+                            placeholder="Select State" [disabled]="true" class="w-100"></p-select>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="w-100 mb-2">
                           <p-select formControlName="county" [options]="countyList" optionLabel="name" optionValue="id"
-                            [disabled]="!beneficiaryForm.get('state')?.value" placeholder="Select County"
+                            [disabled]="true" placeholder="Select County"
                             class="w-100"></p-select>
                         </div>
                       </div>
