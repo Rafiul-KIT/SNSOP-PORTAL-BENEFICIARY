@@ -41,11 +41,13 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
+  relationshipOther?: string;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
   respondentId: string;
   phone: string;
   documentType: string;
+  documentTypeOther?: string;
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string;
   registrationPhase: string;
@@ -72,6 +74,7 @@ interface BeneficiaryVm {
     nationalId: string;
     phone: string;
     documentType: string;
+    documentTypeOther?: string;
     photo?: string;
     biometric?: BiometricDto;
     rightFingers: FingerVm[];
@@ -133,6 +136,7 @@ export class BeneficiaryEditApprovalDetails {
   editedLeftFingers: FingerVm[] = [];
 
   taskId: string | null = null;
+  approvalStatus: string = '';
   householdId: string | null = null; // helpful when in task mode
   currentTaskId?: number;
   isApprove: boolean = true;
@@ -157,95 +161,7 @@ export class BeneficiaryEditApprovalDetails {
     private router: Router
   ) { }
 
-  // approveTask() {
-  //   if (!this.taskId) {
-  //     console.error('Approve clicked, but task id is missing:', this.taskId);
-  //     return;
-  //   }
 
-  //   this.confirmationService.confirm({
-  //     message: `Are you sure you want to approve task #${this.taskId}?`,
-  //     header: 'Confirm Approval',
-  //     icon: 'fas fa-check-circle',
-  //     rejectButtonProps: {
-  //       severity: 'danger',
-  //     },
-  //     accept: () => {
-  //       const payload = {
-  //         approvalTaskId: this.taskId,
-  //         approved: true,
-  //       };
-
-  //       this.api
-  //         .POST('/api/approval/doApprove', payload)
-  //         .then(() => {
-  //           const life = 1200;
-  //           this.messageService.add({
-  //             severity: 'success',
-  //             summary: 'Approved',
-  //             detail: `Task #${this.taskId} approved successfully.`,
-  //             life,
-  //           });
-  //           setTimeout(() => {
-  //             this.router.navigate(['/beneficiary-approval-list/edit']);
-  //           }, life);
-  //         })
-  //         .catch((err: any) => {
-  //           console.error(err);
-  //           this.messageService.add({
-  //             severity: 'error',
-  //             summary: 'Error',
-  //             detail: 'Failed to approve task',
-  //           });
-  //         });
-  //     },
-  //   });
-  // }
-
-  // rejectTask() {
-  //   if (!this.taskId) {
-  //     console.error('Reject clicked, but task id is missing:', this.taskId);
-  //     return;
-  //   }
-
-  //   this.confirmationService.confirm({
-  //     message: `Are you sure you want to reject task #${this.taskId}?`,
-  //     header: 'Confirm Rejection',
-  //     icon: 'fas fa-ban',
-  //     rejectButtonProps: {
-  //       severity: 'danger',
-  //     },
-  //     accept: () => {
-  //       const payload = {
-  //         approvalTaskId: this.taskId,
-  //         approved: false,
-  //       };
-
-  //       this.api
-  //         .POST('/api/approval/doApprove', payload)
-  //         .then(() => {
-  //           const life = 1200;
-  //           this.messageService.add({
-  //             severity: 'warn',
-  //             summary: 'Rejected',
-  //             detail: `Task #${this.taskId} rejected successfully.`,
-  //             life,
-  //           });
-  //           setTimeout(() => {
-  //             this.router.navigate(['/beneficiary-approval-list/edit']); // note the leading slash
-  //           }, life);
-  //         })
-  //         .catch((err: any) => {
-  //           console.error(err);
-  //           this.messageService.add({
-  //             severity: 'error',
-  //             summary: 'Error',
-  //             detail: 'Failed to reject task',
-  //           });
-  //         });
-  //     },
-  //   });
-  // }
 
 openApprovalDialog(isApprove: boolean) {
   if (!this.taskId) {
@@ -310,78 +226,6 @@ private handleApproval() {
     });
 }
 
-
-  /*ngOnInit() {
-    const applicationId = this.route.snapshot.paramMap.get('applicationId');
-
-    if (applicationId) {
-      // 1. preload geo lookup data first
-      Promise.all([
-        this.lookup.getOrFetchStateList(),
-        this.lookup.getCountyListByStateId(''),
-        this.lookup.getPayamListByCountyId(''),
-        this.lookup.getBomaListByPayamId('')
-      ])
-        .then(() => {
-          // 2. only then fetch beneficiary details
-          this.fetchBeneficiaryDetails(applicationId);
-        });
-    }
-  }*/
-
-  // ngOnInit() {
-  //   const id = this.route.snapshot.paramMap.get('id');
-  //   const isTaskMode = this.route.snapshot.queryParamMap.get('taskMode') === 'true';
-  //   this.isOnTaskDetails = isTaskMode;
-
-  //   if (isTaskMode) this.taskId = id!;
-  //   else this.householdId = id!;
-
-  //   if (!id) return;
-
-  //   this.isLoading = true;
-  //   Promise.all([
-  //     this.lookup.getOrFetchStateList(),
-  //     this.lookup.getCountyListByStateId(''),
-  //     this.lookup.getPayamListByCountyId(''),
-  //     this.lookup.getBomaListByPayamId(''),
-  //   ])
-  //     .then(async () => {
-  //       if (isTaskMode && this.taskId) {
-  //         const edited = await this.loadTaskDetails(this.taskId);
-
-  //         // 1) set edited details
-  //         const editedDto = edited.taskDetails as BeneficiaryDto;
-  //         this.editedDetails = this.mapToVm(editedDto);
-  //         this.prepareFingerImages(editedDto.biometrics, 'edited');
-
-  //         // 2) store differences
-  //         this.setDifferences(edited.differences);
-
-  //         // 3) derive householdId and load old
-  //         this.householdId =
-  //           (editedDto as any).householdId ??
-  //           (editedDto as any).beneficiaryId ??
-  //           editedDto.applicationId;
-
-  //         if (this.householdId) {
-  //           const oldDto = await this.loadBeneficiaryDetailsDto(this.householdId);
-  //           this.oldDetails = this.mapToVm(oldDto);
-  //           this.prepareFingerImages(oldDto.biometrics, 'old');
-  //         } else {
-  //           console.warn('Could not determine householdId from task details payload.');
-  //         }
-  //       } else if (this.householdId) {
-  //         await this.fetchBeneficiaryDetails(this.householdId);
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  //     .finally(() => {
-  //       this.isLoading = false;
-  //       this.cdr.detectChanges();
-  //     });
-  // }
-
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     const isTaskMode = (this.route.snapshot.queryParamMap.get('taskMode') || '').toLowerCase() === 'true';
@@ -404,7 +248,7 @@ private handleApproval() {
 
       // 🔑 Single API call for both modes
       const approval = await this.loadTaskDetails(id);
-
+      this.approvalStatus = (approval as any)?.approvalStatus || '';
       if (isTaskMode && approval.taskDetails) {
         const editedDto = approval.taskDetails as BeneficiaryDto;
         this.editedDetails = this.mapToVm(editedDto);
@@ -432,16 +276,17 @@ private handleApproval() {
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
+      
     }
   }
 
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     // helper: adds prefix if base64 exists, otherwise empty string (or placeholder if you want)
     const normalizePhoto = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/dummyHuman.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
 
     const normalizeFinger = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
 
     return {
       applicationId: dto.applicationId,
@@ -449,6 +294,7 @@ private handleApproval() {
         dto.respondentFirstName,
         dto.respondentMiddleName,
         dto.respondentLastName,
+        dto.respondentNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -456,16 +302,19 @@ private handleApproval() {
       spouseName: [dto.spouseFirstName,
       dto.spouseMiddleName,
       dto.spouseLastName,
+      dto.spouseNickName,
       ]
         .filter(Boolean)
         .join(' '),
       age: dto.respondentAge,
       gender: dto.respondentGender,
       relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      relationshipOther: dto.relationshipOther,
       respondentMaritalStatus: dto.respondentMaritalStatus,
       respondentLegalStatus: dto.respondentLegalStatus,
       respondentId: dto.respondentId,
       documentType: dto.documentType,
+      documentTypeOther: dto.documentTypeOther,
       mobileMoneyProvider: dto.mobileMoneyProvider,
       mobileWalletNumber: dto.mobileWalletNumber,
       registrationPhase: dto.registrationPhase,
@@ -475,6 +324,7 @@ private handleApproval() {
 
       household: {
         incomeSource: dto.householdIncomeSource,
+        incomeSourceOther: dto.incomeSourceOther,
         monthlyIncome: dto.householdMonthlyAvgIncome,
         selectionCriteria: dto.selectionCriteria,
         selectionReasons: (dto.selectionReason || []).map((r: string) =>
@@ -508,14 +358,14 @@ private handleApproval() {
         boma: dto.address?.boma
           ? this.lookup.getBomaNameById(dto.address.boma)
           : '',
-        lat: dto.address?.location?.lat,
-        lon: dto.address?.location?.lon,
+        lat: dto.address?.lat,
+        lon: dto.address?.lon,
       },
 
       alternates: [dto.alternatePayee1, dto.alternatePayee2]
         .filter((alt): alt is AlternatePayeeDto => !!alt)
         .map((alt) => ({
-          name: `${alt.payeeFirstName ?? ''} ${alt.payeeLastName ?? ''}`.trim(),
+          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
           age: alt.payeeAge ?? 0,
           gender: alt.payeeGender,
           relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
@@ -523,6 +373,7 @@ private handleApproval() {
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
+          documentTypeOther: alt.documentTypeOther,
           photo: normalizePhoto(alt.biometrics?.photoData),
           biometric: alt.biometrics,
 
@@ -584,7 +435,7 @@ private handleApproval() {
         })),
 
       nominees: (dto.nominees || []).map((n: NomineeDto) => ({
-        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName]
+        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
           .filter(Boolean)
           .join(' '),
         age: n.nomineeAge,
@@ -655,7 +506,7 @@ private handleApproval() {
   }
 
   private prepareFingerImages(bio: BiometricDto | undefined, target: 'old' | 'edited') {
-    const nf = (img?: string) => (img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg');
+    const nf = (img?: string) => (img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg');
 
     const right = !bio ? [] : [
       { label: 'Thumb', image: nf(bio.rtFingerData), tooltip: 'Right Thumb' },
@@ -683,8 +534,11 @@ private handleApproval() {
 
   private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
+    this.approvalStatus = res?.approvalStatus || '';
     return (res?.data || {}) as ApprovalDetailsResponse;
   }
+
+  
 
   get nomineeCount(): number {
     const oldLen = this.oldDetails?.nominees?.length ?? 0;

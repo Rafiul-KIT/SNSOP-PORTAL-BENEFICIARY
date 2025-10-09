@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { AccordionModule } from 'primeng/accordion';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -10,7 +10,7 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { Loader } from '../../../components/loader/loader';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../services/api.service';
-import { LookupService, LookupItem } from '../../../services/lookup.service';
+import { LookupService } from '../../../services/lookup.service';
 
 import {
   BeneficiaryDto,
@@ -22,6 +22,9 @@ import {
   Occupation,
 } from '../../../models/beneficiary';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 
@@ -39,6 +42,7 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
+  relationshipOther?: string;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
   respondentId: string;
@@ -105,7 +109,8 @@ interface BeneficiaryVm {
     TableModule,
     ScrollPanelModule,
     ToastModule,
-    ConfirmDialogModule,
+    DialogModule,
+    FormsModule,
     Loader,
     ButtonModule,
   ],
@@ -120,6 +125,11 @@ export class BeneficiaryDetails implements OnInit {
   beneficiaryDetails!: BeneficiaryVm | null;
   rightFingers: any[] = [];
   leftFingers: any[] = [];
+  activeStatus: number | null = null;
+  isRestoreDialogVisible = false;
+  restoreComment: string = '';
+
+
 
   items = [
     {
@@ -133,6 +143,7 @@ export class BeneficiaryDetails implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     public lookup: LookupService,
@@ -140,105 +151,6 @@ export class BeneficiaryDetails implements OnInit {
     private confirmationService: ConfirmationService
   ) {}
 
-  approveTask() {
-    if (!this.taskId) {
-      console.error('Approve clicked, but task id is missing:', this.taskId);
-      return;
-    }
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to approve task #${this.taskId}?`,
-      header: 'Confirm Approval',
-      icon: 'fas fa-check-circle',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: true,
-        };
-
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Approved',
-              detail: `Task #${this.taskId} approved successfully.`,
-            });
-            this.fetchTaskDetails(this.taskId);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to approve task',
-            });
-          });
-      },
-    });
-  }
-
-  rejectTask() {
-    if (!this.taskId) {
-      console.error('Reject clicked, but task id is missing:', this.taskId);
-      return;
-    }
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to reject task #${this.taskId}?`,
-      header: 'Confirm Rejection',
-      icon: 'fas fa-ban',
-      rejectButtonProps: {
-        severity: 'danger',
-      },
-      accept: () => {
-        const payload = {
-          approvalTaskId: this.taskId,
-          approved: false,
-        };
-
-        this.api
-          .POST('/api/approval/doApprove', payload)
-          .then(() => {
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Rejected',
-              detail: `Task #${this.taskId} rejected successfully.`,
-            });
-            this.fetchTaskDetails(this.taskId);
-          })
-          .catch((err: any) => {
-            console.error(err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to reject task',
-            });
-          });
-      },
-    });
-  }
-
-  /*ngOnInit() {
-    const applicationId = this.route.snapshot.paramMap.get('applicationId');
-
-    if (applicationId) {
-      // 1. preload geo lookup data first
-      Promise.all([
-        this.lookup.getOrFetchStateList(),
-        this.lookup.getCountyListByStateId(''),
-        this.lookup.getPayamListByCountyId(''),
-        this.lookup.getBomaListByPayamId('')
-      ])
-        .then(() => {
-          // 2. only then fetch beneficiary details
-          this.fetchBeneficiaryDetails(applicationId);
-        });
-    }
-  }*/
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -270,6 +182,8 @@ export class BeneficiaryDetails implements OnInit {
     this.api
       .GET(`api/beneficiary/details/${householdId}`)
       .then((res: any) => {
+        this.activeStatus = res?.data?.activeStatus ?? null;
+        console.log('Active status details:', this.activeStatus);
         const dto = res?.data as BeneficiaryDto;
         this.beneficiaryDetails = this.mapToVm(dto);
         this.prepareFingerImages(dto.biometrics);
@@ -286,6 +200,8 @@ export class BeneficiaryDetails implements OnInit {
     this.api
       .GET(`api/approval/details/${taskId}`)
       .then((res: any) => {
+        this.activeStatus = res?.data?.activeStatus ?? null;
+        console.log('Active status task:', this.activeStatus);
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
         this.prepareFingerImages(dto.biometrics);
@@ -300,10 +216,10 @@ export class BeneficiaryDetails implements OnInit {
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     // helper: adds prefix if base64 exists, otherwise empty string (or placeholder if you want)
     const normalizePhoto = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/dummyHuman.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
 
     const normalizeFinger = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
 
     return {
       applicationId: dto.applicationId,
@@ -311,6 +227,7 @@ export class BeneficiaryDetails implements OnInit {
         dto.respondentFirstName,
         dto.respondentMiddleName,
         dto.respondentLastName,
+        dto.respondentNickName,
       ]
         .filter(Boolean)
         .join(' '),
@@ -318,12 +235,14 @@ export class BeneficiaryDetails implements OnInit {
       spouseName: [ dto.spouseFirstName,
         dto.spouseMiddleName,
         dto.spouseLastName,
+        dto.spouseNickName,
       ]
         .filter(Boolean)
         .join(' '),
       age: dto.respondentAge,
       gender: dto.respondentGender,
       relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      relationshipOther: dto.relationshipOther,
       respondentMaritalStatus: dto.respondentMaritalStatus,
       respondentLegalStatus: dto.respondentLegalStatus,
       respondentId: dto.respondentId,
@@ -337,6 +256,7 @@ export class BeneficiaryDetails implements OnInit {
 
       household: {
         incomeSource: dto.householdIncomeSource,
+        incomeSourceOther: dto.incomeSourceOther,
         monthlyIncome: dto.householdMonthlyAvgIncome,
         selectionCriteria: dto.selectionCriteria,
         selectionReasons: (dto.selectionReason || []).map((r: string) =>
@@ -370,14 +290,14 @@ export class BeneficiaryDetails implements OnInit {
         boma: dto.address?.boma
           ? this.lookup.getBomaNameById(dto.address.boma)
           : '',
-        lat: dto.address?.location?.lat,
-        lon: dto.address?.location?.lon,
+        lat: dto.address?.lat,
+        lon: dto.address?.lon,
       },
 
       alternates: [dto.alternatePayee1, dto.alternatePayee2]
         .filter((alt): alt is AlternatePayeeDto => !!alt)
         .map((alt) => ({
-          name: `${alt.payeeFirstName ?? ''} ${alt.payeeLastName ?? ''}`.trim(),
+          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
           age: alt.payeeAge ?? 0,
           gender: alt.payeeGender,
           relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
@@ -446,7 +366,7 @@ export class BeneficiaryDetails implements OnInit {
         })),
 
       nominees: (dto.nominees || []).map((n: NomineeDto) => ({
-        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName]
+        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
           .filter(Boolean)
           .join(' '),
         age: n.nomineeAge,
@@ -518,7 +438,7 @@ export class BeneficiaryDetails implements OnInit {
 
   private prepareFingerImages(bio?: BiometricDto) {
     const normalizeFinger = (img?: string): string =>
-      img ? `data:image/jpeg;base64,${img}` : '/images/tick.jpg';
+      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
 
     if (!bio) {
       this.rightFingers = [];
@@ -583,21 +503,68 @@ export class BeneficiaryDetails implements OnInit {
     ];
   }
 
-  /*onApprove(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with approval API
-    } finally {
-      this.isSubmitting = false;
-    }
+restoreBeneficiary() {
+  if (!this.beneficiaryDetails?.applicationId) return;
+  this.restoreComment = ''; // Reset comment before showing dialog
+  this.isRestoreDialogVisible = true;
+}
+
+cancelRestore() {
+  this.isRestoreDialogVisible = false;
+}
+
+confirmRestore() {
+  // ✅ Validate comment
+  if (!this.restoreComment.trim()) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Comment Required',
+      detail: 'Please write a reason for restoring this beneficiary.',
+    });
+    return;
   }
 
-  onReject(comment: string) {
-    this.isSubmitting = true;
-    try {
-      // TODO: integrate with reject API
-    } finally {
-      this.isSubmitting = false;
-    }
-  }*/
+  const payload = {
+    householdId: this.beneficiaryDetails!.applicationId,
+    comment: this.restoreComment.trim(),
+  };
+
+  this.isLoading = true;
+  this.isRestoreDialogVisible = false; // Hide dialog
+
+  this.api
+    .POST('/api/beneficiary/archive', payload)
+    .then((res: any) => {
+      if (res?.data?.operationResult) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Restored',
+          detail: 'Beneficiary restored successfully.',
+        });
+
+        // Redirect after a short delay to allow user to see the message
+        setTimeout(() => {
+          this.router.navigate(['/beneficiary/restore']);
+        }, 1500);
+      } else {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Restore Failed',
+          detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
+        });
+      }
+    })
+    .catch((err) => {
+      console.error('Restore API error:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to restore beneficiary.',
+      });
+    })
+    .finally(() => {
+      this.isLoading = false;
+    });
+}
+
 }

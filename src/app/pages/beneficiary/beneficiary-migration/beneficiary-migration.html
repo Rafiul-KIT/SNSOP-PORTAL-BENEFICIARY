@@ -65,42 +65,64 @@
                   <h5 class="card-header">GEO location</h5>
                   <div class="card-body">
                     <div class="row">
+                      <!-- State -->
                       <div class="col-md-6">
-                        <div class="w-100 mb-2">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">State</label>
                           <p-select formControlName="state" [options]="stateList" optionLabel="name" optionValue="id"
                             placeholder="Select State" [disabled]="true" class="w-100"></p-select>
                         </div>
                       </div>
+
+                      <!-- County -->
                       <div class="col-md-6">
-                        <div class="w-100 mb-2">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">County</label>
                           <p-select formControlName="county" [options]="countyList" optionLabel="name" optionValue="id"
                             [disabled]="true" placeholder="Select County"
                             class="w-100"></p-select>
                         </div>
                       </div>
+
+                      <!-- Payam -->
                       <div class="col-md-6">
-                        <div class="w-100 mb-2">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Payam</label>
                           <p-select formControlName="payam" [options]="payamList" optionLabel="name" optionValue="id"
                             [disabled]="!beneficiaryForm.get('county')?.value" placeholder="Select Payam"
                             class="w-100"></p-select>
                         </div>
                       </div>
+
+                      <!-- Boma -->
                       <div class="col-md-6">
-                        <div class="w-100 mb-2">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Boma</label>
                           <p-select formControlName="boma" [options]="bomaList" optionLabel="name" optionValue="id"
                             [disabled]="!beneficiaryForm.get('payam')?.value" placeholder="Select Boma"
                             class="w-100"></p-select>
                         </div>
                       </div>
+
+                      <!-- Latitude -->
                       <div class="col-md-6">
-                        <input class="w-100" pInputText placeholder="GPS Coordinates (Lat)" formControlName="gpsLat"
-                          readonly />
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Latitude</label>
+                          <input class="w-100" pInputText placeholder="GPS Coordinates (Lat)" formControlName="gpsLat"
+                            [readonly]="true" />
+                        </div>
                       </div>
+
+                      <!-- Longitude -->
                       <div class="col-md-6">
-                        <input class="w-100" pInputText placeholder="GPS Coordinates (Long)" formControlName="gpsLong"
-                          readonly />
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Longitude</label>
+                          <input class="w-100" pInputText placeholder="GPS Coordinates (Long)" formControlName="gpsLong"
+                            [readonly]="true" />
+                        </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
               </div>

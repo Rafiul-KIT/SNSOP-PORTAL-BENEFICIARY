@@ -114,6 +114,9 @@ export class BeneficiaryList implements OnInit {
   currentPage = 0; // 0-based
   pageSize = 10;
   advanceSearchPanelVisible = false;
+  archiveComment: string = ''; // holds comment text
+  beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
+
 
   constructor(
     private fb: FormBuilder,
@@ -124,17 +127,17 @@ export class BeneficiaryList implements OnInit {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
 
   private loadLookups() {
-  this.states = this.lookup.getStateList();
-  this.counties = this.lookup.getAllCountyList();
-  this.payams = this.lookup.getAllPayamList();
-  this.bomas = this.lookup.getAllBomaList();
-  this.genderOptions = this.lookup.getGenderList();
-  this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
-}
+    this.states = this.lookup.getStateList();
+    this.counties = this.lookup.getAllCountyList();
+    this.payams = this.lookup.getAllPayamList();
+    this.bomas = this.lookup.getAllBomaList();
+    this.genderOptions = this.lookup.getGenderListbyId();
+    this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+  }
   ngOnInit() {
     this.initForm();
     this.initBreadcrumb();
@@ -327,19 +330,19 @@ export class BeneficiaryList implements OnInit {
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
-            String(b.address.stateId)
+          String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) ||
-            String(b.address.countyId)
+          String(b.address.countyId)
           : '',
         payamName: b.address?.payam
           ? this.lookup.getPayamNameById(b.address.payam) ||
-            String(b.address.payam)
+          String(b.address.payam)
           : '',
         bomaName: b.address?.boma
           ? this.lookup.getBomaNameById(b.address.boma) ||
-            String(b.address.boma)
+          String(b.address.boma)
           : '',
       };
     });
@@ -412,65 +415,86 @@ export class BeneficiaryList implements OnInit {
     if (!b?.applicationId) return;
     this.router.navigate(['/beneficiary/details', String(b.applicationId)]);
   }
+
+
   deleteBeneficiary(b: BeneficiaryVm) {
+    this.beneficiaryToDelete = b;
+    this.archiveComment = '';
+
     this.confirmationService.confirm({
+      key: 'archiveDialog',
+      header: 'Confirm Archive',
       message: `Are you sure you want to archive ${b.fullName}?`,
-      header: 'Confirmation',
       icon: 'fas fa-exclamation-triangle text-warning',
       acceptLabel: 'Yes',
-      acceptIcon: 'fas fa-check',
       rejectLabel: 'No',
-      rejectIcon: 'fas fa-times',
       acceptButtonStyleClass: 'p-button-success',
       rejectButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        // Prepare the data for the API call
-        const requestData = {
-          householdId: b.applicationId, // Send the applicationId as the householdId in the request body
-        };
-
-        // Call the API to archive (POST request)
-        const apiPath = '/api/beneficiary/delete'; // Your API endpoint for deleting (archiving)
-        this.api
-          .POST(apiPath, requestData) // Call API via the POST method
-          .then((res: any) => {
-            const data = res?.data;
-            if (!data) throw new Error('Empty response');
-            if (data.operationResult === false) {
-              this.messageService.add({
-                severity: 'warn',
-                summary: 'Archive Failed',
-                detail: data.errorMsg || 'Failed to archive beneficiary',
-              });
-            } else {
-              // Successfully archived from backend, now update UI
-              this.beneficiaries = this.beneficiaries.filter(
-                (x) => x.applicationId !== b.applicationId
-              );
-
-              // Show success message
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Archived',
-                detail: 'Beneficiary archive request sent successfully',
-              });
-              this.cdr.markForCheck();
-            }
-          })
-          .catch((err) => {
-            console.error('Archive beneficiary error:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to archive beneficiary',
-            });
-          })
-          .finally(() => {
-            this.cdr.markForCheck();
-          });
-      },
+      accept: () => this.handleArchiveConfirm(),
     });
   }
+
+  handleArchiveConfirm() {
+    // validate comment
+    if (!this.archiveComment || !this.archiveComment.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Comment Required',
+        detail: 'Please provide a reason for archiving before proceeding.',
+      });
+      return;
+    }
+
+    if (!this.beneficiaryToDelete) return;
+
+    const b = this.beneficiaryToDelete;
+
+    const requestData = {
+      householdId: b.applicationId,
+      comment: this.archiveComment.trim(),
+    };
+
+    const apiPath = '/api/beneficiary/delete';
+    this.api
+      .POST(apiPath, requestData)
+      .then((res: any) => {
+        const data = res?.data;
+        if (!data) throw new Error('Empty response');
+
+        if (data.operationResult === false) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Archive Failed',
+            detail: data.errorMsg || 'Failed to send request for archiving beneficiary',
+          });
+        } else {
+          this.beneficiaries = this.beneficiaries.filter(
+            (x) => x.applicationId !== b.applicationId
+          );
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Archived',
+            detail: 'Beneficiary archive request sent successfully.',
+          });
+          this.cdr.markForCheck();
+        }
+      })
+      .catch((err) => {
+        console.error('Archive beneficiary error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to send ruquest for archiving beneficiary.',
+        });
+      })
+      .finally(() => {
+        this.archiveComment = '';
+        this.beneficiaryToDelete = null;
+      });
+  }
+
+
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }

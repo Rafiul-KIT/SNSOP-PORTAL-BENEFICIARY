@@ -56,11 +56,13 @@ export interface BeneficiaryDto {
     countyId: number;
     payam: number;
     boma: string;
-    location?: {
+    lat: number;
+    lon: number;
+  };
+  location?: {
       lat: number;
       lon: number;
     };
-  };
 
   householdSize: number;
   householdMember2?: HouseholdMemberGroup;
@@ -93,4 +95,6 @@ export interface BeneficiaryDto {
   mobileWalletNumber?: string;
 
   requestId: string;
+  comment: string;
+  activeStatus: number;
 }

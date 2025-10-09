@@ -31,7 +31,7 @@
         <p-select formControlName="taskType" [options]="[
         { label: 'Edit', value: 'BENEFICIARY_EDIT' },
         { label: 'Migrate', value: 'BENEFICIARY_MIGRATION' },
-        { label: 'Delete', value: 'BENEFICIARY_DELETE' }
+        { label: 'Archive', value: 'BENEFICIARY_DELETE' }
       ]" optionLabel="label" optionValue="value" class="w-100">
         </p-select>
         <label>Task Type</label>
@@ -114,7 +114,7 @@
       <td style="max-width:500px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
         {{ b.taskType === 'BENEFICIARY_EDIT' ? 'Edit'
         : b.taskType === 'BENEFICIARY_MIGRATION' ? 'Migrate'
-        : b.taskType === 'BENEFICIARY_DELETE' ? 'Delete'
+        : b.taskType === 'BENEFICIARY_DELETE' ? 'Archive'
         : b.taskType }}
       </td>
 

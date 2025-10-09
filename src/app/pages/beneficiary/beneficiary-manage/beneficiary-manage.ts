@@ -48,6 +48,7 @@ export class BeneficiaryManage implements OnInit {
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
   occupationOptions: any[] = [];
+  incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
   filteredReasons: any[] = [];
 
@@ -87,6 +88,7 @@ export class BeneficiaryManage implements OnInit {
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
     this.idTypeOptions = this.lookup.getDocumentTypeEnum();
     this.occupationOptions = this.lookup.getOccupationEnum();
+    this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
 
     this.ageGroups.forEach(group => {
       this.beneficiaryForm.addControl(group.maleTotal, this.fb.control(''));
@@ -122,6 +124,7 @@ export class BeneficiaryManage implements OnInit {
       respondentLastName: [''],
       respondentNickName: [''],
       relationship: [''],
+      relationshipOther: [''],
       respondentAge: [''],
       gender: [''],
       maritalStatus: [''],
@@ -166,6 +169,7 @@ export class BeneficiaryManage implements OnInit {
           respondentNickName: dto.respondentNickName,
           relationship: dto.relationshipWithHouseholdHead,
           respondentAge: dto.respondentAge,
+          relationshipOther: dto.relationshipOther,
           gender: dto.respondentGender,
           maritalStatus: dto.respondentMaritalStatus,
           spouseFirstName: dto.spouseFirstName,
@@ -295,6 +299,7 @@ export class BeneficiaryManage implements OnInit {
     payload.respondentNickName = formValue.respondentNickName;
     payload.relationshipWithHouseholdHead = formValue.relationship;
     payload.respondentAge = formValue.respondentAge;
+    payload.relationshipOther = formValue.relationshipOther;
     payload.respondentGender = formValue.gender;
     payload.respondentMaritalStatus = formValue.maritalStatus;
     payload.spouseFirstName = formValue.spouseFirstName;
@@ -408,7 +413,10 @@ export class BeneficiaryManage implements OnInit {
         payload.alternatePayee1.payeeNickName = alt1.payeeNickName;
         payload.alternatePayee1.payeeGender = alt1.payeeGender;
         payload.alternatePayee1.payeeAge = alt1.payeeAge;
+        payload.alternatePayee1.relationshipWithHouseholdHead = alt1.relationshipWithHouseholdHead;
+        payload.alternatePayee1.relationshipOther = alt1.relationshipOther;
         payload.alternatePayee1.documentType = alt1.documentType;
+        payload.alternatePayee1.documentTypeOther = alt1.documentTypeOther;
         payload.alternatePayee1.nationalId = alt1.nationalId;
         payload.alternatePayee1.payeePhoneNo = alt1.payeePhoneNo;
       }
@@ -421,6 +429,9 @@ export class BeneficiaryManage implements OnInit {
         payload.alternatePayee2.payeeNickName = alt2.payeeNickName;
         payload.alternatePayee2.payeeGender = alt2.payeeGender;
         payload.alternatePayee2.payeeAge = alt2.payeeAge;
+        payload.alternatePayee2.relationshipWithHouseholdHead = alt2.relationshipWithHouseholdHead;
+        payload.alternatePayee2.relationshipOther = alt2.relationshipOther;
+        payload.alternatePayee2.documentTypeOther = alt2.documentTypeOther;
         payload.alternatePayee2.documentType = alt2.documentType;
         payload.alternatePayee2.nationalId = alt2.nationalId;
         payload.alternatePayee2.payeePhoneNo = alt2.payeePhoneNo;
@@ -582,7 +593,10 @@ export class BeneficiaryManage implements OnInit {
       payeeNickName: [alt.payeeNickName || ''],
       payeeGender: [alt.payeeGender || ''],
       payeeAge: [alt.payeeAge || ''],
+      relationshipWithHouseholdHead: [alt.relationshipWithHouseholdHead || ''],
+      relationshipOther: [alt.relationshipOther || ''],
       documentType: [alt.documentType || ''],
+      documentTypeOther: [alt.documentTypeOther || ''],
       nationalId: [alt.nationalId || ''],
       payeePhoneNo: [alt.payeePhoneNo || ''],
       hasNationalId: [alt.documentType && alt.documentType !== 'NONE' ? 'Yes' : 'No']
