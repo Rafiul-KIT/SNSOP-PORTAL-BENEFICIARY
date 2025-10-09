@@ -96,4 +96,5 @@ export interface BeneficiaryDto {
 
   requestId: string;
   comment: string;
+  activeStatus: number;
 }

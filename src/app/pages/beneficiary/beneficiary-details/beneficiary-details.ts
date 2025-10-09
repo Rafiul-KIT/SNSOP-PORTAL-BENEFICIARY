@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { AccordionModule } from 'primeng/accordion';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -22,6 +22,9 @@ import {
   Occupation,
 } from '../../../models/beneficiary';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 
@@ -106,7 +109,8 @@ interface BeneficiaryVm {
     TableModule,
     ScrollPanelModule,
     ToastModule,
-    ConfirmDialogModule,
+    DialogModule,
+    FormsModule,
     Loader,
     ButtonModule,
   ],
@@ -122,6 +126,7 @@ export class BeneficiaryDetails implements OnInit {
   rightFingers: any[] = [];
   leftFingers: any[] = [];
   activeStatus: number | null = null;
+  isRestoreDialogVisible = false;
   restoreComment: string = '';
 
 
@@ -138,6 +143,7 @@ export class BeneficiaryDetails implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     public lookup: LookupService,
@@ -176,6 +182,8 @@ export class BeneficiaryDetails implements OnInit {
     this.api
       .GET(`api/beneficiary/details/${householdId}`)
       .then((res: any) => {
+        this.activeStatus = res?.data?.activeStatus ?? null;
+        console.log('Active status details:', this.activeStatus);
         const dto = res?.data as BeneficiaryDto;
         this.beneficiaryDetails = this.mapToVm(dto);
         this.prepareFingerImages(dto.biometrics);
@@ -193,6 +201,7 @@ export class BeneficiaryDetails implements OnInit {
       .GET(`api/approval/details/${taskId}`)
       .then((res: any) => {
         this.activeStatus = res?.data?.activeStatus ?? null;
+        console.log('Active status task:', this.activeStatus);
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
         this.prepareFingerImages(dto.biometrics);
@@ -496,77 +505,66 @@ export class BeneficiaryDetails implements OnInit {
 
 restoreBeneficiary() {
   if (!this.beneficiaryDetails?.applicationId) return;
+  this.restoreComment = ''; // Reset comment before showing dialog
+  this.isRestoreDialogVisible = true;
+}
 
-  // Reset previous comment before opening dialog
-  this.restoreComment = '';
+cancelRestore() {
+  this.isRestoreDialogVisible = false;
+}
 
-  this.confirmationService.confirm({
-    key: 'restoreDialog',
-    header: 'Confirm Restore',
-    message: `
-      <div style="margin-bottom: 10px;">
-        <strong>Please provide a comment before restoring:</strong>
-      </div>
-      <textarea rows="3" style="width:100%;" pInputTextarea [(ngModel)]="restoreComment"
-        placeholder="Enter your comment..."></textarea>
-    `,
-    icon: 'fas fa-trash-restore text-primary',
-    acceptLabel: 'Yes',
-    rejectLabel: 'No',
-    acceptButtonStyleClass: 'p-button-success',
-    rejectButtonStyleClass: 'p-button-danger',
+confirmRestore() {
+  // ✅ Validate comment
+  if (!this.restoreComment.trim()) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Comment Required',
+      detail: 'Please write a reason for restoring this beneficiary.',
+    });
+    return;
+  }
 
-    accept: () => {
-      // ✅ Validate comment
-      if (!this.restoreComment.trim()) {
+  const payload = {
+    householdId: this.beneficiaryDetails!.applicationId,
+    comment: this.restoreComment.trim(),
+  };
+
+  this.isLoading = true;
+  this.isRestoreDialogVisible = false; // Hide dialog
+
+  this.api
+    .POST('/api/beneficiary/archive', payload)
+    .then((res: any) => {
+      if (res?.data?.operationResult) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Restored',
+          detail: 'Beneficiary restored successfully.',
+        });
+
+        // Redirect after a short delay to allow user to see the message
+        setTimeout(() => {
+          this.router.navigate(['/beneficiary/restore']);
+        }, 1500);
+      } else {
         this.messageService.add({
           severity: 'warn',
-          summary: 'Comment Required',
-          detail: 'Please write a reason for restoring this beneficiary.',
+          summary: 'Restore Failed',
+          detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
         });
-        return;
       }
-
-      const payload = {
-        householdId: this.beneficiaryDetails!.applicationId,
-        comment: this.restoreComment.trim(),
-      };
-
-      this.isLoading = true;
-
-      this.api
-        .POST('/api/beneficiary/archive', payload)
-        .then((res: any) => {
-          if (res?.data?.operationResult) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Restored',
-              detail: 'Beneficiary restored successfully.',
-            });
-            // optionally refresh data or redirect
-            this.activeStatus = 0; // mark as active again
-            this.cdr.markForCheck();
-          } else {
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Restore Failed',
-              detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
-            });
-          }
-        })
-        .catch((err) => {
-          console.error('Restore API error:', err);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to restore beneficiary.',
-          });
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-  });
+    })
+    .catch((err) => {
+      console.error('Restore API error:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to restore beneficiary.',
+      });
+    })
+    .finally(() => {
+      this.isLoading = false;
+    });
 }
 
 }

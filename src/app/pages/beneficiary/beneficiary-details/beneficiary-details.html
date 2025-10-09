@@ -11,14 +11,14 @@
       <p-tab value="0">Beneficiary Information</p-tab>
       <p-tab value="1">Alternate Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
-      @if(activeStatus !== null && activeStatus === 1){
+      @if(activeStatus === 1){
       <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
 
         <p-button type="button" icon="fas fa-trash-restore" pTooltip="Restore" tooltipPosition="bottom" appendTo="body"
           size="small" severity="primary" class="me-1" label="Restore" (onClick)="restoreBeneficiary()" />
       </div>
-      }
 
+      }
     </p-tablist>
 
     <p-tabpanels>
@@ -655,4 +655,15 @@
 </div>
 
 <p-toast position="bottom-right" />
-<p-confirmDialog [style]="{ width: '450px' }" />
+<p-dialog header="Confirm Restore" [(visible)]="isRestoreDialogVisible" [modal]="true" [style]="{ width: '450px' }">
+  <div class="p-fluid">
+    <div class="field">
+        <label for="restore-comment">Please provide a comment before restoring:</label>
+        <textarea id="restore-comment" rows="3" pInputTextarea [(ngModel)]="restoreComment"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="fas fa-times" (click)="cancelRestore()" label="No" styleClass="p-button-danger"></p-button>
+    <p-button icon="fas fa-check" (click)="confirmRestore()" label="Yes" styleClass="p-button-success"></p-button>
+  </ng-template>
+</p-dialog>
