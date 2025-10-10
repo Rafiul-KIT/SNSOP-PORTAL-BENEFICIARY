@@ -419,6 +419,7 @@ export class BeneficiaryManage implements OnInit {
         payload.alternatePayee1.documentTypeOther = alt1.documentTypeOther;
         payload.alternatePayee1.nationalId = alt1.nationalId;
         payload.alternatePayee1.payeePhoneNo = alt1.payeePhoneNo;
+        delete payload.alternatePayee1.biometrics;
       }
 
       if (payload.alternatePayee2 && formValue.alternates[1]) {
@@ -435,6 +436,7 @@ export class BeneficiaryManage implements OnInit {
         payload.alternatePayee2.documentType = alt2.documentType;
         payload.alternatePayee2.nationalId = alt2.nationalId;
         payload.alternatePayee2.payeePhoneNo = alt2.payeePhoneNo;
+        delete payload.alternatePayee2.biometrics;
       }
     }
 
@@ -455,7 +457,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeOccupation: n.nomineeOccupation,
       otherOccupation: n.otherOccupation?.trim() ? n.otherOccupation : null,
     }));
-
+    delete payload.biometrics;
     return payload;
   }
 
