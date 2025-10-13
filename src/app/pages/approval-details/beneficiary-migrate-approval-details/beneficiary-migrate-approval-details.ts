@@ -44,7 +44,7 @@ export class BeneficiaryMigrateApprovalDetails {
 
   items = [
     { label: 'Approval List', icon: 'fas fa-users me-2', routerLink: '/beneficiary-approval-list/edit' },
-    { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Migration Details', icon: 'fas fa-user-cog me-2' },
   ];
 
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
