@@ -1,12 +1,15 @@
 export const environment = {
   production: false,
-  domain: "localhost",
-  globalApi: 'http://api.snsopmis.com:8000/services',
+  env: 'dev',
+  useHash: true,
+  domain: 'https://devportalmaster.southsudansafetynet.info',
+  globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
   portals: {
-    master: "http://master.snsopmis.com:4010/",
-    beneficiary: "http://beneficiary.snsopmis.com:4020/",
-    payment: "http://payment.snsopmis.com:4030/",
-    grm: "http://grm.snsopmis.com:4040/",
-    report: "http://report.snsopmis.com:4050/",
+    master: 'https://devportalmaster.southsudansafetynet.info/master/',
+    beneficiary: 'https://devportalmaster.southsudansafetynet.info/beneficiary',
+    payment: 'https://devportalmaster.southsudansafetynet.info/payment',
+    grm: 'https://devportalmaster.southsudansafetynet.info/grm',
+    report: 'https://devportalmaster.southsudansafetynet.info/report',
   },
+  cookie_name:'mis_ta'
 };

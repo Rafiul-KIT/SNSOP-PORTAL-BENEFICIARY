@@ -1,5 +1,7 @@
 export const environment = {
   production: true,
+  env: 'prod',
+  useHash: true,
   domain: 'snsopmis.com',
   globalApi: 'http://api.snsopmis.com:8000/services',
   portals: {
@@ -9,4 +11,5 @@ export const environment = {
     grm: 'http://grm.snsopmis.com',
     report: 'http://report.snsopmis.com',
   },
+  cookie_name:'mis_ta'
 };

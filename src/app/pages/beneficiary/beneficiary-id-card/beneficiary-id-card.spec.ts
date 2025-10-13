@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BeneficiaryEditApproval } from './beneficiary-edit-approval';
+import { BeneficiaryIdCard } from './beneficiary-id-card';
 
-describe('BeneficiaryEditApproval', () => {
-  let component: BeneficiaryEditApproval;
-  let fixture: ComponentFixture<BeneficiaryEditApproval>;
+describe('BeneficiaryIdCard', () => {
+  let component: BeneficiaryIdCard;
+  let fixture: ComponentFixture<BeneficiaryIdCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BeneficiaryEditApproval]
+      imports: [BeneficiaryIdCard]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BeneficiaryEditApproval);
+    fixture = TestBed.createComponent(BeneficiaryIdCard);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

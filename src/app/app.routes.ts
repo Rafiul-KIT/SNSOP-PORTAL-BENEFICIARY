@@ -5,54 +5,72 @@ import { BeneficiaryList } from './pages/beneficiary/beneficiary-list/beneficiar
 import { BeneficiaryDetails } from './pages/beneficiary/beneficiary-details/beneficiary-details';
 import { BeneficiaryManage } from './pages/beneficiary/beneficiary-manage/beneficiary-manage';
 import { BeneficiaryMigration } from './pages/beneficiary/beneficiary-migration/beneficiary-migration';
-import { BeneficiaryArchiveApproval } from './pages/approval/beneficiary-archive-approval/beneficiary-archive-approval';
-import { BeneficiaryEditApproval } from './pages/approval/beneficiary-edit-approval/beneficiary-edit-approval';
-import { BeneficiaryMigrateApproval } from './pages/approval/beneficiary-migrate-approval/beneficiary-migrate-approval';
+import { BeneficiaryEditApprovalList } from './pages/approval-list/beneficiary-edit-approval-list/beneficiary-edit-approval-list';
+import { BeneficiaryEditApprovalDetails } from './pages/approval-details/beneficiary-edit-approval-details/beneficiary-edit-approval-details';
+import { routeGuard } from './route.guard';
+import { BeneficiaryIdCard } from './pages/beneficiary/beneficiary-id-card/beneficiary-id-card';
+import { BeneficiaryArchiveApprovalDetails } from './pages/approval-details/beneficiary-archive-approval-details/beneficiary-archive-approval-details';
+import { BeneficiaryMigrateApprovalDetails } from './pages/approval-details/beneficiary-migrate-approval-details/beneficiary-migrate-approval-details';
+import { BeneficiaryRestore } from './pages/beneficiary/beneficiary-restore/beneficiary-restore';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
+    canActivate: [routeGuard],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-
   {
     path: 'beneficiary',
+    canActivate: [routeGuard],
     children: [
       {
-        component: BeneficiaryList,
         path: 'list',
+        component: BeneficiaryList,
       },
+      { path: 'details/:id', component: BeneficiaryDetails },
       {
-        component: BeneficiaryDetails,
-        path: 'details/:bid',
-      },
-      {
+        path: 'edit/:applicationId',
         component: BeneficiaryManage,
-        path: 'edit/:bid',
       },
       {
-        component: BeneficiaryMigration,
         path: 'migrate/:bid',
+        component: BeneficiaryMigration,
+      },
+      {
+        path: 'id-card',
+        component: BeneficiaryIdCard,
+      },
+      {
+        path: 'restore',
+        component: BeneficiaryRestore,
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
   {
-    path: 'beneficiary-approval',
+    path: 'beneficiary-approval-list',
+    canActivate: [routeGuard],
     children: [
-      { path: 'edit', component: BeneficiaryEditApproval },
-      {
-        path: 'migrate',
-        component: BeneficiaryMigrateApproval,
-      },
-      {
-        path: 'archive',
-        component: BeneficiaryArchiveApproval,
-      },
+      { path: 'edit', component: BeneficiaryEditApprovalList },
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
+  {
+    path: 'beneficiary-edit-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryEditApprovalDetails,
+  },
+  {
+    path: 'beneficiary-migrate-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryMigrateApprovalDetails,
+  },
+  {
+    path: 'beneficiary-archive-details/:id',
+    canActivate: [routeGuard],
+    component: BeneficiaryArchiveApprovalDetails,
+  },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,
     path: '**',
