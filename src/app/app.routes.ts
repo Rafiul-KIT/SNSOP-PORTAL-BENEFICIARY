@@ -12,6 +12,7 @@ import { BeneficiaryIdCard } from './pages/beneficiary/beneficiary-id-card/benef
 import { BeneficiaryArchiveApprovalDetails } from './pages/approval-details/beneficiary-archive-approval-details/beneficiary-archive-approval-details';
 import { BeneficiaryMigrateApprovalDetails } from './pages/approval-details/beneficiary-migrate-approval-details/beneficiary-migrate-approval-details';
 import { BeneficiaryRestore } from './pages/beneficiary/beneficiary-restore/beneficiary-restore';
+import { ReportComponent } from './pages/report/report';
 
 export const routes: Routes = [
   {
@@ -55,10 +56,16 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
+  
   {
     path: 'beneficiary-edit-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryEditApprovalDetails,
+  },
+    {
+    path: 'report',
+    canActivate: [routeGuard],
+    component: ReportComponent,
   },
   {
     path: 'beneficiary-migrate-details/:id',
