@@ -224,7 +224,62 @@ export class LookupService {
       return '--';
     }
   };
+    HouseHoldIncomeSourceEnum = [
+    { id: 0, value: 'NONE', label: "None" },
+    { id: 1, value: 'SELLING_OF_FARM', label: "Selling of farm" },
+    { id: 2, value: 'SELLING_OF_NON_FARM', label: "Selling of non farm" },
+    { id: 3, value: 'CAUSAL_LABOUR', label: "Casual Labour" },
+    { id: 4, value: 'FORMAL_EMPLOYMENT', label: "Formal Employement" },
+    { id: 5, value: 'REMITTANCES', label: "Remittances" },
+    { id: 6, value: 'GIFT', label: "Gift" },
+    { id: 7, value: 'FROM_GOVT', label: "From Govt." },
+    { id: 8, value: 'FROM_NGO', label: "From NGO" },
+    { id: 9, value: 'PENSION', label: "Pension" },
+    { id: 10, value: 'OTHER', label: "Other" },
+  ];
+  getHouseHoldIncomeSourceEnum = () => {
+    return this.HouseHoldIncomeSourceEnum;
+  }
+  getHouseHoldIncomeSourceByValue = (value: any) => {
+    const dataFpund = this.HouseHoldIncomeSourceEnum.find((sre: any) => sre.value == value);
+    if (dataFpund) {
+      return dataFpund.label;
+    } else {
+      return '--';
+    }
+  }
+    GenderEnum = [
+    { id: 0, value: 'MALE', label: "Male" },
+    { id: 1, value: 'FEMALE', label: "Female" }
+  ];
+  getGenderEnum = () => {
+    return this.GenderEnum;
+  }
+  getGenderEnumByValue = (value: any) => {
+    const dataFpund = this.GenderEnum.find((sce: any) => sce.value == value);
+    if (dataFpund) {
+      return dataFpund.label;
+    } else {
+      return '--';
+    }
+  }
+  RegistrationPhaseEnum =[
+  { id: 0, value: 'PARENT', label: "PP (Parent Project)" },
+  { id: 1, value: 'AF', label: "AF (Additional Financing)" }
+];
+getRegistrationPhaseEnum = () => {
+    return this.RegistrationPhaseEnum;
+  }
 
+  getRegistrationPhaseEnumByValue = (value: any) => {
+    const dataFound = this.RegistrationPhaseEnum.find((sce: any) => sce.value == value);
+    if (dataFound) {
+      return dataFound.label;
+    } else {
+      return '--';
+    }
+  }
+  
   NotParticipationReasonEnum = [
     {
       id: 1,

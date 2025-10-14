@@ -114,7 +114,7 @@ export class Header {
       {
         label: 'Report',
         icon: 'fas fa-file-alt',
-        routerLink: '/beneficiary/id-card',
+        routerLink: 'report',
         routerLinkActiveOptions: 'active',
       },
       {
