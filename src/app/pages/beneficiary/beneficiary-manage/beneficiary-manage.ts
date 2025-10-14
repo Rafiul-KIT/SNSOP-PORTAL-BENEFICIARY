@@ -282,7 +282,7 @@ ngOnInit(): void {
 
       if (value && value !== 'NONE' && value !== 'SELECT') {
         monthlyControl.enable({ emitEvent: false });
-        monthlyControl.setValidators([this.numberNotNegative('Add valid monthly income')]);
+        monthlyControl.setValidators([this.numberNotNegative('Add valid monthly income'), this.numMax(1000000)]);
       } else {
         monthlyControl.disable({ emitEvent: false });
         monthlyControl.clearValidators();
@@ -304,6 +304,7 @@ ngOnDestroy(): void {
   // ========= Form skeleton =========
   private initForm() {
     this.beneficiaryForm = this.fb.group({
+      householdNumber: [{ value: '', disabled: true }],
       respondentFirstName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
       respondentMiddleName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
       respondentLastName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
@@ -356,6 +357,7 @@ ngOnDestroy(): void {
 
         // Patch personal
         this.beneficiaryForm.patchValue({
+          householdNumber: dto.applicationId || '',
           respondentFirstName: dto.respondentFirstName,
           respondentMiddleName: dto.respondentMiddleName,
           respondentLastName: dto.respondentLastName,
@@ -501,7 +503,7 @@ ngOnDestroy(): void {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : ''
         });
         delete (payload.alternatePayee1 as any).biometrics;
       }
@@ -519,7 +521,7 @@ ngOnDestroy(): void {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : ''
         });
         delete (payload.alternatePayee2 as any).biometrics;
       }
@@ -671,7 +673,10 @@ ngOnDestroy(): void {
       documentType: [a.documentType || ''],
       documentTypeOther: [a.documentTypeOther || ''],
       nationalId: [a.nationalId || ''],
-      payeePhoneNo: [a.payeePhoneNo || '', [this.optionalPattern(this.RGX_PHONE_13, 'Phone number length must be 13')]],
+      payeePhoneNo: [
+        a.payeePhoneNo?.startsWith('+211') ? a.payeePhoneNo.substring(4) : a.payeePhoneNo || '',
+        [this.optionalPattern(this.RGX_PHONE_9, 'Phone number must be 9 digits')],
+      ],
       hasNationalId: [a.documentType && a.documentType !== 'NONE' ? 'Yes' : 'No']
     });
 

@@ -26,6 +26,21 @@
               <h5 class="card-header">Basic Information</h5>
               <br />
               <div class="card-body row g-2">
+
+                <!-- Household Number (readonly) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <input
+                      pInputText
+                      id="householdNumber"
+                      formControlName="householdNumber"
+                      class="w-100"
+                      style="font-size: 1rem; padding: 0.25rem 0.25rem;"
+                      readonly
+                    />
+                    <label for="householdNumber">Household Number</label>
+                  </p-floatlabel>
+                </div>
                 <!-- First Name -->
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
@@ -299,17 +314,6 @@
                   }
                 </div>
 
-                <!-- Other income -->
-                <div class="col-md-4 mb-1">
-                  <p-floatlabel variant="on">
-                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
-                      [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
-                    <label for="otherIncomeSource">Other Income Source</label>
-                  </p-floatlabel>
-                  @if (showError('otherIncomeSource')) {
-                  <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
-                  }
-                </div>
 
                 <!-- Avg Income -->
                 <div class="col-md-4 mb-1">
@@ -323,6 +327,19 @@
                   }
 
                 </div>
+
+                <!-- Other income -->
+                <div class="col-md-4 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
+                           [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
+                    <label for="otherIncomeSource">Other Income Source</label>
+                  </p-floatlabel>
+                  @if (showError('otherIncomeSource')) {
+                    <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
+                  }
+                </div>
+
 
                 <!-- Support Type -->
                 <div class="col-md-4 mb-1">
@@ -472,7 +489,7 @@
               @for (alt of alternates.controls; let i = $index; track alt) {
               <div [formGroupName]="i" class="col-md-6">
                 <div class="card h-100 shadow-sm rounded">
-                  <h5 class="card-header text-center">Alternate Payee {{ i + 1 }}</h5>
+                  <h5 class="card-header text-center">Alternate {{ i + 1 }}</h5>
                   <div class="card-body">
                     <div class="row g-2">
                       <div class="col-md-12 mb-2">
@@ -554,7 +571,7 @@
 
                       <div class="col-md-12 mb-2">
                         <p-floatlabel variant="on">
-                          <p-select [options]="idTypeOptions" optionLabel="label" optionValue="value"
+                          <p-select [options]="currentIdTypeOptions" optionLabel="label" optionValue="value"
                             formControlName="documentType" class="w-100">
                           </p-select>
                           <label>ID Type</label>
@@ -577,10 +594,22 @@
 
                       <div class="col-md-12 mb-2">
                         <p-floatlabel variant="on">
-                          <input pInputText formControlName="payeePhoneNo" class="w-100" />
+                          <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">+211</span>
+                            <input
+                              pInputText
+                              formControlName="payeePhoneNo"
+                              class="form-control border-start-0"
+                              maxlength="9"
+                              placeholder="Enter 9-digit number"
+                              pattern="\d*"
+                              oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            />
+                          </div>
                           <label>Contact Number</label>
                         </p-floatlabel>
                       </div>
+
 
                     </div>
                   </div>
