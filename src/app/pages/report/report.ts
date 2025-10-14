@@ -7,12 +7,20 @@ import { ApiService } from '../../services/api.service';
 import { LookupService } from '../../services/lookup.service';
 import { LoadingSpinner } from "../../components/loading-spinner/loading-spinner";
 import { Loader } from "../../components/loader/loader";
+import { ReportBeneficiaryList } from "../report-list/report-beneficiary-list/report-beneficiary-list";
+import { ReportStaffWiseBeneficiaryCount } from "../report-list/report-staff-wise-beneficiary-count/report-staff-wise-beneficiary-count";
+import { ReportAgeGroupGenderWiseBeneficiaryCount } from "../report-list/report-age-group-gender-wise-beneficiary-count/report-age-group-gender-wise-beneficiary-count";
+import { ReportMatchList } from "../report-list/report-match-list/report-match-list";
+import { ReportLocationWiseNomineeCount } from "../report-list/report-location-wise-nominee-count/report-location-wise-nominee-count";
+import { ReportCompleteHouseholdSurvey } from "../report-list/report-complete-household-survey/report-complete-household-survey";
+import { ReportReconciledSummaryResult } from "../report-list/report-reconciled-summary-result/report-reconciled-summary-result";
+import { ReportReconciliationSummaryCount } from "../report-list/report-reconciliation-summary-count/report-reconciliation-summary-count";
 
 
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, LoadingSpinner, Loader],
+  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, LoadingSpinner, Loader, ReportBeneficiaryList, ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount, ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey, ReportReconciledSummaryResult, ReportReconciliationSummaryCount],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
