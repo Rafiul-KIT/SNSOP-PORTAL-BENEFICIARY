@@ -1243,29 +1243,27 @@
                                                     <th colspan="5">Right Hand Finger</th>
                                                 </tr>
                                                 <tr>
-
-                                                    <td>
-                                                    <td *ngFor="let f of alt.rightFingers; let j = index"
+                                                    @for (f of alt.rightFingers; track f; let j = $index) {
+                                                    <td
                                                         [ngClass]="changedClass(altFingerPath(i,'right',j))"
                                                         [pTooltip]="diffTip(altFingerPath(i,'right',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
-
+                                                    }
                                                 </tr>
                                                 <tr>
                                                     <th colspan="5">Left Hand Finger</th>
                                                 </tr>
                                                 <tr>
-
-                                                    <td>
-                                                    <td *ngFor="let f of alt.leftFingers; let j = index"
+                                                    @for (f of alt.leftFingers; track f; let j = $index) {
+                                                    <td
                                                         [ngClass]="changedClass(altFingerPath(i,'left',j))"
                                                         [pTooltip]="diffTip(altFingerPath(i,'left',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
                                                     </td>
-
+                                                    }
                                                 </tr>
                                             </tbody>
                                         </table>

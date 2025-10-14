@@ -450,8 +450,12 @@ export class BeneficiaryList implements OnInit {
     const b = this.beneficiaryToDelete;
 
     const requestData = {
-      householdId: b.applicationId,
-      comment: this.archiveComment.trim(),
+      beneficiaries: [
+        {
+          householdId: b.applicationId,
+          comment: this.archiveComment.trim(),
+        },
+      ],
     };
 
     const apiPath = '/api/beneficiary/delete';
@@ -461,23 +465,36 @@ export class BeneficiaryList implements OnInit {
         const data = res?.data;
         if (!data) throw new Error('Empty response');
 
-        if (data.operationResult === false) {
+        // Checking for operation result in the bulkResponse
+        const response = data.bulkResponse && data.bulkResponse[0];
+        if (response) {
+          if (response.result === 'FAILED') {
+            // Show error if result is failed
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Archive Failed',
+              detail: response.errorMessage || 'Failed to send request for archiving beneficiary',
+            });
+          } else if (response.result === 'SUCCESS') {
+            // Handle success if result is successful
+            this.beneficiaries = this.beneficiaries.filter(
+              (x) => x.applicationId !== b.applicationId
+            );
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Archived',
+              detail: 'Beneficiary archive request sent successfully.',
+            });
+            this.cdr.markForCheck();
+          }
+        } else {
+          // Handle case where there's no response
           this.messageService.add({
             severity: 'warn',
-            summary: 'Archive Failed',
-            detail: data.errorMsg || 'Failed to send request for archiving beneficiary',
+            summary: 'No Response',
+            detail: 'No response returned from the server.',
           });
-        } else {
-          this.beneficiaries = this.beneficiaries.filter(
-            (x) => x.applicationId !== b.applicationId
-          );
-
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Archived',
-            detail: 'Beneficiary archive request sent successfully.',
-          });
-          this.cdr.markForCheck();
         }
       })
       .catch((err) => {
@@ -485,7 +502,7 @@ export class BeneficiaryList implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to send ruquest for archiving beneficiary.',
+          detail: 'Failed to send request for archiving beneficiary.',
         });
       })
       .finally(() => {
