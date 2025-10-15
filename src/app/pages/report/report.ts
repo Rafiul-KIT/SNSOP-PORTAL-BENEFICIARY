@@ -485,7 +485,7 @@ export class ReportComponent implements OnInit {
   ngOnInit(): void {
     this.items = [{ label: 'Report', icon: 'fas fa-chart-line me-2' }];
     this.home = { 
-      label: 'Dashboard', 
+      label: '', 
       icon: 'fas fa-home me-2', 
       routerLink: '/' 
     };
