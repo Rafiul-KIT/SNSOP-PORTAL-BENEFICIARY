@@ -1,12 +1,12 @@
 <p-tabs [(value)]="activeCategory" (valueChange)="setCategory($event)">
   <p-tablist>
-    <p-tab [value]="0">Summary ALL</p-tab>
+    <p-tab [value]="3">Summary ALL</p-tab>
     <p-tab [value]="1">Summary PP</p-tab>
     <p-tab [value]="2">Summary AF</p-tab>
   </p-tablist>
 
   <p-tabpanels>
-    <p-tabpanel [value]="0">
+    <p-tabpanel [value]="3">
       <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
     </p-tabpanel>
     <p-tabpanel [value]="1">

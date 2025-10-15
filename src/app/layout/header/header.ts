@@ -90,26 +90,26 @@ export class Header {
       {
         label: 'Beneficiary ID Cards',
         icon: 'fas fa-id-card',
-        routerLink: '/beneficiary/id-card',
+        routerLink: 'id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'Job Card',
         icon: 'fas fa-id-card',
-        routerLink: '/beneficiary/id-card',
+        routerLink: 'id-card',
         routerLinkActiveOptions: 'active',
       },
       
       {
         label: 'Work Progress',
         icon: 'fas fa-line-chart',
-        routerLink: '/beneficiary/id-card',
+        routerLink: 'id-card',
         routerLinkActiveOptions: 'active',
       },
       {
         label: 'LIPW Export',
         icon: 'fas fa-file-export',
-        routerLink: '/beneficiary/id-card',
+        routerLink: 'id-card',
         routerLinkActiveOptions: 'active',
       },
       {

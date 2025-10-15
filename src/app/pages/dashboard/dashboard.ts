@@ -1,17 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-
-import { Chart, registerables, ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, registerables, ChartConfiguration, ChartData, ChartType, ChartEvent } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-
-// PrimeNG (standalone)
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from 'primeng/tabs';
 import { Tooltip as PTooltip } from 'primeng/tooltip';
-
-// Your spinner
 import { Loader } from '../../components/loader/loader';
+import { ApiService } from '../../services/api.service';
+import { LookupService } from '../../services/lookup.service';
+import { Router } from '@angular/router';
 
-// ✅ Register ALL chart.js controllers/elements/scales/plugins at once
+
 Chart.register(...registerables);
 
 @Component({
@@ -22,96 +20,115 @@ Chart.register(...registerables);
     NgTemplateOutlet,
     Loader,
     BaseChartDirective,
-    // PrimeNG standalone imports
     Tabs, Tab, TabList, TabPanels, TabPanel, PTooltip
   ],
   styleUrls: ['./dashboard.scss']
 })
 export class Dashboard implements OnInit {
+
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
-  isLoading = true;  // Initially loading
+  isLoading: boolean = true;
+  countyList: any = [];
   dashboardSummary: any = null;
-  countyWiseNomineeListByGender: Array<{ county: string; maleNominee: number; femaleNominee: number }> = [];
-  countyWiseDuplicateBeneficaiaryList: Array<{ county: string; count: number }> = [];
-  totalBeneficiaryCount = 0;
-  dailyCountList: Array<{ day: string; count: number }> = [];
+  countyWiseNomineeListByGender: any = [];
+  countyWiseDuplicateBeneficaiaryList: any = [];
+  totalBeneficiaryCount: number = 0;
+  dailyCountList: any = [];
+  activeCategory: number = 3;
 
-  // start on "ALL"
-  activeCategory: number = 0;
 
+
+
+  constructor(private apiService: ApiService, public lookupService: LookupService, private router: Router, private cdr: ChangeDetectorRef) { }
   private countyAxis: Array<{ id: string; name: string }> = [];
-
-  public genderLegendOptions: ChartConfiguration['options'] = { plugins: { legend: { display: true } } };
-  public supportLegendOptions: ChartConfiguration['options'] = { plugins: { legend: { display: true } } };
-
+  public genderLegendOptions: ChartConfiguration['options'];
+  public supportLegendOptions: ChartConfiguration['options'];
   public barChartOptions: ChartConfiguration['options'] = {
-    scales: { x: {}, y: { min: 1 } },
-    plugins: { legend: { display: true } }
+    scales: {
+      x: {},
+      y: {
+        min: 1,
+      },
+    },
+    plugins: {
+      legend: {
+        display: true,
+      }
+    },
   };
   public barChartType: ChartType = 'bar';
-  public barChartCountyData: ChartData<'bar'> = { labels: [], datasets: [] };
-
-  public doughnutChartType: ChartType = 'doughnut';
-  public doughnutChartGenderData: ChartData<'doughnut'> = { labels: [], datasets: [] };
-  public doughnutChartSupportCategoryData: ChartData<'doughnut'> = { labels: [], datasets: [] };
-
-  constructor() {}
-
-  // valueChange from <p-tabs> can be string|number; normalize to number
-  setCategory(value: string | number) {
-    this.activeCategory = Number(value);
-    this.getSummary(); // fetch data immediately when the category changes
-  }
-
-  ngOnInit(): void {
-    this.getSummary(); // load data immediately on component initialization
-  }
-
-  getSummary = () => {
-    this.isLoading = true; // Set loading to true before fetching data
-
-    // 👉 Fetching real-time data or mock data immediately
-    this.dashboardSummary = {
-      countyWiseBeneficiary: {
-        '101': 120, '102': 90, '103': 150,
-        '104': 110, '105': 130, '106': 140, '107': 95, '108': 160
-      },
-      countyWiseDeduplicate: {
-        '101': 5, '102': 3, '103': 8,
-        '104': 6, '105': 4, '106': 7, '107': 2, '108': 9
-      },
-      lipwCount: 400,
-      disCount: 350,
-      maleCount: 420,
-      femaleCount: 330,
-      totalBeneficiary: 750,
-      countyWiseNominee: [
-        { county: '101', maleNominee: 50, femaleNominee: 70 },
-        { county: '102', maleNominee: 30, femaleNominee: 60 },
-        { county: '103', maleNominee: 40, femaleNominee: 80 },
-        { county: '104', maleNominee: 45, femaleNominee: 65 },
-        { county: '105', maleNominee: 60, femaleNominee: 70 },
-        { county: '106', maleNominee: 55, femaleNominee: 85 },
-        { county: '107', maleNominee: 35, femaleNominee: 60 },
-        { county: '108', maleNominee: 70, femaleNominee: 90 }
-      ],
-      dayWiseCount: {
-        '2025-09-16': 20,
-        '2025-09-17': 40,
-        '2025-09-18': 35,
-        '2025-09-19': 50,
-        '2025-09-20': 45,
-        '2025-09-21': 60,
-        '2025-09-22': 100
-      }
-    };
-
-    this.setGraphData(this.dashboardSummary);
-    this.isLoading = false; // Set loading to false once data is ready
+  public barChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
+  public barChartCountyData: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
   };
 
+  // Doughnut
+  public doughnutChartType: ChartType = 'doughnut';
+  public doughnutChartData: ChartData<'doughnut'> = {
+    labels: [],
+    datasets: []
+  };
+  public doughnutChartGenderData: ChartData<'doughnut'> = {
+    labels: [],
+    datasets: []
+  };
+  public doughnutChartSupportCategoryData: ChartData<'doughnut'> = {
+    labels: [],
+    datasets: []
+  };
+
+  setCategory(value: number | string) {
+    // PrimeNG emits the tab's [value], not an event object
+    this.activeCategory = Number(value);
+
+    // 3 = ALL, 1 = PP, 2 = AF
+    console.log('Tab switched to category:', value);
+
+    this.getSummary();
+  }
+
+
+
+  getSummary = () => {
+    this.isLoading = true;
+    this.countyList = this.lookupService.getCountyList();
+
+    let apiUrl = '';
+    if (this.activeCategory === 1) {
+      apiUrl = 'api/dashboard/summary/PARENT'; // Category 1 endpoint
+    } else if (this.activeCategory === 2) {
+      apiUrl = 'api/dashboard/summary/AF'; // Category 2 endpoint
+    } else if (this.activeCategory === 3) {
+      apiUrl = 'api/dashboard/summary'; // Category 3 endpoint
+    }
+
+
+    this.apiService.GET(apiUrl).then(res => {
+      if (res.status == 200) {
+        this.dashboardSummary = res.data;
+        this.setGraphData(this.dashboardSummary);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    }).catch(err => {
+      console.error(err);
+      this.dashboardSummary = null;
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    });
+  }
+
   setGraphData = (graphData: any) => {
+    const allIds = new Set<string>();
+    (this.countyList || []).forEach((c: any) => allIds.add(String(c.id)));
+    Object.keys(graphData?.countyWiseBeneficiary || {}).forEach(id => allIds.add(String(id)));
+    Object.keys(graphData?.countyWiseDeduplicate || {}).forEach(id => allIds.add(String(id)));
+
     const labels: string[] = [];
     const beneficiaryCounts: number[] = [];
     const targetCounts: number[] = [];
@@ -119,36 +136,40 @@ export class Dashboard implements OnInit {
 
     this.countyAxis = [];
 
-    // county mapping for mock ids
-    const counties = [
-      { id: '101', name: 'JUBA', target: 200 },
-      { id: '102', name: 'PARIANG', target: 150 },
-      { id: '103', name: 'MELUTH', target: 180 },
-      { id: '104', name: 'YAMBIO', target: 160 },
-      { id: '105', name: 'TORIT', target: 190 },
-      { id: '106', name: 'BOR', target: 170 },
-      { id: '107', name: 'KAJO-KEJI', target: 140 },
-      { id: '108', name: 'WAU', target: 210 }
-    ];
+    // 👉 filter out counties whose target == 0 for the active category
+    const filteredIds = Array.from(allIds).filter(id =>
+      (this.lookupService.getTargetRegistrationTotalById(id, this.activeCategory) || 0) > 0
+    );
 
-    counties.forEach((c) => {
-      const countyBeneficiary = graphData?.countyWiseBeneficiary?.[c.id] ?? 0;
-      const countyDuplicate = graphData?.countyWiseDeduplicate?.[c.id] ?? 0;
+    for (const id of filteredIds) {
+      const name = this.lookupService.getCountyNameById(id) || id;
 
-      this.countyAxis.push({ id: c.id, name: c.name });
-      labels.push(c.name);
+      const countyBeneficiary = graphData?.countyWiseBeneficiary?.[id] ?? 0;
+      const countyDuplicate = graphData?.countyWiseDeduplicate?.[id] ?? 0;
+      const targetTotal = this.lookupService.getTargetRegistrationTotalById(id, this.activeCategory) ?? 0;
+
+      this.countyAxis.push({ id, name });
+      labels.push(name);
       beneficiaryCounts.push(countyBeneficiary);
-      targetCounts.push(c.target);
-      duplicateRows.push({ county: c.name, count: countyDuplicate });
-    });
+      targetCounts.push(targetTotal);
+      // Duplicate table also ignores zero-target counties:
+      duplicateRows.push({ county: name, count: countyDuplicate });
+    }
 
-    this.barChartCountyData = {
-      labels,
-      datasets: [
-        { data: beneficiaryCounts, label: 'Beneficiary' },
-        { data: targetCounts, label: 'Target' }
-      ]
-    };
+    if (!labels.length) {
+      this.barChartCountyData = {
+        labels: ['No Data'],
+        datasets: [{ data: [0], label: 'No Data Available' }]
+      };
+    } else {
+      this.barChartCountyData = {
+        labels,
+        datasets: [
+          { data: beneficiaryCounts, label: 'Beneficiary' },
+          { data: targetCounts, label: 'Target' }
+        ]
+      };
+    }
 
     this.doughnutChartSupportCategoryData = {
       labels: ['LIPW', 'DIS'],
@@ -164,33 +185,162 @@ export class Dashboard implements OnInit {
     this.countyWiseDuplicateBeneficaiaryList = duplicateRows;
     this.countyWiseNomineeListByGender = graphData?.countyWiseNominee || [];
 
-    // day-wise list
     this.dailyCountList = [];
-    const daysCountKeys = Object.keys(graphData?.dayWiseCount || {});
-    daysCountKeys.sort().forEach((dck: string) => {
-      this.dailyCountList.push({ day: dck, count: graphData.dayWiseCount[dck] });
+    const daysCountKeys = Object.keys(this.dashboardSummary?.dayWiseCount || {});
+    daysCountKeys.sort().forEach((dck: any) => {
+      this.dailyCountList.push({ day: dck, count: this.dashboardSummary.dayWiseCount[dck] });
     });
   };
 
-  // stubs (wire later)
-  gotoBeneficiaryList() {}
-  onDoughnutClick(e: any, kind: string) {}
-  onBarClick(e: any) {}
 
-  // simple mock lookup
-  lookupService = {
-    getCountyNameById: (id: string) => {
-      const names: any = {
-        '101': 'JUBA',
-        '102': 'PARIANG',
-        '103': 'MELUTH',
-        '104': 'YAMBIO',
-        '105': 'TORIT',
-        '106': 'BOR',
-        '107': 'KAJO-KEJI',
-        '108': 'WAU'
-      };
-      return names[id] || id;
+
+
+  gotoBeneficiaryList() {
+    let phase = '';
+    let searchPreset: any = {
+      page: 0,
+      size: 10,
+      sortColumn: 'CREATED',
+      sortOrder: 'DESC'
+    };
+
+    if (this.activeCategory === 1) {
+      phase = 'PARENT';
+      searchPreset.criteria = [{ fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase }];
+    } else if (this.activeCategory === 2) {
+      phase = 'AF';
+      searchPreset.criteria = [{ fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase }];
+    } else if (this.activeCategory === 3) {
+      // Don't include 'REGISTRATION_PHASE' criteria for category 3
+      searchPreset.criteria = [];
     }
-  };
+
+    this.router.navigate(['beneficiary/list'], { state: { searchPreset } });
+  }
+
+
+  private buildLegendOptions(): ChartConfiguration['options'] {
+    return {
+      plugins: {
+        legend: {
+          display: true,
+          // ✅ do NOT override onClick → default toggle works
+        }
+      }
+    };
+  }
+
+
+
+
+
+
+
+  private handleDoughnutSelection(kind: 'gender' | 'support', label: string) {
+    let phase = '';
+    if (this.activeCategory === 1) {
+      phase = 'PARENT';
+    } else if (this.activeCategory === 2) {
+      phase = 'AF';
+    } else if (this.activeCategory === 3) {
+      phase = "";  // ✅ or "" if you want to skip filtering
+    }
+
+    const L = (label ?? '').toString().trim().toUpperCase();
+
+    let criteria: Array<{ fieldName: string; operator: string; value: string }> = [];
+
+    if (kind === 'gender') {
+      // MALE -> "0", FEMALE -> "1"
+      const genderCode = (L === 'FEMALE' || L === '1') ? '1' : '0';
+      criteria.push({ fieldName: 'RESPONDENT_GENDER', operator: 'EQUAL', value: genderCode });
+    } else {
+      // LIPW -> "0", DIS -> "1"
+      const supportCode = (L === 'DIS' || L === '1') ? '1' : '0';
+      criteria.push({ fieldName: 'SELECTION_CRITERIA', operator: 'LIKE', value: supportCode });
+    }
+
+    // Add REGISTRATION_PHASE criteria only if activeCategory is not 3
+    if (this.activeCategory !== 3) {
+      criteria.push({ fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase });
+    }
+
+    const searchPreset = {
+      criteria,
+      page: 0,
+      size: 10,
+      sortColumn: 'CREATED',
+      sortOrder: 'DESC'
+    };
+
+    this.router.navigate(['beneficiary/list'], { state: { searchPreset } });
+  }
+
+
+
+
+  onDoughnutClick(
+    e: { event?: ChartEvent; active?: any[] },
+    kind: 'gender' | 'support'
+  ) {
+    const active = e?.active;
+    if (!active?.length) return;
+
+    const sliceIndex = active[0].index;
+    if (sliceIndex === undefined) return;
+
+    const labels = (kind === 'gender'
+      ? this.doughnutChartGenderData.labels
+      : this.doughnutChartSupportCategoryData.labels) as string[];
+
+    const label = labels?.[sliceIndex];
+    if (label) this.handleDoughnutSelection(kind, label);
+  }
+
+  onBarClick(e: { event?: ChartEvent; active?: any[] }) {
+    const active = e?.active;
+    if (!active?.length) return;
+
+    const barIndex = active[0].index;
+    if (barIndex === undefined) return;
+
+    const selected = this.countyAxis[barIndex];
+    if (!selected) return;
+
+    this.handleBarSelectionById(selected.id);
+  }
+
+  private handleBarSelectionById(countyId: string) {
+    let phase = '';
+    if (this.activeCategory === 1) phase = 'PARENT';
+    else if (this.activeCategory === 2) phase = 'AF';
+    else phase = '';
+
+    const criteria: Array<{ fieldName: string; operator: string; value: string | number }> = [
+      { fieldName: 'COUNTY_ID', operator: 'EQUAL', value: countyId }
+    ];
+
+    if (this.activeCategory !== 3) {
+      criteria.push({ fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase });
+    }
+
+    const searchPreset = {
+      criteria,
+      page: 0,
+      size: 10,
+      sortColumn: 'CREATED',
+      sortOrder: 'DESC'
+    };
+
+    this.router.navigate(['beneficiary/list'], { state: { searchPreset } });
+  }
+
+
+
+  ngOnInit(): void {
+    this.genderLegendOptions = this.buildLegendOptions();
+    this.supportLegendOptions = this.buildLegendOptions();
+    this.getSummary();
+  }
+
 }

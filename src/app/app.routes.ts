@@ -30,8 +30,14 @@ export const routes: Routes = [
         path: 'list',
         component: BeneficiaryList,
       },
-      { path: 'details/:id', component: BeneficiaryDetails },
-       { path: 'audit-details/:id', component: BeneficiaryAuditDetails },
+      {
+        path: 'details/:id',
+        component: BeneficiaryDetails
+      },
+      {
+        path: 'audit-details/:id',
+        component: BeneficiaryAuditDetails
+      },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
@@ -45,10 +51,6 @@ export const routes: Routes = [
         component: BeneficiaryMigration,
       },
       {
-        path: 'id-card',
-        component: BeneficiaryIdCard,
-      },
-      {
         path: 'restore',
         component: BeneficiaryRestore,
       },
@@ -59,7 +61,10 @@ export const routes: Routes = [
     path: 'beneficiary-approval-list',
     canActivate: [routeGuard],
     children: [
-      { path: 'edit', component: BeneficiaryEditApprovalList },
+      {
+        path: 'edit',
+        component: BeneficiaryEditApprovalList
+      },
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
@@ -84,6 +89,10 @@ export const routes: Routes = [
     path: 'beneficiary-archive-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryArchiveApprovalDetails,
+  },
+  {
+    path: 'id-card',
+    component: BeneficiaryIdCard,
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {

@@ -23,6 +23,14 @@ export interface GetLookupResponse {
   totalCount: number;
 }
 
+interface RegistrationTarget {
+  id: string;
+  name: string;
+  TOTAL: number;
+  LIPW: number;
+  DIS: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -731,4 +739,133 @@ getRegistrationPhaseEnum = () => {
       return '--';
     }
   };
+
+    counyWisePpRegistrationTarget:RegistrationTarget[] = [
+    {"id":"7101","name":"RENK","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7102","name":"MANYO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7103","name":"FASHODA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7104","name":"MELUTH","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"7105","name":"MABAN","TOTAL":8750,"LIPW":6125,"DIS":2625},
+    {"id":"7106","name":"MAIWUT","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7107","name":"LUAKPINY","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7108","name":"LONGOCHUK","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7109","name":"ULANG","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7110","name":"BAILIET","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7111","name":"MALAKAL","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7112","name":"PANYIKANG","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7201","name":"FANGAK","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7202","name":"KHORFLUS","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7203","name":"AYOD","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7204","name":"DUK","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7205","name":"UROR","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7206","name":"NYIROL","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7207","name":"AKOBO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7210","name":"TWIC EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7211","name":"BOR SOUTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7301","name":"PARIANG","TOTAL":8750,"LIPW":6125,"DIS":2625},
+    {"id":"7302","name":"ABIEMNHOM","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7303","name":"MAYOM","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7304","name":"RUBKONA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7305","name":"GUIT","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7306","name":"KOCH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7307","name":"LEER","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7308","name":"MAYENDIT","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7309","name":"PANYIJIAR","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"7401","name":"JAMJANG","TOTAL":8750,"LIPW":6699,"DIS":2051},
+    {"id":"8101","name":"ABYEI","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8102","name":"TWIC","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8103","name":"GOGRIAL WEST","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"8104","name":"GOGRIAL EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8105","name":"TONJ NORTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8106","name":"TONJ EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8107","name":"TONJ SOUTH","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"8201","name":"AWEIL NORTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8202","name":"AWEIL EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8203","name":"AWEIL SOUTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8204","name":"AWEIL WEST","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"8205","name":"AWEIL CENTRE","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8301","name":"RAJA","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"8302","name":"JUR RIVER","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8303","name":"WAU","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8401","name":"CUEIBET","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8402","name":"RUMBEK NORTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8403","name":"RUMBEK CENTRE","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8404","name":"WULU","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8405","name":"RUMBEK EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8406","name":"YIROL WEST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8407","name":"YIROL EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"8408","name":"AWERIAL","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9101","name":"TAMBURA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9102","name":"NAGERO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9103","name":"NZARA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9104","name":"EZO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9105","name":"YAMBIO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9106","name":"IBBA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9107","name":"MARIDI","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9108","name":"MVOLO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9109","name":"MUNDRI WEST","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9110","name":"MUNDRI EAST","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9201","name":"TEREKEKA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9202","name":"JUBA","TOTAL":12500,"LIPW":8750,"DIS":3750},
+    {"id":"9203","name":"LAINYA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9204","name":"YEI","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9205","name":"MAROBO","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9206","name":"KAJO KEJI","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9301","name":"TORIT","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9302","name":"LOPA/LAFON","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9303","name":"KAPOTEA NORTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9304","name":"KAPOTEA EAST","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9305","name":"KAPOTEA SOUTH","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9306","name":"BUWAGI","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9307","name":"MAGWI","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9309","name":"TORIT MUNICIPAL COUNCIL","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9310","name":"POCHALLA","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9311","name":"PIBOR","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9312","name":"BOR MUNICIPAL","TOTAL":5500,"LIPW":3850,"DIS":1650},
+    {"id":"9405","name":"BUDA","TOTAL":0,"LIPW":0,"DIS":0},
+    {"id":"9406","name":"BUWAGI","TOTAL":0,"LIPW":0,"DIS":0}
+  ];
+
+  counyWiseAfRegistrationTarget: RegistrationTarget[] = [
+    { id: "9202", name: "JUBA",          TOTAL: 7500,  LIPW: 5250, DIS: 2250 },
+    { id: "7105", name: "MABAN",         TOTAL: 9600,  LIPW: 6720, DIS: 2880 },
+    { id: "7401", name: "JAMJANG",       TOTAL: 9600,  LIPW: 6720, DIS: 2880 },
+    { id: "9105", name: "YAMBIO",        TOTAL: 6400,  LIPW: 4480, DIS: 1920 },
+    { id: "8204", name: "AWEIL WEST",    TOTAL: 6400,  LIPW: 4480, DIS: 1920 },
+    { id: "7304", name: "RUBKONA",       TOTAL: 5500,  LIPW: 3850, DIS: 1650 },
+    { id: "7307", name: "LEER",          TOTAL: 5500,  LIPW: 3850, DIS: 1650 },
+    { id: "7111", name: "MALAKAL",       TOTAL: 5500,  LIPW: 3850, DIS: 1650 },
+    { id: "8403", name: "RUMBEK CENTRE", TOTAL: 5500,  LIPW: 3850, DIS: 1650 },
+  ];
+
+
+    getCombinedRegistrationTarget(): RegistrationTarget[] {
+    const combinedMap: { [key: string]: RegistrationTarget } = {};
+
+    this.counyWisePpRegistrationTarget.forEach((item: RegistrationTarget) => {
+      combinedMap[item.id] = { ...item };
+    });
+
+    this.counyWiseAfRegistrationTarget.forEach((item: RegistrationTarget) => {
+      if (combinedMap[item.id]) {
+        combinedMap[item.id].TOTAL += item.TOTAL;
+        combinedMap[item.id].LIPW += item.LIPW;
+        combinedMap[item.id].DIS += item.DIS;
+      } else {
+        combinedMap[item.id] = { ...item };
+      }
+    });
+
+    return Object.values(combinedMap);
+  }
+
+    getTargetRegistrationTotalById(id: string, category: number = 3) {
+    let source: any[] = [];
+    if (category === 1) source = this.counyWisePpRegistrationTarget;
+    else if (category === 2) source = this.counyWiseAfRegistrationTarget;
+    else source = this.getCombinedRegistrationTarget();
+
+    const nowRes = source.find((sce: any) => sce.id == id);
+    return nowRes ? nowRes.TOTAL : 0;
+  }
 }

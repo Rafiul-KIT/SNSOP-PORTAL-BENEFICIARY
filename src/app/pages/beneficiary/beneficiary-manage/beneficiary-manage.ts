@@ -90,58 +90,58 @@ export class BeneficiaryManage implements OnInit {
   ) { }
 
   // ========= Init =========
-ngOnInit(): void {
-  this.initForm();
+  ngOnInit(): void {
+    this.initForm();
 
-  // Lookups
-  this.genderOptions = this.lookup.getGenderList();
-  this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
-  this.relationshipOptions = this.lookup.getRelationshipEnum();
-  this.legalStatusOptions = this.lookup.getLegalStatusEnum();
+    // Lookups
+    this.genderOptions = this.lookup.getGenderList();
+    this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
+    this.relationshipOptions = this.lookup.getRelationshipEnum();
+    this.legalStatusOptions = this.lookup.getLegalStatusEnum();
 
-  this.occupationOptions = this.lookup.getNomineeOccupationEnum();
-  this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
-  this.allReasons = this.lookup.getSelectionReasonEnum();
+    this.occupationOptions = this.lookup.getNomineeOccupationEnum();
+    this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
+    this.allReasons = this.lookup.getSelectionReasonEnum();
 
-  // Dynamic age-group controls with bounds 0..10 per mobile rule
-  this.ageGroups.forEach(group => {
-    this.beneficiaryForm.addControl(group.maleTotal, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.maleDisable, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.maleChronicalIll, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.maleBoth, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.femaleTotal, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.femaleDisable, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.femaleChronicalIll, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl(group.femaleBoth, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-  });
+    // Dynamic age-group controls with bounds 0..10 per mobile rule
+    this.ageGroups.forEach(group => {
+      this.beneficiaryForm.addControl(group.maleTotal, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.maleDisable, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.maleChronicalIll, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.maleBoth, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.femaleTotal, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.femaleDisable, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.femaleChronicalIll, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+      this.beneficiaryForm.addControl(group.femaleBoth, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    });
 
-  // Form-level validators (mirror Java)
-  this.beneficiaryForm.setValidators([
-    this.breakdownSubcategoryNotExceedTotal(),
-    this.householdSizeMatchesSum(),
-    this.literate1835NotExceedYouth(),
-    this.personalAgeExistsInBreakdown(),
-    this.genderPresentIfSelected(),
-    this.selectionReasonsRequired(),
-    this.disLipwEligibility()
-  ]);
+    // Form-level validators (mirror Java)
+    this.beneficiaryForm.setValidators([
+      this.breakdownSubcategoryNotExceedTotal(),
+      this.householdSizeMatchesSum(),
+      this.literate1835NotExceedYouth(),
+      this.personalAgeExistsInBreakdown(),
+      this.genderPresentIfSelected(),
+      this.selectionReasonsRequired(),
+      this.disLipwEligibility()
+    ]);
 
-  // Existing load
-  const applicationId = this.route.snapshot.paramMap.get('applicationId');
-  if (applicationId) {
-    this.isLoading = true;
-    this.loadBeneficiary(applicationId);
-  } else {
-    this.isLoading = false;
-  }
+    // Existing load
+    const applicationId = this.route.snapshot.paramMap.get('applicationId');
+    if (applicationId) {
+      this.isLoading = true;
+      this.loadBeneficiary(applicationId);
+    } else {
+      this.isLoading = false;
+    }
 
-  // Filter reasons by Support Type
-  this.beneficiaryForm.get('supportType')?.valueChanges.pipe(
-    takeUntil(this.destroy$)
-  ).subscribe(val => {
-    this.filterReasons(val);
-    this.beneficiaryForm.updateValueAndValidity();
-  });
+    // Filter reasons by Support Type
+    this.beneficiaryForm.get('supportType')?.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(val => {
+      this.filterReasons(val);
+      this.beneficiaryForm.updateValueAndValidity();
+    });
 
     // Conditional validators
     this.beneficiaryForm.get('relationship')?.valueChanges.pipe(
@@ -292,15 +292,15 @@ ngOnInit(): void {
       otherControl.updateValueAndValidity({ emitEvent: false });
       monthlyControl.updateValueAndValidity({ emitEvent: false });
     });
-  this.cdr.detectChanges();
-}
+    this.cdr.detectChanges();
+  }
 
 
-ngOnDestroy(): void {
-  // Unsubscribe when the component is destroyed to avoid memory leaks
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+  ngOnDestroy(): void {
+    // Unsubscribe when the component is destroyed to avoid memory leaks
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   // ========= Form skeleton =========
   private initForm() {
     this.beneficiaryForm = this.fb.group({
@@ -439,10 +439,8 @@ ngOnDestroy(): void {
     payload.respondentLegalStatus = formValue.legalStatus;
     payload.documentType = formValue.idType;
     payload.documentTypeOther = formValue.idTypeOther;
-    payload.respondentId = formValue.respondentIdNumber;
-    payload.respondentPhoneNo = formValue.respondentPhone
-      ? `+211${formValue.respondentPhone}`
-      : '';
+    const phone = formValue.respondentPhone?.toString().trim();
+    payload.respondentPhoneNo = phone ? `+211${phone}` : '';
     if (formValue.hasNationalId === 'No') {
       payload.documentType = 'NONE';
       payload.documentTypeOther = '';
@@ -452,8 +450,6 @@ ngOnDestroy(): void {
       payload.documentTypeOther = formValue.idTypeOther;
       payload.respondentId = formValue.respondentIdNumber;
     }
-    payload.respondentPhoneNo = formValue.respondentPhone;
-
     payload.householdIncomeSource = formValue.mainIncomeSource;
     payload.incomeSourceOther = formValue.otherIncomeSource;
     payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
