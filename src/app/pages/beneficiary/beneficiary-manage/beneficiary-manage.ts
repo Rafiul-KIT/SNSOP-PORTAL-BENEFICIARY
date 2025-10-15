@@ -48,6 +48,7 @@ export class BeneficiaryManage implements OnInit {
   relationshipOptions: any[] = [];
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
+  currentIdTypeOptions: any[] = [];
   occupationOptions: any[] = [];
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
@@ -59,9 +60,9 @@ export class BeneficiaryManage implements OnInit {
   private RGX_ALPHANUM_HYPHEN = /^[A-Za-z0-9\-]+$/;         // Correct regex
   private RGX_ALPHANUM_SPACE = /^[A-Za-z0-9 ]+$/;      // alphanum + space
   private RGX_REFUGEE_ID = /^[A-Za-z0-9\-]+$/;          // refugee IDs allow hyphen
-  private RGX_PHONE_13 = /^\+?\d{12}$/;                // 12 digits w/ optional +
+  private RGX_PHONE_9 = /^\d{9}$/;                // 9 digits w/ optional +
   private MIN_NAME = 3;
-  private MAX_NAME = 50;
+  private MAX_NAME = 30;
 
   ageGroups = [
     { label: '0-2 yrs', maleTotal: 'm0_2_total', maleDisable: 'm0_2_disable', maleChronicalIll: 'm0_2_chronic', maleBoth: 'm0_2_both', femaleTotal: 'f0_2_total', femaleDisable: 'f0_2_disable', femaleChronicalIll: 'f0_2_chronic', femaleBoth: 'f0_2_both' },
@@ -97,7 +98,7 @@ ngOnInit(): void {
   this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
   this.relationshipOptions = this.lookup.getRelationshipEnum();
   this.legalStatusOptions = this.lookup.getLegalStatusEnum();
-  this.idTypeOptions = this.lookup.getDocumentTypeEnum();
+
   this.occupationOptions = this.lookup.getNomineeOccupationEnum();
   this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
   this.allReasons = this.lookup.getSelectionReasonEnum();
@@ -157,7 +158,7 @@ ngOnInit(): void {
       }
       control.updateValueAndValidity({ emitEvent: false });
     });
-  
+
     this.beneficiaryForm.get('maritalStatus')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(value => {
@@ -175,73 +176,101 @@ ngOnInit(): void {
         control.updateValueAndValidity({ emitEvent: false });
       });
     });
-  
-    const updateIdValidators = () => {
-      const legal = this.beneficiaryForm.get('legalStatus')!.value;
-      const hasId = this.beneficiaryForm.get('hasNationalId')!.value;
+
+    // --- ID Information Logic ---
+    const updateIdLogic = () => {
+      const legalStatus = this.beneficiaryForm.get('legalStatus')!.value;
+      const hasIdControl = this.beneficiaryForm.get('hasNationalId')!;
       const typeControl = this.beneficiaryForm.get('idType')!;
-      const numberControl = this.beneficiaryForm.get('respondentIdNumber')!;
       const otherControl = this.beneficiaryForm.get('idTypeOther')!;
-  
+      const numberControl = this.beneficiaryForm.get('respondentIdNumber')!;
+
+      // Reset validators before applying new ones
       typeControl.clearValidators();
-      numberControl.clearValidators();
       otherControl.clearValidators();
-  
-      if (legal === 'REFUGEE') {
+      numberControl.clearValidators();
+
+      const allIdTypes = this.lookup.getDocumentTypeEnum();
+      const refugeeIdTypes = allIdTypes.filter(o => o.value.startsWith('REFUGEE'));
+      const nonRefugeeIdTypes = allIdTypes.filter(o => !o.value.startsWith('REFUGEE') && o.value !== 'SELECT');
+
+      if (legalStatus === 'REFUGEE') {
+        this.currentIdTypeOptions = refugeeIdTypes;
+        if (!typeControl.value || !refugeeIdTypes.some(o => o.value === typeControl.value)) {
+          typeControl.setValue('', { emitEvent: false });
+        }
+
+        hasIdControl.setValue('Yes', { emitEvent: false });
+        hasIdControl.disable({ emitEvent: false });
+
+        typeControl.setValidators([Validators.required]);
+        numberControl.setValidators([Validators.required, this.pattern(this.RGX_REFUGEE_ID, 'ID must be valid refugee format'), this.size(5, 14)]);
+
         typeControl.enable({ emitEvent: false });
         numberControl.enable({ emitEvent: false });
         typeControl.setValidators([Validators.required, this.disallow(['SELECT', 'PASSPORT', 'NATIONAL_ID', 'OTHER'], 'Please select a valid ID type')]);
         numberControl.setValidators([Validators.required, this.pattern(this.RGX_REFUGEE_ID, 'ID number must contain digits, letters, hyphen only'), this.size(5, 14)]);
-        
+
         otherControl.disable({ emitEvent: false });
         otherControl.setValue('', { emitEvent: false });
+      } else {
+        this.currentIdTypeOptions = nonRefugeeIdTypes;
+        if (!typeControl.value || !nonRefugeeIdTypes.some(o => o.value === typeControl.value)) {
+          typeControl.setValue('', { emitEvent: false });
+        }
+        hasIdControl.enable({ emitEvent: false });
 
-      } else { // Not a refugee
-        if (hasId === 'Yes') {
+        if (hasIdControl.value === 'Yes') {
           typeControl.enable({ emitEvent: false });
-          typeControl.setValidators([Validators.required, this.disallow(['SELECT'], 'Please select a valid ID Type'), this.disallow(['REFUGEE_RATION_CARD', 'REFUGEE_ID_CARD', 'REFUGEE_PROOF_OF_REGISTRATION'], 'Non-refugees must select Passport, National ID or Other')]);
-          
-          // Logic for idTypeOther
+          typeControl.setValidators([Validators.required]);
+
           if (typeControl.value === 'OTHER') {
             otherControl.enable({ emitEvent: false });
-            otherControl.setValidators([Validators.required, this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'), this.size(2, 50)]);
-          } else {
+            numberControl.enable({ emitEvent: false });
+            otherControl.setValidators([Validators.required, this.pattern(this.RGX_CHARS_SPACES, 'Only letters/spaces'), this.size(2, 50)]);
+            numberControl.setValidators([Validators.required, this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'), this.size(5, 14)]);
+          } else if (typeControl.value === 'NONE' || !typeControl.value) {
             otherControl.disable({ emitEvent: false });
+            numberControl.disable({ emitEvent: false });
+            otherControl.setValue('', { emitEvent: false });
+            numberControl.setValue('', { emitEvent: false });
+          } else { // Passport, National ID
+            numberControl.enable({ emitEvent: false });
+            otherControl.disable({ emitEvent: false });
+            numberControl.setValidators([Validators.required, this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'), this.size(5, 14)]);
             otherControl.setValue('', { emitEvent: false });
           }
-
-          // Logic for respondentIdNumber
-          if (typeControl.value === 'NONE') {
-            numberControl.disable({ emitEvent: false });
-            numberControl.setValue('', { emitEvent: false });
-          } else {
-            numberControl.enable({ emitEvent: false });
-            numberControl.setValidators([Validators.required, this.pattern(this.RGX_ALPHANUM_SPACE, 'ID number must contain digits, letters'), this.size(5, 14)]);
-          }
-        } else { // hasId === 'No'
+        } else { // hasNationalId is 'No' or empty
           typeControl.disable({ emitEvent: false });
-          numberControl.disable({ emitEvent: false });
           otherControl.disable({ emitEvent: false });
+          numberControl.disable({ emitEvent: false });
           typeControl.setValue('', { emitEvent: false });
-          numberControl.setValue('', { emitEvent: false });
           otherControl.setValue('', { emitEvent: false });
+          numberControl.setValue('', { emitEvent: false });
         }
       }
+
+      // Force UI update
       typeControl.updateValueAndValidity({ emitEvent: false });
-      numberControl.updateValueAndValidity({ emitEvent: false });
       otherControl.updateValueAndValidity({ emitEvent: false });
+      numberControl.updateValueAndValidity({ emitEvent: false });
+      this.cdr.detectChanges();
     };
-  
-    this.beneficiaryForm.get('legalStatus')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(updateIdValidators);
-    this.beneficiaryForm.get('hasNationalId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(updateIdValidators);
-    this.beneficiaryForm.get('idType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(updateIdValidators);
-  
+
+    // Triggers for the ID logic
+    this.beneficiaryForm.get('legalStatus')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => updateIdLogic());
+    this.beneficiaryForm.get('hasNationalId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => updateIdLogic());
+    this.beneficiaryForm.get('idType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => updateIdLogic());
+
+    // Initial run to set the form state
+    updateIdLogic();
+
     this.beneficiaryForm.get('mainIncomeSource')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(value => {
       const otherControl = this.beneficiaryForm.get('otherIncomeSource')!;
       const monthlyControl = this.beneficiaryForm.get('avgMonthlyIncome')!;
-  
+
       if (value === 'OTHER') {
         otherControl.enable({ emitEvent: false });
         otherControl.setValidators([Validators.required, this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'), this.size(2, 50)]);
@@ -250,16 +279,16 @@ ngOnInit(): void {
         otherControl.clearValidators();
         otherControl.setValue('', { emitEvent: false });
       }
-  
+
       if (value && value !== 'NONE' && value !== 'SELECT') {
         monthlyControl.enable({ emitEvent: false });
-        monthlyControl.setValidators([this.numberNotNegative('Add valid monthly income')]);
+        monthlyControl.setValidators([this.numberNotNegative('Add valid monthly income'), this.numMax(1000000)]);
       } else {
         monthlyControl.disable({ emitEvent: false });
         monthlyControl.clearValidators();
         monthlyControl.setValue('', { emitEvent: false });
       }
-  
+
       otherControl.updateValueAndValidity({ emitEvent: false });
       monthlyControl.updateValueAndValidity({ emitEvent: false });
     });
@@ -275,6 +304,7 @@ ngOnDestroy(): void {
   // ========= Form skeleton =========
   private initForm() {
     this.beneficiaryForm = this.fb.group({
+      householdNumber: [{ value: '', disabled: true }],
       respondentFirstName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
       respondentMiddleName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
       respondentLastName: ['', [Validators.required, this.capitalized(), this.onlyLetters(), this.size(this.MIN_NAME, this.MAX_NAME)]],
@@ -298,7 +328,7 @@ ngOnDestroy(): void {
       idTypeOther: [''],
       respondentIdNumber: [''],
 
-      respondentPhone: ['', [this.optionalPattern(this.RGX_PHONE_13, 'Phone number length must be 13')]],
+      respondentPhone: ['', [this.optionalPattern(this.RGX_PHONE_9, 'Phone number length must be 9')]],
 
       mainIncomeSource: ['', [this.notSelectRequired()]],
       otherIncomeSource: [''],
@@ -327,6 +357,7 @@ ngOnDestroy(): void {
 
         // Patch personal
         this.beneficiaryForm.patchValue({
+          householdNumber: dto.applicationId || '',
           respondentFirstName: dto.respondentFirstName,
           respondentMiddleName: dto.respondentMiddleName,
           respondentLastName: dto.respondentLastName,
@@ -345,7 +376,9 @@ ngOnDestroy(): void {
           idType: dto.documentType,
           idTypeOther: dto.documentTypeOther,
           respondentIdNumber: dto.respondentId,
-          respondentPhone: dto.respondentPhoneNo,
+          respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
+            ? dto.respondentPhoneNo.substring(4)
+            : dto.respondentPhoneNo || '',
           mainIncomeSource: dto.householdIncomeSource,
           otherIncomeSource: dto.incomeSourceOther,
           avgMonthlyIncome: dto.householdMonthlyAvgIncome,
@@ -407,6 +440,18 @@ ngOnDestroy(): void {
     payload.documentType = formValue.idType;
     payload.documentTypeOther = formValue.idTypeOther;
     payload.respondentId = formValue.respondentIdNumber;
+    payload.respondentPhoneNo = formValue.respondentPhone
+      ? `+211${formValue.respondentPhone}`
+      : '';
+    if (formValue.hasNationalId === 'No') {
+      payload.documentType = 'NONE';
+      payload.documentTypeOther = '';
+      payload.respondentId = '';
+    } else {
+      payload.documentType = formValue.idType;
+      payload.documentTypeOther = formValue.idTypeOther;
+      payload.respondentId = formValue.respondentIdNumber;
+    }
     payload.respondentPhoneNo = formValue.respondentPhone;
 
     payload.householdIncomeSource = formValue.mainIncomeSource;
@@ -458,7 +503,7 @@ ngOnDestroy(): void {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : ''
         });
         delete (payload.alternatePayee1 as any).biometrics;
       }
@@ -476,7 +521,7 @@ ngOnDestroy(): void {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : ''
         });
         delete (payload.alternatePayee2 as any).biometrics;
       }
@@ -511,7 +556,7 @@ ngOnDestroy(): void {
       return;
     }
 
-    const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.value);
+    const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.getRawValue());
     const payload = { beneficiaries: [beneficiary] };
 
     this.isLoading = true;
@@ -628,7 +673,10 @@ ngOnDestroy(): void {
       documentType: [a.documentType || ''],
       documentTypeOther: [a.documentTypeOther || ''],
       nationalId: [a.nationalId || ''],
-      payeePhoneNo: [a.payeePhoneNo || '', [this.optionalPattern(this.RGX_PHONE_13, 'Phone number length must be 13')]],
+      payeePhoneNo: [
+        a.payeePhoneNo?.startsWith('+211') ? a.payeePhoneNo.substring(4) : a.payeePhoneNo || '',
+        [this.optionalPattern(this.RGX_PHONE_9, 'Phone number must be 9 digits')],
+      ],
       hasNationalId: [a.documentType && a.documentType !== 'NONE' ? 'Yes' : 'No']
     });
 

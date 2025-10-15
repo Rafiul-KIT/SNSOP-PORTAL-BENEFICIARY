@@ -12,7 +12,7 @@
       <p-tab value="0">Personal Information</p-tab>
       <p-tab value="1">Alternate Payee Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
-      <p-button class="ms-auto p-2" severity="info" type="submit" [disabled]="beneficiaryForm.invalid"
+      <p-button class="ms-auto p-2" severity="info" type="submit"
         icon="fas fa-save" size="small" label="Update" />
     </p-tablist>
 
@@ -26,6 +26,21 @@
               <h5 class="card-header">Basic Information</h5>
               <br />
               <div class="card-body row g-2">
+
+                <!-- Household Number (readonly) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <input
+                      pInputText
+                      id="householdNumber"
+                      formControlName="householdNumber"
+                      class="w-100"
+                      style="font-size: 1rem; padding: 0.25rem 0.25rem;"
+                      readonly
+                    />
+                    <label for="householdNumber">Household Number</label>
+                  </p-floatlabel>
+                </div>
                 <!-- First Name -->
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
@@ -211,10 +226,18 @@
                   }
                 </div>
 
+                <!-- Has ID Radio -->
+                <div class="col-md-3 mb-1">
+                  <label>Do you have a ID?</label><br />
+                  <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" /> Yes
+                  &nbsp;&nbsp;
+                  <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" /> No
+                </div>
+
                 <!-- ID Type -->
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
-                    <p-select id="idType" formControlName="idType" class="w-100" [options]="idTypeOptions"
+                    <p-select id="idType" formControlName="idType" class="w-100" [options]="currentIdTypeOptions"
                       optionLabel="label" optionValue="value" [ngClass]="{'is-invalid': showError('idType')}">
                     </p-select>
                     <label for="idType">ID Type</label>
@@ -250,21 +273,24 @@
                 <!-- Phone -->
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
-                    <input pInputText id="respondentPhone" formControlName="respondentPhone" class="w-100"
-                      [ngClass]="{'is-invalid': showError('respondentPhone')}" />
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-end-0">+211</span>
+                      <input
+                        pInputText
+                        id="respondentPhone"
+                        formControlName="respondentPhone"
+                        class="form-control border-start-0"
+                        maxlength="9"
+                        placeholder="Enter 9-digit number"
+                        [ngClass]="{'is-invalid': showError('respondentPhone')}"
+                      />
+                    </div>
                     <label for="respondentPhone">Phone Number</label>
                   </p-floatlabel>
-                  @if (showError('respondentPhone')) {
-                  <small class="text-danger">{{ getError('respondentPhone') }}</small>
-                  }
-                </div>
 
-                <!-- Has ID Radio -->
-                <div class="col-md-3 mb-1">
-                  <label>Do you have a national ID?</label><br />
-                  <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" /> Yes
-                  &nbsp;&nbsp;
-                  <input class="form-check-input" type="radio" value="No" formControlName="hasNationalId" /> No
+                  @if (showError('respondentPhone')) {
+                    <small class="text-danger">{{ getError('respondentPhone') }}</small>
+                  }
                 </div>
               </div>
             </div>
@@ -288,17 +314,6 @@
                   }
                 </div>
 
-                <!-- Other income -->
-                <div class="col-md-4 mb-1">
-                  <p-floatlabel variant="on">
-                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
-                      [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
-                    <label for="otherIncomeSource">Other Income Source</label>
-                  </p-floatlabel>
-                  @if (showError('otherIncomeSource')) {
-                  <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
-                  }
-                </div>
 
                 <!-- Avg Income -->
                 <div class="col-md-4 mb-1">
@@ -312,6 +327,19 @@
                   }
 
                 </div>
+
+                <!-- Other income -->
+                <div class="col-md-4 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
+                           [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
+                    <label for="otherIncomeSource">Other Income Source</label>
+                  </p-floatlabel>
+                  @if (showError('otherIncomeSource')) {
+                    <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
+                  }
+                </div>
+
 
                 <!-- Support Type -->
                 <div class="col-md-4 mb-1">
@@ -461,7 +489,7 @@
               @for (alt of alternates.controls; let i = $index; track alt) {
               <div [formGroupName]="i" class="col-md-6">
                 <div class="card h-100 shadow-sm rounded">
-                  <h5 class="card-header text-center">Alternate Payee {{ i + 1 }}</h5>
+                  <h5 class="card-header text-center">Alternate {{ i + 1 }}</h5>
                   <div class="card-body">
                     <div class="row g-2">
                       <div class="col-md-12 mb-2">
@@ -543,7 +571,7 @@
 
                       <div class="col-md-12 mb-2">
                         <p-floatlabel variant="on">
-                          <p-select [options]="idTypeOptions" optionLabel="label" optionValue="value"
+                          <p-select [options]="currentIdTypeOptions" optionLabel="label" optionValue="value"
                             formControlName="documentType" class="w-100">
                           </p-select>
                           <label>ID Type</label>
@@ -566,10 +594,22 @@
 
                       <div class="col-md-12 mb-2">
                         <p-floatlabel variant="on">
-                          <input pInputText formControlName="payeePhoneNo" class="w-100" />
+                          <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">+211</span>
+                            <input
+                              pInputText
+                              formControlName="payeePhoneNo"
+                              class="form-control border-start-0"
+                              maxlength="9"
+                              placeholder="Enter 9-digit number"
+                              pattern="\d*"
+                              oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            />
+                          </div>
                           <label>Contact Number</label>
                         </p-floatlabel>
                       </div>
+
 
                     </div>
                   </div>
