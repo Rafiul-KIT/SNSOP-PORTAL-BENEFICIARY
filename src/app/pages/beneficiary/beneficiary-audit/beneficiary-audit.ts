@@ -181,7 +181,7 @@ export class BeneficiaryAudit implements OnInit  {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Beneficiary Audit List' }];
   }
 
   // ---------- dependent dropdowns ----------
