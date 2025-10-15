@@ -13,6 +13,8 @@ import { BeneficiaryArchiveApprovalDetails } from './pages/approval-details/bene
 import { BeneficiaryMigrateApprovalDetails } from './pages/approval-details/beneficiary-migrate-approval-details/beneficiary-migrate-approval-details';
 import { BeneficiaryRestore } from './pages/beneficiary/beneficiary-restore/beneficiary-restore';
 import { ReportComponent } from './pages/report/report';
+import { BeneficiaryAudit } from './pages/beneficiary/beneficiary-audit/beneficiary-audit';
+import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-details/beneficiary-audit-details';
 
 export const routes: Routes = [
   {
@@ -29,9 +31,14 @@ export const routes: Routes = [
         component: BeneficiaryList,
       },
       { path: 'details/:id', component: BeneficiaryDetails },
+       { path: 'audit-details/:id', component: BeneficiaryAuditDetails },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
+      },
+      {
+        path: 'audit',
+        component: BeneficiaryAudit,
       },
       {
         path: 'migrate/:bid',
@@ -56,17 +63,18 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
-  
+
   {
     path: 'beneficiary-edit-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryEditApprovalDetails,
   },
-    {
+  {
     path: 'report',
     canActivate: [routeGuard],
     component: ReportComponent,
   },
+
   {
     path: 'beneficiary-migrate-details/:id',
     canActivate: [routeGuard],

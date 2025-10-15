@@ -99,6 +99,7 @@ export class Header {
         routerLink: '/beneficiary/id-card',
         routerLinkActiveOptions: 'active',
       },
+      
       {
         label: 'Work Progress',
         icon: 'fas fa-line-chart',
@@ -115,6 +116,12 @@ export class Header {
         label: 'Report',
         icon: 'fas fa-file-alt',
         routerLink: 'report',
+        routerLinkActiveOptions: 'active',
+      },
+         {
+        label: 'Beneficiary Audit',
+        icon: 'fas fa-history',
+        routerLink: '/beneficiary/audit',
         routerLinkActiveOptions: 'active',
       },
       {
