@@ -15,11 +15,23 @@ import { BeneficiaryRestore } from './pages/beneficiary/beneficiary-restore/bene
 import { ReportComponent } from './pages/report/report';
 import { BeneficiaryAudit } from './pages/beneficiary/beneficiary-audit/beneficiary-audit';
 import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-details/beneficiary-audit-details';
+import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudication-list';
+import { MatchList } from './pages/adjudication/match-list/match-list';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
+    canActivate: [routeGuard],
+  },
+    {
+    component: AdjudicationList,
+    path: 'adjudication-list',
+    canActivate: [routeGuard],
+  },
+  {
+    component: MatchList,
+    path: 'match-list/:id',
     canActivate: [routeGuard],
   },
   {

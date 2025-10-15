@@ -15,12 +15,13 @@ import { ReportLocationWiseNomineeCount } from "../report-list/report-location-w
 import { ReportCompleteHouseholdSurvey } from "../report-list/report-complete-household-survey/report-complete-household-survey";
 import { ReportReconciledSummaryResult } from "../report-list/report-reconciled-summary-result/report-reconciled-summary-result";
 import { ReportReconciliationSummaryCount } from "../report-list/report-reconciliation-summary-count/report-reconciliation-summary-count";
+import { Button } from "primeng/button";
 
 
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, LoadingSpinner, Loader, ReportBeneficiaryList, ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount, ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey, ReportReconciledSummaryResult, ReportReconciliationSummaryCount],
+  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, LoadingSpinner, Loader, ReportBeneficiaryList, ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount, ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey, ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
@@ -484,9 +485,9 @@ export class ReportComponent implements OnInit {
   ngOnInit(): void {
     this.items = [{ label: 'Report', icon: 'fas fa-chart-line me-2' }];
     this.home = { 
-      label: 'Dashboard', 
+      label: '', 
       icon: 'fas fa-home me-2', 
-      routerLink: '/admin/dashboard' 
+      routerLink: '/' 
     };
     this.isLoading = false;
   }
