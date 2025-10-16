@@ -178,11 +178,9 @@ export class BeneficiaryAuditDetails implements OnInit {
         this.lookup.getPayamListByCountyId(''),
         this.lookup.getBomaListByPayamId(''),
       ]).then(() => {
-        if (isTaskMode) {
-          this.fetchTaskDetails(id); // 👈 call task details API
-        } else {
+      
           this.fetchBeneficiaryDetails(id); // 👈 call beneficiary details API
-        }
+       
       });
     }
   }
@@ -190,7 +188,7 @@ export class BeneficiaryAuditDetails implements OnInit {
   fetchBeneficiaryDetails(householdId: string) {
     this.isLoading = true;
     this.api
-      .GET(`api/beneficiary/details/${householdId}`)
+      .GET(`api/audit/beneficiary/${householdId}`) 
       .then((res: any) => {
         this.activeStatus = res?.data?.activeStatus ?? null;
         console.log('Active status details:', this.activeStatus);
@@ -205,23 +203,7 @@ export class BeneficiaryAuditDetails implements OnInit {
       });
   }
 
-  fetchTaskDetails(taskId: string) {
-    this.isLoading = true;
-    this.api
-      .GET(`api/approval/details/${taskId}`)
-      .then((res: any) => {
-        this.activeStatus = res?.data?.activeStatus ?? null;
-        console.log('Active status task:', this.activeStatus);
-        const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
-        this.beneficiaryDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometrics);
-      })
-      .catch((err) => console.error('Error loading task details:', err))
-      .finally(() => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      });
-  }
+
 
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     // Helper functions to normalize images
@@ -536,67 +518,6 @@ export class BeneficiaryAuditDetails implements OnInit {
     }
   }
 
-  restoreBeneficiary() {
-    if (!this.beneficiaryDetails?.applicationId) return;
-    this.restoreComment = ''; // Reset comment before showing dialog
-    this.isRestoreDialogVisible = true;
-  }
 
-  cancelRestore() {
-    this.isRestoreDialogVisible = false;
-  }
 
-  confirmRestore() {
-    // ✅ Validate comment
-    if (!this.restoreComment.trim()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Comment Required',
-        detail: 'Please write a reason for restoring this beneficiary.',
-      });
-      return;
-    }
-
-    const payload = {
-      householdId: this.beneficiaryDetails!.applicationId,
-      comment: this.restoreComment.trim(),
-    };
-
-    this.isLoading = true;
-    this.isRestoreDialogVisible = false; // Hide dialog
-
-    this.api
-      .POST('/api/beneficiary/archive', payload)
-      .then((res: any) => {
-        if (res?.data?.operationResult) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Restored',
-            detail: 'Beneficiary restored successfully.',
-          });
-
-          // Redirect after a short delay to allow user to see the message
-          setTimeout(() => {
-            this.router.navigate(['/beneficiary/restore']);
-          }, 1500);
-        } else {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Restore Failed',
-            detail: res?.data?.errorMsg || 'Unable to restore beneficiary.',
-          });
-        }
-      })
-      .catch((err) => {
-        console.error('Restore API error:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to restore beneficiary.',
-        });
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
-  }
 }

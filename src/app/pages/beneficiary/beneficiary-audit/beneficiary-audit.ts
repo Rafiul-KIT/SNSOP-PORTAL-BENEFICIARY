@@ -69,8 +69,8 @@ interface BeneficiaryVm {
 
 @Component({
   selector: 'app-beneficiary-audit',
-  standalone:true,
-    imports: [
+  standalone: true,
+  imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -89,11 +89,11 @@ interface BeneficiaryVm {
   ],
   templateUrl: './beneficiary-audit.html',
   styleUrl: './beneficiary-audit.scss',
-   providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BeneficiaryAudit implements OnInit  {
- isLoading = true;
+export class BeneficiaryAudit implements OnInit {
+  isLoading = true;
   searchForm!: FormGroup;
 
   // geo lookup lists
@@ -117,7 +117,6 @@ export class BeneficiaryAudit implements OnInit  {
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
 
-
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
@@ -127,8 +126,7 @@ export class BeneficiaryAudit implements OnInit  {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
-  ) { }
-
+  ) {}
 
   private loadLookups() {
     this.states = this.lookup.getStateList();
@@ -142,25 +140,9 @@ export class BeneficiaryAudit implements OnInit  {
     this.initForm();
     this.initBreadcrumb();
 
-    // // Preload all lookup lists first
-    // Promise.all([
-    //   this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
-    //   this.lookup
-    //     .getCountyListByStateId('')
-    //     .then((list) => (this.counties = list)),
-    //   this.lookup
-    //     .getPayamListByCountyId('')
-    //     .then((list) => (this.payams = list)),
-    //   this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
-    // ]).then(() => {
     this.loadLookups();
 
-    // console.log(this.counties, this.payams, this.bomas);
-
-    // ✅ Only fetch beneficiaries after lookup data is ready
     this.fetchPage(this.currentPage, this.pageSize);
-    // this.cdr.markForCheck();
-    // });
   }
 
   initForm() {
@@ -330,19 +312,19 @@ export class BeneficiaryAudit implements OnInit  {
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
-          String(b.address.stateId)
+            String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) ||
-          String(b.address.countyId)
+            String(b.address.countyId)
           : '',
         payamName: b.address?.payam
           ? this.lookup.getPayamNameById(b.address.payam) ||
-          String(b.address.payam)
+            String(b.address.payam)
           : '',
         bomaName: b.address?.boma
           ? this.lookup.getBomaNameById(b.address.boma) ||
-          String(b.address.boma)
+            String(b.address.boma)
           : '',
       };
     });
@@ -403,115 +385,14 @@ export class BeneficiaryAudit implements OnInit  {
   }
 
   // ---------- Actions ----------
-  editBeneficiary(b: BeneficiaryVm) {
-    if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/edit', String(b.applicationId)]);
-  }
-  migrateBeneficiary(b: BeneficiaryVm) {
-    if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/migrate', String(b.applicationId)]);
-  }
+
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/audit-details', String(b.applicationId)]);
+    this.router.navigate([
+      '/beneficiary/audit-details',
+      String(b.applicationId),
+    ]);
   }
-
-
-  deleteBeneficiary(b: BeneficiaryVm) {
-    this.beneficiaryToDelete = b;
-    this.archiveComment = '';
-
-    this.confirmationService.confirm({
-      key: 'archiveDialog',
-      header: 'Confirm Archive',
-      message: `Are you sure you want to archive ${b.fullName}?`,
-      icon: 'fas fa-exclamation-triangle text-warning',
-      acceptLabel: 'Yes',
-      rejectLabel: 'No',
-      acceptButtonStyleClass: 'p-button-success',
-      rejectButtonStyleClass: 'p-button-danger',
-      accept: () => this.handleArchiveConfirm(),
-    });
-  }
-
-  handleArchiveConfirm() {
-    // validate comment
-    if (!this.archiveComment || !this.archiveComment.trim()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Comment Required',
-        detail: 'Please provide a reason for archiving before proceeding.',
-      });
-      return;
-    }
-
-    if (!this.beneficiaryToDelete) return;
-
-    const b = this.beneficiaryToDelete;
-
-    const requestData = {
-      beneficiaries: [
-        {
-          householdId: b.applicationId,
-          comment: this.archiveComment.trim(),
-        },
-      ],
-    };
-
-    const apiPath = '/api/beneficiary/delete';
-    this.api
-      .POST(apiPath, requestData)
-      .then((res: any) => {
-        const data = res?.data;
-        if (!data) throw new Error('Empty response');
-
-        // Checking for operation result in the bulkResponse
-        const response = data.bulkResponse && data.bulkResponse[0];
-        if (response) {
-          if (response.result === 'FAILED') {
-            // Show error if result is failed
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Archive Failed',
-              detail: response.errorMessage || 'Failed to send request for archiving beneficiary',
-            });
-          } else if (response.result === 'SUCCESS') {
-            // Handle success if result is successful
-            this.beneficiaries = this.beneficiaries.filter(
-              (x) => x.applicationId !== b.applicationId
-            );
-
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Archived',
-              detail: 'Beneficiary archive request sent successfully.',
-            });
-            this.cdr.markForCheck();
-          }
-        } else {
-          // Handle case where there's no response
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'No Response',
-            detail: 'No response returned from the server.',
-          });
-        }
-      })
-      .catch((err) => {
-        console.error('Archive beneficiary error:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to send request for archiving beneficiary.',
-        });
-      })
-      .finally(() => {
-        this.archiveComment = '';
-        this.beneficiaryToDelete = null;
-      });
-  }
-
-
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }
