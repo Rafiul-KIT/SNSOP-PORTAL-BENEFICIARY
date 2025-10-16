@@ -70,12 +70,7 @@ export class Header {
         routerLink: '/dashboard',
         routerLinkActiveOptions: 'active',
       },
-          {
-        label: 'Adjudication',
-        icon: 'fas fa-users-viewfinder',
-        routerLink: '/adjudication-list',
-        routerLinkActiveOptions: 'active',
-      },
+
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
@@ -92,6 +87,12 @@ export class Header {
           },
 
         ],
+      },
+                {
+        label: 'Adjudication',
+        icon: 'fas fa-users-viewfinder',
+        routerLink: '/adjudication-list',
+        routerLinkActiveOptions: 'active',
       },
       {
         label: 'Beneficiary ID Cards',

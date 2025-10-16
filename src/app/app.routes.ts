@@ -12,26 +12,11 @@ import { BeneficiaryIdCard } from './pages/beneficiary/beneficiary-id-card/benef
 import { BeneficiaryArchiveApprovalDetails } from './pages/approval-details/beneficiary-archive-approval-details/beneficiary-archive-approval-details';
 import { BeneficiaryMigrateApprovalDetails } from './pages/approval-details/beneficiary-migrate-approval-details/beneficiary-migrate-approval-details';
 import { BeneficiaryRestore } from './pages/beneficiary/beneficiary-restore/beneficiary-restore';
-import { ReportComponent } from './pages/report/report';
-import { BeneficiaryAudit } from './pages/beneficiary/beneficiary-audit/beneficiary-audit';
-import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-details/beneficiary-audit-details';
-import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudication-list';
-import { MatchList } from './pages/adjudication/match-list/match-list';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
-    canActivate: [routeGuard],
-  },
-    {
-    component: AdjudicationList,
-    path: 'adjudication-list',
-    canActivate: [routeGuard],
-  },
-  {
-    component: MatchList,
-    path: 'match-list/:id',
     canActivate: [routeGuard],
   },
   {
@@ -42,25 +27,18 @@ export const routes: Routes = [
         path: 'list',
         component: BeneficiaryList,
       },
-      {
-        path: 'details/:id',
-        component: BeneficiaryDetails
-      },
-      {
-        path: 'audit-details/:id',
-        component: BeneficiaryAuditDetails
-      },
+      { path: 'details/:id', component: BeneficiaryDetails },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
       },
       {
-        path: 'audit',
-        component: BeneficiaryAudit,
-      },
-      {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
+      },
+      {
+        path: 'id-card',
+        component: BeneficiaryIdCard,
       },
       {
         path: 'restore',
@@ -73,25 +51,15 @@ export const routes: Routes = [
     path: 'beneficiary-approval-list',
     canActivate: [routeGuard],
     children: [
-      {
-        path: 'edit',
-        component: BeneficiaryEditApprovalList
-      },
+      { path: 'edit', component: BeneficiaryEditApprovalList },
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
     ],
   },
-
   {
     path: 'beneficiary-edit-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryEditApprovalDetails,
   },
-  {
-    path: 'report',
-    canActivate: [routeGuard],
-    component: ReportComponent,
-  },
-
   {
     path: 'beneficiary-migrate-details/:id',
     canActivate: [routeGuard],
@@ -101,10 +69,6 @@ export const routes: Routes = [
     path: 'beneficiary-archive-details/:id',
     canActivate: [routeGuard],
     component: BeneficiaryArchiveApprovalDetails,
-  },
-  {
-    path: 'id-card',
-    component: BeneficiaryIdCard,
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {

@@ -26,8 +26,10 @@
                TAB: Beneficiary Information
           ========================== -->
       <p-tabpanel value="0">
-        <div style="height: calc(100vh - 210px); overflow-y: auto">
+        <div class="px-5" style="height: calc(100vh - 210px);  overflow-y: auto">
+        
           <div class="row g-2">
+            
             <!-- Personal Info -->
             <div class="col-12 col-md-4">
               <div class="card shadow-sm rounded">
@@ -465,11 +467,11 @@
            TAB: Alternate Information
       ========================== -->
       <p-tabpanel value="1">
-        <div style="height: calc(100vh - 210px); overflow-y: auto">
+        <div class="px-5" style="height: calc(100vh - 210px); overflow-y: auto">
           <div class="row g-3">
             @if (!beneficiaryDetails.alternates.length) {
             <div class="col-12">
-              <div class="alert alert-gray text-center mb-0">
+              <div class="alert alert-warning  text-center mb-0">
                 No Alternate Payee Information Provided
               </div>
             </div>
@@ -568,7 +570,7 @@
                TAB: Nominee Information
           ========================== -->
       <p-tabpanel value="2">
-        <div style="height: calc(100vh - 210px); overflow-y: auto">
+        <div class="px-5" style="height: calc(100vh - 210px); overflow-y: auto">
           <div class="row">
             @for (nominee of beneficiaryDetails.nominees; track nominee; let i =
             $index) {

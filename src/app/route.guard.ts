@@ -16,5 +16,6 @@ export const routeGuard: CanActivateChildFn = (route: any) => {
     const redirectUrl = `${environment.portals.master}/#/landing`; // Use hash-based routing for production
     window.location.href = redirectUrl; // Redirect to the correct landing page
   }
-  return lState;
+ return lState;
 };
+
