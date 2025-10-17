@@ -37,7 +37,7 @@
                TAB: Beneficiary Information
           ========================== -->
             <p-tabpanel value="0">
-                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row g-2">
                         <!-- Personal Info -->
                         <div class="col-12 col-md-6">
@@ -1111,7 +1111,7 @@
            TAB: Alternate Information
       ========================== -->
             <p-tabpanel value="1">
-                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row g-3">
                         <!-- ===== Left Column: OLD ===== -->
                         <div class="col-12 col-md-6">
@@ -1244,8 +1244,7 @@
                                                 </tr>
                                                 <tr>
                                                     @for (f of alt.rightFingers; track f; let j = $index) {
-                                                    <td
-                                                        [ngClass]="changedClass(altFingerPath(i,'right',j))"
+                                                    <td [ngClass]="changedClass(altFingerPath(i,'right',j))"
                                                         [pTooltip]="diffTip(altFingerPath(i,'right',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
@@ -1257,8 +1256,7 @@
                                                 </tr>
                                                 <tr>
                                                     @for (f of alt.leftFingers; track f; let j = $index) {
-                                                    <td
-                                                        [ngClass]="changedClass(altFingerPath(i,'left',j))"
+                                                    <td [ngClass]="changedClass(altFingerPath(i,'left',j))"
                                                         [pTooltip]="diffTip(altFingerPath(i,'left',j))">
                                                         <img [src]="f.image" height="40" /><br />
                                                         <kbd>{{ f.label }}</kbd>
@@ -1353,7 +1351,7 @@
                TAB: Nominee Information
           ========================== -->
             <p-tabpanel value="2">
-                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                <div class="p-3" style="height: calc(100vh - 210px); overflow-y: auto">
                     <div class="row">
                         <!-- When both are empty -->
                         @if (nomineeCount === 0) {
