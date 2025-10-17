@@ -395,11 +395,11 @@ export class BeneficiaryList implements OnInit {
 
   resetForm() {
     this.searchForm.reset();
-    this.counties = [];
-    this.payams = [];
-    this.bomas = [];
-    this.loadLookups();
-    this.searchBeneficiaries();
+    // this.counties = [];
+    // this.payams = [];
+    // this.bomas = [];
+    // this.loadLookups();
+    // this.searchBeneficiaries();
   }
 
   // ---------- Actions ----------

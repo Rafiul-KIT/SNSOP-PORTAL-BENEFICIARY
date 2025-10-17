@@ -298,6 +298,18 @@
                   }
                 </div>
 
+                <!-- Other income -->
+                <div class="col-md-4 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
+                      [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
+                    <label for="otherIncomeSource">Other Income Source</label>
+                  </p-floatlabel>
+                  @if (showError('otherIncomeSource')) {
+                  <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
+                  }
+                </div>
+
 
                 <!-- Avg Income -->
                 <div class="col-md-4 mb-1">
@@ -312,17 +324,21 @@
 
                 </div>
 
-                <!-- Other income -->
+                <!-- Mobile money -->
                 <div class="col-md-4 mb-1">
                   <p-floatlabel variant="on">
-                    <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
-                      [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
-                    <label for="otherIncomeSource">Other Income Source</label>
+                    <p-select id="mobileMoneyProvider" formControlName="mobileMoneyProvider" class="w-100"
+                      [options]="mobileMoneyOptions" optionLabel="label" optionValue="value"
+                      [ngClass]="{'is-invalid': showError('mobileMoneyProvider')}">
+                    </p-select>
+                    <label for="mobileMoneyProvider">Mobile Money Provider</label>
                   </p-floatlabel>
-                  @if (showError('otherIncomeSource')) {
-                  <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
+                  @if (showError('mobileMoneyProvider')) {
+                  <small class="text-danger">{{ getError('mobileMoneyProvider') }}</small>
                   }
                 </div>
+
+
 
 
                 <!-- Support Type -->

@@ -868,4 +868,26 @@ getRegistrationPhaseEnum = () => {
     const nowRes = source.find((sce: any) => sce.id == id);
     return nowRes ? nowRes.TOTAL : 0;
   }
+
+
+      MobileMoneyProviderEnum  = [
+    { id: 1, value: 'MOMO', label: 'MOMO' },
+    { id: 2, value: 'MGURUSH', label: 'MGURUSH' },
+    { id: 3, value: 'DIGICASH', label: 'DIGICASH' },
+  ];
+
+  getMobileMoneyProviderEnum = () => {
+    return this.MobileMoneyProviderEnum ;
+  };
+
+  getMobileMoneyProviderEnumByValue = (value: any) => {
+    const dataFound = this.MobileMoneyProviderEnum .find(
+      (item: any) => item.value == value
+    );
+    if (dataFound) {
+      return dataFound.label;
+    } else {
+      return '--';
+    }
+  };
 }

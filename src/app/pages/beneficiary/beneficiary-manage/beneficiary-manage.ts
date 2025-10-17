@@ -60,6 +60,7 @@ export class BeneficiaryManage implements OnInit {
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
   filteredReasons: any[] = [];
+  mobileMoneyOptions: any[] = [];
 
   // ===== Regex & constants (aligned with mobile/Java) =====
   private RGX_ONLY_CHARS = /^[A-Za-z]+$/; // names (no spaces/digits/special)
@@ -172,6 +173,7 @@ export class BeneficiaryManage implements OnInit {
 
     this.occupationOptions = this.lookup.getNomineeOccupationEnum();
     this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
+    this.mobileMoneyOptions = this.lookup.getMobileMoneyProviderEnum();
     this.allReasons = this.lookup.getSelectionReasonEnum();
 
     // Dynamic age-group controls with bounds 0..10 per mobile rule
@@ -567,10 +569,11 @@ export class BeneficiaryManage implements OnInit {
       ],
 
       mainIncomeSource: ['', [this.notSelectRequired()]],
+      mobileMoneyProvider: ['', [this.notSelectRequired()]],
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],
 
-      supportType: ['', [this.notSelectRequired()]],
+      supportType: [''],
       selectionReasons: this.fb.control([]),
 
       canReadWrite: [''], // 'Yes'|'No'
@@ -615,6 +618,7 @@ export class BeneficiaryManage implements OnInit {
             ? dto.respondentPhoneNo.substring(4)
             : dto.respondentPhoneNo || '',
           mainIncomeSource: dto.householdIncomeSource,
+          mobileMoneyProvider: dto.mobileMoneyProvider,
           otherIncomeSource: dto.incomeSourceOther,
           avgMonthlyIncome: dto.householdMonthlyAvgIncome,
           supportType:
@@ -757,6 +761,7 @@ export class BeneficiaryManage implements OnInit {
       payload.respondentId = formValue.respondentIdNumber;
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
+    payload.mobileMoneyProvider = formValue.mobileMoneyProvider;
     payload.incomeSourceOther = formValue.otherIncomeSource;
     payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
 
