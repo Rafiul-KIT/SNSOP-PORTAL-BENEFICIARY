@@ -22,12 +22,13 @@
                     <label class="me-2 p-2 fw-semibold text-secondary">Select Revision:</label>
                     <p-select [(ngModel)]="selectedRevision" [options]="revisionOptions" optionLabel="label"
                         optionValue="value" placeholder="Select Revision" size="small" appendTo="body"
-                        styleClass="w-auto" (onChange)="selectRevision($event.value)" />
+                        styleClass="w-auto" (onChange)="selectRevision(selectedRevision)" />
                 </div>
+
             </div>
 
             <!-- Restore Button (only when activeStatus === 1) -->
-        
+
         </p-tablist>
 
 
@@ -56,7 +57,7 @@
                                             </tr>
                                             <tr>
                                                 <th>Name</th>
-                                                <td class="bg-warning text-dark fw-semibold border-start border-3 border-warning"
+                                                <td class=" text-dark fw-semibold border-start border-3"
                                                     data-bs-toggle="tooltip" data-bs-placement="top"
                                                     title="This field was modified">
                                                     {{ beneficiaryDetails.name }}
@@ -617,9 +618,8 @@
                                             <tr>
                                                 <th>Age</th>
 
-                                                <td class="bg-warning text-dark fw-semibold border-start border-3 border-warning"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="This field was modified">
+                                                <td class="text-dark fw-semibold border-start border-3 "
+                                                    data-bs-toggle="tooltip" data-bs-placement="top">
                                                     {{ alt.age }}
                                                 </td>
                                             </tr>
@@ -683,9 +683,8 @@
                                         <tbody>
                                             <tr>
                                                 <th>Name</th>
-                                                <td class="bg-warning text-dark fw-semibold border-start border-3 border-warning"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="This field was modified">
+                                                <td class=" text-dark fw-semibold border-start border-3 "
+                                                    data-bs-toggle="tooltip" data-bs-placement="top">
                                                     {{ nominee.name }}
                                                 </td>
 
@@ -738,17 +737,59 @@
                     </div>
                 </div>
             </p-tabpanel>
-             <p-tabpanel value="3">
-                <div class="p-5" style="height: calc(100vh - 210px); overflow-y: auto">
-                    <div class="row">
-                        <p>This is for user info:</p>
+           <p-tabpanel value="3">
+    <div class="p-5" style="height: calc(100vh - 210px); overflow-y: auto">
+        <div class="row">
+            @if (userInfo) {
+            <div class="col-12">
+                <div class="card shadow-sm rounded">
+                    <div class="card-header bg-gray text-black">
+                        User Information
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 180px">User ID</th>
+                                    <td>{{ userInfo.userId }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Revision Type</th>
+                                    <td>
+                                        {{
+                                          getRevisionMessage(userInfo.revisionType)
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Time of revision</th>
+                                   <td>{{ userInfo.timestamp ? (userInfo.timestamp | date: 'medium') : 'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </p-tabpanel>
+            </div>
+            } @else {
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No user information available
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</p-tabpanel>
+
         </p-tabpanels>
     </p-tabs>
 
-  
+
+    }
+    @else {
+
+    <div class="alert alert-warning text-center mt-3">
+      No data available to display.
+    </div>
     } }
 </div>
-

@@ -7,7 +7,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule } from 'primeng/table';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
-import { SelectModule } from 'primeng/select'; 
+import { SelectModule } from 'primeng/select';
 import { Loader } from '../../../components/loader/loader';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../services/api.service';
@@ -128,14 +128,11 @@ export class BeneficiaryAuditDetails implements OnInit {
   isRestoreDialogVisible = false;
   restoreComment: string = '';
   selectedRevision: string = 'Revision 1';
-  
+  auditRecords: any[] = [];
+  selectedRevisionData: any = null;
   // Add revision options
-  revisionOptions = [
-    { label: 'Revision 1', value: 'Revision 1' },
-    { label: 'Revision 2', value: 'Revision 2' },
-    { label: 'Revision 3', value: 'Revision 3' }
-  ];
- 
+  revisionOptions = [{ label: 'Revision 1', value: 'Revision 1' }];
+
   items = [
     {
       label: 'Beneficiary Audit List',
@@ -145,7 +142,11 @@ export class BeneficiaryAuditDetails implements OnInit {
     { label: 'Beneficiary Audit Details', icon: 'fas fa-user-cog me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
-
+  userInfo: {
+    userId: number;
+    timestamp: string;
+    revisionType: string;
+  } | null = null;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -155,13 +156,7 @@ export class BeneficiaryAuditDetails implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
-  
-  selectRevision(revision: string) {
-    this.selectedRevision = revision;
-    console.log('Selected revision:', revision);
-    // Your logic here
-    this.cdr.detectChanges();
-  }
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     const isTaskMode =
@@ -171,30 +166,50 @@ export class BeneficiaryAuditDetails implements OnInit {
       this.taskId = id;
     }
     if (id) {
-      // preload geo lookup data first
       Promise.all([
         this.lookup.getOrFetchStateList(),
         this.lookup.getCountyListByStateId(''),
         this.lookup.getPayamListByCountyId(''),
         this.lookup.getBomaListByPayamId(''),
       ]).then(() => {
-      
-          this.fetchBeneficiaryDetails(id); // 👈 call beneficiary details API
-       
+        this.fetchBeneficiaryDetails(id);
       });
     }
   }
-
+  getRevisionMessage(revisionType: string): string {
+    switch (revisionType) {
+      case 'ADD':
+        return 'User added information to the system';
+      case 'DEL':
+        return 'User deleted information from the system';
+      case 'MOD':
+        return 'User modified information in the system';
+      default:
+        return 'Unknown revision type';
+    }
+  }
   fetchBeneficiaryDetails(householdId: string) {
     this.isLoading = true;
     this.api
-      .GET(`api/audit/beneficiary/${householdId}`) 
+      .GET(`api/audit/beneficiary/${householdId}`)
       .then((res: any) => {
         this.activeStatus = res?.data?.activeStatus ?? null;
-        console.log('Active status details:', this.activeStatus);
-        const dto = res?.data as BeneficiaryDto;
-        this.beneficiaryDetails = this.mapToVm(dto);
-        this.prepareFingerImages(dto.biometrics);
+        this.auditRecords = res?.data?.auditRecords || [];
+
+        this.revisionOptions = this.auditRecords.map((record) => ({
+          label: `Version ${record.version} (Revision ${record.revision})`,
+          value: `Revision ${record.revision}`,
+          version: record.version,
+        }));
+
+        if (this.auditRecords.length > 0) {
+          const latestRecord = this.auditRecords.reduce((max, record) =>
+            record.version > max.version ? record : max
+          );
+
+          this.selectedRevision = `Revision ${latestRecord.revision}`;
+          this.loadRevisionData(latestRecord.revision);
+        }
       })
       .catch((err) => console.error('Error loading beneficiary details:', err))
       .finally(() => {
@@ -203,7 +218,28 @@ export class BeneficiaryAuditDetails implements OnInit {
       });
   }
 
+  selectRevision(revision: string) {
+    this.selectedRevision = revision;
+    const revisionNumber = parseInt(revision.replace('Revision ', ''));
+    this.loadRevisionData(revisionNumber);
+  }
 
+  loadRevisionData(revisionNumber: number) {
+    const record = this.auditRecords.find((r) => r.revision === revisionNumber);
+    if (record) {
+      const dto = record.data as BeneficiaryDto;
+      this.beneficiaryDetails = this.mapToVm(dto);
+      this.prepareFingerImages(dto.biometrics);
+
+      this.userInfo = {
+        userId: record.userId,
+        timestamp: record.timestamp,
+        revisionType: record.revisionType,
+      };
+
+      this.cdr.detectChanges();
+    }
+  }
 
   private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     // Helper functions to normalize images
@@ -517,7 +553,4 @@ export class BeneficiaryAuditDetails implements OnInit {
       ]);
     }
   }
-
-
-
 }
