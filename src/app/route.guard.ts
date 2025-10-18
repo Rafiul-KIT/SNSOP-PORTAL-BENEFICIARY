@@ -25,20 +25,20 @@ export const routeGuard: CanActivateChildFn = (route: any) => {
   try {
     decoded = jwtDecode(token);
   } catch {
-    router.navigateByUrl('http://master.snsopmis.com/#/landing'); // If decoding fails, redirect to the landing page
+    router.navigateByUrl('/landing'); // If decoding fails, redirect to the landing page
     return false; // Prevent access to the route
   }
 
   // Step 3: Check if the token is expired
   if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-    router.navigateByUrl('http://master.snsopmis.com/#/landing'); // If expired, redirect to landing
+    router.navigateByUrl('/landing'); // If expired, redirect to landing
     return false; // Prevent access to the route
   }
 
   // Step 4: Get the menus from sessionStorage for the current user's role
   const menus = sessionStorage.getItem(`menus_${decoded.roleId}`);
   if (!menus) {
-    router.navigateByUrl('http://master.snsopmis.com/#/unauthorized'); // If no menus found in sessionStorage, redirect to unauthorized
+    router.navigateByUrl('/unauthorized'); // If no menus found in sessionStorage, redirect to unauthorized
     return false; // Prevent access to the route
   }
 
