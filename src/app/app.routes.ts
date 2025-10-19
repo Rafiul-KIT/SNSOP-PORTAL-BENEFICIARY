@@ -31,7 +31,7 @@ export const routes: Routes = [
   {
     component: MatchList,
     path: 'match-list/:id',
-    canActivate: [routeGuard],
+    // canActivate: [routeGuard],
   },
   {
     path: 'beneficiary',
