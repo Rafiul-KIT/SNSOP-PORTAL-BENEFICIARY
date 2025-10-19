@@ -389,7 +389,7 @@ export class BeneficiaryAudit implements OnInit {
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
     this.router.navigate([
-      '/beneficiary/audit-details',
+      '/beneficiary-audit/audit-details',
       String(b.applicationId),
     ]);
   }

@@ -286,13 +286,13 @@ export class BeneficiaryEditApprovalList implements OnInit {
     // Check the taskType and determine the route accordingly
     switch (b.taskType) {
       case 'BENEFICIARY_EDIT':
-        route = '/beneficiary-edit-details';
+        route = 'beneficiary-approval/edit-details';
         break;
       case 'BENEFICIARY_MIGRATION':
-        route = '/beneficiary-migrate-details';
+        route = 'beneficiary-approval/migrate-details';
         break;
       case 'BENEFICIARY_DELETE':
-        route = '/beneficiary-archive-details';
+        route = 'beneficiary-approval/archive-details';
         break;
       default:
         console.error('Unknown taskType:', b.taskType);

@@ -17,13 +17,14 @@ import { BeneficiaryAudit } from './pages/beneficiary/beneficiary-audit/benefici
 import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-details/beneficiary-audit-details';
 import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudication-list';
 import { MatchList } from './pages/adjudication/match-list/match-list';
+import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-restore-details/beneficiary-restore-details';
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
     canActivate: [routeGuard],
   },
-    {
+  {
     component: AdjudicationList,
     path: 'adjudication-list',
     canActivate: [routeGuard],
@@ -41,65 +42,77 @@ export const routes: Routes = [
         path: 'list',
         component: BeneficiaryList,
       },
-       {
-        path: 'details/:id',
-        component: BeneficiaryDetails
-      },
       {
-        path: 'audit-details/:id',
-        component: BeneficiaryAuditDetails
+        path: 'details/:id',
+        component: BeneficiaryDetails,
       },
+      // {
+      //   path: 'audit-details/:id',
+      //   component: BeneficiaryAuditDetails
+      // },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
       },
-        {
-        path: 'audit',
-        component: BeneficiaryAudit,
-      },
+      //   {
+      //   path: 'audit',
+      //   component: BeneficiaryAudit,
+      // },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
       },
+      // {
+      //   path: 'id-card',
+      //   component: BeneficiaryIdCard,
+      // },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
+  },
+  {
+    path: 'beneficiary-approval',
+    canActivate: [routeGuard],
+    children: [
+      { path: 'list', component: BeneficiaryEditApprovalList },
       {
-        path: 'id-card',
-        component: BeneficiaryIdCard,
+        path: 'edit-details/:id',
+        component: BeneficiaryEditApprovalDetails,
       },
       {
-        path: 'restore',
-        component: BeneficiaryRestore,
+        path: 'migrate-details/:id',
+        component: BeneficiaryMigrateApprovalDetails,
+      },
+      {
+        path: 'archive-details/:id',
+        component: BeneficiaryArchiveApprovalDetails,
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
   {
-    path: 'beneficiary-approval-list',
+    path: 'beneficiary-audit',
     canActivate: [routeGuard],
     children: [
-      { path: 'edit', component: BeneficiaryEditApprovalList },
-      { path: '', pathMatch: 'full', redirectTo: 'edit' },
+      { path: 'audit', component: BeneficiaryAudit },
+      { path: 'audit-details/:id', component: BeneficiaryAuditDetails },
+      { path: '', pathMatch: 'full', redirectTo: 'audit' },
     ],
   },
   {
-    path: 'beneficiary-edit-details/:id',
-    canActivate: [routeGuard],
-    component: BeneficiaryEditApprovalDetails,
-  },
-   {
     path: 'report',
     canActivate: [routeGuard],
     component: ReportComponent,
   },
-  {
-    path: 'beneficiary-migrate-details/:id',
+   {
+    path: 'restore',
     canActivate: [routeGuard],
-    component: BeneficiaryMigrateApprovalDetails,
+    children: [
+      { path: 'list', component: BeneficiaryRestore },
+      { path: 'details/:id', component: BeneficiaryRestoreDetails },
+      { path: '', pathMatch: 'full', redirectTo: 'audit' },
+    ],
   },
-  {
-    path: 'beneficiary-archive-details/:id',
-    canActivate: [routeGuard],
-    component: BeneficiaryArchiveApprovalDetails,
-  },
+
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,

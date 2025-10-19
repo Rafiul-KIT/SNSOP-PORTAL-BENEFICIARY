@@ -412,7 +412,7 @@ export class BeneficiaryRestore implements OnInit {
   // ---------- Actions ----------
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/details', String(b.applicationId)]);
+    this.router.navigate(['restore/details', String(b.applicationId)]);
   }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;

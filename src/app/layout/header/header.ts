@@ -22,10 +22,22 @@ export class Header {
   menusLoaded = false; // ✅ controls when to render
 
   portalList = [
-    { label: 'Beneficiary', link: environment.portals.beneficiary, icon: 'fas fa-user-friends' },
-    { label: 'Payment', link: environment.portals.payment, icon: 'fas fa-credit-card' },
+    {
+      label: 'Beneficiary',
+      link: environment.portals.beneficiary,
+      icon: 'fas fa-user-friends',
+    },
+    {
+      label: 'Payment',
+      link: environment.portals.payment,
+      icon: 'fas fa-credit-card',
+    },
     { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
-    { label: 'Report', link: environment.portals.report, icon: 'fas fa-chart-line' },
+    {
+      label: 'Report',
+      link: environment.portals.report,
+      icon: 'fas fa-chart-line',
+    },
     { label: 'Settings', icon: 'fas fa-cog' },
     { label: 'Survey CTO', icon: 'fas fa-poll' },
   ];
@@ -54,7 +66,10 @@ export class Header {
       );
 
       if (response && Array.isArray(response.data)) {
-        sessionStorage.setItem(`menus_${roleId}`, JSON.stringify(response.data));
+        sessionStorage.setItem(
+          `menus_${roleId}`,
+          JSON.stringify(response.data)
+        );
 
         // Handle empty response
         if (response.data.length === 0) {
@@ -82,32 +97,99 @@ export class Header {
 
   getStaticMenus(): any[] {
     return [
-      { label: 'Dashboard', icon: 'fas fa-tachometer-alt', routerLink: 'dashboard' },
+      {
+        label: 'Dashboard',
+        icon: 'fas fa-tachometer-alt',
+        routerLink: 'dashboard',
+      },
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
-          { label: 'Beneficiary List', icon: 'fas fa-list', routerLink: 'beneficiary/list' },
-          { label: 'Approval List', icon: 'fas fa-user-check', routerLink: 'beneficiary-approval-list/edit' },
+          {
+            label: 'Beneficiary List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary/list',
+          },
+          // {
+          //   label: 'Approval List',
+          //   icon: 'fas fa-user-check',
+          //   routerLink: 'beneficiary-approval-list/edit',
+          // },
         ],
       },
-      { label: 'Adjudication', icon: 'fas fa-users-viewfinder', routerLink: 'adjudication-list' },
-      { label: 'Beneficiary ID Cards', icon: 'fas fa-id-card', routerLink: 'id-card' },
+      {
+        label: 'Approval List',
+        icon: 'fas fa-user-check',
+        items: [
+          {
+            label: 'List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary-approval/list',
+          },
+          // {
+          //   label: 'Approval List',
+          //   icon: 'fas fa-user-check',
+          //   routerLink: 'beneficiary-approval-list/edit',
+          // },
+        ],
+      },
+      {
+        label: 'Adjudication',
+        icon: 'fas fa-users-viewfinder',
+        routerLink: 'adjudication-list',
+      },
+      {
+        label: 'Beneficiary ID Cards',
+        icon: 'fas fa-id-card',
+        routerLink: 'id-card',
+      },
       { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },
-      { label: 'Work Progress', icon: 'fas fa-chart-line', routerLink: 'work-progress' },
-      { label: 'LIPW Export', icon: 'fas fa-file-export', routerLink: 'lipw-export' },
+      {
+        label: 'Work Progress',
+        icon: 'fas fa-chart-line',
+        routerLink: 'work-progress',
+      },
+      {
+        label: 'LIPW Export',
+        icon: 'fas fa-file-export',
+        routerLink: 'lipw-export',
+      },
       { label: 'Report', icon: 'fas fa-file-alt', routerLink: 'report' },
-      { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary/audit' },
-      { label: 'Archived Beneficiary', icon: 'fas fa-trash-restore', routerLink: 'beneficiary/restore' },
+      // { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary-audit/audit' },
+      {
+        label: 'Beneficiary Audit',
+        icon: 'fas fa-history',
+        items: [
+          {
+            label: 'Audit List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary-audit/audit',
+          },
+        ],
+      },
+      {
+        label: 'Archived Beneficiary',
+        icon: 'fas fa-trash-restore',
+        items: [
+          {
+            label: 'Archived List',
+            icon: 'fas fa-list',
+            routerLink: 'restore/list',
+          },
+        ],
+      },
     ];
   }
 
   filterMenusByAccess(menus: any[], allowed: string[]): any[] {
     return menus
-      .filter(menu => allowed.includes(menu.label))
-      .map(menu => ({
+      .filter((menu) => allowed.includes(menu.label))
+      .map((menu) => ({
         ...menu,
-        items: menu.items ? this.filterMenusByAccess(menu.items, allowed) : undefined,
+        items: menu.items
+          ? this.filterMenusByAccess(menu.items, allowed)
+          : undefined,
       }));
   }
 
