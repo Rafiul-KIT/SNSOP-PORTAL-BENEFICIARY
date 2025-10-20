@@ -200,7 +200,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     }
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to approve task #${b.id}?`,
+      message: `Are you sure you want to approve?`,
       header: 'Confirm Approval',
       icon: 'fas fa-check-circle',
       rejectButtonProps: {
@@ -241,7 +241,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     }
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to reject task #${b.id}?`,
+      message: `Are you sure you want to reject?`,
       header: 'Confirm Rejection',
       icon: 'fas fa-ban',
       rejectButtonProps: {

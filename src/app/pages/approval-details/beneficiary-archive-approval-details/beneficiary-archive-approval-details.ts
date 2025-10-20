@@ -135,7 +135,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     {
       label: 'Approval List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary-approval-list/edit',
+      routerLink: '/beneficiary-approval/list',
     },
     { label: 'Beneficiary Archiving Details', icon: 'fas fa-user-cog me-2' },
   ];
@@ -199,7 +199,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
         });
         this.isLoading = false;
         setTimeout(() => {
-          this.router.navigate(['/beneficiary-approval-list/edit']);
+          this.router.navigate(['/beneficiary-approval/list']);
         }, life);
       })
       .catch((err: any) => {
