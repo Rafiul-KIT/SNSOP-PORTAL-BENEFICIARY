@@ -38,7 +38,7 @@ export class Header {
       link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
-    { label: 'Settings', icon: 'fas fa-cog' },
+    { label: 'Settings', link: environment.portals.master, icon: 'fas fa-cog' },
     { label: 'Survey CTO', icon: 'fas fa-poll' },
   ];
 
