@@ -517,7 +517,7 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
 
           // Redirect after a short delay to allow user to see the message
           setTimeout(() => {
-            this.router.navigate(['/beneficiary/restore']);
+            this.router.navigate(['/restore/list']);
           }, 1500);
         } else {
           this.messageService.add({

@@ -5,7 +5,8 @@ export const environment = {
   domain: 'https://devportalmaster.southsudansafetynet.info',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
   portals: {
-    master: 'https://devportalmaster.southsudansafetynet.info/master/#/home/portals',
+    master: 'https://devportalmaster.southsudansafetynet.info/master',
+    masterSettings: 'https://devportalmaster.southsudansafetynet.info/master/#/home/portals/landing',
     beneficiary: 'https://devportalmaster.southsudansafetynet.info/beneficiary',
     payment: 'https://devportalmaster.southsudansafetynet.info/payment',
     grm: 'https://devportalmaster.southsudansafetynet.info/grm',
