@@ -54,6 +54,7 @@ interface BeneficiaryVm {
   respondentGender: Gender;
   respondentAge: number;
   respondentPhoneNo: string;
+  registrationPhase: RegPhase;
   address?: {
     stateId: string;
     countyId: string;
@@ -129,39 +130,37 @@ export class BeneficiaryList implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
+  private async loadLookups() {
+    // Warm the caches (Promises)
+    await Promise.all([
+      this.lookup.getOrFetchStateList(),
+      this.lookup.fetchAllCountyList(),
+      this.lookup.fetchAllPayamList(),
+      this.lookup.fetchAllBomaList(),
+    ]);
 
-  private loadLookups() {
+    // Now read from the sync getters
     this.states = this.lookup.getStateList();
     this.counties = this.lookup.getAllCountyList();
     this.payams = this.lookup.getAllPayamList();
     this.bomas = this.lookup.getAllBomaList();
+
+    // Use MALE/FEMALE ids, not 0/1
     this.genderOptions = this.lookup.getGenderListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+
+    this.cdr.markForCheck();
   }
-  ngOnInit() {
+
+  async ngOnInit() {
     this.initForm();
     this.initBreadcrumb();
 
-    // // Preload all lookup lists first
-    // Promise.all([
-    //   this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
-    //   this.lookup
-    //     .getCountyListByStateId('')
-    //     .then((list) => (this.counties = list)),
-    //   this.lookup
-    //     .getPayamListByCountyId('')
-    //     .then((list) => (this.payams = list)),
-    //   this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
-    // ]).then(() => {
-    this.loadLookups();
-
-    // console.log(this.counties, this.payams, this.bomas);
-
-    // ✅ Only fetch beneficiaries after lookup data is ready
+    await this.loadLookups();                // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
-    // this.cdr.markForCheck();
-    // });
   }
+
+
 
   initForm() {
     this.searchForm = this.fb.group({
@@ -395,12 +394,11 @@ export class BeneficiaryList implements OnInit {
 
   resetForm() {
     this.searchForm.reset();
-    // this.counties = [];
-    // this.payams = [];
-    // this.bomas = [];
-    // this.loadLookups();
-    // this.searchBeneficiaries();
+    this.currentPage = 0;
+    this.fetchPage(this.currentPage, this.pageSize);
   }
+
+
 
   // ---------- Actions ----------
   editBeneficiary(b: BeneficiaryVm) {

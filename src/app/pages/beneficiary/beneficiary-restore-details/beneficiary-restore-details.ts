@@ -134,7 +134,7 @@ export class BeneficiaryRestoreDetails implements OnInit {
       {
         label: 'Beneficiary List',
         icon: 'fas fa-users me-2',
-        routerLink: '/beneficiary/list',
+        routerLink: '/restore/list',
       },
       { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
     ];
