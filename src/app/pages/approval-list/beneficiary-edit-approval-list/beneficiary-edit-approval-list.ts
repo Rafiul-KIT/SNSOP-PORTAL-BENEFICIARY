@@ -200,7 +200,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     }
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to approve task #${b.id}?`,
+      message: `Are you sure you want to approve?`,
       header: 'Confirm Approval',
       icon: 'fas fa-check-circle',
       rejectButtonProps: {
@@ -241,7 +241,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
     }
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to reject task #${b.id}?`,
+      message: `Are you sure you want to reject?`,
       header: 'Confirm Rejection',
       icon: 'fas fa-ban',
       rejectButtonProps: {
@@ -286,13 +286,13 @@ export class BeneficiaryEditApprovalList implements OnInit {
     // Check the taskType and determine the route accordingly
     switch (b.taskType) {
       case 'BENEFICIARY_EDIT':
-        route = '/beneficiary-edit-details';
+        route = 'beneficiary-approval/edit-details';
         break;
       case 'BENEFICIARY_MIGRATION':
-        route = '/beneficiary-migrate-details';
+        route = 'beneficiary-approval/migrate-details';
         break;
       case 'BENEFICIARY_DELETE':
-        route = '/beneficiary-archive-details';
+        route = 'beneficiary-approval/archive-details';
         break;
       default:
         console.error('Unknown taskType:', b.taskType);

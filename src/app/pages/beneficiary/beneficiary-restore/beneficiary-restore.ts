@@ -130,38 +130,33 @@ export class BeneficiaryRestore implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
+  private async loadLookups() {
+    // Warm the caches (Promises)
+    await Promise.all([
+      this.lookup.getOrFetchStateList(),
+      this.lookup.fetchAllCountyList(),
+      this.lookup.fetchAllPayamList(),
+      this.lookup.fetchAllBomaList(),
+    ]);
 
-  private loadLookups() {
+    // Now read from the sync getters
     this.states = this.lookup.getStateList();
     this.counties = this.lookup.getAllCountyList();
     this.payams = this.lookup.getAllPayamList();
     this.bomas = this.lookup.getAllBomaList();
-    this.genderOptions = this.lookup.getGenderListbyId();
+
+    // Use MALE/FEMALE ids, not 0/1
+    this.genderOptions = this.lookup.getGenderList();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+
+    this.cdr.markForCheck();
   }
-  ngOnInit() {
+  async ngOnInit() {
     this.initForm();
     this.initBreadcrumb();
 
-    // // Preload all lookup lists first
-    // Promise.all([
-    //   this.lookup.getOrFetchStateList().then((list) => (this.states = list)),
-    //   this.lookup
-    //     .getCountyListByStateId('')
-    //     .then((list) => (this.counties = list)),
-    //   this.lookup
-    //     .getPayamListByCountyId('')
-    //     .then((list) => (this.payams = list)),
-    //   this.lookup.getBomaListByPayamId('').then((list) => (this.bomas = list)),
-    // ]).then(() => {
-    this.loadLookups();
-
-    // console.log(this.counties, this.payams, this.bomas);
-
-    // ✅ Only fetch beneficiaries after lookup data is ready
+    await this.loadLookups();                // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
-    // this.cdr.markForCheck();
-    // });
   }
 
   initForm() {
@@ -402,17 +397,14 @@ export class BeneficiaryRestore implements OnInit {
 
   resetForm() {
     this.searchForm.reset();
-    this.counties = [];
-    this.payams = [];
-    this.bomas = [];
-    this.loadLookups();
-    this.searchBeneficiaries();
+    this.currentPage = 0;
+    this.fetchPage(this.currentPage, this.pageSize);
   }
 
   // ---------- Actions ----------
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/details', String(b.applicationId)]);
+    this.router.navigate(['restore/details', String(b.applicationId)]);
   }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;

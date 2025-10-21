@@ -570,6 +570,15 @@ export class BeneficiaryManage implements OnInit {
 
       mainIncomeSource: ['', [this.notSelectRequired()]],
       mobileMoneyProvider: ['', [this.notSelectRequired()]],
+      mobileWalletNumber: [
+        '',
+        [
+          this.optionalPattern(
+            this.RGX_PHONE_9,
+            'Phone number length must be 9'
+          ),
+        ],
+      ],
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],
 
@@ -619,6 +628,9 @@ export class BeneficiaryManage implements OnInit {
             : dto.respondentPhoneNo || '',
           mainIncomeSource: dto.householdIncomeSource,
           mobileMoneyProvider: dto.mobileMoneyProvider,
+          mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
+            ? dto.mobileWalletNumber.substring(4)
+            : dto.mobileWalletNumber || '',
           otherIncomeSource: dto.incomeSourceOther,
           avgMonthlyIncome: dto.householdMonthlyAvgIncome,
           supportType:
@@ -762,6 +774,8 @@ export class BeneficiaryManage implements OnInit {
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
     payload.mobileMoneyProvider = formValue.mobileMoneyProvider;
+    const wphone = formValue.mobileWalletNumber?.toString().trim();
+    payload.mobileWalletNumber = phone ? `+211${wphone}` : '';
     payload.incomeSourceOther = formValue.otherIncomeSource;
     payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
 
@@ -1253,6 +1267,7 @@ export class BeneficiaryManage implements OnInit {
       idTypeOther: 'ID Type Other',
       respondentIdNumber: 'ID Number',
       respondentPhone: 'Phone Number',
+      mobileWalletNumber: 'Mobile Wallet Number',
 
       // Alternate/Nominee fields
       payeeFirstName: 'First Name',
@@ -1324,7 +1339,7 @@ export class BeneficiaryManage implements OnInit {
 
     // Pattern validation (for phone)
     if (errors['pattern']) {
-      if (fieldName === 'respondentPhone' || fieldName === 'payeePhoneNo') {
+      if (fieldName === 'respondentPhone' || fieldName === 'payeePhoneNo' || fieldName == 'mobileWalletNumber') {
         return 'Phone number must be exactly 9 digits';
       }
       return `${label} format is invalid`;

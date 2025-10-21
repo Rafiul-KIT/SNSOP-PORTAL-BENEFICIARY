@@ -145,7 +145,7 @@ export class BeneficiaryEditApprovalDetails {
     {
       label: 'Approval List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary-approval-list/edit',
+      routerLink: '/beneficiary-approval/list',
     },
     { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
   ];
@@ -212,7 +212,7 @@ export class BeneficiaryEditApprovalDetails {
         });
         this.isLoading = false;
         setTimeout(() => {
-          this.router.navigate(['/beneficiary-approval-list/edit']);
+          this.router.navigate(['/beneficiary-approval/list']);
         }, life);
       })
       .catch((err: any) => {

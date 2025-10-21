@@ -126,22 +126,36 @@ export class BeneficiaryAudit implements OnInit {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
-  private loadLookups() {
+  private async loadLookups() {
+    // Warm the caches (Promises)
+    await Promise.all([
+      this.lookup.getOrFetchStateList(),
+      this.lookup.fetchAllCountyList(),
+      this.lookup.fetchAllPayamList(),
+      this.lookup.fetchAllBomaList(),
+    ]);
+
+    // Now read from the sync getters
     this.states = this.lookup.getStateList();
     this.counties = this.lookup.getAllCountyList();
     this.payams = this.lookup.getAllPayamList();
     this.bomas = this.lookup.getAllBomaList();
-    this.genderOptions = this.lookup.getGenderListbyId();
+
+    // Use MALE/FEMALE ids, not 0/1
+    this.genderOptions = this.lookup.getGenderList();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+
+    this.cdr.markForCheck();
   }
-  ngOnInit() {
+
+
+  async ngOnInit() {
     this.initForm();
     this.initBreadcrumb();
 
-    this.loadLookups();
-
+    await this.loadLookups();                // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
@@ -312,19 +326,19 @@ export class BeneficiaryAudit implements OnInit {
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
-            String(b.address.stateId)
+          String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) ||
-            String(b.address.countyId)
+          String(b.address.countyId)
           : '',
         payamName: b.address?.payam
           ? this.lookup.getPayamNameById(b.address.payam) ||
-            String(b.address.payam)
+          String(b.address.payam)
           : '',
         bomaName: b.address?.boma
           ? this.lookup.getBomaNameById(b.address.boma) ||
-            String(b.address.boma)
+          String(b.address.boma)
           : '',
       };
     });
@@ -377,11 +391,8 @@ export class BeneficiaryAudit implements OnInit {
 
   resetForm() {
     this.searchForm.reset();
-    this.counties = [];
-    this.payams = [];
-    this.bomas = [];
-    this.loadLookups();
-    this.searchBeneficiaries();
+    this.currentPage = 0;
+    this.fetchPage(this.currentPage, this.pageSize);
   }
 
   // ---------- Actions ----------
@@ -389,7 +400,7 @@ export class BeneficiaryAudit implements OnInit {
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
     this.router.navigate([
-      '/beneficiary/audit-details',
+      '/beneficiary-audit/audit-details',
       String(b.applicationId),
     ]);
   }

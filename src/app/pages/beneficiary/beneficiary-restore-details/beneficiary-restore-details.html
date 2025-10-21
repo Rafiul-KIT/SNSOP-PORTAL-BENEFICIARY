@@ -1,0 +1,671 @@
+<div class="position-relative">
+  <div class="breadcrumb-wrapper">
+    <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+  </div>
+  @if (isLoading) {
+  <app-loader />
+  } @else { @if (beneficiaryDetails) {
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Beneficiary Information</p-tab>
+      <p-tab value="1">Alternate Information</p-tab>
+      <p-tab value="2">Nominee Information</p-tab>
+      @if(activeStatus === 1){
+      <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
+
+        <p-button type="button" icon="fas fa-trash-restore" pTooltip="Restore" tooltipPosition="bottom" appendTo="body"
+          size="small" severity="primary" class="me-1" label="Restore" (onClick)="restoreBeneficiary()" />
+      </div>
+
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- =========================
+               TAB: Beneficiary Information
+          ========================== -->
+      <p-tabpanel value="0">
+        <div class="px-5" style="height: calc(100vh - 210px);  overflow-y: auto">
+
+          <div class="row g-2">
+
+            <!-- Personal Info -->
+            <div class="col-12 col-md-4">
+              <div class="card shadow-sm rounded">
+                <div class="card-header bg-gray text-black">
+                  Personal Information
+                </div>
+                <div class="card-body text-center">
+                  <img [src]="beneficiaryDetails.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
+                    width="200" />
+                  <table class="table table-bordered table-sm text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Application ID</th>
+                        <td>{{ beneficiaryDetails.applicationId }}</td>
+                      </tr>
+                      <tr>
+                        <th>Name</th>
+                        <td>{{ beneficiaryDetails.name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ beneficiaryDetails.age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ beneficiaryDetails.gender }}</td>
+                      </tr>
+                      <tr>
+                        <th>Relationship</th>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(
+                          beneficiaryDetails.relationshipWithHouseholdHead
+                          )
+                          }}
+                          @if (
+                          beneficiaryDetails.relationshipWithHouseholdHead === 'OTHER' &&
+                          beneficiaryDetails.relationshipOther
+                          ) {
+                          ({{ beneficiaryDetails.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Marital Status</th>
+                        <td>{{ beneficiaryDetails.respondentMaritalStatus }}</td>
+                      </tr>
+                      <tr>
+                        <th>Spouse Name</th>
+                        <td>{{ beneficiaryDetails.spouseName }}</td>
+                      </tr>
+                      <tr>
+                        <th>Legal Status</th>
+                        <td>{{ beneficiaryDetails.respondentLegalStatus }}</td>
+                      </tr>
+                      <tr>
+                        <th>ID Number (Type)</th>
+                        <td>{{ beneficiaryDetails.respondentId }} ({{
+                          lookup.getDocumentTypeEnumByValue(beneficiaryDetails.documentType) }})</td>
+                      </tr>
+                      <tr>
+                        <th>Mobile Money Provider</th>
+                        <td>{{ beneficiaryDetails.mobileMoneyProvider }}</td>
+                      </tr>
+                      <tr>
+                        <th>Mobile Wallet Number</th>
+                        <td>{{ beneficiaryDetails.mobileWalletNumber }}</td>
+                      </tr>
+                      <tr>
+                        <th>Registration Phase</th>
+                        <td>{{ beneficiaryDetails.registrationPhase }}</td>
+                      </tr>
+                      <tr>
+                        <th>Phone</th>
+                        <td>{{ beneficiaryDetails.phone }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card shadow-sm rounded mt-2">
+                <div class="card-header bg-gray text-black">
+                  Biometric Fingerprints
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered text-center mb-0">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of rightFingers; track f) {
+                          <td>
+                            <img [pTooltip]="f.tooltip" tooltipPosition="top" [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of leftFingers; track f) {
+                          <td>
+                            <img [pTooltip]="f.tooltip" tooltipPosition="top" [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fingerprints -->
+            <div class="col-12 col-md-8">
+              <div class="card">
+                <p-accordion value="0">
+                  <!-- Household -->
+                  <p-accordion-panel value="0">
+                    <p-accordion-header>Household Information</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th>Income Source</th>
+                                <td>
+                                  {{
+                                  lookup.getIncomeSourceEnumByValue(
+                                  beneficiaryDetails.household?.incomeSource
+                                  )
+                                  }}
+                                  @if (
+                                  beneficiaryDetails.household?.incomeSource === 'OTHER' &&
+                                  beneficiaryDetails.household?.incomeSourceOther
+                                  ) {
+                                  ({{ beneficiaryDetails.household?.incomeSourceOther }})
+                                  }
+                                </td>
+                              </tr>
+
+
+                              <tr>
+                                <th>Monthly Avg Income</th>
+                                <td>
+                                  {{ beneficiaryDetails.household?.monthlyIncome
+                                  || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Selection Criteria</th>
+                                <td>
+                                  {{
+                                  beneficiaryDetails.household?.selectionCriteria
+                                  || '-' }}
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Selection Reasons</th>
+                                <td>
+                                  @if
+                                  (beneficiaryDetails.household?.selectionReasons?.length)
+                                  {
+                                  <ul>
+                                    @for (r of
+                                    beneficiaryDetails.household.selectionReasons;
+                                    track r; let i = $index) {
+                                    <li>{{ i + 1 }}. {{ r }}</li>
+                                    }
+                                  </ul>
+                                  } @else { N/A }
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th colspan="8" class="bg-secondary text-light text-center">
+                                  Total Member: {{ beneficiaryDetails.householdSize }}
+                                </th>
+                              </tr>
+                              <tr>
+                                <th class="table-label">Female Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember2?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Male Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember2?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember5?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember17?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember35?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember64?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember65?.maleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Chronically ill Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember2?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember2?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember2?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember2?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember5?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember5?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember17?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember17?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember35?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember35?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember64?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember64?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember65?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember65?.maleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleChronicalIll || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Member with Disability</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember2?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember2?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember2?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember2?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMember5?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember5?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMember17?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember17?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMember35?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember35?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMember64?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember64?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMember65?.maleBoth || 0) +
+                                  (beneficiaryDetails.householdMember65?.maleDisable || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleDisable || 0)
+                                  }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th class="table-label">0–2 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember2?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember2?.femaleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">3–5 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember5?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember5?.femaleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">6–17 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember17?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember17?.femaleTotal || 0)
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th class="table-label">18–35 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember35?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember35?.femaleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">36–64 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember64?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember64?.femaleTotal || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">64+ Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (beneficiaryDetails.householdMember65?.maleTotal || 0) +
+                                  (beneficiaryDetails.householdMember65?.femaleTotal || 0)
+                                  }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+
+                          <table class="table table-bordered mb-0 mt-3">
+                            <tbody>
+                              <tr>
+                                <th>
+                                  Not including yourself, how many other members
+                                  of your household are between 18 and 35 and
+                                  can read and write
+                                </th>
+                                <td class="text-center">
+                                  {{
+                                  beneficiaryDetails.household?.memberReadWrite
+                                  ?? 0 }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>
+                                  Respondent Can read/Write (Any Language)
+                                </th>
+                                <td class="text-center">
+                                  {{ beneficiaryDetails.household?.isReadWrite
+                                  === true ? 'Yes' :
+                                  beneficiaryDetails.household?.isReadWrite ===
+                                  false ? 'No' : '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+
+                  <!-- Address -->
+                  <p-accordion-panel value="1">
+                    <p-accordion-header>Address Information</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th style="width: 180px">State</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.state || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>County</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.county || '-'
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Payam</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.payam || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Boma</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.boma || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Latitude</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.lat || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Longitude</th>
+                                <td>
+                                  {{ beneficiaryDetails.address?.lon || '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                </p-accordion>
+              </div>
+            </div>
+          </div>
+
+          <!-- =========================
+                 Accordion inside the same tab
+                 (Household, Address, Alternate)
+            ========================== -->
+          <!-- <div class="mt-3">
+
+        </div> -->
+        </div>
+      </p-tabpanel>
+
+      <!-- =========================
+           TAB: Alternate Information
+      ========================== -->
+      <p-tabpanel value="1">
+        <div class="px-5" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="row g-3">
+            @if (!beneficiaryDetails.alternates.length) {
+            <div class="col-12">
+              <div class="alert alert-warning  text-center mb-0">
+                No Alternate Payee Information Provided
+              </div>
+            </div>
+            } @for (alt of beneficiaryDetails.alternates; track alt; let i = $index) {
+            <div class="col-12 col-md-6">
+              <div class="card shadow-sm rounded h-100">
+                <div class="card-header bg-gray text-black text-center">
+                  Alternate {{ i + 1 }}
+                </div>
+                <div class="card-body text-center">
+                  <img [src]="alt.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3" width="200" />
+
+                  @if (alt.biometrics) {
+                  <div class="table-responsive mb-3">
+                    <table class="table table-bordered text-center">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt.rightFingers; track f) {
+                          <td>
+                            <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt.leftFingers; track f) {
+                          <td>
+                            <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  }
+
+                  <table class="table table-sm table-bordered text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th style="width: 160px">Name</th>
+                        <td>{{ alt.name || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ alt.age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ alt.gender || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Alternate Relationship</th>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
+                          }}
+                          @if (
+                          alt.relationshipWithHouseholdHead === 'OTHER' && alt.relationshipOther
+                          ) {
+                          ({{ alt.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>ID</th>
+                        <td>{{ alt.nationalId || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Document Type</th>
+                        <td>{{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}</td>
+                      </tr>
+                      <tr>
+                        <th>Phone</th>
+                        <td>{{ alt.phone || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+
+
+      <!-- =========================
+               TAB: Nominee Information
+          ========================== -->
+      <p-tabpanel value="2">
+        <div class="px-5" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="row">
+            @for (nominee of beneficiaryDetails.nominees; track nominee; let i =
+            $index) {
+            <div class="col-md-6">
+              <div class="card shadow-sm rounded mb-3">
+                <div class="card-header bg-gray text-black text-center">
+                  Nominee {{ i + 1 }}
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Name</th>
+                        <td>{{ nominee.name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ nominee.age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ nominee.gender }}</td>
+                      </tr>
+                      <tr>
+                        <th>Relation</th>
+                        <td>
+                          {{ lookup.getRelationshipEnumByValue(nominee.relation) }}
+                          {{ nominee.relation === 'OTHER' ? '(' + nominee.relationshipOther + ')' : '' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Occupation</th>
+                        <td>{{ nominee.nomineeOccupation }}</td>
+
+                      </tr>
+                      <tr>
+                        <th>
+                          Can read/Write
+                        </th>
+                        <td>
+                          {{ nominee.isReadWrite
+                          === true ? 'Yes' :
+                          nominee.isReadWrite ===
+                          false ? 'No' : '-' }}
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            } @if (!beneficiaryDetails.nominees.length) {
+            <div class="col-12">
+              <div class="alert alert-warning text-center">
+                No Nominee Information Provided
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  <!-- ===== Actions: Comment + Approve/Reject ===== -->
+  <!--<hr class="my-4" />
+  <div class="card shadow-sm rounded">
+    <div class="card-header bg-gray text-black">Approval Comment</div>
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="approvalComment" class="form-label">Comment (optional)</label>
+        <textarea class="form-control" rows="4" (input)="approvalComment = $any($event.target).value"></textarea>
+      </div>
+      <div class="d-flex gap-2 justify-content-end">
+        <p-button severity="danger" label="Reject" outlined="true" icon="fas fa-times"
+          (click)="onReject(approvalComment)" [disabled]="isLoading || isSubmitting" />
+        <p-button severity="success" label="Approve" outlined="true" icon="fas fa-check"
+          (onClick)="onApprove(approvalComment)" [disabled]="isLoading || isSubmitting" />
+      </div>
+    </div>
+  </div>-->
+  } }
+</div>
+
+<p-toast position="bottom-right" />
+<p-dialog header="Confirm Restore" [(visible)]="isRestoreDialogVisible" [modal]="true" [style]="{ width: '450px' }">
+  <div class="p-fluid">
+    <div class="field">
+        <label for="restore-comment">Please provide a comment before restoring:</label>
+        <textarea id="restore-comment" rows="3" pInputTextarea [(ngModel)]="restoreComment"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="fas fa-times" (click)="cancelRestore()" label="No" styleClass="p-button-danger"></p-button>
+    <p-button icon="fas fa-check" (click)="confirmRestore()" label="Yes" styleClass="p-button-success"></p-button>
+  </ng-template>
+</p-dialog>

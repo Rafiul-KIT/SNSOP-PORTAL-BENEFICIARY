@@ -19,6 +19,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
+    provideHttpClient(),
     provideRouter(routes, withHashLocation()),
     provideAnimationsAsync(),
     providePrimeNG({
@@ -26,7 +27,7 @@ export const appConfig: ApplicationConfig = {
         preset: Aura,
       }
     }),
-    
+
     MessageService
   ],
 };

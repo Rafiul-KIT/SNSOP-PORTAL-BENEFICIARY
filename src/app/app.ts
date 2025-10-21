@@ -12,7 +12,7 @@ import { Loader } from './components/loader/loader';
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
-  protected title = 'snsop-mf-portal-master';
+  protected title = 'snsop-mf-portal-beneficiary';
   isLoading: boolean = true;
   constructor(private lookup: LookupService, private cdr: ChangeDetectorRef) {}
 
