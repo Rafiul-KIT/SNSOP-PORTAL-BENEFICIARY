@@ -146,7 +146,7 @@ export class BeneficiaryRestore implements OnInit {
     this.bomas = this.lookup.getAllBomaList();
 
     // Use MALE/FEMALE ids, not 0/1
-    this.genderOptions = this.lookup.getGenderList();
+    this.genderOptions = this.lookup.getGenderListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
     this.cdr.markForCheck();

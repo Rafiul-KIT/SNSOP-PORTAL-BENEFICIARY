@@ -59,20 +59,12 @@ export class Header {
 
   async loadMenusForUser(roleId: number) {
     try {
-      const response = await firstValueFrom(
-        this.http.get<any>(
-          `https://devgwapp.southsudansafetynet.info/mis_auth/api/menus/role/${roleId}`
-        )
-      );
-
-      if (response && Array.isArray(response.data)) {
-        sessionStorage.setItem(
-          `menus_${roleId}`,
-          JSON.stringify(response.data)
-        );
+      const menus = sessionStorage.getItem(`menus_${roleId}`);
+      if (menus) {
+        const responseData = JSON.parse(menus);
 
         // Handle empty response
-        if (response.data.length === 0) {
+        if (responseData.length === 0) {
           console.warn(`No menus found for role ${roleId}`);
           this.menuList = [];
           this.menusLoaded = true;
@@ -80,11 +72,16 @@ export class Header {
           return;
         }
 
-        const allowedNames = response.data.map((menu: any) => menu.name);
+        const allowedNames = responseData.map((menu: any) => menu.name);
         const allMenus = this.getStaticMenus();
 
         // ✅ Update safely and trigger view refresh
         this.menuList = this.filterMenusByAccess(allMenus, allowedNames);
+        this.menusLoaded = true;
+        this.cdRef.detectChanges();
+      } else {
+        console.warn(`No menus found in sessionStorage for role ${roleId}`);
+        this.menuList = [];
         this.menusLoaded = true;
         this.cdRef.detectChanges();
       }

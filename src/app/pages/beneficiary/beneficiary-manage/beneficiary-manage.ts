@@ -571,13 +571,13 @@ export class BeneficiaryManage implements OnInit {
       mainIncomeSource: ['', [this.notSelectRequired()]],
       mobileMoneyProvider: ['', [this.notSelectRequired()]],
       mobileWalletNumber: [
-        '',
-        [
-          this.optionalPattern(
-            this.RGX_PHONE_9,
-            'Phone number length must be 9'
-          ),
-        ],
+        ''
+        // [
+        //   this.optionalPattern(
+        //     this.RGX_PHONE_9,
+        //     'Phone number length must be 9'
+        //   ),
+        // ],
       ],
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],

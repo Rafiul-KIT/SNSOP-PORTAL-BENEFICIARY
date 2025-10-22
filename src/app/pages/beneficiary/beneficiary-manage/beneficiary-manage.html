@@ -343,15 +343,15 @@
                     <div class="input-group">
                       <span class="input-group-text bg-light border-end-0">+211</span>
                       <input pInputText id="mobileWalletNumber" formControlName="mobileWalletNumber"
-                        class="form-control border-start-0" maxlength="9" placeholder="Enter 9-digit number"
-                        [ngClass]="{'is-invalid': showError('respondentPhone')}" />
+                        class="form-control border-start-0" maxlength="9" placeholder="Enter 9-digit number"/>
+                        <!-- [ngClass]="{'is-invalid': showError('respondentPhone')}"  -->
                     </div>
                     <label for="mobileWalletNumber">Mobile Wallet Number</label>
                   </p-floatlabel>
 
-                  @if (showError('mobileWalletNumber')) {
+                  <!-- @if (showError('mobileWalletNumber')) {
                   <small class="text-danger">{{ getError('mobileWalletNumber') }}</small>
-                  }
+                  } -->
                 </div>
 
 
