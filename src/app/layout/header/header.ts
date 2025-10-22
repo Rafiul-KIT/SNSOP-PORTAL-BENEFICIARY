@@ -38,7 +38,11 @@ export class Header {
       link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
-    { label: 'Settings', link: environment.portals.masterSettings, icon: 'fas fa-cog' },
+    {
+      label: 'Settings',
+      link: environment.portals.masterSettings,
+      icon: 'fas fa-cog',
+    },
     { label: 'Survey CTO', icon: 'fas fa-poll' },
   ];
 
@@ -103,6 +107,11 @@ export class Header {
         routerLink: 'dashboard',
       },
       {
+        label: 'New Register',
+        icon: 'fas fa-id-card',
+        routerLink: 'newRegister',
+      },
+      {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
@@ -118,18 +127,8 @@ export class Header {
           // },
         ],
       },
-            {
-        label: 'New Register',
-        icon: 'fas fa-people-group',
-        items: [
-          {
-            label: 'Beneficiary Verification',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary/list',
-          },
-       
-        ],
-      },
+ 
+
       {
         label: 'Approval List',
         icon: 'fas fa-user-check',
@@ -146,6 +145,7 @@ export class Header {
           // },
         ],
       },
+
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
@@ -191,6 +191,7 @@ export class Header {
           },
         ],
       },
+ 
     ];
   }
 
