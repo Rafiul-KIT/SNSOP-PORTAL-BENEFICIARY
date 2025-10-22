@@ -118,6 +118,18 @@ export class Header {
           // },
         ],
       },
+            {
+        label: 'New Register',
+        icon: 'fas fa-people-group',
+        items: [
+          {
+            label: 'Beneficiary Verification',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary/list',
+          },
+       
+        ],
+      },
       {
         label: 'Approval List',
         icon: 'fas fa-user-check',

@@ -69,6 +69,18 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
+   {
+    path: 'newRegister',
+    canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryList,
+      },
+   
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
+  },
   {
     path: 'beneficiary-approval',
     canActivate: [routeGuard],
