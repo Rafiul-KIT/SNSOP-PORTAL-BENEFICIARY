@@ -209,7 +209,7 @@ export class Dashboard implements OnInit {
             data: targetCounts,
             label: 'Target',
             backgroundColor: '#00924b',
-            borderColor: '#007a3d',
+            borderColor: '#00924b',
             borderWidth: 2,
 
             hoverBackgroundColor: '#007a3d',
@@ -453,7 +453,6 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.genderLegendOptions = this.buildLegendOptions();
     this.supportLegendOptions = this.buildLegendOptions();
-
     this.getSummary();
     this.cdr.detectChanges();
   }
