@@ -2,6 +2,7 @@ import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
+  APP_INITIALIZER
 } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withHashLocation } from '@angular/router';
@@ -12,8 +13,13 @@ import Aura from '@primeuix/themes/aura';
 // 👇 Import HttpClient + interceptor
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
+import { PermissionService } from './services/permission.service';
 
-
+export function initializeApp(permissionService: PermissionService) {
+  return (): Promise<any> => {
+    return permissionService.loadPermissions();
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,7 +33,13 @@ export const appConfig: ApplicationConfig = {
         preset: Aura,
       }
     }),
-
-    MessageService
+    MessageService,
+    PermissionService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [PermissionService],
+      multi: true
+    }
   ],
 };

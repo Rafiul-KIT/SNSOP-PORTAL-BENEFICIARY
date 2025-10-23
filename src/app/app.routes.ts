@@ -18,7 +18,7 @@ import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-d
 import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudication-list';
 import { MatchList } from './pages/adjudication/match-list/match-list';
 import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-restore-details/beneficiary-restore-details';
-import { NewRegister } from './pages/beneficiary/new-register/new-register';
+
 export const routes: Routes = [
   {
     component: Dashboard,
@@ -70,11 +70,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-  {
-    path: 'newRegister',
-    canActivate: [routeGuard],
-     component: NewRegister,
-  },
+  
   {
     path: 'beneficiary-approval',
     canActivate: [routeGuard],
