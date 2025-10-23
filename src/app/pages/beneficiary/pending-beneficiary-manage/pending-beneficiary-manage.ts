@@ -160,11 +160,11 @@ export class PendingBeneficiaryManage implements OnInit {
 
   items = [
     {
-      label: 'Beneficiary List',
+      label: 'Pending Beneficiary List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary/list',
+      routerLink: '/pending-beneficiary/list',
     },
-    { label: 'Manage Beneficiary', icon: 'fas fa-user-pen me-2' },
+    { label: 'Pending Beneficiary Edit' , icon: 'fas fa-user-pen me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 

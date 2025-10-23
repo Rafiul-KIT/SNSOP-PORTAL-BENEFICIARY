@@ -182,7 +182,7 @@ selectedBeneficiaries: any[] = [];
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Pending Beneficiary List' }];
   }
 
   // ---------- dependent dropdowns ----------
