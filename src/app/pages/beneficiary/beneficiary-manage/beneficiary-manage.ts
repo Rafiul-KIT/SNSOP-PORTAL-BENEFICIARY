@@ -236,7 +236,7 @@ export class BeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
-    this.beneficiaryForm.get('supportType')?.disable();
+ 
     this.beneficiaryForm
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))

@@ -114,13 +114,24 @@ export class Header {
             routerLink: 'beneficiary/list',
           },
           
-          {
-            label: 'Pending Beneficiary Verification',
-            icon: 'fas fa-user-check',
-            routerLink: 'beneficiary/pending-beneficiary-list',
-          },
+        
         ],
       },
+
+      {
+        label: 'Pending Beneficiaries',
+        icon: 'fas fa-clock',
+        items: [
+          {
+            label: 'Pending List',
+            icon: 'fas fa-list',
+            routerLink: 'pending-beneficiary/list',
+          },
+          
+        
+        ],
+      },
+           
  
 
       {

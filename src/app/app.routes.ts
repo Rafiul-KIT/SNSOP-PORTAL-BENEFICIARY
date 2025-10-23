@@ -18,6 +18,8 @@ import { BeneficiaryAuditDetails } from './pages/beneficiary/beneficiary-audit-d
 import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudication-list';
 import { MatchList } from './pages/adjudication/match-list/match-list';
 import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-restore-details/beneficiary-restore-details';
+import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
+import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
 
 export const routes: Routes = [
   {
@@ -40,6 +42,10 @@ export const routes: Routes = [
     canActivate: [routeGuard],
     children: [
       {
+        path: 'list',
+        component: BeneficiaryList,
+      },
+       {
         path: 'list',
         component: BeneficiaryList,
       },
@@ -70,7 +76,27 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-  
+  {
+    path: 'pending-beneficiary',
+    canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: PendingBeneficiaryList,
+      },
+        {
+        path: 'edit/:applicationId',
+        component: PendingBeneficiaryManage,
+      },
+       
+     
+      // {
+      //   path: 'id-card',
+      //   component: BeneficiaryIdCard,
+      // },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
+  },
   {
     path: 'beneficiary-approval',
     canActivate: [routeGuard],

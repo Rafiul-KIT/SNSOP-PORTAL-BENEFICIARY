@@ -1,0 +1,990 @@
+<div class="breadcrumb-wrapper">
+    <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+
+<p-toast position="bottom-right" />
+@if(isLoading){
+<app-loader />
+}@else {
+<form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+    <p-tabs value="0">
+        <p-tablist value="0">
+            <div class="">
+                
+            </div>
+            <p-tab value="0">Personal Information</p-tab>
+            <p-tab value="1">Alternate Payee Information</p-tab>
+            <p-tab value="2">Nominee Information</p-tab>
+         <div class="d-flex align-items-center ms-auto mx-4">
+    <button type="button" class="btn btn-danger btn-sm me-2">
+        <i class="fas fa-trash-alt me-1"></i> Delete
+    </button>
+    <button type="button" class="btn btn-info btn-sm text-white">
+        <i class="fas fa-save me-1"></i> Update
+    </button>
+</div>
+
+        </p-tablist>
+
+        <p-tabpanels>
+            <!-- ================= Tab: Personal ================= -->
+            <p-tabpanel value="0">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                    <div class="container user-form" style="padding-bottom: 100px">
+                        <!-- Basic Information -->
+
+                        <div class="card mt-2">
+                            <h5 class="card-header">Basic Information</h5>
+                            <br />
+                            <div class="card-body row g-2">
+
+                                <!-- Household Number (readonly) -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="householdNumber" formControlName="householdNumber"
+                                            class="w-100" style="font-size: 1rem; padding: 0.25rem 0.25rem;" readonly />
+                                        <label for="householdNumber">Household Number</label>
+                                    </p-floatlabel>
+                                </div>
+                                <!-- First Name -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentFirstName" formControlName="respondentFirstName"
+                                            class="w-100"
+                                            [ngClass]="{ 'is-invalid': showError('respondentFirstName') }" />
+                                        <label for="respondentFirstName">Respondent First Name</label>
+                                    </p-floatlabel>
+
+                                    @if (showError('respondentFirstName')) {
+                                    <small class="text-danger">
+                                        {{ getError('respondentFirstName') }}
+                                    </small>
+                                    }
+                                </div>
+
+
+                                <!-- Middle Name -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentMiddleName"
+                                            formControlName="respondentMiddleName" class="w-100"
+                                            [ngClass]="{'is-invalid': showError('respondentMiddleName')}" />
+                                        <label for="respondentMiddleName">Respondent Middle Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('respondentMiddleName')) {
+                                    <small class="text-danger">{{ getError('respondentMiddleName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentLastName" formControlName="respondentLastName"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('respondentLastName')}" />
+                                        <label for="respondentLastName">Respondent Last Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('respondentLastName')) {
+                                    <small class="text-danger">{{ getError('respondentLastName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Nick Name (optional) -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentNickName" formControlName="respondentNickName"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('respondentNickName')}" />
+                                        <label for="respondentNickName">Respondent Nick Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('respondentNickName')) {
+                                    <small class="text-danger">{{ getError('respondentNickName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Relationship -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="relationship" formControlName="relationship" class="w-100"
+                                            [options]="relationshipOptions" optionLabel="label" optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('relationship')}">
+                                        </p-select>
+                                        <label for="relationship">Relationship</label>
+                                    </p-floatlabel>
+                                    @if (showError('relationship')) {
+                                    <small class="text-danger">{{ getError('relationship') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Relationship Other -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="relationshipOther" formControlName="relationshipOther"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('relationshipOther')}" />
+                                        <label for="relationshipOther">Relationship Other</label>
+                                    </p-floatlabel>
+                                    @if (showError('relationshipOther')) {
+                                    <small class="text-danger">{{ getError('relationshipOther') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Age -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentAge" formControlName="respondentAge"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('respondentAge')}" />
+                                        <label for="respondentAge">Respondent Age</label>
+                                    </p-floatlabel>
+                                    @if (showError('respondentAge')) {
+                                    <small class="text-danger">{{ getError('respondentAge') }}</small>
+                                    }
+                                    @if (beneficiaryForm.errors?.['ageMissing']) {
+                                    <small class="text-danger">{{ beneficiaryForm.errors?.['ageMissing'] }}</small>
+                                    }
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="gender" formControlName="gender" class="w-100"
+                                            [options]="genderOptions" optionLabel="name" optionValue="id"
+                                            [ngClass]="{'is-invalid': showError('gender')}">
+                                        </p-select>
+                                        <label for="gender">Gender</label>
+                                    </p-floatlabel>
+                                    @if (showError('gender')) {
+                                    <small class="text-danger">{{ getError('gender') }}</small>
+                                    }
+                                    @if (beneficiaryForm.errors?.['genderMismatch']) {
+                                    <small class="text-danger">{{ beneficiaryForm.errors?.['genderMismatch'] }}</small>
+                                    }
+                                </div>
+
+                                <!-- Marital Status -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="maritalStatus" formControlName="maritalStatus" class="w-100"
+                                            [options]="maritalStatusOptions" optionLabel="label" optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('maritalStatus')}">
+                                        </p-select>
+                                        <label for="maritalStatus">Marital Status</label>
+                                    </p-floatlabel>
+                                    @if (showError('maritalStatus')) {
+                                    <small class="text-danger">{{ getError('maritalStatus') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Spouse First -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="spouseFirstName" formControlName="spouseFirstName"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('spouseFirstName')}" />
+                                        <label for="spouseFirstName">Spouse First Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('spouseFirstName')) {
+                                    <small class="text-danger">{{ getError('spouseFirstName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Spouse Middle -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="spouseMiddleName" formControlName="spouseMiddleName"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('spouseMiddleName')}" />
+                                        <label for="spouseMiddleName">Spouse Middle Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('spouseMiddleName')) {
+                                    <small class="text-danger">{{ getError('spouseMiddleName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Spouse Last -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="spouseLastName" formControlName="spouseLastName"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('spouseLastName')}" />
+                                        <label for="spouseLastName">Spouse Last Name</label>
+                                    </p-floatlabel>
+                                    @if (showError('spouseLastName')) {
+                                    <small class="text-danger">{{ getError('spouseLastName') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Spouse Nick -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="spouseNickName" formControlName="spouseNickName"
+                                            class="w-100" />
+                                        <label for="spouseNickName">Spouse Nick Name</label>
+                                    </p-floatlabel>
+                                </div>
+
+                                <!-- Legal Status -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="legalStatus" formControlName="legalStatus" class="w-100"
+                                            [options]="legalStatusOptions" optionLabel="label" optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('legalStatus')}">
+                                        </p-select>
+                                        <label for="legalStatus">Legal Status</label>
+                                    </p-floatlabel>
+                                    @if (showError('legalStatus')) {
+                                    <small class="text-danger">{{ getError('legalStatus') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Has ID Radio -->
+                                <div class="col-md-3 mb-1">
+                                    <label>Do you have a ID?</label><br />
+                                    <input class="form-check-input" type="radio" value="Yes"
+                                        formControlName="hasNationalId" /> Yes
+                                    &nbsp;&nbsp;
+                                    <input class="form-check-input" type="radio" value="No"
+                                        formControlName="hasNationalId" /> No
+                                </div>
+
+                                <!-- ID Type -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="idType" formControlName="idType" class="w-100"
+                                            [options]="currentIdTypeOptions" optionLabel="label" optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('idType')}">
+                                        </p-select>
+                                        <label for="idType">ID Type</label>
+                                    </p-floatlabel>
+                                    @if (showError('idType')) {
+                                    <small class="text-danger">{{ getError('idType') }}</small>
+                                    }
+                                </div>
+
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="idTypeOther" formControlName="idTypeOther" class="w-100"
+                                            [ngClass]="{'is-invalid': showError('idTypeOther')}" />
+                                        <label for="idTypeOther">ID Type Other</label>
+                                    </p-floatlabel>
+                                    @if (showError('idTypeOther')) {
+                                    <small class="text-danger">{{ getError('idTypeOther') }}</small>
+                                    }
+                                </div>
+
+                                <!-- ID Number -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="respondentIdNumber" formControlName="respondentIdNumber"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('respondentIdNumber')}" />
+                                        <label for="respondentIdNumber">Respondent ID Number</label>
+                                    </p-floatlabel>
+                                    @if (showError('respondentIdNumber')) {
+                                    <small class="text-danger">{{ getError('respondentIdNumber') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">+211</span>
+                                            <input pInputText id="respondentPhone" formControlName="respondentPhone"
+                                                class="form-control border-start-0" maxlength="9"
+                                                placeholder="Enter 9-digit number"
+                                                [ngClass]="{'is-invalid': showError('respondentPhone')}" />
+                                        </div>
+                                        <label for="respondentPhone">Phone Number</label>
+                                    </p-floatlabel>
+
+                                    @if (showError('respondentPhone')) {
+                                    <small class="text-danger">{{ getError('respondentPhone') }}</small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selection Criteria -->
+                        <div class="card mt-3">
+                            <h5 class="card-header">Selection Criteria</h5>
+                            <br />
+                            <div class="card-body row g-3">
+                                <!-- Main Income -->
+                                <div class="col-md-4 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"
+                                            [options]="incomeSourceOptions" optionLabel="label" optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('mainIncomeSource')}">
+                                        </p-select>
+                                        <label for="mainIncomeSource">Main Income Source</label>
+                                    </p-floatlabel>
+                                    @if (showError('mainIncomeSource')) {
+                                    <small class="text-danger">{{ getError('mainIncomeSource') }}</small>
+                                    }
+                                </div>
+
+                                <!-- Other income -->
+                                <div class="col-md-4 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
+                                        <label for="otherIncomeSource">Other Income Source</label>
+                                    </p-floatlabel>
+                                    @if (showError('otherIncomeSource')) {
+                                    <small class="text-danger">{{ getError('otherIncomeSource') }}</small>
+                                    }
+                                </div>
+
+
+                                <!-- Avg Income -->
+                                <div class="col-md-4 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="avgMonthlyIncome" formControlName="avgMonthlyIncome"
+                                            class="w-100" [ngClass]="{'is-invalid': showError('avgMonthlyIncome')}" />
+                                        <label for="avgMonthlyIncome">Household Monthly Average Income</label>
+                                    </p-floatlabel>
+                                    @if (showError('avgMonthlyIncome')) {
+                                    <small class="text-danger">{{ getError('avgMonthlyIncome') }}</small>
+                                    }
+
+                                </div>
+
+                                <!-- Mobile money -->
+                                <div class="col-md-4 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <p-select id="mobileMoneyProvider" formControlName="mobileMoneyProvider"
+                                            class="w-100" [options]="mobileMoneyOptions" optionLabel="label"
+                                            optionValue="value"
+                                            [ngClass]="{'is-invalid': showError('mobileMoneyProvider')}">
+                                        </p-select>
+                                        <label for="mobileMoneyProvider">Mobile Money Provider</label>
+                                    </p-floatlabel>
+                                    @if (showError('mobileMoneyProvider')) {
+                                    <small class="text-danger">{{ getError('mobileMoneyProvider') }}</small>
+                                    }
+                                </div>
+
+                                <div class="col-md-3 mb-1">
+                                    <p-floatlabel variant="on">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">+211</span>
+                                            <input pInputText id="mobileWalletNumber"
+                                                formControlName="mobileWalletNumber" class="form-control border-start-0"
+                                                maxlength="9" placeholder="Enter 9-digit number"
+                                                [ngClass]="{'is-invalid': showError('respondentMobileWalletPhone')}" />
+                                        </div>
+                                        <label for="mobileWalletNumber">Mobile Wallet Number</label>
+                                    </p-floatlabel>
+
+                                    <!-- @if (showError('mobileWalletNumber')) {
+                  <small class="text-danger">{{ getError('mobileWalletNumber') }}</small>
+                  } -->
+                                </div>
+
+
+
+
+                                <!-- Support Type -->
+                                <div class="col-md-4 mb-1">
+                                    <label>Support Type</label><br />
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="Public Works"
+                                            formControlName="supportType" />
+                                        Public Works
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="Direct Income Support"
+                                            formControlName="supportType" />
+                                        Direct Income Support
+                                    </div>
+                                    @if (showError('supportType')) {
+                                    <small class="text-danger">{{ getError('supportType') }}</small>
+                                    }
+                                    @if (beneficiaryForm.errors?.['disRule']) {
+                                    <small class="text-danger">{{ beneficiaryForm.errors?.['disRule'] }}</small>
+                                    }
+                                    @if (beneficiaryForm.errors?.['lipwRule']) {
+                                    <small class="text-danger">{{ beneficiaryForm.errors?.['lipwRule'] }}</small>
+                                    }
+                                </div>
+
+                                <!-- Selection Reasons -->
+                                <div class="col-md-12 mb-1">
+                                    <label>Selection Reasons</label>
+                                    <div class="border rounded p-2">
+                                        @for (reason of filteredReasons; track reason.value) {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" [value]="reason.value"
+                                                (change)="onReasonChange($event, reason.value)"
+                                                [checked]="isReasonSelected(reason.value)" />
+                                            <label class="form-check-label">{{ reason.label }}</label>
+                                        </div>
+                                        } @empty {
+                                        <div class="text-muted small">No selection reasons available</div>
+                                        }
+                                    </div>
+                                    @if (beneficiaryForm.errors?.['reasons']) {
+                                    <small class="text-danger">{{ beneficiaryForm.errors?.['reasons'] }}</small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Household Information -->
+                        <div class="card mt-3">
+                            <h5 class="card-header">Household Information</h5>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Age Group</th>
+                                            <th colspan="4">Male</th>
+                                            <th colspan="4">Female</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>With Disability</th>
+                                            <th>With Chronic Illness</th>
+                                            <th>Both</th>
+                                            <th>Total</th>
+                                            <th>With Disability</th>
+                                            <th>With Chronic Illness</th>
+                                            <th>Both</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (ageGroup of ageGroups; track ageGroup) {
+                                        <tr>
+                                            <td>{{ ageGroup.label }}</td>
+
+                                            <td><input pInputText class="w-100" [formControlName]="ageGroup.maleTotal"
+                                                    readonly /></td>
+                                            <td><input pInputText class="w-100" [formControlName]="ageGroup.maleDisable"
+                                                    readonly /></td>
+                                            <td><input pInputText class="w-100"
+                                                    [formControlName]="ageGroup.maleChronicalIll" readonly /></td>
+                                            <td><input pInputText class="w-100" [formControlName]="ageGroup.maleBoth"
+                                                    readonly /></td>
+
+                                            <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleTotal"
+                                                    readonly /></td>
+                                            <td><input pInputText class="w-100"
+                                                    [formControlName]="ageGroup.femaleDisable" readonly /></td>
+                                            <td><input pInputText class="w-100"
+                                                    [formControlName]="ageGroup.femaleChronicalIll" readonly />
+                                            </td>
+                                            <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth"
+                                                    readonly /></td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                @if (beneficiaryForm.errors?.['subExceeds']) {
+                                <div class="alert alert-danger mt-2">
+                                    {{ beneficiaryForm.errors?.['subExceeds'] }}
+                                </div>
+                                }
+
+                                <!-- HH totals & literacy -->
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-6 mb-1">
+                                        <p-floatlabel variant="on">
+                                            <input pInputText id="literate1835Count" formControlName="literate1835Count"
+                                                class="w-100" [ngClass]="{'is-invalid': showError('literate1835Count')}"
+                                                readonly />
+                                            <label for="literate1835Count">18-35 yr literate members</label>
+                                        </p-floatlabel>
+                                        @if (beneficiaryForm.errors?.['literateInvalid']) {
+                                        <small class="text-danger">{{ beneficiaryForm.errors?.['literateInvalid']
+                                            }}</small>
+                                        }
+                                        @if (beneficiaryForm.errors?.['literateTooHigh']) {
+                                        <small class="text-danger">{{ beneficiaryForm.errors?.['literateTooHigh']
+                                            }}</small>
+                                        }
+                                    </div>
+
+                                    <div class="col-md-6 mb-1">
+                                        <p-floatlabel variant="on">
+                                            <input pInputText id="householdSize" formControlName="householdSize"
+                                                class="w-100" [ngClass]="{'is-invalid': showError('householdSize')}"
+                                                readonly />
+                                            <label for="householdSize">Household Size</label>
+                                        </p-floatlabel>
+                                        @if (beneficiaryForm.errors?.['hhEmpty']) {
+                                        <small class="text-danger">{{ beneficiaryForm.errors?.['hhEmpty'] }}</small>
+                                        }
+                                        @if (beneficiaryForm.errors?.['hhSizeMismatch']) {
+                                        <small class="text-danger">{{ beneficiaryForm.errors?.['hhSizeMismatch']
+                                            }}</small>
+                                        }
+                                    </div>
+
+                                    <div class="col-md-6 mb-1">
+                                        <label>Do you read and write?</label><br />
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="Yes"
+                                                formControlName="canReadWrite" />
+                                            Yes
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="No"
+                                                formControlName="canReadWrite" />
+                                            No
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- /container -->
+                </div>
+            </p-tabpanel>
+
+            <!-- ================= Tab: Alternate ================= -->
+            <p-tabpanel value="1">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                    <div class="container user-form">
+                        @if (!alternates.controls.length) {
+                        <div class="col-12">
+                            <div class="alert alert-success text-center">
+                                No Alternate Payee Information Provided
+                            </div>
+                        </div>
+                        }
+                        <div class="row justify-content-center g-3" formArrayName="alternates">
+                            @for (alt of alternates.controls; let i = $index; track alt) {
+                            <div [formGroupName]="i" class="col-md-6">
+                                <div class="card h-100 shadow-sm rounded">
+                                    <h5 class="card-header text-center">Alternate {{ i + 1 }}</h5>
+                                    <div class="card-body">
+                                        <div class="row g-2">
+                                            <!-- First Name -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="payeeFirstName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeFirstName')?.touched || alternates.at(i).get('payeeFirstName')?.dirty) && alternates.at(i).get('payeeFirstName')?.invalid}" />
+                                                    <label>First Name</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeFirstName')?.touched ||
+                                                alternates.at(i).get('payeeFirstName')?.dirty) &&
+                                                alternates.at(i).get('payeeFirstName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('payeeFirstName', i, 'alternates') }}
+                                                </small>
+
+                                                }
+                                            </div>
+
+                                            <!-- Middle Name -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="payeeMiddleName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeMiddleName')?.touched || alternates.at(i).get('payeeMiddleName')?.dirty) && alternates.at(i).get('payeeMiddleName')?.invalid}" />
+                                                    <label>Middle Name</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeMiddleName')?.touched ||
+                                                alternates.at(i).get('payeeMiddleName')?.dirty) &&
+                                                alternates.at(i).get('payeeMiddleName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeeMiddleName', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Last Name -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="payeeLastName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeLastName')?.touched || alternates.at(i).get('payeeLastName')?.dirty) && alternates.at(i).get('payeeLastName')?.invalid}" />
+                                                    <label>Last Name</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeLastName')?.touched ||
+                                                alternates.at(i).get('payeeLastName')?.dirty) &&
+                                                alternates.at(i).get('payeeLastName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeeLastName', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Nick Name -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="payeeNickName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeNickName')?.touched || alternates.at(i).get('payeeNickName')?.dirty) && alternates.at(i).get('payeeNickName')?.invalid}" />
+                                                    <label>Nick Name</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeNickName')?.touched ||
+                                                alternates.at(i).get('payeeNickName')?.dirty) &&
+                                                alternates.at(i).get('payeeNickName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeeNickName', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Gender -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="genderOptions" optionLabel="name"
+                                                        optionValue="id" formControlName="payeeGender" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeGender')?.touched || alternates.at(i).get('payeeGender')?.dirty) && alternates.at(i).get('payeeGender')?.invalid}">
+                                                    </p-select>
+                                                    <label>Gender</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeGender')?.touched ||
+                                                alternates.at(i).get('payeeGender')?.dirty) &&
+                                                alternates.at(i).get('payeeGender')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeeGender', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Age -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="payeeAge" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('payeeAge')?.touched || alternates.at(i).get('payeeAge')?.dirty) && alternates.at(i).get('payeeAge')?.invalid}" />
+                                                    <label>Age</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeeAge')?.touched ||
+                                                alternates.at(i).get('payeeAge')?.dirty) &&
+                                                alternates.at(i).get('payeeAge')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeeAge', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Relationship -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="relationshipOptions" optionLabel="label"
+                                                        optionValue="value"
+                                                        formControlName="relationshipWithHouseholdHead" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('relationshipWithHouseholdHead')?.touched || alternates.at(i).get('relationshipWithHouseholdHead')?.dirty) && alternates.at(i).get('relationshipWithHouseholdHead')?.invalid}">
+                                                    </p-select>
+                                                    <label>Relationship</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('relationshipWithHouseholdHead')?.touched ||
+                                                alternates.at(i).get('relationshipWithHouseholdHead')?.dirty) &&
+                                                alternates.at(i).get('relationshipWithHouseholdHead')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'relationshipWithHouseholdHead', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Relationship Other -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="relationshipOther" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('relationshipOther')?.touched || alternates.at(i).get('relationshipOther')?.dirty) && alternates.at(i).get('relationshipOther')?.invalid}" />
+                                                    <label>Relationship Other</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('relationshipOther')?.touched ||
+                                                alternates.at(i).get('relationshipOther')?.dirty) &&
+                                                alternates.at(i).get('relationshipOther')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('relationshipOther', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Has National ID -->
+                                            <div class="col-md-12 mb-2">
+                                                <label class="form-label">Do you have a national ID?</label><br />
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="Yes"
+                                                        formControlName="hasNationalId" />
+                                                    Yes
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="No"
+                                                        formControlName="hasNationalId" />
+                                                    No
+                                                </div>
+                                            </div>
+
+                                            <!-- ID Type -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="currentIdTypeOptions" optionLabel="label"
+                                                        optionValue="value" formControlName="documentType" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('documentType')?.touched || alternates.at(i).get('documentType')?.dirty) && alternates.at(i).get('documentType')?.invalid}">
+                                                    </p-select>
+                                                    <label>ID Type</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('documentType')?.touched ||
+                                                alternates.at(i).get('documentType')?.dirty) &&
+                                                alternates.at(i).get('documentType')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'documentType', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- ID Type Other -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="documentTypeOther" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('documentTypeOther')?.touched || alternates.at(i).get('documentTypeOther')?.dirty) && alternates.at(i).get('documentTypeOther')?.invalid}" />
+                                                    <label>ID Type Other</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('documentTypeOther')?.touched ||
+                                                alternates.at(i).get('documentTypeOther')?.dirty) &&
+                                                alternates.at(i).get('documentTypeOther')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'documentTypeOther', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- ID Number -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nationalId" class="w-100"
+                                                        [ngClass]="{'is-invalid': (alternates.at(i).get('nationalId')?.touched || alternates.at(i).get('nationalId')?.dirty) && alternates.at(i).get('nationalId')?.invalid}" />
+                                                    <label>ID Number</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('nationalId')?.touched ||
+                                                alternates.at(i).get('nationalId')?.dirty)
+                                                && alternates.at(i).get('nationalId')?.invalid)
+                                                {
+                                                <small class="text-danger">
+                                                    {{ getError( 'nationalId', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Contact Number -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light border-end-0">+211</span>
+                                                        <input pInputText formControlName="payeePhoneNo"
+                                                            class="form-control border-start-0" maxlength="9"
+                                                            placeholder="Enter 9-digit number" pattern="\d*"
+                                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                                            [ngClass]="{'is-invalid': (alternates.at(i).get('payeePhoneNo')?.touched || alternates.at(i).get('payeePhoneNo')?.dirty) && alternates.at(i).get('payeePhoneNo')?.invalid}" />
+                                                    </div>
+                                                    <label>Contact Number</label>
+                                                </p-floatlabel>
+                                                @if ((alternates.at(i).get('payeePhoneNo')?.touched ||
+                                                alternates.at(i).get('payeePhoneNo')?.dirty) &&
+                                                alternates.at(i).get('payeePhoneNo')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError( 'payeePhoneNo', i, 'alternates') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </p-tabpanel>
+
+            <!-- ================= Tab: Nominees ================= -->
+            <p-tabpanel value="2">
+                <div style="height: calc(100vh - 210px); overflow-y: auto">
+                    <div class="container user-form">
+                        @if (!nominees.controls.length) {
+                        <div class="col-12">
+                            <div class="alert alert-success text-center">
+                                No Nominee Information Provided
+                            </div>
+                        </div>
+                        }
+                        <div class="row justify-content-center g-3" formArrayName="nominees">
+
+                            @for(nominee of nominees.controls; let i = $index; track nominee){
+                            <div [formGroupName]="i" class="col-md-6">
+                                <div class="card h-100 shadow-sm rounded">
+                                    <h5 class="card-header text-center">Nominee {{ i + 1 }}</h5>
+                                    <div class="card-body">
+                                        <div class="row g-2">
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nomineeFirstName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeFirstName')?.touched || nominees.at(i).get('nomineeFirstName')?.dirty) && nominees.at(i).get('nomineeFirstName')?.invalid}" />
+                                                    <label>First Name</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeFirstName')?.touched ||
+                                                nominees.at(i).get('nomineeFirstName')?.dirty) &&
+                                                nominees.at(i).get('nomineeFirstName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeFirstName', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nomineeMiddleName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeMiddleName')?.touched || nominees.at(i).get('nomineeMiddleName')?.dirty) && nominees.at(i).get('nomineeMiddleName')?.invalid}" />
+                                                    <label>Middle Name</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeMiddleName')?.touched ||
+                                                nominees.at(i).get('nomineeMiddleName')?.dirty) &&
+                                                nominees.at(i).get('nomineeMiddleName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeMiddleName', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nomineeLastName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeLastName')?.touched || nominees.at(i).get('nomineeLastName')?.dirty) && nominees.at(i).get('nomineeLastName')?.invalid}" />
+                                                    <label>Last Name</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeLastName')?.touched ||
+                                                nominees.at(i).get('nomineeLastName')?.dirty) &&
+                                                nominees.at(i).get('nomineeLastName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeLastName', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nomineeNickName" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeNickName')?.touched || nominees.at(i).get('nomineeNickName')?.dirty) && nominees.at(i).get('nomineeNickName')?.invalid}" />
+                                                    <label>Nick Name</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeNickName')?.touched ||
+                                                nominees.at(i).get('nomineeNickName')?.dirty) &&
+                                                nominees.at(i).get('nomineeNickName')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeNickName', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="genderOptions" optionLabel="name"
+                                                        optionValue="id" formControlName="nomineeGender" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeGender')?.touched || nominees.at(i).get('nomineeGender')?.dirty) && nominees.at(i).get('nomineeGender')?.invalid}">
+                                                    </p-select>
+                                                    <label>Gender</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeGender')?.touched ||
+                                                nominees.at(i).get('nomineeGender')?.dirty) &&
+                                                nominees.at(i).get('nomineeGender')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeGender', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="nomineeAge" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeAge')?.touched || nominees.at(i).get('nomineeAge')?.dirty) && nominees.at(i).get('nomineeAge')?.invalid}" />
+                                                    <label>Age</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeAge')?.touched ||
+                                                nominees.at(i).get('nomineeAge')?.dirty) &&
+                                                nominees.at(i).get('nomineeAge')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeAge', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="relationshipOptions" optionLabel="label"
+                                                        optionValue="value"
+                                                        formControlName="relationshipWithHouseholdHead" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('relationshipWithHouseholdHead')?.touched || nominees.at(i).get('relationshipWithHouseholdHead')?.dirty) && nominees.at(i).get('relationshipWithHouseholdHead')?.invalid}">
+                                                    </p-select>
+                                                    <label>Relationship</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('relationshipWithHouseholdHead')?.touched ||
+                                                nominees.at(i).get('relationshipWithHouseholdHead')?.dirty) &&
+                                                nominees.at(i).get('relationshipWithHouseholdHead')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('relationshipWithHouseholdHead', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-1">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="relationshipOther" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('relationshipOther')?.touched || nominees.at(i).get('relationshipOther')?.dirty) && nominees.at(i).get('relationshipOther')?.invalid}" />
+                                                    <label>Other Relationship</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('relationshipOther')?.touched ||
+                                                nominees.at(i).get('relationshipOther')?.dirty) &&
+                                                nominees.at(i).get('relationshipOther')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('relationshipOther', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-1">
+                                                <label class="form-label">Can Read/Write?</label><br />
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" [value]="true"
+                                                        formControlName="isReadWrite" />
+                                                    Yes
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" [value]="false"
+                                                        formControlName="isReadWrite" />
+                                                    No
+                                                </div>
+                                                @if ((nominees.at(i).get('isReadWrite')?.touched ||
+                                                nominees.at(i).get('isReadWrite')?.dirty) &&
+                                                nominees.at(i).get('isReadWrite')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('isReadWrite', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <p-select [options]="occupationOptions" optionLabel="label"
+                                                        optionValue="value" formControlName="nomineeOccupation"
+                                                        class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('nomineeOccupation')?.touched || nominees.at(i).get('nomineeOccupation')?.dirty) && nominees.at(i).get('nomineeOccupation')?.invalid}">
+                                                    </p-select>
+                                                    <label>Occupation</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('nomineeOccupation')?.touched ||
+                                                nominees.at(i).get('nomineeOccupation')?.dirty) &&
+                                                nominees.at(i).get('nomineeOccupation')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('nomineeOccupation', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
+
+                                            <!-- Add 'otherOccupation' if you want to surface it -->
+                                            <!--
+                        <div class="col-md-12 mb-2">
+                          <p-floatlabel variant="on">
+                            <input pInputText formControlName="otherOccupation" class="w-100" />
+                            <label>Other Occupation</label>
+                          </p-floatlabel>
+                        </div>
+                        -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</form>
+}
