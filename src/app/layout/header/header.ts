@@ -108,6 +108,12 @@ export class Header {
             icon: 'fas fa-list',
             routerLink: 'beneficiary/list',
           },
+          {
+            label: 'New Registration',
+            icon: 'fas fa-user-plus',
+            routerLink: 'beneficiary/new-registration',
+          },
+
           // {
           //   label: 'Approval List',
           //   icon: 'fas fa-user-check',
