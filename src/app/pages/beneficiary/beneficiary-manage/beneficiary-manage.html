@@ -343,8 +343,8 @@
                     <div class="input-group">
                       <span class="input-group-text bg-light border-end-0">+211</span>
                       <input pInputText id="mobileWalletNumber" formControlName="mobileWalletNumber"
-                        class="form-control border-start-0" maxlength="9" placeholder="Enter 9-digit number"/>
-                        <!-- [ngClass]="{'is-invalid': showError('respondentPhone')}"  -->
+                        class="form-control border-start-0" maxlength="9" placeholder="Enter 9-digit number"
+                        [ngClass]="{'is-invalid': showError('respondentPhone')}" />
                     </div>
                     <label for="mobileWalletNumber">Mobile Wallet Number</label>
                   </p-floatlabel>
@@ -386,7 +386,7 @@
                   <div class="border rounded p-2">
                     @for (reason of filteredReasons; track reason.value) {
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" [value]="reason.value" [disabled]="true"
+                      <input class="form-check-input" type="checkbox" [value]="reason.value" 
                         (change)="onReasonChange($event, reason.value)" [checked]="isReasonSelected(reason.value)" />
                       <label class="form-check-label">{{ reason.label }}</label>
                     </div>
@@ -504,7 +504,7 @@
           <div class="container user-form">
             @if (!alternates.controls.length) {
             <div class="col-12">
-              <div class="alert alert-warning text-center">
+              <div class="alert alert-success text-center">
                 No Alternate Payee Information Provided
               </div>
             </div>
@@ -748,7 +748,7 @@
           <div class="container user-form">
             @if (!nominees.controls.length) {
             <div class="col-12">
-              <div class="alert alert-warning text-center">
+              <div class="alert alert-success text-center">
                 No Nominee Information Provided
               </div>
             </div>

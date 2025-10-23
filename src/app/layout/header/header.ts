@@ -38,7 +38,11 @@ export class Header {
       link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
-    { label: 'Settings', link: environment.portals.masterSettings, icon: 'fas fa-cog' },
+    {
+      label: 'Settings',
+      link: environment.portals.masterSettings,
+      icon: 'fas fa-cog',
+    },
     { label: 'Survey CTO', icon: 'fas fa-poll' },
   ];
 
@@ -99,6 +103,7 @@ export class Header {
         icon: 'fas fa-tachometer-alt',
         routerLink: 'dashboard',
       },
+ 
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
@@ -119,8 +124,27 @@ export class Header {
           //   icon: 'fas fa-user-check',
           //   routerLink: 'beneficiary-approval-list/edit',
           // },
+          
+        
         ],
       },
+
+      {
+        label: 'Pending Beneficiaries',
+        icon: 'fas fa-clock',
+        items: [
+          {
+            label: 'Pending List',
+            icon: 'fas fa-list',
+            routerLink: 'pending-beneficiary/list',
+          },
+          
+        
+        ],
+      },
+           
+ 
+
       {
         label: 'Approval List',
         icon: 'fas fa-user-check',
@@ -137,6 +161,7 @@ export class Header {
           // },
         ],
       },
+
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
@@ -171,6 +196,7 @@ export class Header {
           },
         ],
       },
+
       {
         label: 'Archived Beneficiary',
         icon: 'fas fa-trash-restore',
@@ -182,6 +208,8 @@ export class Header {
           },
         ],
       },
+  
+ 
     ];
   }
 

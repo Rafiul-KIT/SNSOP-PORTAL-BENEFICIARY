@@ -236,7 +236,7 @@ export class BeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
-    this.beneficiaryForm.get('supportType')?.disable();
+ 
     this.beneficiaryForm
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
@@ -498,10 +498,16 @@ export class BeneficiaryManage implements OnInit {
   }
 
   private updateFormUI() {
-    this.updateRelationshipFields(this.beneficiaryForm.get('relationship')!.value);
-    this.updateMaritalStatusFields(this.beneficiaryForm.get('maritalStatus')!.value);
+    this.updateRelationshipFields(
+      this.beneficiaryForm.get('relationship')!.value
+    );
+    this.updateMaritalStatusFields(
+      this.beneficiaryForm.get('maritalStatus')!.value
+    );
     this.updateIdLogic();
-    this.updateIncomeSourceFields(this.beneficiaryForm.get('mainIncomeSource')!.value);
+    this.updateIncomeSourceFields(
+      this.beneficiaryForm.get('mainIncomeSource')!.value
+    );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
     this.cdr.detectChanges();
@@ -557,7 +563,15 @@ export class BeneficiaryManage implements OnInit {
       idType: [''],
       idTypeOther: [''],
       respondentIdNumber: [''],
-
+      respondentMobileWalletPhone: [
+        '',
+        [
+          this.optionalPattern(
+            this.RGX_PHONE_9,
+            'Phone number length must be 9'
+          ),
+        ],
+      ],
       respondentPhone: [
         '',
         [
@@ -603,47 +617,50 @@ export class BeneficiaryManage implements OnInit {
         const dto = this.originalDto;
 
         // Patch personal
-        this.beneficiaryForm.patchValue({
-          householdNumber: dto.applicationId || '',
-          respondentFirstName: dto.respondentFirstName,
-          respondentMiddleName: dto.respondentMiddleName,
-          respondentLastName: dto.respondentLastName,
-          respondentNickName: dto.respondentNickName,
-          relationship: dto.relationshipWithHouseholdHead,
-          relationshipOther: dto.relationshipOther,
-          respondentAge: dto.respondentAge,
-          gender: dto.respondentGender,
-          maritalStatus: dto.respondentMaritalStatus,
-          spouseFirstName: dto.spouseFirstName,
-          spouseMiddleName: dto.spouseMiddleName,
-          spouseLastName: dto.spouseLastName,
-          spouseNickName: dto.spouseNickName,
-          legalStatus: dto.respondentLegalStatus,
-          hasNationalId: dto.documentType !== 'NONE' ? 'Yes' : 'No',
-          idType: dto.documentType,
-          idTypeOther: dto.documentTypeOther,
-          respondentIdNumber: dto.respondentId,
-          respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
-            ? dto.respondentPhoneNo.substring(4)
-            : dto.respondentPhoneNo || '',
-          mainIncomeSource: dto.householdIncomeSource,
-          mobileMoneyProvider: dto.mobileMoneyProvider,
-          mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
-            ? dto.mobileWalletNumber.substring(4)
-            : dto.mobileWalletNumber || '',
-          otherIncomeSource: dto.incomeSourceOther,
-          avgMonthlyIncome: dto.householdMonthlyAvgIncome,
-          supportType:
-            dto.selectionCriteria === 'LIPW'
-              ? 'Public Works'
-              : 'Direct Income Support',
-          selectionReasons: Array.isArray(dto.selectionReason)
-            ? dto.selectionReason
-            : [dto.selectionReason],
-          canReadWrite: dto.isReadWrite ? 'Yes' : 'No',
-          literate1835Count: dto.memberReadWrite ?? '0',
-          householdSize: dto.householdSize ?? '0',
-        }, { emitEvent: false });
+        this.beneficiaryForm.patchValue(
+          {
+            householdNumber: dto.applicationId || '',
+            respondentFirstName: dto.respondentFirstName,
+            respondentMiddleName: dto.respondentMiddleName,
+            respondentLastName: dto.respondentLastName,
+            respondentNickName: dto.respondentNickName,
+            relationship: dto.relationshipWithHouseholdHead,
+            relationshipOther: dto.relationshipOther,
+            respondentAge: dto.respondentAge,
+            gender: dto.respondentGender,
+            maritalStatus: dto.respondentMaritalStatus,
+            spouseFirstName: dto.spouseFirstName,
+            spouseMiddleName: dto.spouseMiddleName,
+            spouseLastName: dto.spouseLastName,
+            spouseNickName: dto.spouseNickName,
+            legalStatus: dto.respondentLegalStatus,
+            hasNationalId: dto.documentType !== 'NONE' ? 'Yes' : 'No',
+            idType: dto.documentType,
+            idTypeOther: dto.documentTypeOther,
+            respondentIdNumber: dto.respondentId,
+            respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
+              ? dto.respondentPhoneNo.substring(4)
+              : dto.respondentPhoneNo || '',
+            mainIncomeSource: dto.householdIncomeSource,
+            mobileMoneyProvider: dto.mobileMoneyProvider,
+            mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
+              ? dto.mobileWalletNumber.substring(4)
+              : dto.mobileWalletNumber || '',
+            otherIncomeSource: dto.incomeSourceOther,
+            avgMonthlyIncome: dto.householdMonthlyAvgIncome,
+            supportType:
+              dto.selectionCriteria === 'LIPW'
+                ? 'Public Works'
+                : 'Direct Income Support',
+            selectionReasons: Array.isArray(dto.selectionReason)
+              ? dto.selectionReason
+              : [dto.selectionReason],
+            canReadWrite: dto.isReadWrite ? 'Yes' : 'No',
+            literate1835Count: dto.memberReadWrite ?? '0',
+            householdSize: dto.householdSize ?? '0',
+          },
+          { emitEvent: false }
+        );
 
         // Patch breakdown helper
         const pv = (src: any, map: Record<string, string>) => {
@@ -729,7 +746,7 @@ export class BeneficiaryManage implements OnInit {
             this.nominees.push(this.createNomineeGroup(n))
           );
         }
-        
+
         this.updateFormUI();
       })
       .catch((err) => console.error('Failed to load beneficiary:', err))
@@ -1339,7 +1356,11 @@ export class BeneficiaryManage implements OnInit {
 
     // Pattern validation (for phone)
     if (errors['pattern']) {
-      if (fieldName === 'respondentPhone' || fieldName === 'payeePhoneNo' || fieldName == 'mobileWalletNumber') {
+      if (
+        fieldName === 'respondentPhone' ||
+        fieldName === 'payeePhoneNo' ||
+        fieldName == 'mobileWalletNumber'
+      ) {
         return 'Phone number must be exactly 9 digits';
       }
       return `${label} format is invalid`;

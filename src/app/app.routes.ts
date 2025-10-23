@@ -19,6 +19,9 @@ import { AdjudicationList } from './pages/adjudication/adjudication-list/adjudic
 import { MatchList } from './pages/adjudication/match-list/match-list';
 import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-restore-details/beneficiary-restore-details';
 import { NewRegistration } from './pages/beneficiary/new-registration/new-registration';
+import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
+import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
+
 export const routes: Routes = [
   {
     component: Dashboard,
@@ -40,6 +43,10 @@ export const routes: Routes = [
     canActivate: [routeGuard],
     children: [
       {
+        path: 'list',
+        component: BeneficiaryList,
+      },
+       {
         path: 'list',
         component: BeneficiaryList,
       },
@@ -75,6 +82,27 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'pending-beneficiary',
+    canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: PendingBeneficiaryList,
+      },
+        {
+        path: 'edit/:applicationId',
+        component: PendingBeneficiaryManage,
+      },
+       
+     
+      // {
+      //   path: 'id-card',
+      //   component: BeneficiaryIdCard,
+      // },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
+  },
+  {
     path: 'beneficiary-approval',
     canActivate: [routeGuard],
     children: [
@@ -94,6 +122,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
+
   {
     path: 'beneficiary-audit',
     canActivate: [routeGuard],
@@ -108,7 +137,7 @@ export const routes: Routes = [
     canActivate: [routeGuard],
     component: ReportComponent,
   },
-   {
+  {
     path: 'restore',
     canActivate: [routeGuard],
     children: [
