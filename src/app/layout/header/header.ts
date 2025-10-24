@@ -130,7 +130,7 @@ export class Header {
       },
 
       {
-        label: 'Pending Beneficiaries',
+        label: 'Beneficiary Verification',
         icon: 'fas fa-clock',
         items: [
           {
