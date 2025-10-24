@@ -42,13 +42,15 @@
               <!-- Total Households -->
               <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
                 role="button" tabindex="0"
+                (click)="gotoBeneficiaryList()"
                 style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;">
-                <span class="fw-bold">Total Households:</span>
+                <span class="fw-bold">Total Beneficiaries:</span>
                 <kbd class="ms-2"
                   style="font-size: 0.9rem; padding: 2px 8px; background-color: #00b7f2; color: white; border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
                   {{ totalBeneficiaryCount }}
                 </kbd>
               </div>
+                  
 
               <!-- Male Count -->
               <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
