@@ -118,55 +118,43 @@ export class Header {
             icon: 'fas fa-user-plus',
             routerLink: 'beneficiary/new-registration',
           },
-
-          // {
-          //   label: 'Approval List',
-          //   icon: 'fas fa-user-check',
-          //   routerLink: 'beneficiary-approval-list/edit',
-          // },
-          
-        
-        ],
-      },
-
-      {
-        label: 'Beneficiary Verification',
-        icon: 'fas fa-clock',
-        items: [
           {
-            label: 'Pending List',
+            label: 'Approval List',
+            icon: 'fas fa-user-check',
+            routerLink: 'beneficiary-approval/list',
+          },
+          {
+            label: 'Beneficiary Audit List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary-audit/audit',
+          },
+          {
+            label: 'Archived Beneficiary List',
+            icon: 'fas fa-list',
+            routerLink: 'restore/list',
+          },
+          {
+            label: 'Pending Verification List',
             icon: 'fas fa-list',
             routerLink: 'pending-beneficiary/list',
           },
-          
-        
         ],
+      },
+      {
+            label: 'Adjudication',
+            icon: 'fas fa-users-viewfinder',
+            routerLink: 'adjudication-list',
+      },
+      { 
+        
+            label: 'Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report'
       },
            
  
 
-      {
-        label: 'Approval List',
-        icon: 'fas fa-user-check',
-        items: [
-          {
-            label: 'List',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary-approval/list',
-          },
-          // {
-          //   label: 'Approval List',
-          //   icon: 'fas fa-user-check',
-          //   routerLink: 'beneficiary-approval-list/edit',
-          // },
-        ],
-      },
-
-      {
-        label: 'Adjudication',
-        icon: 'fas fa-users-viewfinder',
-        routerLink: 'adjudication-list',
-      },
+      
       {
         label: 'Beneficiary ID Cards',
         icon: 'fas fa-id-card',
@@ -183,33 +171,8 @@ export class Header {
         icon: 'fas fa-file-export',
         routerLink: 'lipw-export',
       },
-      { label: 'Report', icon: 'fas fa-file-alt', routerLink: 'report' },
+      
       // { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary-audit/audit' },
-      {
-        label: 'Beneficiary Audit',
-        icon: 'fas fa-history',
-        items: [
-          {
-            label: 'Audit List',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary-audit/audit',
-          },
-        ],
-      },
-
-      {
-        label: 'Archived Beneficiary',
-        icon: 'fas fa-trash-restore',
-        items: [
-          {
-            label: 'Archived List',
-            icon: 'fas fa-list',
-            routerLink: 'restore/list',
-          },
-        ],
-      },
-  
- 
     ];
   }
 
