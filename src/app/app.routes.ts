@@ -28,15 +28,20 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [routeGuard],
   },
-  {
-    component: AdjudicationList,
-    path: 'adjudication-list',
+    {
+    path: 'adjudication',
     canActivate: [routeGuard],
-  },
-  {
-    component: MatchList,
-    path: 'match-list/:id',
-    // canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: AdjudicationList,
+      },
+      {
+        path: 'match-list/:id',
+        component: MatchList,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
   {
     path: 'beneficiary',
@@ -54,88 +59,94 @@ export const routes: Routes = [
         path: 'details/:id',
         component: BeneficiaryDetails,
       },
-      // {
-      //   path: 'audit-details/:id',
-      //   component: BeneficiaryAuditDetails
-      // },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
       },
-      //   {
-      //   path: 'audit',
-      //   component: BeneficiaryAudit,
-      // },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
       },
-      // {
-      //   path: 'id-card',
-      //   component: BeneficiaryIdCard,
-      // },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
   {
-    path: 'pending-beneficiary/list',
+    path: 'pending-beneficiary',
     canActivate: [routeGuard],
-    component: PendingBeneficiaryList,
+    children: [
+      {
+        path: 'list',
+        component: PendingBeneficiaryList,
+      },
+      {
+        path: 'edit/:applicationId',
+        component: PendingBeneficiaryManage,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-    
   {
-    path: 'pending-beneficiary/edit/:applicationId',
-    component: PendingBeneficiaryManage,
-  },
-       
-     
-      
-  {
-    path: 'beneficiary-approval/list',
+    path: 'beneficiary-approval',
     canActivate: [routeGuard],
-    component: BeneficiaryEditApprovalList
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryEditApprovalList,
+      },
+      {
+        path: 'edit-details/:id',
+        component: BeneficiaryEditApprovalDetails,
+      },
+      {
+        path: 'migrate-details/:id',
+        component: BeneficiaryEditApprovalDetails,
+      },
+      {
+        path: 'archive-details/:id',
+        component: BeneficiaryEditApprovalDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-  {
-    path: 'beneficiary-approval/edit-details/:id',
-    
-    component: BeneficiaryEditApprovalDetails
-  },
-  {
-    path: 'beneficiary-approval/migrate-details/:id',
-    
-    component: BeneficiaryMigrateApprovalDetails
-  },
-  {
-    path: 'beneficiary-approval/archive-details/:id',
-    
-    component: BeneficiaryArchiveApprovalDetails
-  },
-  {
-    path: 'beneficiary-audit/audit',
+    {
+    path: 'beneficiary-audit',
     canActivate: [routeGuard],
-    component: BeneficiaryAudit
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryAudit,
+      },
+      {
+        path: 'audit-details/:id',
+        component: BeneficiaryAuditDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-  { path: 'beneficiary-audit/audit-details/:id',
-    component: BeneficiaryAuditDetails
-  },
-    
   {
     path: 'report',
     canActivate: [routeGuard],
     component: ReportComponent,
   },
-  {
-    path: 'restore/list',
+      {
+    path: 'restore',
     canActivate: [routeGuard],
-    component: BeneficiaryRestore
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryRestore,
+      },
+      {
+        path: 'details/:id',
+        component: BeneficiaryRestoreDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-  { path: 'restore/details/:id',
-    component: BeneficiaryRestoreDetails
-  },
-
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,
     path: '**',
   },
 ];
+

@@ -103,7 +103,7 @@ export class Header {
         icon: 'fas fa-tachometer-alt',
         routerLink: 'dashboard',
       },
- 
+
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
@@ -126,7 +126,7 @@ export class Header {
           {
             label: 'Beneficiary Audit List',
             icon: 'fas fa-list',
-            routerLink: 'beneficiary-audit/audit',
+            routerLink: 'beneficiary-audit/list',
           },
           {
             label: 'Archived Beneficiary List',
@@ -141,20 +141,15 @@ export class Header {
         ],
       },
       {
-            label: 'Adjudication',
-            icon: 'fas fa-users-viewfinder',
-            routerLink: 'adjudication-list',
+        label: 'Adjudication',
+        icon: 'fas fa-users-viewfinder',
+        routerLink: 'adjudication/list',
       },
-      { 
-        
-            label: 'Report',
-            icon: 'fas fa-file-alt',
-            routerLink: 'report'
+      {
+        label: 'Report',
+        icon: 'fas fa-file-alt',
+        routerLink: 'report',
       },
-           
- 
-
-      
       {
         label: 'Beneficiary ID Cards',
         icon: 'fas fa-id-card',
@@ -171,18 +166,18 @@ export class Header {
         icon: 'fas fa-file-export',
         routerLink: 'lipw-export',
       },
-      
-      // { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary-audit/audit' },
     ];
   }
 
-  filterMenusByAccess(menus: any[], allowed: string[]): any[] {
+  // ✅ Recursive filter: keep only allowed menus (parent and child)
+  filterMenusByAccess(menus: any[], allowedNames: string[]): any[] {
     return menus
-      .filter((menu) => allowed.includes(menu.label))
+      .filter((menu) => allowedNames.includes(menu.label)) // filter parent menus
       .map((menu) => ({
         ...menu,
+        // Recursively filter child menus if the parent is allowed
         items: menu.items
-          ? this.filterMenusByAccess(menu.items, allowed)
+          ? this.filterMenusByAccess(menu.items, allowedNames)
           : undefined,
       }));
   }
