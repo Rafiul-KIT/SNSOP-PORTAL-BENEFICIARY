@@ -161,11 +161,11 @@ export class PendingBeneficiaryManage implements OnInit {
 
   items = [
     {
-      label: 'Beneficiary List',
+      label: 'Pending Beneficiary List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary/list',
+      routerLink: '/pending-beneficiary/list',
     },
-    { label: 'Manage Beneficiary', icon: 'fas fa-user-pen me-2' },
+    { label: 'Manage Pending Beneficiary', icon: 'fas fa-user-pen me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 
@@ -880,7 +880,7 @@ export class PendingBeneficiaryManage implements OnInit {
             summary: 'Deleted',
             detail: 'Beneficiary has been deleted successfully.',
           });
-          setTimeout(() => this.router.navigate(['/beneficiary/list']), 2000);
+          setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 2000);
         } else {
           const errorMsg = res.errorMsg || 'An unknown error occurred during deletion.';
           this.messageService.add({
@@ -1096,7 +1096,7 @@ export class PendingBeneficiaryManage implements OnInit {
             summary: 'Update Successful',
             detail: 'Beneficiary edit request sent successfully!',
           });
-          setTimeout(() => this.router.navigate(['/beneficiary/list']), 3000);
+          setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
         } else if (first.result === 'FAILED') {
           this.messageService.add({
             severity: 'error',
