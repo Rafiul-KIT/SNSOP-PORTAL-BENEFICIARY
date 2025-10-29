@@ -99,11 +99,11 @@ export const routes: Routes = [
       },
       {
         path: 'migrate-details/:id',
-        component: BeneficiaryEditApprovalDetails,
+        component: BeneficiaryMigrateApprovalDetails,
       },
       {
         path: 'archive-details/:id',
-        component: BeneficiaryEditApprovalDetails,
+        component: BeneficiaryArchiveApprovalDetails,
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
