@@ -137,6 +137,16 @@ export class NewRegistration implements OnInit {
       this.beneficiaryForm.addControl(g.femaleBoth, this.fb.control('0', [this.numMin(0), this.numMax(10)]));
     });
 
+    this.beneficiaryForm.addControl('f18_35_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
+    this.beneficiaryForm.addControl('f36_64_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
     // Form-level validators
     this.beneficiaryForm.setValidators([
       this.breakdownSubcategoryNotExceedTotal(),
@@ -539,6 +549,27 @@ export class NewRegistration implements OnInit {
     payload.householdMember64 = buildSlice('m36_64', 'f36_64');
     payload.householdMember65 = buildSlice('m65', 'f65');
 
+    payload.householdMemberLactating35 = {
+      maleTotal: 0,
+      maleDisable: 0,
+      maleChronicalIll: 0,
+      maleBoth: 0,
+      femaleTotal: +formValue.f18_35_lactating_total || 0,
+      femaleDisable: +formValue.f18_35_lactating_disable || 0,
+      femaleChronicalIll: +formValue.f18_35_lactating_chronic || 0,
+      femaleBoth: +formValue.f18_35_lactating_both || 0,
+    };
+    payload.householdMemberLactating64 = {
+      maleTotal: 0,
+      maleDisable: 0,
+      maleChronicalIll: 0,
+      maleBoth: 0,
+      femaleTotal: +formValue.f36_64_lactating_total || 0,
+      femaleDisable: +formValue.f36_64_lactating_disable || 0,
+      femaleChronicalIll: +formValue.f36_64_lactating_chronic || 0,
+      femaleBoth: +formValue.f36_64_lactating_both || 0,
+    };
+
     // Alternates (exactly 2 in UI; include only if minimally filled)
     const altArr = formValue.alternates || [];
     const mapAlt = (a: any) => ({
@@ -908,6 +939,23 @@ export class NewRegistration implements OnInit {
   private breakdownSubcategoryNotExceedTotal() {
     return (fg: AbstractControl): ValidationErrors | null => {
       if (!(fg instanceof FormGroup)) return null;
+
+      const f18_35_lactating_total = +fg.get('f18_35_lactating_total')?.value || 0;
+      const f18_35_lactating_disable = +fg.get('f18_35_lactating_disable')?.value || 0;
+      const f18_35_lactating_chronic = +fg.get('f18_35_lactating_chronic')?.value || 0;
+      const f18_35_lactating_both = +fg.get('f18_35_lactating_both')?.value || 0;
+      if (f18_35_lactating_disable + f18_35_lactating_chronic + f18_35_lactating_both > f18_35_lactating_total) {
+          return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
+      }
+
+      const f36_64_lactating_total = +fg.get('f36_64_lactating_total')?.value || 0;
+      const f36_64_lactating_disable = +fg.get('f36_64_lactating_disable')?.value || 0;
+      const f36_64_lactating_chronic = +fg.get('f36_64_lactating_chronic')?.value || 0;
+      const f36_64_lactating_both = +fg.get('f36_64_lactating_both')?.value || 0;
+      if (f36_64_lactating_disable + f36_64_lactating_chronic + f36_64_lactating_both > f36_64_lactating_total) {
+          return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
+      }
+      
       for (const g of this.ageGroups) {
         const mT = +fg.get(g.maleTotal)?.value || 0;
         const mD = +fg.get(g.maleDisable)?.value || 0;

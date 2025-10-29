@@ -28,25 +28,26 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [routeGuard],
   },
-  {
-    component: AdjudicationList,
-    path: 'adjudication-list',
+    {
+    path: 'adjudication',
     canActivate: [routeGuard],
-  },
-  {
-    component: MatchList,
-    path: 'match-list/:id',
-    // canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: AdjudicationList,
+      },
+      {
+        path: 'match-list/:id',
+        component: MatchList,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
   {
     path: 'beneficiary',
     canActivate: [routeGuard],
     children: [
       {
-        path: 'list',
-        component: BeneficiaryList,
-      },
-       {
         path: 'list',
         component: BeneficiaryList,
       },
@@ -58,26 +59,14 @@ export const routes: Routes = [
         path: 'details/:id',
         component: BeneficiaryDetails,
       },
-      // {
-      //   path: 'audit-details/:id',
-      //   component: BeneficiaryAuditDetails
-      // },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
       },
-      //   {
-      //   path: 'audit',
-      //   component: BeneficiaryAudit,
-      // },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
       },
-      // {
-      //   path: 'id-card',
-      //   component: BeneficiaryIdCard,
-      // },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
@@ -89,16 +78,10 @@ export const routes: Routes = [
         path: 'list',
         component: PendingBeneficiaryList,
       },
-        {
+      {
         path: 'edit/:applicationId',
         component: PendingBeneficiaryManage,
       },
-       
-     
-      // {
-      //   path: 'id-card',
-      //   component: BeneficiaryIdCard,
-      // },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
@@ -106,7 +89,10 @@ export const routes: Routes = [
     path: 'beneficiary-approval',
     canActivate: [routeGuard],
     children: [
-      { path: 'list', component: BeneficiaryEditApprovalList },
+      {
+        path: 'list',
+        component: BeneficiaryEditApprovalList,
+      },
       {
         path: 'edit-details/:id',
         component: BeneficiaryEditApprovalDetails,
@@ -122,34 +108,76 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-
-  {
+    {
     path: 'beneficiary-audit',
     canActivate: [routeGuard],
     children: [
-      { path: 'audit', component: BeneficiaryAudit },
-      { path: 'audit-details/:id', component: BeneficiaryAuditDetails },
-      { path: '', pathMatch: 'full', redirectTo: 'audit' },
+      {
+        path: 'list',
+        component: BeneficiaryAudit,
+      },
+      {
+        path: 'audit-details/:id',
+        component: BeneficiaryAuditDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
   {
     path: 'report',
     canActivate: [routeGuard],
-    component: ReportComponent,
+   children: [
+    {
+      path: 'boma-wise-beneficiary-list',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 1, reportTitle: 'Boma Wise Beneficiary List Report' }
+    },
+    {
+      path: 'data-entry-wise-registration',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 2, reportTitle: 'Boma & Data Entry Staff Wise Registration Report' }
+    },
+    {
+      path: 'boma-wise-age-group',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 5, reportTitle: 'Boma Wise Age Group Report' }
+    },
+    {
+      path: 'interested-in-component2',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 6, reportTitle: 'Households Interested in Component 2 Report' }
+    },
+    {
+      path: 'biometric-match-list',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 7, reportTitle: 'Report for Biometric Match List' }
+    },
+    {
+      path: 'complete-household-survey',
+      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
+      data: { reportType: 8, reportTitle: 'Complete Household Survey Report' }
+    }
+  ]
   },
-  {
+      {
     path: 'restore',
     canActivate: [routeGuard],
     children: [
-      { path: 'list', component: BeneficiaryRestore },
-      { path: 'details/:id', component: BeneficiaryRestoreDetails },
-      { path: '', pathMatch: 'full', redirectTo: 'audit' },
+      {
+        path: 'list',
+        component: BeneficiaryRestore,
+      },
+      {
+        path: 'details/:id',
+        component: BeneficiaryRestoreDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,
     path: '**',
   },
 ];
+

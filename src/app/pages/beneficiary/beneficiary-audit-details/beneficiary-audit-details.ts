@@ -137,7 +137,7 @@ export class BeneficiaryAuditDetails implements OnInit {
     {
       label: 'Beneficiary Audit List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary-audit/audit',
+      routerLink: '/beneficiary-audit/list',
     },
     { label: 'Beneficiary Audit Details', icon: 'fas fa-user-cog me-2' },
   ];

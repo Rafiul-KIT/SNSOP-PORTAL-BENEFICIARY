@@ -16,6 +16,7 @@ import { ReportCompleteHouseholdSurvey } from "../report-list/report-complete-ho
 import { ReportReconciledSummaryResult } from "../report-list/report-reconciled-summary-result/report-reconciled-summary-result";
 import { ReportReconciliationSummaryCount } from "../report-list/report-reconciliation-summary-count/report-reconciliation-summary-count";
 import { Button } from "primeng/button";
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -59,7 +60,8 @@ export class ReportComponent implements OnInit {
 
   constructor(
     private apiService : ApiService, 
-    public lookupService: LookupService
+    public lookupService: LookupService,
+    private route: ActivatedRoute
   ) { }
 
   showReportForm = (reportType: number, reportTitle: string): void => {
@@ -483,12 +485,20 @@ export class ReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.items = [{ label: 'Report', icon: 'fas fa-chart-line me-2' }];
     this.home = { 
       label: '', 
       icon: 'fas fa-home me-2', 
       routerLink: '/' 
     };
     this.isLoading = false;
+
+    this.route.data.subscribe(data => {
+      const reportType = data['reportType'];
+      const reportTitle = data['reportTitle'];
+      if (reportType && reportTitle) {
+        this.items = [{ label: reportTitle, icon: 'fas fa-chart-line me-2' }];
+        this.showReportForm(reportType, reportTitle);
+      }
+    });
   }
 }

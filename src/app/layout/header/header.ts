@@ -103,69 +103,83 @@ export class Header {
         icon: 'fas fa-tachometer-alt',
         routerLink: 'dashboard',
       },
- 
+
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
+          {
+            label: 'Pending Verification List',
+            icon: 'fas fa-list',
+            routerLink: 'pending-beneficiary/list',
+          },
           {
             label: 'Beneficiary List',
             icon: 'fas fa-list',
             routerLink: 'beneficiary/list',
           },
           {
+            label: 'Approval List',
+            icon: 'fas fa-user-check',
+            routerLink: 'beneficiary-approval/list',
+          },
+          {
+            label: 'Beneficiary Audit List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary-audit/list',
+          },
+          {
+            label: 'Archived Beneficiary List',
+            icon: 'fas fa-list',
+            routerLink: 'restore/list',
+          },
+          {
             label: 'New Registration',
             icon: 'fas fa-user-plus',
             routerLink: 'beneficiary/new-registration',
           },
-
-          // {
-          //   label: 'Approval List',
-          //   icon: 'fas fa-user-check',
-          //   routerLink: 'beneficiary-approval-list/edit',
-          // },
-          
-        
         ],
       },
-
-      {
-        label: 'Pending Beneficiaries',
-        icon: 'fas fa-clock',
-        items: [
-          {
-            label: 'Pending List',
-            icon: 'fas fa-list',
-            routerLink: 'pending-beneficiary/list',
-          },
-          
-        
-        ],
-      },
-           
- 
-
-      {
-        label: 'Approval List',
-        icon: 'fas fa-user-check',
-        items: [
-          {
-            label: 'List',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary-approval/list',
-          },
-          // {
-          //   label: 'Approval List',
-          //   icon: 'fas fa-user-check',
-          //   routerLink: 'beneficiary-approval-list/edit',
-          // },
-        ],
-      },
-
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        routerLink: 'adjudication-list',
+        routerLink: 'adjudication/list',
+      },
+      {
+        label: 'Report',
+        icon: 'fas fa-file-alt',
+        items: [
+          {
+            label: 'Boma Wise Beneficiary List Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-beneficiary-list',
+          },
+          {
+            label: 'Boma & Data Entry Staff Wise Registration Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/data-entry-wise-registration',
+          },
+          {
+            label: 'Boma Wise Age Group Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-age-group',
+          },
+          {
+            label: 'Households Interested in Component 2 Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/interested-in-component2',
+          },
+          {
+            label: 'Report for Biometric Match List',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/biometric-match-list',
+          },
+          {
+            label: 'Complete Household Survey Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/complete-household-survey',
+          },
+        ],
       },
       {
         label: 'Beneficiary ID Cards',
@@ -183,43 +197,18 @@ export class Header {
         icon: 'fas fa-file-export',
         routerLink: 'lipw-export',
       },
-      { label: 'Report', icon: 'fas fa-file-alt', routerLink: 'report' },
-      // { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary-audit/audit' },
-      {
-        label: 'Beneficiary Audit',
-        icon: 'fas fa-history',
-        items: [
-          {
-            label: 'Audit List',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary-audit/audit',
-          },
-        ],
-      },
-
-      {
-        label: 'Archived Beneficiary',
-        icon: 'fas fa-trash-restore',
-        items: [
-          {
-            label: 'Archived List',
-            icon: 'fas fa-list',
-            routerLink: 'restore/list',
-          },
-        ],
-      },
-  
- 
     ];
   }
 
-  filterMenusByAccess(menus: any[], allowed: string[]): any[] {
+  // ✅ Recursive filter: keep only allowed menus (parent and child)
+  filterMenusByAccess(menus: any[], allowedNames: string[]): any[] {
     return menus
-      .filter((menu) => allowed.includes(menu.label))
+      .filter((menu) => allowedNames.includes(menu.label)) // filter parent menus
       .map((menu) => ({
         ...menu,
+        // Recursively filter child menus if the parent is allowed
         items: menu.items
-          ? this.filterMenusByAccess(menu.items, allowed)
+          ? this.filterMenusByAccess(menu.items, allowedNames)
           : undefined,
       }));
   }

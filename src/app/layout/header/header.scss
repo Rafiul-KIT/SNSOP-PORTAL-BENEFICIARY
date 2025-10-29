@@ -3,14 +3,14 @@
   top: 0;
   left: 0;
   height: 60px;
-  background-color: #ffffff;
+  background-color: #CFE2FF;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100vw;
   padding: 0 10px;
   z-index: 99999;
-  border-bottom: 1px solid #95bce4;
+  border-bottom: 1px solid #0481fd;
 
   .portals {
     color: #202020;
@@ -84,8 +84,8 @@
     padding: 16px;
     max-width: 425px;
     height: auto;
-    background: #ffffff;
-    box-shadow: 0px 24px 48px -12px rgba(16, 24, 40, 0.18);
+    background: #E7F1FF;
+    box-shadow: 0px 24px 48px -12px rgba(79, 128, 226, 0.18);
     border-radius: 0 12px 12px 0;
     transition: 0.3s;
 
@@ -113,7 +113,7 @@
         width: 120px;
         height: 123px;
         background: #ffffff;
-        border: 2px solid #eaecf0;
+        border: 2px solid #afc3eb;
         border-radius: 12px;
         transition: 0.3s;
 

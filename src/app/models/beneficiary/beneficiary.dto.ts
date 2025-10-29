@@ -71,6 +71,8 @@ export interface BeneficiaryDto {
   householdMember35?: HouseholdMemberGroup;
   householdMember64?: HouseholdMemberGroup;
   householdMember65?: HouseholdMemberGroup;
+  householdMemberLactating35?: HouseholdMemberGroup;
+  householdMemberLactating64?: HouseholdMemberGroup;
 
   isReadWrite: boolean;
   memberReadWrite: number;
