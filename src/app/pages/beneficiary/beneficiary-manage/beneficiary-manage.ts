@@ -1620,6 +1620,8 @@ export class BeneficiaryManage implements OnInit {
           (+fg.get(g.maleTotal)?.value || 0) +
           (+fg.get(g.femaleTotal)?.value || 0);
       }
+      sum += (+fg.get('f18_35_lactating_total')?.value || 0);
+      sum += (+fg.get('f36_64_lactating_total')?.value || 0);
       const size = +fg.get('householdSize')?.value || 0;
       if (size <= 0)
         return {

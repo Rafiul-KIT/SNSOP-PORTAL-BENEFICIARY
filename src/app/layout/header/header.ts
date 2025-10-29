@@ -109,14 +109,14 @@ export class Header {
         icon: 'fas fa-people-group',
         items: [
           {
+            label: 'Pending Verification List',
+            icon: 'fas fa-list',
+            routerLink: 'pending-beneficiary/list',
+          },
+          {
             label: 'Beneficiary List',
             icon: 'fas fa-list',
             routerLink: 'beneficiary/list',
-          },
-          {
-            label: 'New Registration',
-            icon: 'fas fa-user-plus',
-            routerLink: 'beneficiary/new-registration',
           },
           {
             label: 'Approval List',
@@ -134,9 +134,9 @@ export class Header {
             routerLink: 'restore/list',
           },
           {
-            label: 'Pending Verification List',
-            icon: 'fas fa-list',
-            routerLink: 'pending-beneficiary/list',
+            label: 'New Registration',
+            icon: 'fas fa-user-plus',
+            routerLink: 'beneficiary/new-registration',
           },
         ],
       },
@@ -148,7 +148,38 @@ export class Header {
       {
         label: 'Report',
         icon: 'fas fa-file-alt',
-        routerLink: 'report',
+        items: [
+          {
+            label: 'Boma Wise Beneficiary List Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-beneficiary-list',
+          },
+          {
+            label: 'Boma & Data Entry Staff Wise Registration Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/data-entry-wise-registration',
+          },
+          {
+            label: 'Boma Wise Age Group Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-age-group',
+          },
+          {
+            label: 'Households Interested in Component 2 Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/interested-in-component2',
+          },
+          {
+            label: 'Report for Biometric Match List',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/biometric-match-list',
+          },
+          {
+            label: 'Complete Household Survey Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/complete-household-survey',
+          },
+        ],
       },
       {
         label: 'Beneficiary ID Cards',

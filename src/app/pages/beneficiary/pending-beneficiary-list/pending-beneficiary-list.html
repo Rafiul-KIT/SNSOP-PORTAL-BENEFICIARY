@@ -218,6 +218,21 @@
 }
 
 <p-toast position="bottom-right"></p-toast>
+<p-confirmDialog key="approveDialog" position="center" [style]="{ width: '500px' }">
+    <ng-template pTemplate="message">
+        <div>
+            <p>
+                Are you sure you want to
+                <strong style="color: green;">approve</strong>?
+            </p>
+
+            <div class="mt-2">
+                <textarea rows="3" [(ngModel)]="approveComment" class="form-control"
+                    placeholder="Optional: Add a comment for approval."></textarea>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
 <p-confirmDialog key="archiveDialog" position="center" [style]="{ width: '500px' }">
     <ng-template pTemplate="message">
         <div>

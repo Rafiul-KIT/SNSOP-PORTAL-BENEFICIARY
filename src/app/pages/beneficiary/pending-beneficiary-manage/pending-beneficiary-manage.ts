@@ -65,6 +65,7 @@ export class PendingBeneficiaryManage implements OnInit {
   isLoading = true;
   beneficiaryForm!: FormGroup;
   originalDto!: BeneficiaryDto;
+  deleteComment: string = '';
   destroy$ = new Subject<void>();
 
   genderOptions: LookupItem[] = [];
@@ -160,11 +161,11 @@ export class PendingBeneficiaryManage implements OnInit {
 
   items = [
     {
-      label: 'Pending Beneficiary List',
+      label: 'Beneficiary List',
       icon: 'fas fa-users me-2',
-      routerLink: '/pending-beneficiary/list',
+      routerLink: '/beneficiary/list',
     },
-    { label: 'Pending Beneficiary Edit' , icon: 'fas fa-user-pen me-2' },
+    { label: 'Manage Beneficiary', icon: 'fas fa-user-pen me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 
@@ -175,7 +176,8 @@ export class PendingBeneficiaryManage implements OnInit {
     private lookup: LookupService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) {}
 
   // ========= Init =========
@@ -229,6 +231,16 @@ export class PendingBeneficiaryManage implements OnInit {
       );
     });
 
+    this.beneficiaryForm.addControl('f18_35_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
+    this.beneficiaryForm.addControl('f36_64_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
     // Form-level validators (mirror Java)
     this.beneficiaryForm.setValidators([
       this.breakdownSubcategoryNotExceedTotal(),
@@ -253,6 +265,7 @@ export class PendingBeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
+ 
     this.beneficiaryForm
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
@@ -289,6 +302,13 @@ export class PendingBeneficiaryManage implements OnInit {
       .get('idType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe(() => this.updateIdLogic());
+
+    this.beneficiaryForm
+      .get('hasMobileWallet')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((value) => {
+        this.updateMobileWalletValidation(value);
+      });
 
     this.beneficiaryForm
       .get('mainIncomeSource')
@@ -359,6 +379,32 @@ export class PendingBeneficiaryManage implements OnInit {
       }
       nickNameControl.updateValueAndValidity({ emitEvent: false });
     }
+  }
+
+  private updateMobileWalletValidation(value: string): void {
+    const mobileMoneyProviderCtrl =
+      this.beneficiaryForm.get('mobileMoneyProvider')!;
+    const mobileWalletNumberCtrl =
+      this.beneficiaryForm.get('mobileWalletNumber')!;
+
+    if (value === 'Yes') {
+      mobileMoneyProviderCtrl.enable({ emitEvent: false });
+      mobileWalletNumberCtrl.enable({ emitEvent: false });
+      mobileMoneyProviderCtrl.setValidators([this.notSelectRequired()]);
+      mobileWalletNumberCtrl.setValidators([
+        Validators.required,
+        this.pattern(this.RGX_PHONE_9, 'Phone number must be 9 digits'),
+      ]);
+    } else {
+      mobileMoneyProviderCtrl.disable({ emitEvent: false });
+      mobileWalletNumberCtrl.disable({ emitEvent: false });
+      mobileMoneyProviderCtrl.clearValidators();
+      mobileWalletNumberCtrl.clearValidators();
+      mobileMoneyProviderCtrl.setValue('', { emitEvent: false });
+      mobileWalletNumberCtrl.setValue('', { emitEvent: false });
+    }
+    mobileMoneyProviderCtrl.updateValueAndValidity({ emitEvent: false });
+    mobileWalletNumberCtrl.updateValueAndValidity({ emitEvent: false });
   }
 
   private updateIncomeSourceFields(value: string): void {
@@ -524,6 +570,9 @@ export class PendingBeneficiaryManage implements OnInit {
     this.updateIncomeSourceFields(
       this.beneficiaryForm.get('mainIncomeSource')!.value
     );
+    this.updateMobileWalletValidation(
+      this.beneficiaryForm.get('hasMobileWallet')!.value
+    );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
     this.cdr.detectChanges();
@@ -599,16 +648,9 @@ export class PendingBeneficiaryManage implements OnInit {
       ],
 
       mainIncomeSource: ['', [this.notSelectRequired()]],
-      mobileMoneyProvider: ['', [this.notSelectRequired()]],
-      mobileWalletNumber: [
-        ''
-        // [
-        //   this.optionalPattern(
-        //     this.RGX_PHONE_9,
-        //     'Phone number length must be 9'
-        //   ),
-        // ],
-      ],
+      hasMobileWallet: [''],
+      mobileMoneyProvider: [''],
+      mobileWalletNumber: [''],
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],
 
@@ -672,6 +714,7 @@ export class PendingBeneficiaryManage implements OnInit {
               ? dto.selectionReason
               : [dto.selectionReason],
             canReadWrite: dto.isReadWrite ? 'Yes' : 'No',
+            hasMobileWallet: dto.hasMobileWallet ? 'Yes' : 'No',
             literate1835Count: dto.memberReadWrite ?? '0',
             householdSize: dto.householdSize ?? '0',
           },
@@ -748,6 +791,19 @@ export class PendingBeneficiaryManage implements OnInit {
           f65_both: 'femaleBoth',
         });
 
+        pv(dto.householdMemberLactating35, {
+          f18_35_lactating_total: 'femaleTotal',
+          f18_35_lactating_disable: 'femaleDisable',
+          f18_35_lactating_chronic: 'femaleChronicalIll',
+          f18_35_lactating_both: 'femaleBoth',
+        });
+        pv(dto.householdMemberLactating64, {
+          f36_64_lactating_total: 'femaleTotal',
+          f36_64_lactating_disable: 'femaleDisable',
+          f36_64_lactating_chronic: 'femaleChronicalIll',
+          f36_64_lactating_both: 'femaleBoth',
+        });
+
         // Alternates
         this.alternates.clear();
         if (dto.alternatePayee1)
@@ -769,6 +825,82 @@ export class PendingBeneficiaryManage implements OnInit {
       .finally(() => {
         this.isLoading = false;
         this.cdr.detectChanges();
+      });
+  }
+
+    // ========= Delete =========
+  onDelete() {
+    this.deleteComment = ''; // Reset comment
+    this.confirmationService.confirm({
+      key: 'deleteDialog',
+      header: 'Confirm Deletion',
+      accept: () => this.handleDeleteConfirm(),
+      reject: () => {
+        // User rejected, no action needed
+      },
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+    });
+  }
+
+  handleDeleteConfirm() {
+    if (!this.deleteComment || !this.deleteComment.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Comment Required',
+        detail: 'Please provide a reason for deletion.',
+      });
+      return;
+    }
+
+    const applicationId = this.originalDto?.applicationId;
+    if (!applicationId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Beneficiary Application ID not found.',
+      });
+      return;
+    }
+
+    const payload = {
+      householdId: [applicationId],
+      comment: this.deleteComment.trim(),
+      enrollmentStatusEnum: 'DELETE'
+    };
+
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.api.POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+      .then((res: any) => {
+        if (res.status === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Deleted',
+            detail: 'Beneficiary has been deleted successfully.',
+          });
+          setTimeout(() => this.router.navigate(['/beneficiary/list']), 2000);
+        } else {
+          const errorMsg = res.errorMsg || 'An unknown error occurred during deletion.';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Deletion Failed',
+            detail: errorMsg,
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Delete beneficiary error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'API Error',
+          detail: 'Failed to delete beneficiary.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -806,6 +938,7 @@ export class PendingBeneficiaryManage implements OnInit {
       payload.respondentId = formValue.respondentIdNumber;
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
+    payload.hasMobileWallet = formValue.hasMobileWallet === 'Yes';
     payload.mobileMoneyProvider = formValue.mobileMoneyProvider;
     const wphone = formValue.mobileWalletNumber?.toString().trim();
     payload.mobileWalletNumber = phone ? `+211${wphone}` : '';
@@ -845,6 +978,23 @@ export class PendingBeneficiaryManage implements OnInit {
     copy('householdMember35', 'm18_35', 'f18_35');
     copy('householdMember64', 'm36_64', 'f36_64');
     copy('householdMember65', 'm65', 'f65');
+
+    if (payload.householdMemberLactating35) {
+      Object.assign(payload.householdMemberLactating35, {
+        femaleTotal: +formValue.f18_35_lactating_total || 0,
+        femaleDisable: +formValue.f18_35_lactating_disable || 0,
+        femaleChronicalIll: +formValue.f18_35_lactating_chronic || 0,
+        femaleBoth: +formValue.f18_35_lactating_both || 0,
+      });
+    }
+    if (payload.householdMemberLactating64) {
+      Object.assign(payload.householdMemberLactating64, {
+        femaleTotal: +formValue.f36_64_lactating_total || 0,
+        femaleDisable: +formValue.f36_64_lactating_disable || 0,
+        femaleChronicalIll: +formValue.f36_64_lactating_chronic || 0,
+        femaleBoth: +formValue.f36_64_lactating_both || 0,
+      });
+    }
 
     // Alternates
     if (formValue.alternates?.length) {
@@ -1516,6 +1666,23 @@ export class PendingBeneficiaryManage implements OnInit {
   private breakdownSubcategoryNotExceedTotal() {
     return (fg: AbstractControl): ValidationErrors | null => {
       if (!(fg instanceof FormGroup)) return null;
+
+      const f18_35_lactating_total = +fg.get('f18_35_lactating_total')?.value || 0;
+      const f18_35_lactating_disable = +fg.get('f18_35_lactating_disable')?.value || 0;
+      const f18_35_lactating_chronic = +fg.get('f18_35_lactating_chronic')?.value || 0;
+      const f18_35_lactating_both = +fg.get('f18_35_lactating_both')?.value || 0;
+      if (f18_35_lactating_disable + f18_35_lactating_chronic + f18_35_lactating_both > f18_35_lactating_total) {
+          return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
+      }
+
+      const f36_64_lactating_total = +fg.get('f36_64_lactating_total')?.value || 0;
+      const f36_64_lactating_disable = +fg.get('f36_64_lactating_disable')?.value || 0;
+      const f36_64_lactating_chronic = +fg.get('f36_64_lactating_chronic')?.value || 0;
+      const f36_64_lactating_both = +fg.get('f36_64_lactating_both')?.value || 0;
+      if (f36_64_lactating_disable + f36_64_lactating_chronic + f36_64_lactating_both > f36_64_lactating_total) {
+          return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
+      }
+      
       for (const g of this.ageGroups) {
         const mT = +fg.get(g.maleTotal)?.value || 0;
         const mD = +fg.get(g.maleDisable)?.value || 0;
@@ -1548,6 +1715,8 @@ export class PendingBeneficiaryManage implements OnInit {
           (+fg.get(g.maleTotal)?.value || 0) +
           (+fg.get(g.femaleTotal)?.value || 0);
       }
+      sum += (+fg.get('f18_35_lactating_total')?.value || 0);
+      sum += (+fg.get('f36_64_lactating_total')?.value || 0);
       const size = +fg.get('householdSize')?.value || 0;
       if (size <= 0)
         return {
