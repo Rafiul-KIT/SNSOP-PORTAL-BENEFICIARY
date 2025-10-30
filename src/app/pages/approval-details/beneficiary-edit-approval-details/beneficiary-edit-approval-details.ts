@@ -424,24 +424,32 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
 
 
 private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: BiometricDto, target: 'old' | 'edited' = 'old', isAlternate: boolean = false) {
-  const checkForWsq = (wsqField: string | undefined): boolean => wsqField != null && wsqField !== '';
+  const getFingerImage = (wsqField: string | undefined): string => {
+    if (wsqField === 'NEW-FINGERPRINT-ADDED') {
+      return 'images/new-finger.png';
+    }
+    if (wsqField != null && wsqField !== '') {
+      return 'images/finger.png';
+    }
+    return 'images/no-finger.png';
+  };
 
   // Prepare Beneficiary's biometric data (right and left fingers)
   const prepareFingerData = (bioData?: BiometricDto) => {
     const right = !bioData ? [] : [
-      { label: 'Thumb', image: checkForWsq(bioData.wsqRt) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Right Thumb' },
-      { label: 'Index', image: checkForWsq(bioData.wsqRi) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Right Index' },
-      { label: 'Middle', image: checkForWsq(bioData.wsqRm) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Right Middle' },
-      { label: 'Ring', image: checkForWsq(bioData.wsqRr) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Right Ring' },
-      { label: 'Little', image: checkForWsq(bioData.wsqRs) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Right Little' },
+      { label: 'Thumb', image: getFingerImage(bioData.wsqRt), tooltip: 'Right Thumb' },
+      { label: 'Index', image: getFingerImage(bioData.wsqRi), tooltip: 'Right Index' },
+      { label: 'Middle', image: getFingerImage(bioData.wsqRm), tooltip: 'Right Middle' },
+      { label: 'Ring', image: getFingerImage(bioData.wsqRr), tooltip: 'Right Ring' },
+      { label: 'Little', image: getFingerImage(bioData.wsqRs), tooltip: 'Right Little' },
     ];
 
     const left = !bioData ? [] : [
-      { label: 'Thumb', image: checkForWsq(bioData.wsqLt) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Left Thumb' },
-      { label: 'Index', image: checkForWsq(bioData.wsqLi) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Left Index' },
-      { label: 'Middle', image: checkForWsq(bioData.wsqLm) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Left Middle' },
-      { label: 'Ring', image: checkForWsq(bioData.wsqLr) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Left Ring' },
-      { label: 'Little', image: checkForWsq(bioData.wsqLs) ? 'images/finger.png' : 'images/no-finger.png', tooltip: 'Left Little' },
+      { label: 'Thumb', image: getFingerImage(bioData.wsqLt), tooltip: 'Left Thumb' },
+      { label: 'Index', image: getFingerImage(bioData.wsqLi), tooltip: 'Left Index' },
+      { label: 'Middle', image: getFingerImage(bioData.wsqLm), tooltip: 'Left Middle' },
+      { label: 'Ring', image: getFingerImage(bioData.wsqLr), tooltip: 'Left Ring' },
+      { label: 'Little', image: getFingerImage(bioData.wsqLs), tooltip: 'Left Little' },
     ];
 
     return { right, left };

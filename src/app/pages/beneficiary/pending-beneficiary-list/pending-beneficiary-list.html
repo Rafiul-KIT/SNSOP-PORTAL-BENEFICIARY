@@ -130,15 +130,15 @@
             </tr>
             <tr>
                 <!-- Select All Checkbox -->
-              <th style="min-width: 8rem; ">
-  <div class="d-flex align-items-center gap-2">
+                <th style="min-width: 8rem; ">
+                    <div class="d-flex align-items-center gap-2">
 
-    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        <label class="me-2 mb-0 fw-semibold text-primery" style="font-size: 0.9rem;">
-      Select All
-    </label>
-  </div>
-</th>
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        <label class="me-2 mb-0 fw-semibold text-primery" style="font-size: 0.9rem;">
+                            Select All
+                        </label>
+                    </div>
+                </th>
 
 
                 <th>Application ID</th>
@@ -189,27 +189,22 @@
             </tr>
         </ng-template>
     </p-table>
-<div class="paginator-wrapper">
-    <p-paginator
-        class="paginator-sticky"
-        style="margin-bottom: 10px;"
-        [rows]="pageSize"
-        [totalRecords]="totalRecords"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        (onPageChange)="onPageChange($event)"
-        [first]="currentPage * pageSize"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
-    </p-paginator>
+    <div class="paginator-wrapper">
+        <p-paginator class="paginator-sticky" style="margin-bottom: 10px;" [rows]="pageSize"
+            [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)"
+            [first]="currentPage * pageSize"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+        </p-paginator>
+        <!-- Approve button visually inside paginator -->
+        <p-button label="Approve Selected" icon="fas fa-check" size="small" severity="primary"
+            (onClick)="approveSelected()" class="approve-btn">
+        </p-button>
 
-    <!-- Approve button visually inside paginator -->
-    <p-button
-        label="Approve Selected"
-        icon="pi pi-check"
-    size="small"
-        (onClick)="approveSelected()"
-        class="approve-btn">
-    </p-button>
-</div>
+        <!-- Delete Selected button visually inside paginator -->
+        <p-button label="Delete Selected" icon="fas fa-trash" size="small" severity="danger"
+            (onClick)="deleteSelected()" class="delete-btn">
+        </p-button>
+    </div>
 
 </div>
 
@@ -218,6 +213,23 @@
 }
 
 <p-toast position="bottom-right"></p-toast>
+
+<p-confirmDialog key="deleteDialog" position="center" [style]="{ width: '500px' }">
+    <ng-template pTemplate="message">
+        <div>
+            <p>
+                Are you sure you want to
+                <strong style="color: red;">delete</strong> the selected beneficiaries?
+            </p>
+
+            <div class="mt-2">
+                <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
+                    placeholder="Add a comment for deletion."></textarea>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
 <p-confirmDialog key="approveDialog" position="center" [style]="{ width: '500px' }">
     <ng-template pTemplate="message">
         <div>
