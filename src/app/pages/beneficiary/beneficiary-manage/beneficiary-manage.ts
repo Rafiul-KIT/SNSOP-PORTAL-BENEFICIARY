@@ -56,6 +56,7 @@ export class BeneficiaryManage implements OnInit {
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
   currentIdTypeOptions: any[] = [];
+  alternateIdTypeOptions: any[] = [];
   occupationOptions: any[] = [];
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
@@ -170,6 +171,7 @@ export class BeneficiaryManage implements OnInit {
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
+    this.alternateIdTypeOptions = this.lookup.getDocumentTypeEnum().filter(o => o.value !== 'SELECT');
 
     this.occupationOptions = this.lookup.getNomineeOccupationEnum();
     this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
@@ -246,6 +248,8 @@ export class BeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
+    this.beneficiaryForm.get('selectionReasons')?.disable();
+    this.beneficiaryForm.get('supportType')?.disable();
  
     this.beneficiaryForm
       .get('supportType')
@@ -917,7 +921,7 @@ export class BeneficiaryManage implements OnInit {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : null,
         });
         delete (payload.alternatePayee1 as any).biometrics;
       }
@@ -935,14 +939,14 @@ export class BeneficiaryManage implements OnInit {
           documentType: a.documentType,
           documentTypeOther: a.documentTypeOther,
           nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : null,
         });
         delete (payload.alternatePayee2 as any).biometrics;
       }
     }
 
     // Nominees
-    payload.nominees = this.nominees.value.map((n: any) => ({
+    payload.nominees = formValue.nominees.map((n: any) => ({
       id: n.id,
       applicationId: payload.applicationId,
       nomineeFirstName: n.nomineeFirstName,
@@ -1031,18 +1035,6 @@ export class BeneficiaryManage implements OnInit {
   }
 
   // ========= Selection reasons =========
-  onReasonChange(event: any, value: string) {
-    const reasons: string[] =
-      this.beneficiaryForm.get('selectionReasons')?.value || [];
-    if (event.target.checked) {
-      if (!reasons.includes(value)) reasons.push(value);
-    } else {
-      const i = reasons.indexOf(value);
-      if (i >= 0) reasons.splice(i, 1);
-    }
-    this.beneficiaryForm.patchValue({ selectionReasons: reasons });
-    this.beneficiaryForm.updateValueAndValidity();
-  }
 
   filterReasons(supportType: string) {
     if (supportType === 'Public Works') {
@@ -1120,7 +1112,8 @@ export class BeneficiaryManage implements OnInit {
     });
 
     // OTHER relationship
-    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe((v) => {
+    const updateNomineeRelationship = () => {
+      const v = g.get('relationshipWithHouseholdHead')?.value;
       const c = g.get('relationshipOther')!;
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
@@ -1135,23 +1128,32 @@ export class BeneficiaryManage implements OnInit {
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe(
+      updateNomineeRelationship
+    );
+    updateNomineeRelationship();
 
     // OTHER occupation
-    g.get('nomineeOccupation')?.valueChanges.subscribe((v) => {
+    const updateNomineeOccupation = () => {
+      const v = g.get('nomineeOccupation')?.value;
       const c = g.get('otherOccupation')!;
-      if (v === 'OTHER') {
+      if (v === 'OTHERS') {
+        c.enable({ emitEvent: false });
         c.setValidators([
           Validators.required,
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 25),
         ]);
       } else {
+        c.disable({ emitEvent: false });
         c.clearValidators();
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('nomineeOccupation')?.valueChanges.subscribe(updateNomineeOccupation);
+    updateNomineeOccupation();
 
     return g;
   }
@@ -1214,7 +1216,8 @@ export class BeneficiaryManage implements OnInit {
     });
 
     // OTHER relationship
-    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe((v) => {
+    const updateAltRelationship = () => {
+      const v = g.get('relationshipWithHouseholdHead')?.value;
       const c = g.get('relationshipOther')!;
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
@@ -1229,7 +1232,10 @@ export class BeneficiaryManage implements OnInit {
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('relationshipWithHouseholdHead')
+      ?.valueChanges.subscribe(updateAltRelationship);
+    updateAltRelationship();
 
     // ID rules (AlForm1Validation)
     const updateAltId = () => {
@@ -1377,6 +1383,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeAge: 'Age',
       isReadWrite: 'Can Read/Write',
       nomineeOccupation: 'Occupation',
+      otherOccupation: 'Other Occupation',
     };
 
     const label = fieldLabels[fieldName] || fieldName;
