@@ -21,17 +21,17 @@ export interface BeneficiaryDto {
   applicationId: string;
 
   respondentFirstName: string;
-  respondentMiddleName?: string;
+  respondentMiddleName?: string | null;
   respondentLastName: string;
-  respondentNickName?: string;
+  respondentNickName?: string | null;
 
-  spouseFirstName?: string;
-  spouseMiddleName?: string;
-  spouseLastName?: string;
-  spouseNickName?: string;
+  spouseFirstName?: string | null;
+  spouseMiddleName?: string | null;
+  spouseLastName?: string | null;
+  spouseNickName?: string | null;
 
   relationshipWithHouseholdHead: RelationshipWithHead;
-  relationshipOther?: string;
+  relationshipOther?: string | null;
 
   respondentAge: number;
   respondentGender: Gender;
@@ -39,12 +39,12 @@ export interface BeneficiaryDto {
   respondentLegalStatus: LegalStatus;
 
   documentType: DocumentType;
-  documentTypeOther?: string;
+  documentTypeOther?: string | null;
   respondentId: string;
-  respondentPhoneNo: string;
+  respondentPhoneNo?: string | null;
 
   householdIncomeSource: HouseholdIncomeSource;
-  incomeSourceOther?: string;
+  incomeSourceOther?: string | null;
   householdMonthlyAvgIncome: number;
   currency: Currency;
 
@@ -94,7 +94,7 @@ export interface BeneficiaryDto {
   registrationPhase: RegPhase;
   hasMobileWallet: boolean;
   mobileMoneyProvider?: MobileMoneyProvider;
-  mobileWalletNumber?: string;
+  mobileWalletNumber?: string | null;
 
   requestId: string;
   comment: string;

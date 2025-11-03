@@ -325,16 +325,16 @@
                 </div>
 
                 <div class="col-md-4 mb-1">
-                    <label>Has mobile wallet?</label><br />
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="Yes" formControlName="hasMobileWallet" />
-                      Yes
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="No" formControlName="hasMobileWallet" />
-                      No
-                    </div>
+                  <label>Has mobile wallet?</label><br />
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="Yes" formControlName="hasMobileWallet" />
+                    Yes
                   </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="No" formControlName="hasMobileWallet" />
+                    No
+                  </div>
+                </div>
 
                 <!-- Mobile money -->
                 <div class="col-md-4 mb-1">
@@ -398,7 +398,8 @@
                   <div class="border rounded p-2">
                     @for (reason of filteredReasons; track reason.value) {
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" [value]="reason.value" [checked]="isReasonSelected(reason.value)" [disabled]="true" />
+                      <input class="form-check-input" type="checkbox" [value]="reason.value"
+                        [checked]="isReasonSelected(reason.value)" [disabled]="true" />
                       <label class="form-check-label">{{ reason.label }}</label>
                     </div>
                     } @empty {

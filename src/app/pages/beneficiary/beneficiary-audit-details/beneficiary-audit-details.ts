@@ -41,14 +41,14 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
-  relationshipOther?: string;
+  relationshipOther?: string | null;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
   respondentId: string;
-  phone: string;
+  phone?: string | null;
   documentType: string;
   mobileMoneyProvider?: MobileMoneyProvider;
-  mobileWalletNumber?: string;
+  mobileWalletNumber?: string | null;
   registrationPhase: string;
 
   photo?: string;
