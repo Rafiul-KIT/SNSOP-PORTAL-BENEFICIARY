@@ -964,6 +964,11 @@ export class PendingBeneficiaryManage implements OnInit {
           nationalId: a.nationalId?.trim() || '',
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+
+        if (payload.alternatePayee1.documentType === 'NONE') {
+            payload.alternatePayee1.documentTypeOther = null;
+            payload.alternatePayee1.nationalId = '';
+        }
         delete (payload.alternatePayee1 as any).biometrics;
       }
       if (payload.alternatePayee2 && formValue.alternates[1]) {
@@ -983,6 +988,11 @@ export class PendingBeneficiaryManage implements OnInit {
           nationalId: a.nationalId?.trim() || '',
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+        
+        if (payload.alternatePayee2.documentType === 'NONE') {
+            payload.alternatePayee2.documentTypeOther = null;
+            payload.alternatePayee2.nationalId = '';
+        }
         delete (payload.alternatePayee2 as any).biometrics;
       }
     }
@@ -1330,7 +1340,7 @@ export class PendingBeneficiaryManage implements OnInit {
         type.disable({ emitEvent: false });
         num.disable({ emitEvent: false });
         other.disable({ emitEvent: false });
-        type.setValue('', { emitEvent: false });
+        type.setValue('NONE', { emitEvent: false });
         num.setValue('', { emitEvent: false });
         other.setValue('', { emitEvent: false });
       }
@@ -1718,7 +1728,15 @@ export class PendingBeneficiaryManage implements OnInit {
         return { m: 'm65_total', f: 'f65_total' };
       };
       const g = group(age);
-      if ((+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0) <= 0) {
+      let count = (+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0);
+
+      if (age >= 18 && age <= 35) {
+        count += (+fg.get('f18_35_lactating_total')?.value || 0);
+      } else if (age >= 36 && age <= 64) {
+        count += (+fg.get('f36_64_lactating_total')?.value || 0);
+      }
+
+      if (count <= 0) {
         return { ageMissing: 'Age not found in household breakdown' };
       }
       return null;
@@ -1734,6 +1752,8 @@ export class PendingBeneficiaryManage implements OnInit {
         if ((+fg.get(g.maleTotal)?.value || 0) > 0) anyMale = true;
         if ((+fg.get(g.femaleTotal)?.value || 0) > 0) anyFemale = true;
       }
+      if ((+fg.get('f18_35_lactating_total')?.value || 0) > 0) anyFemale = true;
+      if ((+fg.get('f36_64_lactating_total')?.value || 0) > 0) anyFemale = true;
       if (gender === 'MALE' && !anyMale)
         return {
           genderMismatch:

@@ -47,7 +47,7 @@ interface BeneficiaryVm {
   respondentId: string;
   phone?: string | null;
   documentType: string;
-  documentTypeOther?: string;
+  documentTypeOther?: string | null;
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string | null;
   registrationPhase: string;
@@ -73,7 +73,7 @@ interface BeneficiaryVm {
     relationshipOther?: string;
     nationalId: string;
     phone: string;
-    documentType: string;
+    documentType?: string;
     documentTypeOther?: string;
     photo?: string;
     biometric?: BiometricDto;
@@ -392,7 +392,7 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
           nationalId: alt.nationalId ?? '',
           phone: alt.payeePhoneNo ?? '',
           documentType: alt.documentType,
-          documentTypeOther: alt.documentTypeOther,
+          documentTypeOther: alt.documentTypeOther ?? undefined,
           photo: normalizePhoto(alt.biometrics?.photoData),
           biometric: alt.biometrics,
 

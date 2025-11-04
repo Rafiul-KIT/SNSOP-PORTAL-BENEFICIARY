@@ -41,10 +41,10 @@ export const routeGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: 
   }
 
   const permittedMenus = JSON.parse(menus);
-  const targetUrl = state.url.startsWith('/') ? state.url.substring(1) : state.url;
+  const targetUrl = state.url.split('?')[0]; // Strip query parameters
 
   const hasAccess = (menus: any[], url: string): boolean => {
-    const cleanUrl = url.split('?')[0]; // Remove query parameters
+    const cleanUrl = url.split('?')[0]; // Remove query parameters from the URL
     const urlSegments = cleanUrl.split('/').filter(s => s.length > 0);
 
     for (const menu of menus) {
@@ -70,6 +70,19 @@ export const routeGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: 
         }
       }
     }
+    // If the route is not found in the menu, allow access to known dynamic paths like:
+    //  - /beneficiary/details/:id
+    //  - /beneficiary/edit/:applicationId
+    //  - Any other parameterized route you want to allow
+    const dynamicRoutePrefixes = ['/beneficiary/details/','/beneficiary/edit/','/beneficiary/migrate/', '/adjudication/', '/report/', '/restore/', '/pending-beneficiary/', '/beneficiary-approval/', '/beneficiary-audit/'];
+
+    // Check if the route starts with any of the dynamic prefixes
+    for (const prefix of dynamicRoutePrefixes) {
+      if (cleanUrl.startsWith(prefix)) {
+        return true; // Allow access to dynamic routes
+      }
+    }
+
     return false;
   };
 
