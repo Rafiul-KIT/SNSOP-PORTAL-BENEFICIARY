@@ -30,7 +30,8 @@
                 <button type="button" class="btn btn-danger btn-sm me-2" (click)="onDelete()">
                     <i class="fas fa-trash-alt me-1"></i> Delete
                 </button>
-                <p-button class="ms-auto p-2" severity="info" type="submit" icon="fas fa-save" size="small" label="Update" />
+                <p-button class="ms-auto p-2" severity="info" type="submit" icon="fas fa-save" size="small"
+                    label="Update" />
             </div>
 
         </p-tablist>
@@ -352,6 +353,20 @@
 
                                 </div>
 
+                                <div class="col-md-4 mb-1">
+                                    <label>Has mobile wallet?</label><br />
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="Yes"
+                                            formControlName="hasMobileWallet" />
+                                        Yes
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="No"
+                                            formControlName="hasMobileWallet" />
+                                        No
+                                    </div>
+                                </div>
+
                                 <!-- Mobile money -->
                                 <div class="col-md-4 mb-1">
                                     <p-floatlabel variant="on">
@@ -374,14 +389,14 @@
                                             <input pInputText id="mobileWalletNumber"
                                                 formControlName="mobileWalletNumber" class="form-control border-start-0"
                                                 maxlength="9" placeholder="Enter 9-digit number"
-                                                [ngClass]="{'is-invalid': showError('respondentMobileWalletPhone')}" />
+                                                [ngClass]="{'is-invalid': showError('mobileWalletNumber')}" />
                                         </div>
                                         <label for="mobileWalletNumber">Mobile Wallet Number</label>
                                     </p-floatlabel>
 
-                                    <!-- @if (showError('mobileWalletNumber')) {
-                  <small class="text-danger">{{ getError('mobileWalletNumber') }}</small>
-                  } -->
+                                    @if (showError('mobileWalletNumber')) {
+                                    <small class="text-danger">{{ getError('mobileWalletNumber') }}</small>
+                                    }
                                 </div>
 
 
@@ -418,8 +433,7 @@
                                         @for (reason of filteredReasons; track reason.value) {
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" [value]="reason.value"
-                                                (change)="onReasonChange($event, reason.value)"
-                                                [checked]="isReasonSelected(reason.value)" />
+                                                [checked]="isReasonSelected(reason.value)" [disabled]="true" />
                                             <label class="form-check-label">{{ reason.label }}</label>
                                         </div>
                                         } @empty {
@@ -739,7 +753,7 @@
                                             <!-- ID Type -->
                                             <div class="col-md-12 mb-2">
                                                 <p-floatlabel variant="on">
-                                                    <p-select [options]="currentIdTypeOptions" optionLabel="label"
+                                                    <p-select [options]="alternateIdTypeOptions" optionLabel="label"
                                                         optionValue="value" formControlName="documentType" class="w-100"
                                                         [ngClass]="{'is-invalid': (alternates.at(i).get('documentType')?.touched || alternates.at(i).get('documentType')?.dirty) && alternates.at(i).get('documentType')?.invalid}">
                                                     </p-select>
@@ -999,15 +1013,20 @@
                                                 }
                                             </div>
 
-                                            <!-- Add 'otherOccupation' if you want to surface it -->
-                                            <!--
-                        <div class="col-md-12 mb-2">
-                          <p-floatlabel variant="on">
-                            <input pInputText formControlName="otherOccupation" class="w-100" />
-                            <label>Other Occupation</label>
-                          </p-floatlabel>
-                        </div>
-                        -->
+                                            <div class="col-md-12 mb-2">
+                                                <p-floatlabel variant="on">
+                                                    <input pInputText formControlName="otherOccupation" class="w-100"
+                                                        [ngClass]="{'is-invalid': (nominees.at(i).get('otherOccupation')?.touched || nominees.at(i).get('otherOccupation')?.dirty) && nominees.at(i).get('otherOccupation')?.invalid}" />
+                                                    <label>Other Occupation</label>
+                                                </p-floatlabel>
+                                                @if ((nominees.at(i).get('otherOccupation')?.touched ||
+                                                nominees.at(i).get('otherOccupation')?.dirty) &&
+                                                nominees.at(i).get('otherOccupation')?.invalid) {
+                                                <small class="text-danger">
+                                                    {{ getError('otherOccupation', i, 'nominees') }}
+                                                </small>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

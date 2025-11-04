@@ -1403,6 +1403,10 @@
                                                 <td>{{ oldDetails!.nominees[i].nomineeOccupation }}</td>
                                             </tr>
                                             <tr>
+                                                <th>Other Occupation</th>
+                                                <td>{{ oldDetails!.nominees[i].otherOccupation }}</td>
+                                            </tr>
+                                            <tr>
                                                 <th>Can read/Write</th>
                                                 <td>
                                                     {{
@@ -1467,6 +1471,13 @@
                                                 <td [ngClass]="changedClass(nomineePath(i,'nomineeOccupation'))"
                                                     [pTooltip]="diffTip(nomineePath(i,'nomineeOccupation'))">
                                                     {{ editedDetails!.nominees[i].nomineeOccupation }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Other Occupation</th>
+                                                <td [ngClass]="changedClass(nomineePath(i,'otherOccupation'))"
+                                                    [pTooltip]="diffTip(nomineePath(i,'otherOccupation'))">
+                                                    {{ editedDetails!.nominees[i].otherOccupation }}
                                                 </td>
                                             </tr>
                                             <tr>

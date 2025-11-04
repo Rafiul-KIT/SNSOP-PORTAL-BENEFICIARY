@@ -70,10 +70,10 @@ interface BeneficiaryVm {
 
 @Component({
   selector: 'app-pending-beneficiary-list',
- 
+
   templateUrl: './pending-beneficiary-list.html',
   styleUrl: './pending-beneficiary-list.scss',
-    standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -103,7 +103,7 @@ export class PendingBeneficiaryList implements OnInit {
   counties: LookupItem[] = [];
   payams: LookupItem[] = [];
   bomas: LookupItem[] = [];
-selectedBeneficiaries: any[] = [];
+  selectedBeneficiaries: any[] = [];
   approveComment: string = '';
 
   genderOptions: LookupItem[] = [];
@@ -428,7 +428,7 @@ selectedBeneficiaries: any[] = [];
       reject: () => {
         // User rejected, no action needed
       },
-      acceptButtonStyleClass: 'p-button-success',
+      acceptButtonStyleClass: 'p-button-primary',
       rejectButtonStyleClass: 'p-button-danger',
     });
   }
@@ -506,7 +506,81 @@ selectedBeneficiaries: any[] = [];
 
   }
 
+  deleteSelected() {
+    if (!this.selectedBeneficiaries || this.selectedBeneficiaries.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Selection',
+        detail: 'Please select beneficiaries to delete.',
+      });
+      return;
+    }
 
+    this.archiveComment = ''; // Reset comment
+
+    this.confirmationService.confirm({
+      key: 'deleteDialog',
+      accept: () => this.handleDeleteConfirm(),
+      reject: () => {
+        // User rejected, no action needed
+      },
+      acceptButtonStyleClass: 'p-button-primary',
+      rejectButtonStyleClass: 'p-button-danger',
+    });
+  }
+
+  handleDeleteConfirm() {
+    if (!this.archiveComment || !this.archiveComment.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Comment Required',
+        detail: 'Please provide a reason for deletion before proceeding.',
+      });
+      return;
+    }
+    const householdIds = this.selectedBeneficiaries.map(b => b.applicationId);
+
+    const payload = {
+      householdId: householdIds,
+      comment: this.archiveComment.trim(),
+      enrollmentStatusEnum: 'DELETE',
+    };
+
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.api.POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+      .then((res: any) => {
+        if (res.status === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Deleted',
+            detail: 'Selected beneficiaries have been deleted successfully.',
+          });
+          this.archiveComment = '';
+          this.selectedBeneficiaries = [];
+          this.fetchPage(this.currentPage, this.pageSize);
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Delete Failed',
+            detail: res.errorMsg || 'There was a problem deleting the beneficiaries.',
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Delete beneficiaries error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'API Error',
+          detail: 'Failed to send delete request.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }

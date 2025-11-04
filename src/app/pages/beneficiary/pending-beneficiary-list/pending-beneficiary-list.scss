@@ -9,7 +9,14 @@
 /* Position button inside the paginator bar */
 .approve-btn {
   position: absolute;
-  background-color:#007a3d !important ;
+  right: 12rem;
+  border-radius: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.delete-btn {
+  position: absolute;
   right: 1rem;
   border-radius: 0.5rem;
   top: 50%;

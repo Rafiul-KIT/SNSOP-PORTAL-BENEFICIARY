@@ -56,6 +56,7 @@ export class BeneficiaryManage implements OnInit {
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
   currentIdTypeOptions: any[] = [];
+  alternateIdTypeOptions: any[] = [];
   occupationOptions: any[] = [];
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
@@ -170,6 +171,7 @@ export class BeneficiaryManage implements OnInit {
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
+    this.alternateIdTypeOptions = this.lookup.getDocumentTypeEnum().filter(o => o.value !== 'SELECT');
 
     this.occupationOptions = this.lookup.getNomineeOccupationEnum();
     this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
@@ -246,6 +248,8 @@ export class BeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
+    this.beneficiaryForm.get('selectionReasons')?.disable();
+    this.beneficiaryForm.get('supportType')?.disable();
  
     this.beneficiaryForm
       .get('supportType')
@@ -310,7 +314,7 @@ export class BeneficiaryManage implements OnInit {
     if (value === 'OTHER') {
       control.enable({ emitEvent: false });
       control.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
         this.size(2, 50),
       ]);
@@ -336,7 +340,7 @@ export class BeneficiaryManage implements OnInit {
       if (value === 'MARRIED') {
         control.enable({ emitEvent: false });
         control.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -373,7 +377,7 @@ export class BeneficiaryManage implements OnInit {
       mobileWalletNumberCtrl.enable({ emitEvent: false });
       mobileMoneyProviderCtrl.setValidators([this.notSelectRequired()]);
       mobileWalletNumberCtrl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_PHONE_9, 'Phone number must be 9 digits'),
       ]);
     } else {
@@ -395,7 +399,7 @@ export class BeneficiaryManage implements OnInit {
     if (value === 'OTHER') {
       otherControl.enable({ emitEvent: false });
       otherControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
         this.size(2, 50),
       ]);
@@ -453,9 +457,9 @@ export class BeneficiaryManage implements OnInit {
       hasIdControl.setValue('Yes', { emitEvent: false });
       hasIdControl.disable({ emitEvent: false });
 
-      typeControl.setValidators([Validators.required]);
+      typeControl.setValidators([this.requiredWithWhitespace()]);
       numberControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_REFUGEE_ID, 'ID must be valid refugee format'),
         this.size(5, 14),
       ]);
@@ -463,14 +467,14 @@ export class BeneficiaryManage implements OnInit {
       typeControl.enable({ emitEvent: false });
       numberControl.enable({ emitEvent: false });
       typeControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.disallow(
           ['SELECT', 'PASSPORT', 'NATIONAL_ID', 'OTHER'],
           'Please select a valid ID type'
         ),
       ]);
       numberControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(
           this.RGX_REFUGEE_ID,
           'ID number must contain digits, letters, hyphen only'
@@ -492,18 +496,18 @@ export class BeneficiaryManage implements OnInit {
 
       if (hasIdControl.value === 'Yes') {
         typeControl.enable({ emitEvent: false });
-        typeControl.setValidators([Validators.required]);
+        typeControl.setValidators([this.requiredWithWhitespace()]);
 
         if (typeControl.value === 'OTHER') {
           otherControl.enable({ emitEvent: false });
           numberControl.enable({ emitEvent: false });
           otherControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_CHARS_SPACES, 'Only letters/spaces'),
             this.size(2, 50),
           ]);
           numberControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'),
             this.size(5, 14),
           ]);
@@ -517,7 +521,7 @@ export class BeneficiaryManage implements OnInit {
           numberControl.enable({ emitEvent: false });
           otherControl.disable({ emitEvent: false });
           numberControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'),
             this.size(5, 14),
           ]);
@@ -566,7 +570,7 @@ export class BeneficiaryManage implements OnInit {
       respondentFirstName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -575,7 +579,7 @@ export class BeneficiaryManage implements OnInit {
       respondentMiddleName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -584,7 +588,7 @@ export class BeneficiaryManage implements OnInit {
       respondentLastName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -679,7 +683,7 @@ export class BeneficiaryManage implements OnInit {
             respondentIdNumber: dto.respondentId,
             respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
               ? dto.respondentPhoneNo.substring(4)
-              : dto.respondentPhoneNo || '',
+              : dto.respondentPhoneNo || null,
             mainIncomeSource: dto.householdIncomeSource,
             mobileMoneyProvider: dto.mobileMoneyProvider,
             mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
@@ -810,45 +814,66 @@ export class BeneficiaryManage implements OnInit {
   }
 
   // ========= Build payload =========
+  private getOptionalStringValue(value: any): string | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    const trimmed = String(value).trim();
+    return trimmed === '' ? null : trimmed;
+  }
+
+  // ========= Build payload =========
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
     const payload: BeneficiaryDto = JSON.parse(
       JSON.stringify(this.originalDto)
     );
 
     payload.respondentFirstName = formValue.respondentFirstName;
-    payload.respondentMiddleName = formValue.respondentMiddleName;
+    payload.respondentMiddleName = this.getOptionalStringValue(
+      formValue.respondentMiddleName
+    );
     payload.respondentLastName = formValue.respondentLastName;
-    payload.respondentNickName = formValue.respondentNickName;
+    payload.respondentNickName = this.getOptionalStringValue(
+      formValue.respondentNickName
+    );
     payload.relationshipWithHouseholdHead = formValue.relationship;
-    payload.relationshipOther = formValue.relationshipOther;
+    payload.relationshipOther = this.getOptionalStringValue(
+      formValue.relationshipOther
+    );
     payload.respondentAge = +formValue.respondentAge;
     payload.respondentGender = formValue.gender;
     payload.respondentMaritalStatus = formValue.maritalStatus;
-    payload.spouseFirstName = formValue.spouseFirstName;
-    payload.spouseMiddleName = formValue.spouseMiddleName;
-    payload.spouseLastName = formValue.spouseLastName;
-    payload.spouseNickName = formValue.spouseNickName;
+    payload.spouseFirstName = this.getOptionalStringValue(
+      formValue.spouseFirstName
+    );
+    payload.spouseMiddleName = this.getOptionalStringValue(
+      formValue.spouseMiddleName
+    );
+    payload.spouseLastName = this.getOptionalStringValue(formValue.spouseLastName);
+    payload.spouseNickName = this.getOptionalStringValue(formValue.spouseNickName);
     payload.respondentLegalStatus = formValue.legalStatus;
-    payload.documentType = formValue.idType;
-    payload.documentTypeOther = formValue.idTypeOther;
     const phone = formValue.respondentPhone?.toString().trim();
-    payload.respondentPhoneNo = phone ? `+211${phone}` : '';
+    payload.respondentPhoneNo = phone ? `+211${phone}` : null;
     if (formValue.hasNationalId === 'No') {
       payload.documentType = 'NONE';
-      payload.documentTypeOther = '';
+      payload.documentTypeOther = null;
       payload.respondentId = '';
     } else {
       payload.documentType = formValue.idType;
-      payload.documentTypeOther = formValue.idTypeOther;
-      payload.respondentId = formValue.respondentIdNumber;
+      payload.documentTypeOther = this.getOptionalStringValue(
+        formValue.idTypeOther
+      );
+      payload.respondentId = formValue.respondentIdNumber?.trim() || '';
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
     payload.hasMobileWallet = formValue.hasMobileWallet === 'Yes';
-    payload.mobileMoneyProvider = formValue.mobileMoneyProvider;
+    payload.mobileMoneyProvider = formValue.mobileMoneyProvider || null;
     const wphone = formValue.mobileWalletNumber?.toString().trim();
-    payload.mobileWalletNumber = phone ? `+211${wphone}` : '';
-    payload.incomeSourceOther = formValue.otherIncomeSource;
-    payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
+    payload.mobileWalletNumber = wphone ? `+211${wphone}` : null;
+    payload.incomeSourceOther = this.getOptionalStringValue(
+      formValue.otherIncomeSource
+    );
+    payload.householdMonthlyAvgIncome = +formValue.avgMonthlyIncome || 0;
 
     payload.selectionCriteria =
       formValue.supportType === 'Public Works' ? 'LIPW' : 'DIS';
@@ -905,59 +930,69 @@ export class BeneficiaryManage implements OnInit {
     if (formValue.alternates?.length) {
       if (payload.alternatePayee1 && formValue.alternates[0]) {
         const a = formValue.alternates[0];
+        const altPhone = a.payeePhoneNo?.toString().trim();
         Object.assign(payload.alternatePayee1, {
           payeeFirstName: a.payeeFirstName,
-          payeeMiddleName: a.payeeMiddleName,
+          payeeMiddleName: this.getOptionalStringValue(a.payeeMiddleName),
           payeeLastName: a.payeeLastName,
-          payeeNickName: a.payeeNickName,
+          payeeNickName: this.getOptionalStringValue(a.payeeNickName),
           payeeGender: a.payeeGender,
           payeeAge: a.payeeAge,
           relationshipWithHouseholdHead: a.relationshipWithHouseholdHead,
-          relationshipOther: a.relationshipOther,
+          relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
-          documentTypeOther: a.documentTypeOther,
-          nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
+          nationalId: a.nationalId?.trim() || '',
+          payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+
+        if (payload.alternatePayee1.documentType === 'NONE') {
+            payload.alternatePayee1.documentTypeOther = null;
+            payload.alternatePayee1.nationalId = '';
+        }
         delete (payload.alternatePayee1 as any).biometrics;
       }
       if (payload.alternatePayee2 && formValue.alternates[1]) {
         const a = formValue.alternates[1];
+        const altPhone = a.payeePhoneNo?.toString().trim();
         Object.assign(payload.alternatePayee2, {
           payeeFirstName: a.payeeFirstName,
-          payeeMiddleName: a.payeeMiddleName,
+          payeeMiddleName: this.getOptionalStringValue(a.payeeMiddleName),
           payeeLastName: a.payeeLastName,
-          payeeNickName: a.payeeNickName,
+          payeeNickName: this.getOptionalStringValue(a.payeeNickName),
           payeeGender: a.payeeGender,
           payeeAge: a.payeeAge,
           relationshipWithHouseholdHead: a.relationshipWithHouseholdHead,
-          relationshipOther: a.relationshipOther,
+          relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
-          documentTypeOther: a.documentTypeOther,
-          nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
+          nationalId: a.nationalId?.trim() || '',
+          payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+        
+        if (payload.alternatePayee2.documentType === 'NONE') {
+            payload.alternatePayee2.documentTypeOther = null;
+            payload.alternatePayee2.nationalId = '';
+        }
         delete (payload.alternatePayee2 as any).biometrics;
       }
     }
 
     // Nominees
-    payload.nominees = this.nominees.value.map((n: any) => ({
+    payload.nominees = formValue.nominees.map((n: any) => ({
       id: n.id,
       applicationId: payload.applicationId,
       nomineeFirstName: n.nomineeFirstName,
       nomineeMiddleName: n.nomineeMiddleName,
       nomineeLastName: n.nomineeLastName,
-      nomineeNickName: n.nomineeNickName?.trim() ? n.nomineeNickName : null,
+      nomineeNickName: this.getOptionalStringValue(n.nomineeNickName),
       relationshipWithHouseholdHead: n.relationshipWithHouseholdHead,
-      relationshipOther: n.relationshipOther?.trim()
-        ? n.relationshipOther
-        : null,
+      relationshipOther: this.getOptionalStringValue(n.relationshipOther),
       nomineeAge: n.nomineeAge,
       nomineeGender: n.nomineeGender,
       isReadWrite: n.isReadWrite,
       nomineeOccupation: n.nomineeOccupation,
-      otherOccupation: n.otherOccupation?.trim() ? n.otherOccupation : null,
+      otherOccupation: this.getOptionalStringValue(n.otherOccupation),
     }));
 
     delete (payload as any).biometrics;
@@ -1031,18 +1066,6 @@ export class BeneficiaryManage implements OnInit {
   }
 
   // ========= Selection reasons =========
-  onReasonChange(event: any, value: string) {
-    const reasons: string[] =
-      this.beneficiaryForm.get('selectionReasons')?.value || [];
-    if (event.target.checked) {
-      if (!reasons.includes(value)) reasons.push(value);
-    } else {
-      const i = reasons.indexOf(value);
-      if (i >= 0) reasons.splice(i, 1);
-    }
-    this.beneficiaryForm.patchValue({ selectionReasons: reasons });
-    this.beneficiaryForm.updateValueAndValidity();
-  }
 
   filterReasons(supportType: string) {
     if (supportType === 'Public Works') {
@@ -1076,7 +1099,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeFirstName: [
         n.nomineeFirstName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1085,7 +1108,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeMiddleName: [
         n.nomineeMiddleName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1094,7 +1117,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeLastName: [
         n.nomineeLastName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1111,7 +1134,7 @@ export class BeneficiaryManage implements OnInit {
       relationshipOther: [n.relationshipOther || ''],
       nomineeAge: [n.nomineeAge || '', [this.intMin(1)]],
       nomineeGender: [n.nomineeGender || '', [this.notSelectRequired()]],
-      isReadWrite: [n.isReadWrite ?? null, [Validators.required]],
+      isReadWrite: [n.isReadWrite ?? null, [this.requiredWithWhitespace()]],
       nomineeOccupation: [
         n.nomineeOccupation || '',
         [this.notSelectRequired()],
@@ -1120,12 +1143,13 @@ export class BeneficiaryManage implements OnInit {
     });
 
     // OTHER relationship
-    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe((v) => {
+    const updateNomineeRelationship = () => {
+      const v = g.get('relationshipWithHouseholdHead')?.value;
       const c = g.get('relationshipOther')!;
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 25),
         ]);
@@ -1135,23 +1159,32 @@ export class BeneficiaryManage implements OnInit {
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe(
+      updateNomineeRelationship
+    );
+    updateNomineeRelationship();
 
     // OTHER occupation
-    g.get('nomineeOccupation')?.valueChanges.subscribe((v) => {
+    const updateNomineeOccupation = () => {
+      const v = g.get('nomineeOccupation')?.value;
       const c = g.get('otherOccupation')!;
       if (v === 'OTHER') {
+        c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 25),
         ]);
       } else {
+        c.disable({ emitEvent: false });
         c.clearValidators();
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('nomineeOccupation')?.valueChanges.subscribe(updateNomineeOccupation);
+    updateNomineeOccupation();
 
     return g;
   }
@@ -1162,7 +1195,7 @@ export class BeneficiaryManage implements OnInit {
       payeeFirstName: [
         a.payeeFirstName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1171,7 +1204,7 @@ export class BeneficiaryManage implements OnInit {
       payeeMiddleName: [
         a.payeeMiddleName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1180,7 +1213,7 @@ export class BeneficiaryManage implements OnInit {
       payeeLastName: [
         a.payeeLastName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1200,7 +1233,7 @@ export class BeneficiaryManage implements OnInit {
       payeePhoneNo: [
         a.payeePhoneNo?.startsWith('+211')
           ? a.payeePhoneNo.substring(4)
-          : a.payeePhoneNo || '',
+          : a.payeePhoneNo || null,
         [
           this.optionalPattern(
             this.RGX_PHONE_9,
@@ -1214,12 +1247,13 @@ export class BeneficiaryManage implements OnInit {
     });
 
     // OTHER relationship
-    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe((v) => {
+    const updateAltRelationship = () => {
+      const v = g.get('relationshipWithHouseholdHead')?.value;
       const c = g.get('relationshipOther')!;
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 50),
         ]);
@@ -1229,7 +1263,10 @@ export class BeneficiaryManage implements OnInit {
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('relationshipWithHouseholdHead')
+      ?.valueChanges.subscribe(updateAltRelationship);
+    updateAltRelationship();
 
     // ID rules (AlForm1Validation)
     const updateAltId = () => {
@@ -1245,14 +1282,14 @@ export class BeneficiaryManage implements OnInit {
       if (hasId === 'Yes') {
         type.enable({ emitEvent: false });
         type.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.disallow(['SELECT'], 'ID Type is required'),
         ]);
 
         if (type.value === 'OTHER') {
           other.enable({ emitEvent: false });
           other.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
             this.size(2, 50),
           ]);
@@ -1273,7 +1310,7 @@ export class BeneficiaryManage implements OnInit {
           ];
           const isRef = refTypes.includes(type.value);
           num.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(
               isRef ? this.RGX_REFUGEE_ID : this.RGX_ALPHANUM_SPACE,
               isRef
@@ -1288,7 +1325,7 @@ export class BeneficiaryManage implements OnInit {
         type.disable({ emitEvent: false });
         num.disable({ emitEvent: false });
         other.disable({ emitEvent: false });
-        type.setValue('', { emitEvent: false });
+        type.setValue('NONE', { emitEvent: false });
         num.setValue('', { emitEvent: false });
         other.setValue('', { emitEvent: false });
       }
@@ -1377,6 +1414,7 @@ export class BeneficiaryManage implements OnInit {
       nomineeAge: 'Age',
       isReadWrite: 'Can Read/Write',
       nomineeOccupation: 'Occupation',
+      otherOccupation: 'Other Occupation',
     };
 
     const label = fieldLabels[fieldName] || fieldName;
@@ -1466,12 +1504,27 @@ export class BeneficiaryManage implements OnInit {
       'Must not contain space, digits or special characters'
     );
   }
+  private requiredWithWhitespace() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (
+        value === null ||
+        value === undefined ||
+        (typeof value === 'string' && value.trim().length === 0)
+      ) {
+        return { required: true };
+      }
+      return null;
+    };
+  }
+
   private size(min: number, max: number) {
     return (c: AbstractControl): ValidationErrors | null => {
-      const v = (c.value ?? '').toString();
+      const v = (c.value ?? '').toString().trim();
       if (!v) return null;
-      if (v.length < min) return { size: `Must be at least ${min} characters` };
-      if (v.length > max) return { size: `Must be at most ${max} characters` };
+      const len = v.length;
+      if (len < min) return { size: { min, max, actual: len } };
+      if (len > max) return { size: { min, max, actual: len } };
       return null;
     };
   }
@@ -1660,7 +1713,15 @@ export class BeneficiaryManage implements OnInit {
         return { m: 'm65_total', f: 'f65_total' };
       };
       const g = group(age);
-      if ((+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0) <= 0) {
+      let count = (+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0);
+
+      if (age >= 18 && age <= 35) {
+        count += (+fg.get('f18_35_lactating_total')?.value || 0);
+      } else if (age >= 36 && age <= 64) {
+        count += (+fg.get('f36_64_lactating_total')?.value || 0);
+      }
+
+      if (count <= 0) {
         return { ageMissing: 'Age not found in household breakdown' };
       }
       return null;
@@ -1676,6 +1737,8 @@ export class BeneficiaryManage implements OnInit {
         if ((+fg.get(g.maleTotal)?.value || 0) > 0) anyMale = true;
         if ((+fg.get(g.femaleTotal)?.value || 0) > 0) anyFemale = true;
       }
+      if ((+fg.get('f18_35_lactating_total')?.value || 0) > 0) anyFemale = true;
+      if ((+fg.get('f36_64_lactating_total')?.value || 0) > 0) anyFemale = true;
       if (gender === 'MALE' && !anyMale)
         return {
           genderMismatch:
