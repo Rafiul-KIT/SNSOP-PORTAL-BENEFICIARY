@@ -1188,7 +1188,7 @@ export class PendingBeneficiaryManage implements OnInit {
     const updateNomineeOccupation = () => {
       const v = g.get('nomineeOccupation')?.value;
       const c = g.get('otherOccupation')!;
-      if (v === 'OTHERS') {
+      if (v === 'OTHER') {
         c.enable({ emitEvent: false });
         c.setValidators([
           this.requiredWithWhitespace(),
