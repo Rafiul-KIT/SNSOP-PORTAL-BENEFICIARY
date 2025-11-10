@@ -16,7 +16,7 @@ import { ReportCompleteHouseholdSurvey } from "../report-list/report-complete-ho
 import { ReportReconciledSummaryResult } from "../report-list/report-reconciled-summary-result/report-reconciled-summary-result";
 import { ReportReconciliationSummaryCount } from "../report-list/report-reconciliation-summary-count/report-reconciliation-summary-count";
 import { Button } from "primeng/button";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 
 @Component({
@@ -61,7 +61,8 @@ export class ReportComponent implements OnInit {
   constructor(
     private apiService : ApiService, 
     public lookupService: LookupService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   showReportForm = (reportType: number, reportTitle: string): void => {
@@ -500,5 +501,8 @@ export class ReportComponent implements OnInit {
         this.showReportForm(reportType, reportTitle);
       }
     });
+  }
+  showUnderConstruction() {
+    this.router.navigate(['under-construction']);
   }
 }

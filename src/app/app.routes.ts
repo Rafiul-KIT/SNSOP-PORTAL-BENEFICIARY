@@ -28,7 +28,7 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [routeGuard],
   },
-    {
+  {
     path: 'adjudication',
     canActivate: [routeGuard],
     children: [
@@ -108,7 +108,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-    {
+  {
     path: 'beneficiary-audit',
     canActivate: [routeGuard],
     children: [
@@ -126,40 +126,58 @@ export const routes: Routes = [
   {
     path: 'report',
     canActivate: [routeGuard],
-   children: [
-    {
-      path: 'boma-wise-beneficiary-list',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 1, reportTitle: 'Boma Wise Beneficiary List Report' }
-    },
-    {
-      path: 'data-entry-wise-registration',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 2, reportTitle: 'Boma & Data Entry Staff Wise Registration Report' }
-    },
-    {
-      path: 'boma-wise-age-group',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 5, reportTitle: 'Boma Wise Age Group Report' }
-    },
-    {
-      path: 'interested-in-component2',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 6, reportTitle: 'Households Interested in Component 2 Report' }
-    },
-    {
-      path: 'biometric-match-list',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 7, reportTitle: 'Report for Biometric Match List' }
-    },
-    {
-      path: 'complete-household-survey',
-      loadComponent: () => import('./pages/report/report').then(m => m.ReportComponent),
-      data: { reportType: 8, reportTitle: 'Complete Household Survey Report' }
-    }
-  ]
-  },
+    children: [
       {
+        path: 'boma-wise-beneficiary-list',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 1,
+          reportTitle: 'Boma Wise Beneficiary List Report',
+        },
+      },
+      {
+        path: 'data-entry-wise-registration',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 2,
+          reportTitle: 'Boma & Data Entry Staff Wise Registration Report',
+        },
+      },
+      {
+        path: 'boma-wise-age-group',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: { reportType: 5, reportTitle: 'Boma Wise Age Group Report' },
+      },
+      {
+        path: 'interested-in-component2',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 6,
+          reportTitle: 'Households Interested in Component 2 Report',
+        },
+      },
+      {
+        path: 'biometric-match-list',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: { reportType: 7, reportTitle: 'Report for Biometric Match List' },
+      },
+      {
+        path: 'complete-household-survey',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 8,
+          reportTitle: 'Complete Household Survey Report',
+        },
+      },
+    ],
+  },
+  {
     path: 'restore',
     canActivate: [routeGuard],
     children: [
@@ -174,10 +192,13 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
+  {
+    path: 'under-construction',
+    component: BeneficiaryIdCard,
+  },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,
     path: '**',
   },
 ];
-
