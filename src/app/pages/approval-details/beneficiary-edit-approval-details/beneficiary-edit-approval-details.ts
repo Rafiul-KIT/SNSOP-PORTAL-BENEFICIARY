@@ -507,7 +507,7 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
   private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
     this.approvalStatus = res?.approvalStatus || '';
-    console.log(res?.data);
+   
     return (res?.data || {}) as ApprovalDetailsResponse;
   }
 
