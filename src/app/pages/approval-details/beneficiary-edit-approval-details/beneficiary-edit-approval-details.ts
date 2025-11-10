@@ -65,7 +65,7 @@ interface BeneficiaryVm {
   householdMember64: any;
   householdMember65: any;
 
-  alternates: {
+  alternates: ({
     name: string;
     age: number;
     gender: string;
@@ -79,7 +79,7 @@ interface BeneficiaryVm {
     biometric?: BiometricDto;
     rightFingers: FingerVm[];
     leftFingers: FingerVm[];
-  }[];
+  } | null)[] | null;
 
   nominees: {
     name: string;
@@ -294,9 +294,9 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
 
   // Prepare finger images based on old or edited data
   if (isOld) {
-    this.prepareFingerImages(biometrics, undefined, 'old');  // For beneficiary's old biometric data
+    this.prepareFingerImages(biometrics, undefined, 'old');
   } else {
-    this.prepareFingerImages(biometrics, undefined, 'edited');  // For beneficiary's edited biometric data
+    this.prepareFingerImages(biometrics, undefined, 'edited');
   }
 
   // Map the Beneficiary data
@@ -371,38 +371,38 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
       lon: dto.address?.lon,
     },
 
-    // Process alternates biometrics
-    alternates: [dto.alternatePayee1, dto.alternatePayee2]
-      .filter((alt): alt is AlternatePayeeDto => !!alt)
-      .map((alt) => {
-        const biometrics = alt.biometrics;
+    // ✅ FIXED: Don't filter out null values, map them instead
+    alternates: [dto.alternatePayee1, dto.alternatePayee2].map((alt) => {
+      // If alt is null, return null
+      if (!alt) return null;
 
-        // Handle alternates' biometrics separately for old or edited data
-        if (isOld) {
-          this.prepareFingerImages(undefined, biometrics, 'old', true);  // For old biometric data of alternates
-        } else {
-          this.prepareFingerImages(undefined, biometrics, 'edited', true);  // For edited biometric data of alternates
-        }
+      const biometrics = alt.biometrics;
 
-        return {
-          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
-          age: alt.payeeAge ?? 0,
-          gender: alt.payeeGender,
-          relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
-          relationshipOther: alt.relationshipOther,
-          nationalId: alt.nationalId ?? '',
-          phone: alt.payeePhoneNo ?? '',
-          documentType: alt.documentType,
-          documentTypeOther: alt.documentTypeOther ?? undefined,
-          photo: normalizePhoto(alt.biometrics?.photoData),
-          biometric: alt.biometrics,
+      // Handle alternates' biometrics separately for old or edited data
+      if (isOld) {
+        this.prepareFingerImages(undefined, biometrics, 'old', true);
+      } else {
+        this.prepareFingerImages(undefined, biometrics, 'edited', true);
+      }
 
-          // Alternate-specific finger sets for old or edited data
-          rightFingers: isOld ? this.oldRightFingers.slice(-5) : this.editedRightFingers.slice(-5), // Get the last 5 right fingers
-          leftFingers: isOld ? this.oldLeftFingers.slice(-5) : this.editedLeftFingers.slice(-5),   // Get the last 5 left fingers
-        };
-      }),
-      nominees: (dto.nominees || []).map((n: NomineeDto) => ({
+      return {
+        name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
+        age: alt.payeeAge ?? 0,
+        gender: alt.payeeGender,
+        relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
+        relationshipOther: alt.relationshipOther,
+        nationalId: alt.nationalId ?? '',
+        phone: alt.payeePhoneNo ?? '',
+        documentType: alt.documentType,
+        documentTypeOther: alt.documentTypeOther ?? undefined,
+        photo: normalizePhoto(alt.biometrics?.photoData),
+        biometric: alt.biometrics,
+        rightFingers: isOld ? this.oldRightFingers.slice(-5) : this.editedRightFingers.slice(-5),
+        leftFingers: isOld ? this.oldLeftFingers.slice(-5) : this.editedLeftFingers.slice(-5),
+      };
+    }),
+
+    nominees: (dto.nominees || []).map((n: NomineeDto) => ({
       name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
         .filter(Boolean)
         .join(' '),
@@ -416,10 +416,8 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
       isReadWrite: n.isReadWrite,
     })),
 
-
-    // Beneficiary-specific finger images for old or edited data
-    rightFingers: isOld ? this.oldRightFingers.slice(0, 5) : this.editedRightFingers.slice(0, 5),  // Get the first 5 right fingers (old or edited)
-    leftFingers: isOld ? this.oldLeftFingers.slice(0, 5) : this.editedLeftFingers.slice(0, 5),    // Get the first 5 left fingers (old or edited)
+    rightFingers: isOld ? this.oldRightFingers.slice(0, 5) : this.editedRightFingers.slice(0, 5),
+    leftFingers: isOld ? this.oldLeftFingers.slice(0, 5) : this.editedLeftFingers.slice(0, 5),
   };
 }
 
@@ -509,6 +507,7 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
   private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
     this.approvalStatus = res?.approvalStatus || '';
+    console.log(res?.data);
     return (res?.data || {}) as ApprovalDetailsResponse;
   }
 
