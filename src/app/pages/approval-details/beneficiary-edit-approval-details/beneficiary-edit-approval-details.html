@@ -1527,7 +1527,23 @@
                                 </div>
                             </div>
                             } @else {
-                            <div class="alert alert-gray text-center">No data (Edited)</div>
+                                @if (oldDetails?.nominees?.[i]) {
+                                    <div class="card shadow-sm rounded mb-3">
+                                        <div class="card-header bg-gray text-black text-center">
+                                            Nominee {{ i + 1 }} (Edited)
+                                        </div>
+                                        <div class="card-body text-center d-flex align-items-center justify-content-center"
+                                            style="min-height: 242px;">
+                                            <div>
+                                                <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                                                <h5 class="mt-3 text-danger">Nominee Deleted</h5>
+                                                <p class="text-muted">This nominee has been removed.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                } @else {
+                                    <div class="alert alert-gray text-center">No data (Edited)</div>
+                                }
                             }
                         </div>
                         }

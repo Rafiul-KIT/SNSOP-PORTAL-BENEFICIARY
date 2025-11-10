@@ -981,6 +981,7 @@ export class BeneficiaryManage implements OnInit {
     // Nominees
     payload.nominees = formValue.nominees.map((n: any) => ({
       id: n.id,
+      nomineeIndex: n.nomineeIndex, // Include nomineeIndex in the payload
       applicationId: payload.applicationId,
       nomineeFirstName: n.nomineeFirstName,
       nomineeMiddleName: n.nomineeMiddleName,
@@ -1096,6 +1097,7 @@ export class BeneficiaryManage implements OnInit {
   private createNomineeGroup(n: any = {}): FormGroup {
     const g = this.fb.group({
       id: [n.id || null],
+      nomineeIndex: [n.nomineeIndex || null], // Add nomineeIndex to the form group
       nomineeFirstName: [
         n.nomineeFirstName || '',
         [

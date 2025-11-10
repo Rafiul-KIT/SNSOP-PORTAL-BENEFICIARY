@@ -402,19 +402,45 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
       };
     }),
 
-    nominees: (dto.nominees || []).map((n: NomineeDto) => ({
-      name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
-        .filter(Boolean)
-        .join(' '),
-      age: n.nomineeAge,
-      gender: n.nomineeGender,
-      relation: n.relationshipWithHouseholdHead,
-      relationshipOther: n.relationshipOther,
-      nomineeOccupation: n.nomineeOccupation,
-      otherOccupation: n.otherOccupation,
-      photo: normalizeFinger(n.biometric?.photoData),
-      isReadWrite: n.isReadWrite,
-    })),
+    nominees: (() => {
+      const nomineeDtos: any[] = dto.nominees || [];
+
+      // If nomineeIndex is present, build a sparse array based on it.
+      if (nomineeDtos.length > 0 && nomineeDtos[0].nomineeIndex !== undefined) {
+        const sparseNominees: any[] = [];
+        for (const n of nomineeDtos) {
+          sparseNominees[n.nomineeIndex - 1] = { // Adjusted for 1-based index
+            name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
+              .filter(Boolean)
+              .join(' '),
+            age: n.nomineeAge,
+            gender: n.nomineeGender,
+            relation: n.relationshipWithHouseholdHead,
+            relationshipOther: n.relationshipOther,
+            nomineeOccupation: n.nomineeOccupation,
+            otherOccupation: n.otherOccupation,
+            photo: normalizeFinger(n.biometric?.photoData),
+            isReadWrite: n.isReadWrite,
+          };
+        }
+        return sparseNominees;
+      }
+
+      // Otherwise, do a direct map (old behavior)
+      return nomineeDtos.map((n: NomineeDto) => ({
+        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
+          .filter(Boolean)
+          .join(' '),
+        age: n.nomineeAge,
+        gender: n.nomineeGender,
+        relation: n.relationshipWithHouseholdHead,
+        relationshipOther: n.relationshipOther,
+        nomineeOccupation: n.nomineeOccupation,
+        otherOccupation: n.otherOccupation,
+        photo: normalizeFinger(n.biometric?.photoData),
+        isReadWrite: n.isReadWrite,
+      }));
+    })(),
 
     rightFingers: isOld ? this.oldRightFingers.slice(0, 5) : this.editedRightFingers.slice(0, 5),
     leftFingers: isOld ? this.oldLeftFingers.slice(0, 5) : this.editedLeftFingers.slice(0, 5),

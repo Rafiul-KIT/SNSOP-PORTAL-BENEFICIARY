@@ -16,4 +16,5 @@ export interface NomineeDto {
   nomineeOccupation: Occupation;
   otherOccupation?: string;
   biometric?: BiometricDto;
+  nomineeIndex?: number; // New field for nominee's original index
 }
