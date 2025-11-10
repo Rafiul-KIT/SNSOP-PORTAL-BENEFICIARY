@@ -119,6 +119,11 @@ export class Header {
             routerLink: 'beneficiary/list',
           },
           {
+            label: 'Beneficiary View List',
+            icon: 'fas fa-list',
+            routerLink: 'beneficiary/view-list',
+          },
+          {
             label: 'Approval List',
             icon: 'fas fa-user-check',
             routerLink: 'beneficiary-approval/list',

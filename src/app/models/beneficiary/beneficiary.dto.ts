@@ -40,7 +40,7 @@ export interface BeneficiaryDto {
 
   documentType: DocumentType;
   documentTypeOther?: string | null;
-  respondentId: string;
+  respondentId?: string | null;
   respondentPhoneNo?: string | null;
 
   householdIncomeSource: HouseholdIncomeSource;

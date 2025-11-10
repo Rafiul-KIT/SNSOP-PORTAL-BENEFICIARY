@@ -44,7 +44,7 @@ interface BeneficiaryVm {
   relationshipOther?: string | null;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
-  respondentId: string;
+  respondentId?: string | null;
   phone?: string | null;
   documentType: string;
   documentTypeOther?: string | null;
@@ -71,7 +71,7 @@ interface BeneficiaryVm {
     gender: string;
     relationshipWithHouseholdHead: RelationshipWithHead;
     relationshipOther?: string;
-    nationalId: string;
+    nationalId?: string | null;
     phone: string;
     documentType?: string;
     documentTypeOther?: string;
@@ -334,7 +334,7 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
     household: {
       incomeSource: dto.householdIncomeSource,
       incomeSourceOther: dto.incomeSourceOther,
-      monthlyIncome: dto.householdMonthlyAvgIncome,
+      monthlyIncome: dto.householdMonthlyAvgIncome ?? null,
       selectionCriteria: dto.selectionCriteria,
       selectionReasons: (dto.selectionReason || []).map((r: string) =>
         this.lookup.getSelectionReasonEnumByValue(r)
@@ -390,8 +390,8 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
           gender: alt.payeeGender,
           relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
           relationshipOther: alt.relationshipOther,
-          nationalId: alt.nationalId ?? '',
-          phone: alt.payeePhoneNo ?? '',
+          nationalId: alt.nationalId ?? null,
+          phone: alt.payeePhoneNo ?? null,
           documentType: alt.documentType,
           documentTypeOther: alt.documentTypeOther ?? undefined,
           photo: normalizePhoto(alt.biometrics?.photoData),

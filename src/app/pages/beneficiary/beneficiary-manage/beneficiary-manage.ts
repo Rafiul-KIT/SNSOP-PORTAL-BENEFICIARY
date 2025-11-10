@@ -857,13 +857,13 @@ export class BeneficiaryManage implements OnInit {
     if (formValue.hasNationalId === 'No') {
       payload.documentType = 'NONE';
       payload.documentTypeOther = null;
-      payload.respondentId = '';
+      payload.respondentId = null;
     } else {
       payload.documentType = formValue.idType;
       payload.documentTypeOther = this.getOptionalStringValue(
         formValue.idTypeOther
       );
-      payload.respondentId = formValue.respondentIdNumber?.trim() || '';
+      payload.respondentId = formValue.respondentIdNumber?.trim() || null;
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
     payload.hasMobileWallet = formValue.hasMobileWallet === 'Yes';
@@ -873,7 +873,7 @@ export class BeneficiaryManage implements OnInit {
     payload.incomeSourceOther = this.getOptionalStringValue(
       formValue.otherIncomeSource
     );
-    payload.householdMonthlyAvgIncome = +formValue.avgMonthlyIncome || 0;
+    payload.householdMonthlyAvgIncome = +formValue.avgMonthlyIncome || -1;
 
     payload.selectionCriteria =
       formValue.supportType === 'Public Works' ? 'LIPW' : 'DIS';
@@ -942,13 +942,13 @@ export class BeneficiaryManage implements OnInit {
           relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
           documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
-          nationalId: a.nationalId?.trim() || '',
+          nationalId: a.nationalId?.trim() || null,
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
 
         if (payload.alternatePayee1.documentType === 'NONE') {
             payload.alternatePayee1.documentTypeOther = null;
-            payload.alternatePayee1.nationalId = '';
+            payload.alternatePayee1.nationalId = null;
         }
         delete (payload.alternatePayee1 as any).biometrics;
       }
@@ -966,13 +966,13 @@ export class BeneficiaryManage implements OnInit {
           relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
           documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
-          nationalId: a.nationalId?.trim() || '',
+          nationalId: a.nationalId?.trim() || null,
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
         
         if (payload.alternatePayee2.documentType === 'NONE') {
             payload.alternatePayee2.documentTypeOther = null;
-            payload.alternatePayee2.nationalId = '';
+            payload.alternatePayee2.nationalId = null;
         }
         delete (payload.alternatePayee2 as any).biometrics;
       }

@@ -44,7 +44,7 @@ interface BeneficiaryVm {
   relationshipOther?: string | null;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
-  respondentId: string;
+  respondentId?: string | null;
   phone?: string | null;
   documentType: string;
   mobileMoneyProvider?: MobileMoneyProvider;

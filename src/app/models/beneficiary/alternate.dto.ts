@@ -13,7 +13,7 @@ export interface AlternatePayeeDto {
   relationshipOther?: string;
   documentType: DocumentType;
   documentTypeOther?: string| null;
-  nationalId: string;
+  nationalId?: string | null;
   payeePhoneNo: string;
   biometrics?: BiometricDto;
 }

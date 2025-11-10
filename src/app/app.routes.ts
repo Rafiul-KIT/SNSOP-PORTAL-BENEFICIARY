@@ -21,6 +21,7 @@ import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-resto
 import { NewRegistration } from './pages/beneficiary/new-registration/new-registration';
 import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
 import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
+import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
 
 export const routes: Routes = [
   {
@@ -50,6 +51,10 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryList,
+      },
+      {
+        path: 'view-list',
+        component: BeneficiaryViewList,
       },
       {
         path: 'new-registration',
