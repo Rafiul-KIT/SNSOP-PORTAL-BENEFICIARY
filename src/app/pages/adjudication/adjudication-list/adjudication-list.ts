@@ -512,7 +512,9 @@ export class AdjudicationList implements OnInit {
       });
   }
 
-
+  showUnderConstruction() {
+    this.router.navigate(['under-construction']);
+  }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }
