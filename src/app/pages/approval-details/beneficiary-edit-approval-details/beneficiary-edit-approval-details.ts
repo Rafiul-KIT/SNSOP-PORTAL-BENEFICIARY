@@ -371,9 +371,9 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
       lon: dto.address?.lon,
     },
 
-    // ✅ FIXED: Don't filter out null values, map them instead
+ 
     alternates: [dto.alternatePayee1, dto.alternatePayee2].map((alt) => {
-      // If alt is null, return null
+   
       if (!alt) return null;
 
       const biometrics = alt.biometrics;
