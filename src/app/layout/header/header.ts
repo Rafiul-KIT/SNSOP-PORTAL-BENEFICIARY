@@ -130,7 +130,7 @@ export class Header {
             routerLink: 'beneficiary-audit/list',
           },
           {
-            label: 'Archived Beneficiary',
+            label: 'Restore Beneficiary',
             icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
