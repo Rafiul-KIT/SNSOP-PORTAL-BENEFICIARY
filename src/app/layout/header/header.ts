@@ -108,12 +108,7 @@ export class Header {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
-          {
-            label: 'Pending Verification List',
-            icon: 'fas fa-list',
-            // routerLink: 'pending-beneficiary/list',
-            routerLink: 'under-construction',
-          },
+          
           {
             label: 'Beneficiary List',
             icon: 'fas fa-list',
@@ -143,6 +138,12 @@ export class Header {
             label: 'New Registration',
             icon: 'fas fa-user-plus',
             // routerLink: 'beneficiary/new-registration',
+            routerLink: 'under-construction',
+          },
+          {
+            label: 'Pending Verification List',
+            icon: 'fas fa-list',
+            // routerLink: 'pending-beneficiary/list',
             routerLink: 'under-construction',
           },
         ],
