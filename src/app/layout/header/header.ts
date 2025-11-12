@@ -110,28 +110,28 @@ export class Header {
         items: [
           
           {
-            label: 'Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary Update',
+            icon: 'fas fa-user-gear',
             routerLink: 'beneficiary/list',
           },
           {
-            label: 'Beneficiary View List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary View',
+            icon: 'fas fa-users-viewfinder',
             routerLink: 'beneficiary/view-list',
           },
           {
-            label: 'Approval List',
+            label: 'Update Approval',
             icon: 'fas fa-user-check',
             routerLink: 'beneficiary-approval/list',
           },
           {
-            label: 'Beneficiary Audit List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary Audit',
+            icon: 'fas fa-address-book',
             routerLink: 'beneficiary-audit/list',
           },
           {
-            label: 'Archived Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Archived Beneficiary',
+            icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
           {
@@ -141,7 +141,7 @@ export class Header {
             routerLink: 'under-construction',
           },
           {
-            label: 'Pending Verification List',
+            label: 'Pending Verification',
             icon: 'fas fa-list',
             // routerLink: 'pending-beneficiary/list',
             routerLink: 'under-construction',
