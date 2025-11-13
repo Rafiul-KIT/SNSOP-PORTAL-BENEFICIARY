@@ -41,14 +41,14 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
-  relationshipOther?: string;
+  relationshipOther?: string | null;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
-  respondentId: string;
-  phone: string;
+  respondentId?: string | null;
+  phone?: string | null;
   documentType: string;
   mobileMoneyProvider?: MobileMoneyProvider;
-  mobileWalletNumber?: string;
+  mobileWalletNumber?: string | null;
   registrationPhase: string;
 
   photo?: string;
@@ -137,7 +137,7 @@ export class BeneficiaryAuditDetails implements OnInit {
     {
       label: 'Beneficiary Audit List',
       icon: 'fas fa-users me-2',
-      routerLink: '/beneficiary-audit/audit',
+      routerLink: '/beneficiary-audit/list',
     },
     { label: 'Beneficiary Audit Details', icon: 'fas fa-user-cog me-2' },
   ];

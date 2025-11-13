@@ -200,19 +200,19 @@ export class Dashboard implements OnInit {
           {
             data: beneficiaryCounts,
             label: 'Beneficiary',
-            backgroundColor: '#00b7f2',
-            borderColor: '#0099cc',
+            backgroundColor: '#F06292',
+            borderColor: '#F06292',
             borderWidth: 2,
-            hoverBackgroundColor: '#0099cc',
+            hoverBackgroundColor: '#ff2420',
           },
           {
             data: targetCounts,
             label: 'Target',
-            backgroundColor: '#00924b',
-            borderColor: '#00924b',
+            backgroundColor: '#10b981',
+            borderColor: '#10b981',
             borderWidth: 2,
 
-            hoverBackgroundColor: '#007a3d',
+            hoverBackgroundColor: '#10b981',
           },
         ],
       };

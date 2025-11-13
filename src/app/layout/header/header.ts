@@ -103,58 +103,93 @@ export class Header {
         icon: 'fas fa-tachometer-alt',
         routerLink: 'dashboard',
       },
- 
+
       {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
+          
           {
-            label: 'Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary Update',
+            icon: 'fas fa-user-gear',
             routerLink: 'beneficiary/list',
           },
           {
-            label: 'New Registration',
-            icon: 'fas fa-user-plus',
-            routerLink: 'beneficiary/new-registration',
+            label: 'Beneficiary View',
+            icon: 'fas fa-users-viewfinder',
+            routerLink: 'beneficiary/view-list',
           },
           {
-            label: 'Approval List',
+            label: 'Update Approval',
             icon: 'fas fa-user-check',
             routerLink: 'beneficiary-approval/list',
           },
           {
-            label: 'Beneficiary Audit List',
-            icon: 'fas fa-list',
-            routerLink: 'beneficiary-audit/audit',
+            label: 'Beneficiary Audit',
+            icon: 'fas fa-address-book',
+            routerLink: 'beneficiary-audit/list',
           },
           {
-            label: 'Archived Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Restore Beneficiary',
+            icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
           {
-            label: 'Pending Verification List',
+            label: 'New Registration',
+            icon: 'fas fa-user-plus',
+            // routerLink: 'beneficiary/new-registration',
+            routerLink: 'under-construction',
+          },
+          {
+            label: 'Pending Verification',
             icon: 'fas fa-list',
-            routerLink: 'pending-beneficiary/list',
+            // routerLink: 'pending-beneficiary/list',
+            routerLink: 'under-construction',
           },
         ],
       },
       {
-            label: 'Adjudication',
-            icon: 'fas fa-users-viewfinder',
-            routerLink: 'adjudication-list',
+        label: 'Adjudication',
+        icon: 'fas fa-users-viewfinder',
+        // routerLink: 'adjudication/list',
+        routerLink: 'under-construction',
       },
-      { 
-        
-            label: 'Report',
+      {
+        label: 'Report',
+        icon: 'fas fa-file-alt',
+        items: [
+          {
+            label: 'Boma Wise Beneficiary List Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report'
+            // routerLink: 'report/boma-wise-beneficiary-list',
+          },
+          {
+            label: 'Boma & Data Entry Staff Wise Registration Report',
+            icon: 'fas fa-file-alt',
+            // routerLink: 'report/data-entry-wise-registration',
+          },
+          {
+            label: 'Boma Wise Age Group Report',
+            icon: 'fas fa-file-alt',
+            // routerLink: 'report/boma-wise-age-group',
+          },
+          {
+            label: 'Households Interested in Component 2 Report',
+            icon: 'fas fa-file-alt',
+            // routerLink: 'report/interested-in-component2',
+          },
+          {
+            label: 'Report for Biometric Match List',
+            icon: 'fas fa-file-alt',
+            // routerLink: 'report/biometric-match-list',
+          },
+          {
+            label: 'Complete Household Survey Report',
+            icon: 'fas fa-file-alt',
+            // routerLink: 'report/complete-household-survey',
+          },
+        ],
       },
-           
- 
-
-      
       {
         label: 'Beneficiary ID Cards',
         icon: 'fas fa-id-card',
@@ -171,18 +206,18 @@ export class Header {
         icon: 'fas fa-file-export',
         routerLink: 'lipw-export',
       },
-      
-      // { label: 'Beneficiary Audit', icon: 'fas fa-history', routerLink: 'beneficiary-audit/audit' },
     ];
   }
 
-  filterMenusByAccess(menus: any[], allowed: string[]): any[] {
+  // ✅ Recursive filter: keep only allowed menus (parent and child)
+  filterMenusByAccess(menus: any[], allowedNames: string[]): any[] {
     return menus
-      .filter((menu) => allowed.includes(menu.label))
+      .filter((menu) => allowedNames.includes(menu.label)) // filter parent menus
       .map((menu) => ({
         ...menu,
+        // Recursively filter child menus if the parent is allowed
         items: menu.items
-          ? this.filterMenusByAccess(menu.items, allowed)
+          ? this.filterMenusByAccess(menu.items, allowedNames)
           : undefined,
       }));
   }

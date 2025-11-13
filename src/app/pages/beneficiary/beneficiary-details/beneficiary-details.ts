@@ -40,14 +40,14 @@ interface BeneficiaryVm {
   age: number;
   gender: string;
   relationshipWithHouseholdHead: string;
-  relationshipOther?: string;
+  relationshipOther?: string | null;
   respondentMaritalStatus: string;
   respondentLegalStatus: string;
-  respondentId: string;
-  phone: string;
+  respondentId?: string | null;
+  phone?: string | null;
   documentType: string;
   mobileMoneyProvider?: MobileMoneyProvider;
-  mobileWalletNumber?: string;
+  mobileWalletNumber?: string | null;
   registrationPhase: string;
 
 
@@ -62,6 +62,8 @@ interface BeneficiaryVm {
   householdMember35: any;
   householdMember64: any;
   householdMember65: any;
+  householdMemberLactating35: any;
+  householdMemberLactating64: any;
 
   alternates: {
     name: string;
@@ -275,6 +277,8 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     householdMember35: dto.householdMember35,
     householdMember64: dto.householdMember64,
     householdMember65: dto.householdMember65,
+    householdMemberLactating35: dto.householdMemberLactating35,
+    householdMemberLactating64: dto.householdMemberLactating64,
 
     address: {
       state:

@@ -35,7 +35,7 @@ import { TooltipModule } from 'primeng/tooltip';
   selector: 'app-pending-beneficiary-manage',
   templateUrl: './pending-beneficiary-manage.html',
   styleUrl: './pending-beneficiary-manage.scss',
-    standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -57,7 +57,7 @@ import { TooltipModule } from 'primeng/tooltip';
     TabList,
     Tab,
     TabPanels
-],
+  ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,6 +65,7 @@ export class PendingBeneficiaryManage implements OnInit {
   isLoading = true;
   beneficiaryForm!: FormGroup;
   originalDto!: BeneficiaryDto;
+  deleteComment: string = '';
   destroy$ = new Subject<void>();
 
   genderOptions: LookupItem[] = [];
@@ -73,6 +74,7 @@ export class PendingBeneficiaryManage implements OnInit {
   legalStatusOptions: any[] = [];
   idTypeOptions: any[] = [];
   currentIdTypeOptions: any[] = [];
+  alternateIdTypeOptions: any[] = [];
   occupationOptions: any[] = [];
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
@@ -164,7 +166,7 @@ export class PendingBeneficiaryManage implements OnInit {
       icon: 'fas fa-users me-2',
       routerLink: '/pending-beneficiary/list',
     },
-    { label: 'Pending Beneficiary Edit' , icon: 'fas fa-user-pen me-2' },
+    { label: 'Manage Pending Beneficiary', icon: 'fas fa-user-pen me-2' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 
@@ -175,8 +177,9 @@ export class PendingBeneficiaryManage implements OnInit {
     private lookup: LookupService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private confirmationService: ConfirmationService
+  ) { }
 
   // ========= Init =========
   ngOnInit(): void {
@@ -187,6 +190,7 @@ export class PendingBeneficiaryManage implements OnInit {
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
+    this.alternateIdTypeOptions = this.lookup.getDocumentTypeEnum().filter(o => o.value !== 'SELECT');
 
     this.occupationOptions = this.lookup.getNomineeOccupationEnum();
     this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
@@ -229,6 +233,16 @@ export class PendingBeneficiaryManage implements OnInit {
       );
     });
 
+    this.beneficiaryForm.addControl('f18_35_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f18_35_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
+    this.beneficiaryForm.addControl('f36_64_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl('f36_64_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+
     // Form-level validators (mirror Java)
     this.beneficiaryForm.setValidators([
       this.breakdownSubcategoryNotExceedTotal(),
@@ -253,6 +267,9 @@ export class PendingBeneficiaryManage implements OnInit {
     // Filter reasons by Support Type
 
     this.beneficiaryForm.get('canReadWrite')?.disable();
+    this.beneficiaryForm.get('selectionReasons')?.disable();
+    this.beneficiaryForm.get('supportType')?.disable();
+
     this.beneficiaryForm
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
@@ -291,6 +308,13 @@ export class PendingBeneficiaryManage implements OnInit {
       .subscribe(() => this.updateIdLogic());
 
     this.beneficiaryForm
+      .get('hasMobileWallet')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((value) => {
+        this.updateMobileWalletValidation(value);
+      });
+
+    this.beneficiaryForm
       .get('mainIncomeSource')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((value) => {
@@ -309,7 +333,7 @@ export class PendingBeneficiaryManage implements OnInit {
     if (value === 'OTHER') {
       control.enable({ emitEvent: false });
       control.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
         this.size(2, 50),
       ]);
@@ -335,7 +359,7 @@ export class PendingBeneficiaryManage implements OnInit {
       if (value === 'MARRIED') {
         control.enable({ emitEvent: false });
         control.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -361,6 +385,32 @@ export class PendingBeneficiaryManage implements OnInit {
     }
   }
 
+  private updateMobileWalletValidation(value: string): void {
+    const mobileMoneyProviderCtrl =
+      this.beneficiaryForm.get('mobileMoneyProvider')!;
+    const mobileWalletNumberCtrl =
+      this.beneficiaryForm.get('mobileWalletNumber')!;
+
+    if (value === 'Yes') {
+      mobileMoneyProviderCtrl.enable({ emitEvent: false });
+      mobileWalletNumberCtrl.enable({ emitEvent: false });
+      mobileMoneyProviderCtrl.setValidators([this.notSelectRequired()]);
+      mobileWalletNumberCtrl.setValidators([
+        this.requiredWithWhitespace(),
+        this.pattern(this.RGX_PHONE_9, 'Phone number must be 9 digits'),
+      ]);
+    } else {
+      mobileMoneyProviderCtrl.disable({ emitEvent: false });
+      mobileWalletNumberCtrl.disable({ emitEvent: false });
+      mobileMoneyProviderCtrl.clearValidators();
+      mobileWalletNumberCtrl.clearValidators();
+      mobileMoneyProviderCtrl.setValue('', { emitEvent: false });
+      mobileWalletNumberCtrl.setValue('', { emitEvent: false });
+    }
+    mobileMoneyProviderCtrl.updateValueAndValidity({ emitEvent: false });
+    mobileWalletNumberCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
   private updateIncomeSourceFields(value: string): void {
     const otherControl = this.beneficiaryForm.get('otherIncomeSource')!;
     const monthlyControl = this.beneficiaryForm.get('avgMonthlyIncome')!;
@@ -368,7 +418,7 @@ export class PendingBeneficiaryManage implements OnInit {
     if (value === 'OTHER') {
       otherControl.enable({ emitEvent: false });
       otherControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
         this.size(2, 50),
       ]);
@@ -426,9 +476,9 @@ export class PendingBeneficiaryManage implements OnInit {
       hasIdControl.setValue('Yes', { emitEvent: false });
       hasIdControl.disable({ emitEvent: false });
 
-      typeControl.setValidators([Validators.required]);
+      typeControl.setValidators([this.requiredWithWhitespace()]);
       numberControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(this.RGX_REFUGEE_ID, 'ID must be valid refugee format'),
         this.size(5, 14),
       ]);
@@ -436,14 +486,14 @@ export class PendingBeneficiaryManage implements OnInit {
       typeControl.enable({ emitEvent: false });
       numberControl.enable({ emitEvent: false });
       typeControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.disallow(
           ['SELECT', 'PASSPORT', 'NATIONAL_ID', 'OTHER'],
           'Please select a valid ID type'
         ),
       ]);
       numberControl.setValidators([
-        Validators.required,
+        this.requiredWithWhitespace(),
         this.pattern(
           this.RGX_REFUGEE_ID,
           'ID number must contain digits, letters, hyphen only'
@@ -465,18 +515,18 @@ export class PendingBeneficiaryManage implements OnInit {
 
       if (hasIdControl.value === 'Yes') {
         typeControl.enable({ emitEvent: false });
-        typeControl.setValidators([Validators.required]);
+        typeControl.setValidators([this.requiredWithWhitespace()]);
 
         if (typeControl.value === 'OTHER') {
           otherControl.enable({ emitEvent: false });
           numberControl.enable({ emitEvent: false });
           otherControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_CHARS_SPACES, 'Only letters/spaces'),
             this.size(2, 50),
           ]);
           numberControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'),
             this.size(5, 14),
           ]);
@@ -490,7 +540,7 @@ export class PendingBeneficiaryManage implements OnInit {
           numberControl.enable({ emitEvent: false });
           otherControl.disable({ emitEvent: false });
           numberControl.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_ALPHANUM_SPACE, 'ID must be alphanumeric'),
             this.size(5, 14),
           ]);
@@ -524,6 +574,9 @@ export class PendingBeneficiaryManage implements OnInit {
     this.updateIncomeSourceFields(
       this.beneficiaryForm.get('mainIncomeSource')!.value
     );
+    this.updateMobileWalletValidation(
+      this.beneficiaryForm.get('hasMobileWallet')!.value
+    );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
     this.cdr.detectChanges();
@@ -536,7 +589,7 @@ export class PendingBeneficiaryManage implements OnInit {
       respondentFirstName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -545,7 +598,7 @@ export class PendingBeneficiaryManage implements OnInit {
       respondentMiddleName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -554,7 +607,7 @@ export class PendingBeneficiaryManage implements OnInit {
       respondentLastName: [
         '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -599,16 +652,9 @@ export class PendingBeneficiaryManage implements OnInit {
       ],
 
       mainIncomeSource: ['', [this.notSelectRequired()]],
-      mobileMoneyProvider: ['', [this.notSelectRequired()]],
-      mobileWalletNumber: [
-        ''
-        // [
-        //   this.optionalPattern(
-        //     this.RGX_PHONE_9,
-        //     'Phone number length must be 9'
-        //   ),
-        // ],
-      ],
+      hasMobileWallet: [''],
+      mobileMoneyProvider: [''],
+      mobileWalletNumber: [''],
       otherIncomeSource: [''],
       avgMonthlyIncome: [''],
 
@@ -656,7 +702,7 @@ export class PendingBeneficiaryManage implements OnInit {
             respondentIdNumber: dto.respondentId,
             respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
               ? dto.respondentPhoneNo.substring(4)
-              : dto.respondentPhoneNo || '',
+              : dto.respondentPhoneNo || null,
             mainIncomeSource: dto.householdIncomeSource,
             mobileMoneyProvider: dto.mobileMoneyProvider,
             mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
@@ -672,6 +718,7 @@ export class PendingBeneficiaryManage implements OnInit {
               ? dto.selectionReason
               : [dto.selectionReason],
             canReadWrite: dto.isReadWrite ? 'Yes' : 'No',
+            hasMobileWallet: dto.hasMobileWallet ? 'Yes' : 'No',
             literate1835Count: dto.memberReadWrite ?? '0',
             householdSize: dto.householdSize ?? '0',
           },
@@ -748,6 +795,19 @@ export class PendingBeneficiaryManage implements OnInit {
           f65_both: 'femaleBoth',
         });
 
+        pv(dto.householdMemberLactating35, {
+          f18_35_lactating_total: 'femaleTotal',
+          f18_35_lactating_disable: 'femaleDisable',
+          f18_35_lactating_chronic: 'femaleChronicalIll',
+          f18_35_lactating_both: 'femaleBoth',
+        });
+        pv(dto.householdMemberLactating64, {
+          f36_64_lactating_total: 'femaleTotal',
+          f36_64_lactating_disable: 'femaleDisable',
+          f36_64_lactating_chronic: 'femaleChronicalIll',
+          f36_64_lactating_both: 'femaleBoth',
+        });
+
         // Alternates
         this.alternates.clear();
         if (dto.alternatePayee1)
@@ -773,44 +833,66 @@ export class PendingBeneficiaryManage implements OnInit {
   }
 
   // ========= Build payload =========
+  private getOptionalStringValue(value: any): string | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    const trimmed = String(value).trim();
+    return trimmed === '' ? null : trimmed;
+  }
+
+  // ========= Build payload =========
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
     const payload: BeneficiaryDto = JSON.parse(
       JSON.stringify(this.originalDto)
     );
 
     payload.respondentFirstName = formValue.respondentFirstName;
-    payload.respondentMiddleName = formValue.respondentMiddleName;
+    payload.respondentMiddleName = this.getOptionalStringValue(
+      formValue.respondentMiddleName
+    );
     payload.respondentLastName = formValue.respondentLastName;
-    payload.respondentNickName = formValue.respondentNickName;
+    payload.respondentNickName = this.getOptionalStringValue(
+      formValue.respondentNickName
+    );
     payload.relationshipWithHouseholdHead = formValue.relationship;
-    payload.relationshipOther = formValue.relationshipOther;
+    payload.relationshipOther = this.getOptionalStringValue(
+      formValue.relationshipOther
+    );
     payload.respondentAge = +formValue.respondentAge;
     payload.respondentGender = formValue.gender;
     payload.respondentMaritalStatus = formValue.maritalStatus;
-    payload.spouseFirstName = formValue.spouseFirstName;
-    payload.spouseMiddleName = formValue.spouseMiddleName;
-    payload.spouseLastName = formValue.spouseLastName;
-    payload.spouseNickName = formValue.spouseNickName;
+    payload.spouseFirstName = this.getOptionalStringValue(
+      formValue.spouseFirstName
+    );
+    payload.spouseMiddleName = this.getOptionalStringValue(
+      formValue.spouseMiddleName
+    );
+    payload.spouseLastName = this.getOptionalStringValue(formValue.spouseLastName);
+    payload.spouseNickName = this.getOptionalStringValue(formValue.spouseNickName);
     payload.respondentLegalStatus = formValue.legalStatus;
-    payload.documentType = formValue.idType;
-    payload.documentTypeOther = formValue.idTypeOther;
     const phone = formValue.respondentPhone?.toString().trim();
-    payload.respondentPhoneNo = phone ? `+211${phone}` : '';
+    payload.respondentPhoneNo = phone ? `+211${phone}` : null;
     if (formValue.hasNationalId === 'No') {
       payload.documentType = 'NONE';
-      payload.documentTypeOther = '';
+      payload.documentTypeOther = null;
       payload.respondentId = '';
     } else {
       payload.documentType = formValue.idType;
-      payload.documentTypeOther = formValue.idTypeOther;
-      payload.respondentId = formValue.respondentIdNumber;
+      payload.documentTypeOther = this.getOptionalStringValue(
+        formValue.idTypeOther
+      );
+      payload.respondentId = formValue.respondentIdNumber?.trim() || '';
     }
     payload.householdIncomeSource = formValue.mainIncomeSource;
-    payload.mobileMoneyProvider = formValue.mobileMoneyProvider;
+    payload.hasMobileWallet = formValue.hasMobileWallet === 'Yes';
+    payload.mobileMoneyProvider = formValue.mobileMoneyProvider || null;
     const wphone = formValue.mobileWalletNumber?.toString().trim();
-    payload.mobileWalletNumber = phone ? `+211${wphone}` : '';
-    payload.incomeSourceOther = formValue.otherIncomeSource;
-    payload.householdMonthlyAvgIncome = formValue.avgMonthlyIncome;
+    payload.mobileWalletNumber = wphone ? `+211${wphone}` : null;
+    payload.incomeSourceOther = this.getOptionalStringValue(
+      formValue.otherIncomeSource
+    );
+    payload.householdMonthlyAvgIncome = +formValue.avgMonthlyIncome || 0;
 
     payload.selectionCriteria =
       formValue.supportType === 'Public Works' ? 'LIPW' : 'DIS';
@@ -846,63 +928,90 @@ export class PendingBeneficiaryManage implements OnInit {
     copy('householdMember64', 'm36_64', 'f36_64');
     copy('householdMember65', 'm65', 'f65');
 
+    if (payload.householdMemberLactating35) {
+      Object.assign(payload.householdMemberLactating35, {
+        femaleTotal: +formValue.f18_35_lactating_total || 0,
+        femaleDisable: +formValue.f18_35_lactating_disable || 0,
+        femaleChronicalIll: +formValue.f18_35_lactating_chronic || 0,
+        femaleBoth: +formValue.f18_35_lactating_both || 0,
+      });
+    }
+    if (payload.householdMemberLactating64) {
+      Object.assign(payload.householdMemberLactating64, {
+        femaleTotal: +formValue.f36_64_lactating_total || 0,
+        femaleDisable: +formValue.f36_64_lactating_disable || 0,
+        femaleChronicalIll: +formValue.f36_64_lactating_chronic || 0,
+        femaleBoth: +formValue.f36_64_lactating_both || 0,
+      });
+    }
+
     // Alternates
     if (formValue.alternates?.length) {
       if (payload.alternatePayee1 && formValue.alternates[0]) {
         const a = formValue.alternates[0];
+        const altPhone = a.payeePhoneNo?.toString().trim();
         Object.assign(payload.alternatePayee1, {
           payeeFirstName: a.payeeFirstName,
-          payeeMiddleName: a.payeeMiddleName,
+          payeeMiddleName: this.getOptionalStringValue(a.payeeMiddleName),
           payeeLastName: a.payeeLastName,
-          payeeNickName: a.payeeNickName,
+          payeeNickName: this.getOptionalStringValue(a.payeeNickName),
           payeeGender: a.payeeGender,
           payeeAge: a.payeeAge,
           relationshipWithHouseholdHead: a.relationshipWithHouseholdHead,
-          relationshipOther: a.relationshipOther,
+          relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
-          documentTypeOther: a.documentTypeOther,
-          nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
+          nationalId: a.nationalId?.trim() || '',
+          payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+
+        if (payload.alternatePayee1.documentType === 'NONE') {
+            payload.alternatePayee1.documentTypeOther = null;
+            payload.alternatePayee1.nationalId = '';
+        }
         delete (payload.alternatePayee1 as any).biometrics;
       }
       if (payload.alternatePayee2 && formValue.alternates[1]) {
         const a = formValue.alternates[1];
+        const altPhone = a.payeePhoneNo?.toString().trim();
         Object.assign(payload.alternatePayee2, {
           payeeFirstName: a.payeeFirstName,
-          payeeMiddleName: a.payeeMiddleName,
+          payeeMiddleName: this.getOptionalStringValue(a.payeeMiddleName),
           payeeLastName: a.payeeLastName,
-          payeeNickName: a.payeeNickName,
+          payeeNickName: this.getOptionalStringValue(a.payeeNickName),
           payeeGender: a.payeeGender,
           payeeAge: a.payeeAge,
           relationshipWithHouseholdHead: a.relationshipWithHouseholdHead,
-          relationshipOther: a.relationshipOther,
+          relationshipOther: this.getOptionalStringValue(a.relationshipOther),
           documentType: a.documentType,
-          documentTypeOther: a.documentTypeOther,
-          nationalId: a.nationalId,
-          payeePhoneNo: a.payeePhoneNo ? `+211${a.payeePhoneNo}` : '',
+          documentTypeOther: this.getOptionalStringValue(a.documentTypeOther),
+          nationalId: a.nationalId?.trim() || '',
+          payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
+        
+        if (payload.alternatePayee2.documentType === 'NONE') {
+            payload.alternatePayee2.documentTypeOther = null;
+            payload.alternatePayee2.nationalId = '';
+        }
         delete (payload.alternatePayee2 as any).biometrics;
       }
     }
 
     // Nominees
-    payload.nominees = this.nominees.value.map((n: any) => ({
+    payload.nominees = formValue.nominees.map((n: any) => ({
       id: n.id,
       applicationId: payload.applicationId,
       nomineeFirstName: n.nomineeFirstName,
       nomineeMiddleName: n.nomineeMiddleName,
       nomineeLastName: n.nomineeLastName,
-      nomineeNickName: n.nomineeNickName?.trim() ? n.nomineeNickName : null,
+      nomineeNickName: this.getOptionalStringValue(n.nomineeNickName),
       relationshipWithHouseholdHead: n.relationshipWithHouseholdHead,
-      relationshipOther: n.relationshipOther?.trim()
-        ? n.relationshipOther
-        : null,
+      relationshipOther: this.getOptionalStringValue(n.relationshipOther),
       nomineeAge: n.nomineeAge,
       nomineeGender: n.nomineeGender,
       isReadWrite: n.isReadWrite,
       nomineeOccupation: n.nomineeOccupation,
-      otherOccupation: n.otherOccupation?.trim() ? n.otherOccupation : null,
+      otherOccupation: this.getOptionalStringValue(n.otherOccupation),
     }));
 
     delete (payload as any).biometrics;
@@ -976,18 +1085,6 @@ export class PendingBeneficiaryManage implements OnInit {
   }
 
   // ========= Selection reasons =========
-  onReasonChange(event: any, value: string) {
-    const reasons: string[] =
-      this.beneficiaryForm.get('selectionReasons')?.value || [];
-    if (event.target.checked) {
-      if (!reasons.includes(value)) reasons.push(value);
-    } else {
-      const i = reasons.indexOf(value);
-      if (i >= 0) reasons.splice(i, 1);
-    }
-    this.beneficiaryForm.patchValue({ selectionReasons: reasons });
-    this.beneficiaryForm.updateValueAndValidity();
-  }
 
   filterReasons(supportType: string) {
     if (supportType === 'Public Works') {
@@ -1021,7 +1118,7 @@ export class PendingBeneficiaryManage implements OnInit {
       nomineeFirstName: [
         n.nomineeFirstName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1030,7 +1127,7 @@ export class PendingBeneficiaryManage implements OnInit {
       nomineeMiddleName: [
         n.nomineeMiddleName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1039,7 +1136,7 @@ export class PendingBeneficiaryManage implements OnInit {
       nomineeLastName: [
         n.nomineeLastName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1065,12 +1162,13 @@ export class PendingBeneficiaryManage implements OnInit {
     });
 
     // OTHER relationship
-    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe((v) => {
+    const updateNomineeRelationship = () => {
+      const v = g.get('relationshipWithHouseholdHead')?.value;
       const c = g.get('relationshipOther')!;
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 25),
         ]);
@@ -1080,23 +1178,32 @@ export class PendingBeneficiaryManage implements OnInit {
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe(
+      updateNomineeRelationship
+    );
+    updateNomineeRelationship();
 
     // OTHER occupation
-    g.get('nomineeOccupation')?.valueChanges.subscribe((v) => {
+    const updateNomineeOccupation = () => {
+      const v = g.get('nomineeOccupation')?.value;
       const c = g.get('otherOccupation')!;
       if (v === 'OTHER') {
+        c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 25),
         ]);
       } else {
+        c.disable({ emitEvent: false });
         c.clearValidators();
         c.setValue('', { emitEvent: false });
       }
       c.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+    g.get('nomineeOccupation')?.valueChanges.subscribe(updateNomineeOccupation);
+    updateNomineeOccupation();
 
     return g;
   }
@@ -1107,7 +1214,7 @@ export class PendingBeneficiaryManage implements OnInit {
       payeeFirstName: [
         a.payeeFirstName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1116,7 +1223,7 @@ export class PendingBeneficiaryManage implements OnInit {
       payeeMiddleName: [
         a.payeeMiddleName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1125,7 +1232,7 @@ export class PendingBeneficiaryManage implements OnInit {
       payeeLastName: [
         a.payeeLastName || '',
         [
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.capitalized(),
           this.onlyLetters(),
           this.size(this.MIN_NAME, this.MAX_NAME),
@@ -1145,7 +1252,7 @@ export class PendingBeneficiaryManage implements OnInit {
       payeePhoneNo: [
         a.payeePhoneNo?.startsWith('+211')
           ? a.payeePhoneNo.substring(4)
-          : a.payeePhoneNo || '',
+          : a.payeePhoneNo || null,
         [
           this.optionalPattern(
             this.RGX_PHONE_9,
@@ -1164,7 +1271,7 @@ export class PendingBeneficiaryManage implements OnInit {
       if (v === 'OTHER') {
         c.enable({ emitEvent: false });
         c.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
           this.size(2, 50),
         ]);
@@ -1190,14 +1297,14 @@ export class PendingBeneficiaryManage implements OnInit {
       if (hasId === 'Yes') {
         type.enable({ emitEvent: false });
         type.setValidators([
-          Validators.required,
+          this.requiredWithWhitespace(),
           this.disallow(['SELECT'], 'ID Type is required'),
         ]);
 
         if (type.value === 'OTHER') {
           other.enable({ emitEvent: false });
           other.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(this.RGX_CHARS_SPACES, 'Only letters and spaces'),
             this.size(2, 50),
           ]);
@@ -1218,7 +1325,7 @@ export class PendingBeneficiaryManage implements OnInit {
           ];
           const isRef = refTypes.includes(type.value);
           num.setValidators([
-            Validators.required,
+            this.requiredWithWhitespace(),
             this.pattern(
               isRef ? this.RGX_REFUGEE_ID : this.RGX_ALPHANUM_SPACE,
               isRef
@@ -1233,7 +1340,7 @@ export class PendingBeneficiaryManage implements OnInit {
         type.disable({ emitEvent: false });
         num.disable({ emitEvent: false });
         other.disable({ emitEvent: false });
-        type.setValue('', { emitEvent: false });
+        type.setValue('NONE', { emitEvent: false });
         num.setValue('', { emitEvent: false });
         other.setValue('', { emitEvent: false });
       }
@@ -1322,6 +1429,7 @@ export class PendingBeneficiaryManage implements OnInit {
       nomineeAge: 'Age',
       isReadWrite: 'Can Read/Write',
       nomineeOccupation: 'Occupation',
+      otherOccupation: 'Other Occupation',
     };
 
     const label = fieldLabels[fieldName] || fieldName;
@@ -1411,12 +1519,27 @@ export class PendingBeneficiaryManage implements OnInit {
       'Must not contain space, digits or special characters'
     );
   }
+  private requiredWithWhitespace() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (
+        value === null ||
+        value === undefined ||
+        (typeof value === 'string' && value.trim().length === 0)
+      ) {
+        return { required: true };
+      }
+      return null;
+    };
+  }
+
   private size(min: number, max: number) {
     return (c: AbstractControl): ValidationErrors | null => {
-      const v = (c.value ?? '').toString();
+      const v = (c.value ?? '').toString().trim();
       if (!v) return null;
-      if (v.length < min) return { size: `Must be at least ${min} characters` };
-      if (v.length > max) return { size: `Must be at most ${max} characters` };
+      const len = v.length;
+      if (len < min) return { size: { min, max, actual: len } };
+      if (len > max) return { size: { min, max, actual: len } };
       return null;
     };
   }
@@ -1516,6 +1639,23 @@ export class PendingBeneficiaryManage implements OnInit {
   private breakdownSubcategoryNotExceedTotal() {
     return (fg: AbstractControl): ValidationErrors | null => {
       if (!(fg instanceof FormGroup)) return null;
+
+      const f18_35_lactating_total = +fg.get('f18_35_lactating_total')?.value || 0;
+      const f18_35_lactating_disable = +fg.get('f18_35_lactating_disable')?.value || 0;
+      const f18_35_lactating_chronic = +fg.get('f18_35_lactating_chronic')?.value || 0;
+      const f18_35_lactating_both = +fg.get('f18_35_lactating_both')?.value || 0;
+      if (f18_35_lactating_disable + f18_35_lactating_chronic + f18_35_lactating_both > f18_35_lactating_total) {
+        return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
+      }
+
+      const f36_64_lactating_total = +fg.get('f36_64_lactating_total')?.value || 0;
+      const f36_64_lactating_disable = +fg.get('f36_64_lactating_disable')?.value || 0;
+      const f36_64_lactating_chronic = +fg.get('f36_64_lactating_chronic')?.value || 0;
+      const f36_64_lactating_both = +fg.get('f36_64_lactating_both')?.value || 0;
+      if (f36_64_lactating_disable + f36_64_lactating_chronic + f36_64_lactating_both > f36_64_lactating_total) {
+        return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
+      }
+
       for (const g of this.ageGroups) {
         const mT = +fg.get(g.maleTotal)?.value || 0;
         const mD = +fg.get(g.maleDisable)?.value || 0;
@@ -1548,6 +1688,8 @@ export class PendingBeneficiaryManage implements OnInit {
           (+fg.get(g.maleTotal)?.value || 0) +
           (+fg.get(g.femaleTotal)?.value || 0);
       }
+      sum += (+fg.get('f18_35_lactating_total')?.value || 0);
+      sum += (+fg.get('f36_64_lactating_total')?.value || 0);
       const size = +fg.get('householdSize')?.value || 0;
       if (size <= 0)
         return {
@@ -1586,7 +1728,15 @@ export class PendingBeneficiaryManage implements OnInit {
         return { m: 'm65_total', f: 'f65_total' };
       };
       const g = group(age);
-      if ((+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0) <= 0) {
+      let count = (+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0);
+
+      if (age >= 18 && age <= 35) {
+        count += (+fg.get('f18_35_lactating_total')?.value || 0);
+      } else if (age >= 36 && age <= 64) {
+        count += (+fg.get('f36_64_lactating_total')?.value || 0);
+      }
+
+      if (count <= 0) {
         return { ageMissing: 'Age not found in household breakdown' };
       }
       return null;
@@ -1602,6 +1752,8 @@ export class PendingBeneficiaryManage implements OnInit {
         if ((+fg.get(g.maleTotal)?.value || 0) > 0) anyMale = true;
         if ((+fg.get(g.femaleTotal)?.value || 0) > 0) anyFemale = true;
       }
+      if ((+fg.get('f18_35_lactating_total')?.value || 0) > 0) anyFemale = true;
+      if ((+fg.get('f36_64_lactating_total')?.value || 0) > 0) anyFemale = true;
       if (gender === 'MALE' && !anyMale)
         return {
           genderMismatch:
@@ -1688,5 +1840,80 @@ export class PendingBeneficiaryManage implements OnInit {
       }
       return null;
     };
+  }
+
+  onDelete() {
+    this.deleteComment = ''; // Reset comment
+    this.confirmationService.confirm({
+      key: 'deleteDialog',
+      header: 'Confirm Deletion',
+      accept: () => this.handleDeleteConfirm(),
+      reject: () => {
+        // User rejected, no action needed
+      },
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+    });
+  }
+
+  handleDeleteConfirm() {
+    if (!this.deleteComment || !this.deleteComment.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Comment Required',
+        detail: 'Please provide a reason for deletion.',
+      });
+      return;
+    }
+
+    const applicationId = this.originalDto?.applicationId;
+    if (!applicationId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Beneficiary Application ID not found.',
+      });
+      return;
+    }
+
+    const payload = {
+      householdId: [applicationId],
+      comment: this.deleteComment.trim(),
+      enrollmentStatusEnum: 'DELETE'
+    };
+
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.api.POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+      .then((res: any) => {
+        if (res.status === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Deleted',
+            detail: 'Beneficiary has been deleted successfully.',
+          });
+          setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 2000);
+        } else {
+          const errorMsg = res.errorMsg || 'An unknown error occurred during deletion.';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Deletion Failed',
+            detail: errorMsg,
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Delete beneficiary error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'API Error',
+          detail: 'Failed to delete beneficiary.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      });
   }
 }

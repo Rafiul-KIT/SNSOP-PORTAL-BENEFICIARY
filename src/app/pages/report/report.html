@@ -71,9 +71,9 @@
         <div class="col-12 col-md-8">
             <div class="bg-light p-2 d-flex justify-content-between align-items-center w-100">
                 <h6 class="mb-0"><b>Report Type:</b> {{selectedReportTypeTitle}}</h6>
-                <button class="btn btn-outline-dark btn-sm" (click)="reportOptions = true;">
+                <!-- <button class="btn btn-outline-dark btn-sm" (click)="reportOptions = true;">
                     <i class="fas fa-arrow-left me-2"></i>Change Report Type
-                </button>
+                </button> -->
             </div>
             <form novalidate [formGroup]="reportForm" class="row mt-2">
                 @if (reportForm.get('staffUserName')) {
@@ -267,7 +267,7 @@
                         <p-button label="Reset" size="small" icon="fas fa-refresh" severity="danger" class="me-2"
                             (click)="resetForm(reportForm)" outlined="true"></p-button>
                         <p-button label=" Generate" [disabled]="reportForm.invalid" size="small"
-                            icon="fas fa-line-chart me-2" (click)="generateReport()"></p-button>
+                            icon="fas fa-line-chart me-2" (click)="showUnderConstruction()"></p-button>
                     </div>
                 </div>
             </form>

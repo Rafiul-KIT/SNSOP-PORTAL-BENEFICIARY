@@ -37,127 +37,82 @@
         <div class="col-12 col-md-12   col-lg-12">
           <div class="card"
             style="background: linear-gradient(135deg); color: rgb(8, 8, 8); border: none; padding: 10px 2px;">
-            <div class="d-flex gap-5 justify-content-between">
+            <div class="d-flex gap-3 justify-content-between flex-wrap">
 
-              <!-- Total Households -->
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                (click)="gotoBeneficiaryList()"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;">
-                <span class="fw-bold">Total Beneficiaries:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ totalBeneficiaryCount }}
-                </kbd>
+
+
+              <!-- Total Beneficiaries -->
+              <div class="alert alert-warning d-flex align-items-center justify-content-between mb-0 p-3 flex-fill"
+                role="button" tabindex="0" (click)="gotoBeneficiaryList()"
+                style="cursor:pointer; font-size:1rem; min-height:80px; border-radius:8px; box-shadow:0px 2px 4px rgba(0,0,0,0.1);">
+                <div class="d-flex flex-column">
+                  <div style="font-size:1.3rem; padding:2px 8px; ; color:#000; border-radius:4px; font-weight:600;  ">
+                    {{ dashboardSummary?.totalBeneficiary || 0 }}
+                  </div>
+                  <span class="fw-bold mt-1">Total Beneficiaries</span>
+                </div>
+                <i class="fas fa-users p-2 rounded-circle" style=" color:#ffc107; font-size:1.2rem; "></i>
               </div>
-                  
+
 
               <!-- Male Count -->
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('gender', 'MALE')" (keydown.enter)="gotoBeneficiaryList('gender', 'MALE')"
-                (keydown.space)="gotoBeneficiaryList('gender', 'MALE')">
-                <span class="fw-bold">Male:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ dashboardSummary?.femaleCount || 0 }}
-                </kbd>
+              <div class="alert alert-info d-flex align-items-center justify-content-between mb-0 p-3 flex-fill"
+                role="button" tabindex="0" (click)="gotoBeneficiaryList()"
+                style="cursor:pointer; font-size:1rem; min-height:80px; border-radius:8px; box-shadow:0px 2px 4px rgba(0,0,0,0.1);">
+                <div class="d-flex flex-column">
+                  <div style="font-size:1.3rem; padding:2px 8px; ; color:#000; border-radius:4px; font-weight:600;  ">
+                    {{ dashboardSummary?.maleCount || 0 }}
+                  </div>
+                  <span class="fw-bold mt-1">Male</span>
+                </div>
+                <i class="fas fa-male p-2 rounded-circle" style=" color:#0dcaf0; font-size:1.2rem; "></i>
               </div>
 
               <!-- Female Count -->
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('gender', 'FEMALE')"
-                (keydown.enter)="gotoBeneficiaryList('gender', 'FEMALE')"
-                (keydown.space)="gotoBeneficiaryList('gender', 'FEMALE')">
-                <span class="fw-bold">Female:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ dashboardSummary?.femaleCount || 0 }}
-                </kbd>
-              </div>
-
-              <!-- DIS Count -->
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'DIS')" (keydown.enter)="gotoBeneficiaryList('support', 'DIS')"
-                (keydown.space)="gotoBeneficiaryList('support', 'DIS')">
-                <span class="fw-bold">DIS:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ dashboardSummary?.disCount || 0 }}
-                </kbd>
+              <div class="alert alert-success d-flex align-items-center justify-content-between mb-0 p-3 flex-fill"
+                role="button" tabindex="0" (click)="gotoBeneficiaryList()"
+                style="cursor:pointer; font-size:1rem; min-height:80px; border-radius:8px; box-shadow:0px 2px 4px rgba(0,0,0,0.1);">
+                <div class="d-flex flex-column">
+                  <div style="font-size:1.3rem; padding:2px 8px; ; color:#000; border-radius:4px; font-weight:600;  ">
+                    {{ dashboardSummary?.femaleCount || 0 }}
+                  </div>
+                  <span class="fw-bold mt-1">Female</span>
+                </div>
+                <i class="fas fa-female p-2 rounded-circle" style=" color:#198754; font-size:1.2rem; "></i>
               </div>
 
               <!-- LIPW Count -->
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.enter)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.space)="gotoBeneficiaryList('support', 'LIPW')">
-                <span class="fw-bold">LIPW:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ dashboardSummary?.lipwCount || 0 }}
-                </kbd>
+              <div class="alert alert-danger d-flex align-items-center justify-content-between mb-0 p-3 flex-fill"
+                role="button" tabindex="0" (click)="gotoBeneficiaryList()"
+                style="cursor:pointer; font-size:1rem; min-height:80px; border-radius:8px; box-shadow:0px 2px 4px rgba(0,0,0,0.1);">
+                <div class="d-flex flex-column">
+                  <div style="font-size:1.3rem; padding:2px 8px; ; color:#000; border-radius:4px; font-weight:600;  ">
+                    {{ dashboardSummary?.lipwCount || 0 }}
+                  </div>
+                  <span class="fw-bold mt-1">LIPW</span>
+                </div>
+                <i class="fas fa-users p-2 rounded-circle" style=" color:#dc3545; font-size:1.2rem; "></i>
+              </div>
+              <!-- DIS Count -->
+              <div class="alert alert-warning d-flex align-items-center justify-content-between mb-0 p-3 flex-fill"
+                role="button" tabindex="0" (click)="gotoBeneficiaryList()"
+                style="cursor:pointer; font-size:1rem; min-height:80px; border-radius:8px; box-shadow:0px 2px 4px rgba(0,0,0,0.1);">
+                <div class="d-flex flex-column">
+                  <div style="font-size:1.3rem; padding:2px 8px; ; color:#000; border-radius:4px; font-weight:600;  ">
+                    {{ dashboardSummary?.disCount || 0 }}
+                  </div>
+                  <span class="fw-bold mt-1">DIS</span>
+                </div>
+                <i class="fas fa-chart-bar p-2 rounded-circle" style=" color:#ffc107; font-size:1.2rem;"></i>
               </div>
 
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.enter)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.space)="gotoBeneficiaryList('support', 'LIPW')">
-                <span class="fw-bold">Pending:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ 350 }}
-                </kbd>
-              </div>
 
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.enter)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.space)="gotoBeneficiaryList('support', 'LIPW')">
-                <span class="fw-bold">Archived:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ 153 }}
-                </kbd>
-              </div>
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.enter)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.space)="gotoBeneficiaryList('support', 'LIPW')">
-                <span class="fw-bold">Paid:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ 338 }}
-                </kbd>
-              </div>
-              <div class="alert alert-primary d-flex align-items-center justify-content-center mb-0 p-2 flex-fill"
-                role="button" tabindex="0"
-                style="cursor: pointer; font-size: 0.75rem; height: 36px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); white-space: nowrap;"
-                (click)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.enter)="gotoBeneficiaryList('support', 'LIPW')"
-                (keydown.space)="gotoBeneficiaryList('support', 'LIPW')">
-                <span class="fw-bold">Unpaid:</span>
-                <kbd class="ms-2"
-                  style="font-size: 0.9rem; padding: 2px 8px; background-color: #ffffff; color: rgb(0, 0, 0); border-radius: 4px; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                  {{ 146 }}
-                </kbd>
-              </div>
 
             </div>
           </div>
+
+
+
 
           <div class="card mt-1">
 
@@ -181,7 +136,7 @@
               <div class="alert alert-info d-flex align-items-center justify-content-center mt-4 mb-0" style="border-radius: 10px; background: linear-gradient(135deg, #00b7f2 0%, #f3fafd 100%); 
                 border: none; color: white; font-weight: 500; padding: 20px; 
                 box-shadow: 0 4px 12px rgba(0, 183, 242, 0.3);">
-                <i class="bi bi-info-circle me-2" style="font-size: 1.5rem;"></i>
+                <i class="bi bi-info-circle me-2" style="font-size: 1.3rem;"></i>
                 <span style="font-size: 1.1rem;">No Data Available</span>
               </div>
               }
@@ -190,8 +145,8 @@
         </div>
 
         <!-- Other Panels -->
-        <div class="col-12  col-md-12 col-lg-12 mt-2">
-          <div class="row">
+        <div class="col-12  col-md-12 col-lg-12 mt-2 ">
+          <div sty class="row">
             <!-- Total Registered Households & Daily Counts -->
             <div class="col-12 col-md-2">
 
@@ -259,7 +214,7 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #f3fafd 100%);
                             color: rgb(8, 8, 8); border: none; padding: 10px 24px;">
-                  <span style="font-weight: 600; font-size: 0.8rem; letter-spacing: 0.3px;"> Gender wise Nominee Count
+                  <span style="font-weight: 600;  font-size: 0.8rem; letter-spacing: 0.3px;"> Gender wise Nominee Count
                     by County</span>
                 </div>
 
@@ -330,9 +285,9 @@
               </div>
             </div>
           </div> <!-- row -->
-        </div> <!-- col-12 -->
-      </div> <!-- row -->
-    </div> <!-- dashboard-wrapper -->
+        </div>
+      </div>
+    </div>
     }
     }
   </div>

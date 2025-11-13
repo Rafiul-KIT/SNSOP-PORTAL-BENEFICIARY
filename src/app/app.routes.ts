@@ -21,6 +21,7 @@ import { BeneficiaryRestoreDetails } from './pages/beneficiary/beneficiary-resto
 import { NewRegistration } from './pages/beneficiary/new-registration/new-registration';
 import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
 import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
+import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
 
 export const routes: Routes = [
   {
@@ -29,14 +30,19 @@ export const routes: Routes = [
     canActivate: [routeGuard],
   },
   {
-    component: AdjudicationList,
-    path: 'adjudication-list',
+    path: 'adjudication',
     canActivate: [routeGuard],
-  },
-  {
-    component: MatchList,
-    path: 'match-list/:id',
-    // canActivate: [routeGuard],
+    children: [
+      {
+        path: 'list',
+        component: AdjudicationList,
+      },
+      {
+        path: 'match-list/:id',
+        component: MatchList,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
   {
     path: 'beneficiary',
@@ -47,6 +53,10 @@ export const routes: Routes = [
         component: BeneficiaryList,
       },
       {
+        path: 'view-list',
+        component: BeneficiaryViewList,
+      },
+      {
         path: 'new-registration',
         component: NewRegistration,
       },
@@ -54,85 +64,143 @@ export const routes: Routes = [
         path: 'details/:id',
         component: BeneficiaryDetails,
       },
-      // {
-      //   path: 'audit-details/:id',
-      //   component: BeneficiaryAuditDetails
-      // },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
       },
-      //   {
-      //   path: 'audit',
-      //   component: BeneficiaryAudit,
-      // },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
       },
-      // {
-      //   path: 'id-card',
-      //   component: BeneficiaryIdCard,
-      // },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
   {
-    path: 'pending-beneficiary/list',
+    path: 'pending-beneficiary',
     canActivate: [routeGuard],
-    component: PendingBeneficiaryList,
+    children: [
+      {
+        path: 'list',
+        component: PendingBeneficiaryList,
+      },
+      {
+        path: 'edit/:applicationId',
+        component: PendingBeneficiaryManage,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-    
   {
-    path: 'pending-beneficiary/edit/:applicationId',
-    component: PendingBeneficiaryManage,
-  },
-       
-     
-      
-  {
-    path: 'beneficiary-approval/list',
+    path: 'beneficiary-approval',
     canActivate: [routeGuard],
-    component: BeneficiaryEditApprovalList
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryEditApprovalList,
+      },
+      {
+        path: 'edit-details/:id',
+        component: BeneficiaryEditApprovalDetails,
+      },
+      {
+        path: 'migrate-details/:id',
+        component: BeneficiaryMigrateApprovalDetails,
+      },
+      {
+        path: 'archive-details/:id',
+        component: BeneficiaryArchiveApprovalDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
   {
-    path: 'beneficiary-approval/edit-details/:id',
-    
-    component: BeneficiaryEditApprovalDetails
-  },
-  {
-    path: 'beneficiary-approval/migrate-details/:id',
-    
-    component: BeneficiaryMigrateApprovalDetails
-  },
-  {
-    path: 'beneficiary-approval/archive-details/:id',
-    
-    component: BeneficiaryArchiveApprovalDetails
-  },
-  {
-    path: 'beneficiary-audit/audit',
+    path: 'beneficiary-audit',
     canActivate: [routeGuard],
-    component: BeneficiaryAudit
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryAudit,
+      },
+      {
+        path: 'audit-details/:id',
+        component: BeneficiaryAuditDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-  { path: 'beneficiary-audit/audit-details/:id',
-    component: BeneficiaryAuditDetails
-  },
-    
   {
     path: 'report',
     canActivate: [routeGuard],
-    component: ReportComponent,
+    children: [
+      {
+        path: 'boma-wise-beneficiary-list',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 1,
+          reportTitle: 'Boma Wise Beneficiary List Report',
+        },
+      },
+      {
+        path: 'data-entry-wise-registration',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 2,
+          reportTitle: 'Boma & Data Entry Staff Wise Registration Report',
+        },
+      },
+      {
+        path: 'boma-wise-age-group',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: { reportType: 5, reportTitle: 'Boma Wise Age Group Report' },
+      },
+      {
+        path: 'interested-in-component2',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 6,
+          reportTitle: 'Households Interested in Component 2 Report',
+        },
+      },
+      {
+        path: 'biometric-match-list',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: { reportType: 7, reportTitle: 'Report for Biometric Match List' },
+      },
+      {
+        path: 'complete-household-survey',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 8,
+          reportTitle: 'Complete Household Survey Report',
+        },
+      },
+    ],
   },
   {
-    path: 'restore/list',
+    path: 'restore',
     canActivate: [routeGuard],
-    component: BeneficiaryRestore
+    children: [
+      {
+        path: 'list',
+        component: BeneficiaryRestore,
+      },
+      {
+        path: 'details/:id',
+        component: BeneficiaryRestoreDetails,
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'list' },
+    ],
   },
-  { path: 'restore/details/:id',
-    component: BeneficiaryRestoreDetails
+  {
+    path: 'under-construction',
+    component: BeneficiaryIdCard,
   },
-
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     component: NotFound,

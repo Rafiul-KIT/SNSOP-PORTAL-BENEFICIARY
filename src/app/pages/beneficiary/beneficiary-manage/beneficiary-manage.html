@@ -325,16 +325,16 @@
                 </div>
 
                 <div class="col-md-4 mb-1">
-                    <label>Has mobile wallet?</label><br />
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="Yes" formControlName="hasMobileWallet" />
-                      Yes
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" value="No" formControlName="hasMobileWallet" />
-                      No
-                    </div>
+                  <label>Has mobile wallet?</label><br />
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="Yes" formControlName="hasMobileWallet" />
+                    Yes
                   </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="No" formControlName="hasMobileWallet" />
+                    No
+                  </div>
+                </div>
 
                 <!-- Mobile money -->
                 <div class="col-md-4 mb-1">
@@ -398,8 +398,8 @@
                   <div class="border rounded p-2">
                     @for (reason of filteredReasons; track reason.value) {
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" [value]="reason.value" 
-                        (change)="onReasonChange($event, reason.value)" [checked]="isReasonSelected(reason.value)" />
+                      <input class="form-check-input" type="checkbox" [value]="reason.value"
+                        [checked]="isReasonSelected(reason.value)" [disabled]="true" />
                       <label class="form-check-label">{{ reason.label }}</label>
                     </div>
                     } @empty {
@@ -460,6 +460,7 @@
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic" readonly /></td>
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_both" readonly /></td>
                     </tr>
+                    
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -678,7 +679,7 @@
 
                       <!-- Has National ID -->
                       <div class="col-md-12 mb-2">
-                        <label class="form-label">Do you have a national ID?</label><br />
+                        <label class="form-label">Do you have a ID?</label><br />
                         <div class="form-check form-check-inline">
                           <input class="form-check-input" type="radio" value="Yes" formControlName="hasNationalId" />
                           Yes
@@ -692,7 +693,7 @@
                       <!-- ID Type -->
                       <div class="col-md-12 mb-2">
                         <p-floatlabel variant="on">
-                          <p-select [options]="currentIdTypeOptions" optionLabel="label" optionValue="value"
+                          <p-select [options]="alternateIdTypeOptions" optionLabel="label" optionValue="value"
                             formControlName="documentType" class="w-100"
                             [ngClass]="{'is-invalid': (alternates.at(i).get('documentType')?.touched || alternates.at(i).get('documentType')?.dirty) && alternates.at(i).get('documentType')?.invalid}">
                           </p-select>
@@ -944,15 +945,20 @@
                         }
                       </div>
 
-                      <!-- Add 'otherOccupation' if you want to surface it -->
-                      <!--
-                        <div class="col-md-12 mb-2">
-                          <p-floatlabel variant="on">
-                            <input pInputText formControlName="otherOccupation" class="w-100" />
-                            <label>Other Occupation</label>
-                          </p-floatlabel>
-                        </div>
-                        -->
+                      <div class="col-md-12 mb-2">
+                        <p-floatlabel variant="on">
+                          <input pInputText formControlName="otherOccupation" class="w-100"
+                            [ngClass]="{'is-invalid': (nominees.at(i).get('otherOccupation')?.touched || nominees.at(i).get('otherOccupation')?.dirty) && nominees.at(i).get('otherOccupation')?.invalid}" />
+                          <label>Other Occupation</label>
+                        </p-floatlabel>
+                        @if ((nominees.at(i).get('otherOccupation')?.touched ||
+                        nominees.at(i).get('otherOccupation')?.dirty) &&
+                        nominees.at(i).get('otherOccupation')?.invalid) {
+                        <small class="text-danger">
+                          {{ getError('otherOccupation', i, 'nominees') }}
+                        </small>
+                        }
+                      </div>
                     </div>
                   </div>
                 </div>

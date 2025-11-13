@@ -597,11 +597,11 @@ export class LookupService {
     { id: 0, value: 'PASSPORT', label: 'Passport' },
     { id: 1, value: 'NATIONAL_ID', label: 'National Id' },
     { id: 2, value: 'OTHER', label: 'Other' },
-    { id: 3, value: 'NONE', label: 'None' },
-    { id: 4, value: 'REFUGEE_RATION_CARD', label: 'Refugee Ration Card' },
-    { id: 5, value: 'REFUGEE_ID_CARD', label: 'Refugee Id Card' },
+    // { id: 3, value: 'NONE', label: 'None' },
+    { id: 3, value: 'REFUGEE_RATION_CARD', label: 'Refugee Ration Card' },
+    { id: 4, value: 'REFUGEE_ID_CARD', label: 'Refugee Id Card' },
     {
-      id: 6,
+      id: 5,
       value: 'REFUGEE_PROOF_OF_REGISTRATION',
       label: 'Refugee Proof of Registration',
     },
@@ -677,36 +677,16 @@ export class LookupService {
 
 
   NomineeOccupationEnum = [
-    { id: 0, value: 'FORMAL_JOB', label: 'Employed in a formal job' },
-    {
-      id: 1,
-      value: 'CASUAL_WORK_OR_DAILY_WAGE_LABOR',
-      label: 'Casual work or daily wage labor',
-    },
-    {
-      id: 2,
-      value: 'SELF_EMPLOYED_BUSINESS_TRADE',
-      label: 'Self-employed in a business or trade',
-    },
-    {
-      id: 3,
-      value: 'AGRICULTURAL_WORK_OR_FARMING',
-      label: 'Agricultural work or farming',
-    },
-    {
-      id: 4,
-      value: 'HOMEMAKER',
-      label: 'Homemaker (manages household activities)',
-    },
-    {
-      id: 5,
-      value: 'UNEMPLOYED_AND_ACTIVELY_SEEKING_WORK',
-      label: 'Unemployed and actively seeking work',
-    },
-    { id: 6, value: 'STUDENT', label: 'Student or in education' },
-    { id: 7, value: 'DISABLE', label: 'Disabled or chronically ill' },
-    { id: 8, value: 'RETIRED', label: 'Retired or not working' },
-    { id: 9, value: 'OTHERS', label: 'Other (specify)' },
+   { id: 1, value: 'FORMAL_JOB', label: 'Formal Job' },
+    { id: 2, value: 'CASUAL_WORK', label: 'Casual Word' },
+    { id: 3, value: 'SELF_EMPLOYED', label: 'Self Employed' },
+    { id: 4, value: 'AGRICULTURAL_WORK', label: 'Agricultural Work' },
+    { id: 5, value: 'HOMEMAKER', label: 'Homemaker' },
+    { id: 6, value: 'UNEMPLOYED', label: 'Unemployed' },
+    { id: 7, value: 'STUDENT', label: 'Student' },
+    { id: 8, value: 'DISABLED', label: 'Disabled' },
+    { id: 9, value: 'RETIRED', label: 'Retired' },
+    { id: 10, value: 'OTHER', label: 'Other' },
   ];
   getNomineeOccupationEnum = () => {
     return this.NomineeOccupationEnum;
