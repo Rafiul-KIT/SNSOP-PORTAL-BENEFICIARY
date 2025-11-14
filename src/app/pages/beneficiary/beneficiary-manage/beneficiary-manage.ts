@@ -51,6 +51,7 @@ export class BeneficiaryManage implements OnInit {
   destroy$ = new Subject<void>();
 
   genderOptions: LookupItem[] = [];
+  registrationPhaseOptions: LookupItem[] = [];
   maritalStatusOptions: any[] = [];
   relationshipOptions: any[] = [];
   legalStatusOptions: any[] = [];
@@ -168,6 +169,7 @@ export class BeneficiaryManage implements OnInit {
 
     // Lookups
     this.genderOptions = this.lookup.getGenderList();
+    this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
@@ -607,6 +609,7 @@ export class BeneficiaryManage implements OnInit {
       spouseMiddleName: [''],
       spouseLastName: [''],
       spouseNickName: [''],
+      registrationPhase: ['', [this.notSelectRequired()]],
 
       legalStatus: ['', [this.notSelectRequired()]],
       hasNationalId: [''], // 'Yes'|'No'
@@ -684,6 +687,7 @@ export class BeneficiaryManage implements OnInit {
             respondentPhone: dto.respondentPhoneNo?.startsWith('+211')
               ? dto.respondentPhoneNo.substring(4)
               : dto.respondentPhoneNo || null,
+            registrationPhase: dto.registrationPhase,
             mainIncomeSource: dto.householdIncomeSource,
             mobileMoneyProvider: dto.mobileMoneyProvider,
             mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
@@ -851,6 +855,7 @@ export class BeneficiaryManage implements OnInit {
     );
     payload.spouseLastName = this.getOptionalStringValue(formValue.spouseLastName);
     payload.spouseNickName = this.getOptionalStringValue(formValue.spouseNickName);
+    payload.registrationPhase = formValue.registrationPhase;
     payload.respondentLegalStatus = formValue.legalStatus;
     const phone = formValue.respondentPhone?.toString().trim();
     payload.respondentPhoneNo = phone ? `+211${phone}` : null;
@@ -1384,6 +1389,7 @@ export class BeneficiaryManage implements OnInit {
       relationshipOther: 'Relationship Other',
       respondentAge: 'Age',
       gender: 'Gender',
+      registrationPhase: 'registrationPhase',
       maritalStatus: 'Marital Status',
       spouseFirstName: 'Spouse First Name',
       spouseMiddleName: 'Spouse Middle Name',
