@@ -22,12 +22,17 @@ import { NewRegistration } from './pages/beneficiary/new-registration/new-regist
 import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
 import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
 import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
+import { Profile } from './pages/profile/profile';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
     canActivate: [routeGuard],
+  },
+   {
+    component: Profile,
+    path: 'profile',
   },
   {
     path: 'adjudication',

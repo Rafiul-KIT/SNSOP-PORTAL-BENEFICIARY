@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./header.scss'],
 })
 export class Header {
+
   showPortalOptions = false;
   showUsermenu = false;
   menuList: any[] = [];
@@ -226,4 +227,7 @@ export class Header {
     this.apiService.logout();
     window.location.href = `${environment.portals.master}/#/landing`;
   }
+  goToProfile = () => {
+    this.router.navigateByUrl('/profile');
+  };
 }
