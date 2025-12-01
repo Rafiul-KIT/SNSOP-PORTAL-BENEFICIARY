@@ -27,6 +27,14 @@
                 <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
             </div>
+
+            <!-- <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
+                <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
+                    size="small" severity="primary" class="me-1" label="Approve" />
+
+                <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
+                    size="small" severity="danger" label="Reject" />
+            </div> -->
             }
 
 
@@ -257,6 +265,10 @@
                                                                     (oldDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
                                                                     (oldDetails?.householdMember65?.femaleTotal
+                                                                    || 0) + 
+                                                                    (oldDetails?.householdMemberLactating35?.femaleTotal
+                                                                    || 0) + 
+                                                                    (oldDetails?.householdMemberLactating64?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -454,10 +466,21 @@
                                                                     }}
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <th class="table-label">Lactating Women (18-35)</th>
+                                                                <td width="75px" class="text-center">
+                                                                    {{ oldDetails?.householdMemberLactating35?.femaleTotal || 0 }}
+                                                                </td>
+
+                                                                <th class="table-label">Lactating Women (36-64)</th>
+                                                                <td width="75px" class="text-center">
+                                                                    {{ oldDetails?.householdMemberLactating64?.femaleTotal || 0 }}
+                                                                </td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
-
-
                                                     <table class="table table-bordered mb-0 mt-3">
                                                         <tbody>
                                                             <tr>
@@ -802,6 +825,10 @@
                                                                     (editedDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
                                                                     (editedDetails?.householdMember65?.femaleTotal
+                                                                    || 0) + 
+                                                                    (editedDetails?.householdMemberLactating35?.femaleTotal
+                                                                    || 0) + 
+                                                                    (editedDetails?.householdMemberLactating64?.femaleTotal
                                                                     || 0)
                                                                     }}
                                                                 </td>
@@ -998,6 +1025,19 @@
                                                                     || 0)
                                                                     }}
                                                                 </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="table-label">Lactating Women (18-35)</th>
+                                                                <td width="75px" class="text-center">
+                                                                    {{ editedDetails?.householdMemberLactating35?.femaleTotal || 0 }}
+                                                                </td>
+
+                                                                <th class="table-label">Lactating Women (36-64)</th>
+                                                                <td width="75px" class="text-center">
+                                                                    {{ editedDetails?.householdMemberLactating64?.femaleTotal || 0 }}
+                                                                </td>
+                                                                <td></td>
+                                                                <td></td>
                                                             </tr>
                                                         </tbody>
                                                     </table>

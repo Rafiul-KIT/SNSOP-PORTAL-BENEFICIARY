@@ -86,6 +86,7 @@ interface BeneficiaryVm {
     gender: string;
     relation: string;
     nomineeOccupation: Occupation;
+    otherOccupation?: string;
     relationshipOther?: string;
     photo?: string;
     isReadWrite?: boolean;
@@ -337,6 +338,7 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       relation: n.relationshipWithHouseholdHead,
       relationshipOther: n.relationshipOther,
       nomineeOccupation: n.nomineeOccupation,
+      otherOccupation: n.otherOccupation,
       photo: normalizeFinger(n.biometric?.photoData),
       isReadWrite: n.isReadWrite,
     })),

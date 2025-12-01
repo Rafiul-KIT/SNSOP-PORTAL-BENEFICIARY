@@ -285,7 +285,7 @@
               <br />
               <div class="card-body row g-3">
                 <!-- Main Income -->
-                <div class="col-md-4 mb-1">
+                <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
                     <p-select id="mainIncomeSource" formControlName="mainIncomeSource" class="w-100"
                       [options]="incomeSourceOptions" optionLabel="label" optionValue="value"
@@ -299,7 +299,7 @@
                 </div>
 
                 <!-- Other income -->
-                <div class="col-md-4 mb-1">
+                <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
                     <input pInputText id="otherIncomeSource" formControlName="otherIncomeSource" class="w-100"
                       [ngClass]="{'is-invalid': showError('otherIncomeSource')}" />
@@ -312,7 +312,7 @@
 
 
                 <!-- Avg Income -->
-                <div class="col-md-4 mb-1">
+                <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
                     <input pInputText id="avgMonthlyIncome" formControlName="avgMonthlyIncome" class="w-100"
                       [ngClass]="{'is-invalid': showError('avgMonthlyIncome')}" />
@@ -324,7 +324,17 @@
 
                 </div>
 
-                <div class="col-md-4 mb-1">
+                <!-- Reg phase -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <p-select id="registrationPhase" formControlName="registrationPhase" class="w-100" [options]="registrationPhaseOptions"
+                      optionLabel="name" optionValue="id">
+                    </p-select>
+                    <label for="registrationPhase">Registration Phase</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="col-md-3 mb-1">
                   <label>Has mobile wallet?</label><br />
                   <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" value="Yes" formControlName="hasMobileWallet" />
@@ -337,7 +347,7 @@
                 </div>
 
                 <!-- Mobile money -->
-                <div class="col-md-4 mb-1">
+                <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
                     <p-select id="mobileMoneyProvider" formControlName="mobileMoneyProvider" class="w-100"
                       [options]="mobileMoneyOptions" optionLabel="label" optionValue="value"
@@ -370,7 +380,7 @@
 
 
                 <!-- Support Type -->
-                <div class="col-md-4 mb-1">
+                <div class="col-md-3 mb-1">
                   <label>Support Type</label><br />
                   <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" value="Public Works" formControlName="supportType" />
@@ -399,7 +409,7 @@
                     @for (reason of filteredReasons; track reason.value) {
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" [value]="reason.value"
-                        [checked]="isReasonSelected(reason.value)" [disabled]="true" />
+                        [checked]="isReasonSelected(reason.value)" [disabled]="false" />
                       <label class="form-check-label">{{ reason.label }}</label>
                     </div>
                     } @empty {
@@ -440,34 +450,34 @@
                     <tr>
                       <td>{{ ageGroup.label }}</td>
 
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleTotal" readonly /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleDisable" readonly /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleChronicalIll" readonly /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleBoth" readonly /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleTotal" /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleDisable" /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleChronicalIll" /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.maleBoth" /></td>
 
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleTotal" readonly /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleDisable" readonly /></td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleChronicalIll" readonly />
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleTotal" /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleDisable" /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleChronicalIll" />
                       </td>
-                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth" readonly /></td>
+                      <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth" /></td>
                     </tr>
                     }
                     <tr>
                       <td>Lactating Women (18-35)</td>
                       <td colspan="4" class="bg-light"></td>
-                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_total" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_disable" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_both" readonly /></td>
+                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_total" /></td>
+                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_disable" /></td>
+                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic" /></td>
+                      <td><input pInputText class="w-100" formControlName="f18_35_lactating_both" /></td>
                     </tr>
                     
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>
-                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_total" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_disable" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_chronic" readonly /></td>
-                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_both" readonly /></td>
+                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_total" /></td>
+                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_disable" /></td>
+                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_chronic" /></td>
+                      <td><input pInputText class="w-100" formControlName="f36_64_lactating_both" /></td>
                     </tr>
                   </tbody>
                 </table>
@@ -497,7 +507,7 @@
                   <div class="col-md-6 mb-1">
                     <p-floatlabel variant="on">
                       <input pInputText id="householdSize" formControlName="householdSize" class="w-100"
-                        [ngClass]="{'is-invalid': showError('householdSize')}" readonly />
+                        [ngClass]="{'is-invalid': showError('householdSize')}" />
                       <label for="householdSize">Household Size</label>
                     </p-floatlabel>
                     @if (beneficiaryForm.errors?.['hhEmpty']) {

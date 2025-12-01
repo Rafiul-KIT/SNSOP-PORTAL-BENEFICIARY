@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./header.scss'],
 })
 export class Header {
+
   showPortalOptions = false;
   showUsermenu = false;
   menuList: any[] = [];
@@ -108,47 +109,51 @@ export class Header {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
+          
           {
-            label: 'Pending Verification List',
-            icon: 'fas fa-list',
-            routerLink: 'pending-beneficiary/list',
-          },
-          {
-            label: 'Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary Update',
+            icon: 'fas fa-user-gear',
             routerLink: 'beneficiary/list',
           },
           {
-            label: 'Beneficiary View List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary View',
+            icon: 'fas fa-users-viewfinder',
             routerLink: 'beneficiary/view-list',
           },
           {
-            label: 'Approval List',
+            label: 'Update Approval',
             icon: 'fas fa-user-check',
             routerLink: 'beneficiary-approval/list',
           },
           {
-            label: 'Beneficiary Audit List',
-            icon: 'fas fa-list',
+            label: 'Beneficiary Audit',
+            icon: 'fas fa-address-book',
             routerLink: 'beneficiary-audit/list',
           },
           {
-            label: 'Archived Beneficiary List',
-            icon: 'fas fa-list',
+            label: 'Restore Beneficiary',
+            icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
           {
             label: 'New Registration',
             icon: 'fas fa-user-plus',
-            routerLink: 'beneficiary/new-registration',
+            // routerLink: 'beneficiary/new-registration',
+            routerLink: 'under-construction',
+          },
+          {
+            label: 'Pending Verification',
+            icon: 'fas fa-list',
+            // routerLink: 'pending-beneficiary/list',
+            routerLink: 'under-construction',
           },
         ],
       },
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        routerLink: 'adjudication/list',
+        // routerLink: 'adjudication/list',
+        routerLink: 'under-construction',
       },
       {
         label: 'Report',
@@ -157,32 +162,32 @@ export class Header {
           {
             label: 'Boma Wise Beneficiary List Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/boma-wise-beneficiary-list',
+            // routerLink: 'report/boma-wise-beneficiary-list',
           },
           {
             label: 'Boma & Data Entry Staff Wise Registration Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/data-entry-wise-registration',
+            // routerLink: 'report/data-entry-wise-registration',
           },
           {
             label: 'Boma Wise Age Group Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/boma-wise-age-group',
+            // routerLink: 'report/boma-wise-age-group',
           },
           {
             label: 'Households Interested in Component 2 Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/interested-in-component2',
+            // routerLink: 'report/interested-in-component2',
           },
           {
             label: 'Report for Biometric Match List',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/biometric-match-list',
+            // routerLink: 'report/biometric-match-list',
           },
           {
             label: 'Complete Household Survey Report',
             icon: 'fas fa-file-alt',
-            routerLink: 'report/complete-household-survey',
+            // routerLink: 'report/complete-household-survey',
           },
         ],
       },
@@ -222,4 +227,7 @@ export class Header {
     this.apiService.logout();
     window.location.href = `${environment.portals.master}/#/landing`;
   }
+  goToProfile = () => {
+    this.router.navigateByUrl('/profile');
+  };
 }

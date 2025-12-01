@@ -32,6 +32,7 @@ export class PermissionService {
               const response = await firstValueFrom(
                 this.http.get<any>(
                   `https://devgwapp.southsudansafetynet.info/mis_auth/api/menus/role/${roleId}`
+                  //  `https://gwapp.southsudansafetynet.info/mis_auth/api/menus/role/${roleId}`
                 )
               );
               if (response && Array.isArray(response.data)) {

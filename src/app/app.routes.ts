@@ -22,12 +22,18 @@ import { NewRegistration } from './pages/beneficiary/new-registration/new-regist
 import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
 import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
 import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
+import { Profile } from './pages/profile/profile';
+import { Unauthorized } from './components/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
     canActivate: [routeGuard],
+  },
+   {
+    component: Profile,
+    path: 'profile',
   },
   {
     path: 'adjudication',
@@ -36,10 +42,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: AdjudicationList,
+        canActivate: [routeGuard],
       },
       {
         path: 'match-list/:id',
         component: MatchList,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -51,26 +59,32 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryList,
+        canActivate: [routeGuard],
       },
       {
         path: 'view-list',
         component: BeneficiaryViewList,
+        canActivate: [routeGuard],
       },
       {
         path: 'new-registration',
         component: NewRegistration,
+        canActivate: [routeGuard],
       },
       {
         path: 'details/:id',
         component: BeneficiaryDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
+        canActivate: [routeGuard],
       },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -82,10 +96,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: PendingBeneficiaryList,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit/:applicationId',
         component: PendingBeneficiaryManage,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -97,18 +113,22 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryEditApprovalList,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit-details/:id',
         component: BeneficiaryEditApprovalDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'migrate-details/:id',
         component: BeneficiaryMigrateApprovalDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'archive-details/:id',
         component: BeneficiaryArchiveApprovalDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -120,10 +140,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryAudit,
+        canActivate: [routeGuard],
       },
       {
         path: 'audit-details/:id',
         component: BeneficiaryAuditDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -189,13 +211,18 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryRestore,
+        canActivate: [routeGuard],
       },
       {
         path: 'details/:id',
         component: BeneficiaryRestoreDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
+  },
+  { path: 'unauthorized', 
+    component: Unauthorized 
   },
   {
     path: 'under-construction',

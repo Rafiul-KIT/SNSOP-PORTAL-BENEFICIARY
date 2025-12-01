@@ -64,6 +64,8 @@ interface BeneficiaryVm {
   householdMember35: any;
   householdMember64: any;
   householdMember65: any;
+  householdMemberLactating35: any;
+  householdMemberLactating64: any;
 
   alternates: ({
     name: string;
@@ -350,6 +352,8 @@ private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
     householdMember35: dto.householdMember35,
     householdMember64: dto.householdMember64,
     householdMember65: dto.householdMember65,
+    householdMemberLactating35: dto.householdMemberLactating35,
+    householdMemberLactating64: dto.householdMemberLactating64,
 
     address: {
       state:
