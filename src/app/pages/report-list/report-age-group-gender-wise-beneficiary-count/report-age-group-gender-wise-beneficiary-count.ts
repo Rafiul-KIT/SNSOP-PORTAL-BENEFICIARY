@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, input } from '@angular/core';
 import { signal } from '@angular/core';
 import FileSaver from 'file-saver';
 
@@ -22,23 +22,29 @@ interface ExportColumn {
 @Component({
   selector: 'app-report-age-group-gender-wise-beneficiary-count',
   standalone: true,
-  imports: [TableModule, ButtonModule, TooltipModule], 
+  imports: [TableModule, ButtonModule, TooltipModule],
   templateUrl: './report-age-group-gender-wise-beneficiary-count.html',
   styleUrls: ['./report-age-group-gender-wise-beneficiary-count.scss'],
 })
 export class ReportAgeGroupGenderWiseBeneficiaryCount {
- 
+
+    constructor(
+    private lookup: LookupService,
+    private cdr: ChangeDetectorRef
+  ) { }
+
   reportResult = input<any>(null);
 
- 
+
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
 
-  
+
   public lookupService = inject(LookupService);
 
   async exportPdf() {
+    // Prepare the filtered list for PDF export by mapping the beneficiary data
     const filteredListForPDF: any[] = this.beneficiaryList().map((element: any) => ({
       State: element.stateId > 0 ? this.lookupService.getStateNameById(element.stateId) : '-',
       County: element.countyId > 0 ? this.lookupService.getCountyNameById(element.countyId) : '-',
@@ -58,12 +64,25 @@ export class ReportAgeGroupGenderWiseBeneficiaryCount {
       Above_64_Male: element.male?._64_and_above,
     }));
 
-    const jsPDF = await import('jspdf');
+    // Dynamically import jsPDF and autoTable
+    const jsPDF = (await import('jspdf')).jsPDF;
     const autoTable = (await import('jspdf-autotable')).default;
-    const doc = new jsPDF.default('landscape', 'pt', 'a4');
-    (doc as any).autoTable(this.exportColumns(), filteredListForPDF);
+
+    // Create a new jsPDF instance in landscape mode
+    const doc = new jsPDF('landscape', 'pt', 'a4');
+
+    // Generate the table with headers and data
+    autoTable(doc, {
+      head: [this.exportColumns().map((col) => col.title)], // Headers for the table
+      body: filteredListForPDF.map((row) =>
+        this.exportColumns().map((col) => row[col.dataKey]) // Data for the table rows
+      ),
+    });
+
+    // Save the PDF with a unique filename
     doc.save(`age_group_gender_wise_beneficiary_count_${Date.now()}.pdf`);
   }
+
 
   async exportExcel() {
     const filteredListForXL: any[] = this.beneficiaryList().map((element: any) => ({
@@ -139,5 +158,6 @@ export class ReportAgeGroupGenderWiseBeneficiaryCount {
     ]);
 
     this.beneficiaryList.set(this.reportResult()?.data ?? []);
+    this.cdr.markForCheck();
   }
 }

@@ -38,10 +38,58 @@ export class ReportBeneficiaryList {
 
   // Export to PDF
   async exportPdf() {
-    const jsPDF = await import('jspdf');
+    const { jsPDF } = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
-    const doc = new jsPDF.default('l', 'px', 'a4');
-    (doc as any).autoTable(this.exportColumns(), this.beneficiaryList());
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: 'a4',
+    });
+
+    const pdfColumns = [
+      { header: 'Application ID', dataKey: 'applicationId' },
+      { header: 'Respondent First Name', dataKey: 'respondentFirstName' },
+      { header: 'Respondent Middle Name', dataKey: 'respondentMiddleName' },
+      { header: 'Respondent Last Name', dataKey: 'respondentLastName' },
+      { header: 'Respondent Nick Name', dataKey: 'respondentNickName' },
+      { header: 'Respondent Gender', dataKey: 'respondentGender' },
+      { header: 'Respondent Age', dataKey: 'respondentAge' },
+      { header: 'Registration Phase', dataKey: 'registrationPhase' },
+      { header: 'State', dataKey: 'state' },
+      { header: 'County', dataKey: 'county' },
+      { header: 'Payam', dataKey: 'payam' },
+      { header: 'Boma', dataKey: 'boma' },
+    ];
+
+    const bodyData = this.beneficiaryList().map((beneficiary) => ({
+      applicationId: beneficiary.applicationId,
+      respondentFirstName: beneficiary.respondentFirstName,
+      respondentMiddleName: beneficiary.respondentMiddleName,
+      respondentLastName: beneficiary.respondentLastName,
+      respondentNickName: beneficiary.respondentNickName,
+      respondentGender: this.lookupService.getGenderEnumByValue(
+        beneficiary.respondentGender
+      ),
+      respondentAge: beneficiary.respondentAge,
+      registrationPhase: beneficiary.registrationPhase,
+      state:
+        this.lookupService.getStateNameById(beneficiary.address?.stateId) ??
+        '-',
+      county:
+        this.lookupService.getCountyNameById(beneficiary.address?.countyId) ??
+        '-',
+      payam:
+        this.lookupService.getPayamNameById(beneficiary.address?.payam) ?? '-',
+      boma:
+        this.lookupService.getBomaNameById(beneficiary.address?.boma) ?? '-',
+    }));
+
+    autoTable(doc, {
+      columns: pdfColumns,
+      body: bodyData,
+    });
+
     doc.save(`beneficiary_list_${Date.now()}.pdf`);
   }
 
