@@ -40,9 +40,16 @@ export class ReportStaffWiseBeneficiaryCount {
     const jsPDF = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
     const doc = new jsPDF.default('l', 'px', 'a4');
+    const mappedBeneficiaryList = this.beneficiaryList().map(beneficiary => {
+      return {
+        ...beneficiary,
+        registrationPhase: beneficiary.registrationPhase === 0 ? 'PARENT' : 'AF'
+      };
+    });
+
     autoTable(doc, {
       columns: this.exportColumns(),
-      body: this.beneficiaryList(),
+      body: mappedBeneficiaryList,
       didDrawPage: (data) => {
         const pageWidth = doc.internal.pageSize.width;
         doc.setFontSize(20);
