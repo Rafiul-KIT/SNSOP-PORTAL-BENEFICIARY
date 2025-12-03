@@ -81,9 +81,9 @@
                     <div class="form-floating mb-3">
                         <select class="form-select" id="staffUserName" formControlName="staffUserName">
                             <option value="">Select Staff</option>
-                            @for (staff of userList; track staff.userName) {
-                            <option [value]="staff.userName">
-                                {{staff.firstName}} {{staff.middleName}} {{staff.lastName}}
+                            @for (staff of userList; track staff.fullName) {
+                            <option [value]="staff.username">
+                                {{staff.fullName}}
                             </option>
                             }
                         </select>

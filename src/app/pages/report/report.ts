@@ -198,7 +198,7 @@ export class ReportComponent implements OnInit {
       sortColumn: "ID",
       sortOrder: "DESC"
     };
-    this.apiService.POST('api/user/search', payload).then(res => {
+    this.apiService.POST('api/users/search', payload, 'alt').then(res => {
       if (res.status === 200) {
         this.userList = res.data.users;
       }

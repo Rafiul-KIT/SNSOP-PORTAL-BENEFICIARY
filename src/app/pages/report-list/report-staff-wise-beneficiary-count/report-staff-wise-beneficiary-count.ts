@@ -14,7 +14,7 @@ interface Column {
 }
 
 interface ExportColumn {
-  title: string;
+  header: string;
   dataKey: string;
 }
 
@@ -40,7 +40,16 @@ export class ReportStaffWiseBeneficiaryCount {
     const jsPDF = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
     const doc = new jsPDF.default('l', 'px', 'a4');
-    (doc as any).autoTable(this.exportColumns(), this.beneficiaryList());
+    autoTable(doc, {
+      columns: this.exportColumns(),
+      body: this.beneficiaryList(),
+      didDrawPage: (data) => {
+        const pageWidth = doc.internal.pageSize.width;
+        doc.setFontSize(20);
+        doc.setTextColor(40);
+        doc.text('Staff Wise Beneficiary Count', pageWidth / 2, 22, { align: 'center' });
+      },
+    });
     doc.save(`staff_wise_beneficiary_count_${Date.now()}.pdf`);
   }
 
@@ -71,7 +80,7 @@ export class ReportStaffWiseBeneficiaryCount {
 
 
     this.exportColumns.set(
-      this.cols().map((col) => ({ title: col.header, dataKey: col.field }))
+      this.cols().map((col) => ({ header: col.header, dataKey: col.field }))
     );
 
     this.beneficiaryList.set(this.reportResult()?.data ?? []);
