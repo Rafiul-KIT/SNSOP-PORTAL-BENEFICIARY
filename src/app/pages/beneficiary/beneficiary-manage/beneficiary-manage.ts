@@ -61,7 +61,7 @@ export class BeneficiaryManage implements OnInit {
   occupationOptions: any[] = [];
   incomeSourceOptions: any[] = [];
   allReasons: any[] = [];
-  filteredReasons: any[] = [];
+  filteredReasons: { label: string; value: string; disabled: boolean }[] = [];
   mobileMoneyOptions: any[] = [];
 
   // ===== Regex & constants (aligned with mobile/Java) =====
@@ -161,7 +161,7 @@ export class BeneficiaryManage implements OnInit {
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   // ========= Init =========
   ngOnInit(): void {
@@ -252,7 +252,7 @@ export class BeneficiaryManage implements OnInit {
     // this.beneficiaryForm.get('canReadWrite')?.disable();
     // this.beneficiaryForm.get('selectionReasons')?.disable();
     // this.beneficiaryForm.get('supportType')?.disable();
- 
+
     this.beneficiaryForm
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
@@ -260,6 +260,11 @@ export class BeneficiaryManage implements OnInit {
         this.filterReasons(val);
         this.beneficiaryForm.updateValueAndValidity();
       });
+
+    // REAL-TIME VALIDATION: Subscribe to form changes to update selection reasons
+    this.beneficiaryForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateSelectionReasonValidation();
+    });
 
     // Conditional validators
     this.beneficiaryForm
@@ -562,6 +567,7 @@ export class BeneficiaryManage implements OnInit {
     );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
+    this.updateSelectionReasonValidation(); // Set initial state
     this.cdr.detectChanges();
   }
 
@@ -952,8 +958,8 @@ export class BeneficiaryManage implements OnInit {
         });
 
         if (payload.alternatePayee1.documentType === 'NONE') {
-            payload.alternatePayee1.documentTypeOther = null;
-            payload.alternatePayee1.nationalId = null;
+          payload.alternatePayee1.documentTypeOther = null;
+          payload.alternatePayee1.nationalId = null;
         }
         delete (payload.alternatePayee1 as any).biometrics;
       }
@@ -974,10 +980,10 @@ export class BeneficiaryManage implements OnInit {
           nationalId: a.nationalId?.trim() || null,
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
-        
+
         if (payload.alternatePayee2.documentType === 'NONE') {
-            payload.alternatePayee2.documentTypeOther = null;
-            payload.alternatePayee2.nationalId = null;
+          payload.alternatePayee2.documentTypeOther = null;
+          payload.alternatePayee2.nationalId = null;
         }
         delete (payload.alternatePayee2 as any).biometrics;
       }
@@ -1074,17 +1080,20 @@ export class BeneficiaryManage implements OnInit {
   // ========= Selection reasons =========
 
   filterReasons(supportType: string) {
+    let reasons: any[] = [];
     if (supportType === 'Public Works') {
-      this.filteredReasons = this.allReasons.filter((r) =>
+      reasons = this.allReasons.filter((r) =>
         r.value.startsWith('LIPW_REASON')
       );
     } else if (supportType === 'Direct Income Support') {
-      this.filteredReasons = this.allReasons.filter((r) =>
+      reasons = this.allReasons.filter((r) =>
         r.value.startsWith('DIS_REASON')
       );
     } else {
-      this.filteredReasons = [];
+      reasons = [];
     }
+    this.filteredReasons = reasons.map(r => ({ ...r, disabled: false }));
+    this.updateSelectionReasonValidation();
   }
   isReasonSelected(value: string): boolean {
     const reasons = this.beneficiaryForm.get('selectionReasons')?.value || [];
@@ -1638,7 +1647,7 @@ export class BeneficiaryManage implements OnInit {
       const f18_35_lactating_chronic = +fg.get('f18_35_lactating_chronic')?.value || 0;
       const f18_35_lactating_both = +fg.get('f18_35_lactating_both')?.value || 0;
       if (f18_35_lactating_disable + f18_35_lactating_chronic + f18_35_lactating_both > f18_35_lactating_total) {
-          return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
+        return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
       }
 
       const f36_64_lactating_total = +fg.get('f36_64_lactating_total')?.value || 0;
@@ -1646,9 +1655,9 @@ export class BeneficiaryManage implements OnInit {
       const f36_64_lactating_chronic = +fg.get('f36_64_lactating_chronic')?.value || 0;
       const f36_64_lactating_both = +fg.get('f36_64_lactating_both')?.value || 0;
       if (f36_64_lactating_disable + f36_64_lactating_chronic + f36_64_lactating_both > f36_64_lactating_total) {
-          return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
+        return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
       }
-      
+
       for (const g of this.ageGroups) {
         const mT = +fg.get(g.maleTotal)?.value || 0;
         const mD = +fg.get(g.maleDisable)?.value || 0;
@@ -1833,5 +1842,156 @@ export class BeneficiaryManage implements OnInit {
       }
       return null;
     };
+  }
+
+  onReasonChange(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const reasonValue = checkbox.value;
+    const selectedReasons = this.beneficiaryForm.get('selectionReasons')?.value as string[] | null || [];
+
+    if (checkbox.checked) {
+      if (!selectedReasons.includes(reasonValue)) {
+        selectedReasons.push(reasonValue);
+      }
+    } else {
+      const index = selectedReasons.indexOf(reasonValue);
+      if (index > -1) {
+        selectedReasons.splice(index, 1);
+      }
+    }
+
+    this.beneficiaryForm.get('selectionReasons')?.setValue(selectedReasons);
+  }
+
+  private updateSelectionReasonValidation() {
+    if (!this.beneficiaryForm) return;
+    const hhData = this.getHouseholdBreakdown();
+    const selectedReasons: string[] = [...this.beneficiaryForm.get('selectionReasons')?.value || []];
+    let reasonsChanged = false;
+
+    this.filteredReasons.forEach(reason => {
+      const shouldBeDisabled = this.isReasonDisabled(reason, hhData);
+      if (reason.disabled !== shouldBeDisabled) {
+        reason.disabled = shouldBeDisabled;
+      }
+
+      if (reason.disabled) {
+        const index = selectedReasons.indexOf(reason.value);
+        if (index > -1) {
+          selectedReasons.splice(index, 1);
+          reasonsChanged = true;
+        }
+      }
+    });
+
+    if (reasonsChanged) {
+      this.beneficiaryForm.get('selectionReasons')?.setValue(selectedReasons, { emitEvent: false });
+    }
+  }
+
+  private getHouseholdBreakdown() {
+    const form = this.beneficiaryForm;
+    const gv = (name: string) => +form.get(name)?.value || 0;
+
+    const child_0_2 = gv('m0_2_total') + gv('f0_2_total');
+    const child_3_5 = gv('m3_5_total') + gv('f3_5_total');
+    const child_6_17 = gv('m6_17_total') + gv('f6_17_total');
+    const childrenTotal = child_0_2 + child_3_5 + child_6_17;
+
+    const youth_18_35_total = gv('m18_35_total') + gv('f18_35_total');
+    const adults_36_64_total = gv('m36_64_total') + gv('f36_64_total');
+    const elderly_65_plus_total = gv('m65_total') + gv('f65_total');
+
+    const youth_18_35_female_total = gv('f18_35_total');
+    const adults_36_64_female_total = gv('f36_64_total');
+
+    const getAbleBodiedForAgeGroup = (group: any) => {
+      const maleTotal = gv(group.maleTotal);
+      const maleDisable = gv(group.maleDisable);
+      const maleChronicalIll = gv(group.maleChronicalIll);
+      const maleBoth = gv(group.maleBoth);
+      const ableMale = maleTotal - (maleDisable + maleChronicalIll + maleBoth);
+
+      const femaleTotal = gv(group.femaleTotal);
+      const femaleDisable = gv(group.femaleDisable);
+      const femaleChronicalIll = gv(group.femaleChronicalIll);
+      const femaleBoth = gv(group.femaleBoth);
+      const ableFemale = femaleTotal - (femaleDisable + femaleChronicalIll + femaleBoth);
+
+      return (ableMale > 0 ? ableMale : 0) + (ableFemale > 0 ? ableFemale : 0);
+    };
+
+    const ableBodied_18_35 = getAbleBodiedForAgeGroup(this.ageGroups[3]);
+    const ableBodied_36_64 = getAbleBodiedForAgeGroup(this.ageGroups[4]);
+    const ableBodied_65_plus = getAbleBodiedForAgeGroup(this.ageGroups[5]);
+
+    const ableBodied_18_64 = ableBodied_18_35 + ableBodied_36_64;
+    const ableBodied_18_plus = ableBodied_18_64 + ableBodied_65_plus;
+
+    const chronicallyIllOrBothInAllAges = this.ageGroups.reduce((sum, group) => {
+      return sum + gv(group.maleChronicalIll) + gv(group.maleBoth) + gv(group.femaleChronicalIll) + gv(group.femaleBoth);
+    }, 0) > 0;
+
+    const otherAgeGroupDependents = this.ageGroups.reduce((sum, group) => {
+      if (group.label === '18-35 yrs' || group.label === '36-64 yrs') {
+        return sum + gv(group.maleDisable) + gv(group.maleChronicalIll) + gv(group.maleBoth) +
+          gv(group.femaleDisable) + gv(group.femaleChronicalIll) + gv(group.femaleBoth);
+      }
+      return sum;
+    }, 0);
+
+    const dependents = childrenTotal + elderly_65_plus_total + otherAgeGroupDependents;
+
+    let ableBodiedTotal = 0;
+    this.ageGroups.forEach(group => {
+      ableBodiedTotal += getAbleBodiedForAgeGroup(group);
+    });
+
+    return {
+      childrenTotal,
+      elderlyTotal: elderly_65_plus_total,
+      chronicallyIllOrBothInAllAges,
+      ableBodied_18_plus,
+      ableBodied_18_64,
+      adults_36_64_total,
+      female_18_64_total: youth_18_35_female_total + adults_36_64_female_total,
+      dependents,
+      youth_18_35_total,
+      ableBodiedTotal: ableBodiedTotal,
+    };
+  }
+
+  private isReasonDisabled(reason: { value: string; label: string }, hhData: any): boolean {
+    switch (reason.value) {
+      case 'DIS_REASON_1': // Child-headed
+        return !(hhData.childrenTotal > 0 && hhData.ableBodied_18_plus === 0);
+
+      case 'DIS_REASON_2': // Elderly-headed
+        return !(hhData.elderlyTotal > 0 && hhData.ableBodied_18_64 === 0);
+
+      case 'DIS_REASON_4': // Chronically-ill headed
+        return !(hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0);
+
+      case 'DIS_REASON_5': // Female-headed
+        return !(hhData.female_18_64_total > 0 && hhData.ableBodied_18_64 === 0);
+
+      case 'LIPW_REASON_4': // Many dependents
+        return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
+
+      case 'LIPW_REASON_2': // Able-bodied youth
+      return !(hhData.ableBodiedTotal > 0); // Updated as per request
+
+      case 'LIPW_REASON_3': // Household headed by youth
+      return !(hhData.ableBodiedTotal > 0); // Updated as per request
+
+      case 'LIPW_REASON_1': // Many dependents
+        return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
+
+      case 'LIPW_REASON_5': // Able-bodied youth
+      return !(hhData.ableBodiedTotal > 0); // Updated as per request
+
+      default:
+        return false;
+    }
   }
 }
