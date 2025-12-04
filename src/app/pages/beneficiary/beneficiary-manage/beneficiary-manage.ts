@@ -1958,6 +1958,7 @@ export class BeneficiaryManage implements OnInit {
       dependents,
       youth_18_35_total,
       ableBodiedTotal: ableBodiedTotal,
+      ableBodied_18_35
     };
   }
 
@@ -1969,26 +1970,28 @@ export class BeneficiaryManage implements OnInit {
       case 'DIS_REASON_2': // Elderly-headed
         return !(hhData.elderlyTotal > 0 && hhData.ableBodied_18_64 === 0);
 
-      case 'DIS_REASON_4': // Chronically-ill headed
+      case 'DIS_REASON_3':
+        return (hhData.ableBodiedTotal > 0)
+      case 'DIS_REASON_4':
         return !(hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0);
 
-      case 'DIS_REASON_5': // Female-headed
+      case 'DIS_REASON_5':
         return !(hhData.female_18_64_total > 0 && hhData.ableBodied_18_64 === 0);
 
-      case 'LIPW_REASON_4': // Many dependents
+      case 'LIPW_REASON_1': 
+        return !(hhData.ableBodiedTotal > 0);
+
+      case 'LIPW_REASON_2': 
+        return !(hhData.ableBodied_18_35 > 0); 
+
+      case 'LIPW_REASON_3': 
+        return !(hhData.ableBodied_18_35 > 0);
+
+      case 'LIPW_REASON_4': 
         return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
 
-      case 'LIPW_REASON_2': // Able-bodied youth
-      return !(hhData.ableBodiedTotal > 0); // Updated as per request
-
-      case 'LIPW_REASON_3': // Household headed by youth
-      return !(hhData.ableBodiedTotal > 0); // Updated as per request
-
-      case 'LIPW_REASON_1': // Many dependents
-        return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
-
-      case 'LIPW_REASON_5': // Able-bodied youth
-      return !(hhData.ableBodiedTotal > 0); // Updated as per request
+      case 'LIPW_REASON_5':
+      return !(hhData.ableBodiedTotal > 0);
 
       default:
         return false;
