@@ -1989,7 +1989,7 @@ export class BeneficiaryManage implements OnInit {
         return !(hhData.ableBodiedTotal > 0);
 
       case 'LIPW_REASON_2': 
-        return !(hhData.ableBodied_18_35 > 0); 
+        return !(hhData.ableBodied_18_35 > 0);
 
       case 'LIPW_REASON_3': 
         return !(hhData.ableBodied_18_35 > 0);
