@@ -81,9 +81,9 @@
                     <div class="form-floating mb-3">
                         <select class="form-select" id="staffUserName" formControlName="staffUserName">
                             <option value="">Select Staff</option>
-                            @for (staff of userList; track staff.userName) {
-                            <option [value]="staff.userName">
-                                {{staff.firstName}} {{staff.middleName}} {{staff.lastName}}
+                            @for (staff of userList; track staff.fullName) {
+                            <option [value]="staff.username">
+                                {{staff.fullName}}
                             </option>
                             }
                         </select>
@@ -244,6 +244,10 @@
                             <option value="3">Payment Cycle 3</option>
                             <option value="4">Payment Cycle 4</option>
                             <option value="5">Payment Cycle 5</option>
+                            <option value="6">Payment Cycle 6</option>
+                            <option value="7">Payment Cycle 7</option>
+                            <option value="8">Payment Cycle 8</option>
+                            <option value="9">Payment Cycle 9</option>
                         </select>
                         <label for="paymentCycle">Payment Cycle</label>
                     </div>
@@ -253,9 +257,9 @@
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="form-floating mb-3">
                         <select class="form-select" id="registrationPhase" formControlName="registrationPhase">
-                            <option value="">Select Registration Phase</option>
-                            <option value="AF">AF</option>
-                            <option value="PARENT">PARENT</option>
+                            <option value= "" >Select Registration Phase</option>
+                            <option value= "1" >AF</option>
+                            <option value= "0" >PARENT</option>
                         </select>
                         <label for="registrationPhase">Registration Phase</label>
                     </div>
@@ -267,7 +271,7 @@
                         <p-button label="Reset" size="small" icon="fas fa-refresh" severity="danger" class="me-2"
                             (click)="resetForm(reportForm)" outlined="true"></p-button>
                         <p-button label=" Generate" [disabled]="reportForm.invalid" size="small"
-                            icon="fas fa-line-chart me-2" (click)="showUnderConstruction()"></p-button>
+                            icon="fas fa-line-chart me-2" (click)="generateReport()"></p-button>
                     </div>
                 </div>
             </form>

@@ -37,7 +37,7 @@
       <tr>
         <td class="text-center">{{ beneficiary.staffId }}</td>
         <td class="text-center">{{ beneficiary.staffName }}</td>
-        <td class="text-center">{{ beneficiary.registrationPhase }}</td>
+        <td class="text-center">{{ beneficiary.registrationPhase === 0 ? 'PARENT' : 'AF' }}</td>
         <td class="text-center">{{ beneficiary.count }}</td>
       </tr>
     </ng-template>
