@@ -1,3 +1,5 @@
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -64,6 +66,8 @@ interface Beneficiary {
     SelectModule,
     Loader,
     RouterModule,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   providers: [MessageService, ConfirmationService],
 })
@@ -83,6 +87,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
   pageSize = 10;
   advanceSearchPanelVisible: boolean = false;
   totalRecords = 0;
+  isScannerVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -101,6 +106,18 @@ export class BeneficiaryEditApprovalList implements OnInit {
     this.loadBeneficiaries(this.currentPage, this.pageSize);
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
     this.breadcrumbItems = [{ label: 'Approval List' }];
+  }
+
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
   }
 
   initForm() {

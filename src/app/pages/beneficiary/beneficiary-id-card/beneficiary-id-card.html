@@ -9,7 +9,7 @@
   <form [formGroup]="searchForm" class="row g-3">
     <div class="col-md-3">
       <p-floatlabel variant="on">
-        <input pInputText class="form-control" formControlName="applicationId" />
+        <input pInputText class="form-control" formControlName="applicationId" appQrInput (qrScanClick)="openQrScanner()" />
         <label>Application ID</label>
       </p-floatlabel>
     </div>
@@ -185,7 +185,7 @@
 </p-paginator>
 
 }
-
+<app-qr-scanner [(visible)]="isScannerVisible" (onScanSuccess)="onQrScanSuccess($event)"></app-qr-scanner>
 <p-toast position="bottom-right"></p-toast>
 <p-confirmDialog key="archiveDialog" position="center" [style]="{ width: '500px' }">
   <ng-template pTemplate="message">

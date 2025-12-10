@@ -1,3 +1,5 @@
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import {
   Component,
   OnInit,
@@ -89,6 +91,8 @@ interface BeneficiaryVm {
     RouterModule,
     TooltipModule,
     Loader,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -119,6 +123,7 @@ export class BeneficiaryIdCard implements OnInit {
   advanceSearchPanelVisible = false;
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
+  isScannerVisible = false;
 
 
   constructor(
@@ -160,6 +165,18 @@ export class BeneficiaryIdCard implements OnInit {
 
     await this.loadLookups();                // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
+  }
+
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
   }
 
 
