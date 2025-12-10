@@ -150,6 +150,11 @@ export class Header {
         ],
       },
       {
+        label: 'Beneficiary ID Cards',
+        icon: 'fas fa-id-card',
+        routerLink: 'id-card',
+      },
+      {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
         // routerLink: 'adjudication/list',
@@ -190,11 +195,6 @@ export class Header {
             routerLink: 'report/complete-household-survey',
           },
         ],
-      },
-      {
-        label: 'Beneficiary ID Cards',
-        icon: 'fas fa-id-card',
-        routerLink: 'id-card',
       },
       { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },
       {
