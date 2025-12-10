@@ -1869,13 +1869,20 @@ export class BeneficiaryManage implements OnInit {
     const selectedReasons: string[] = [...this.beneficiaryForm.get('selectionReasons')?.value || []];
     let reasonsChanged = false;
 
-    this.filteredReasons.forEach(reason => {
-      const shouldBeDisabled = this.isReasonDisabled(reason, hhData);
-      if (reason.disabled !== shouldBeDisabled) {
-        reason.disabled = shouldBeDisabled;
-      }
+    const hasDisRule = this.beneficiaryForm.hasError('disRule');
+    const hasLipwRule = this.beneficiaryForm.hasError('lipwRule');
 
-      if (reason.disabled) {
+    this.filteredReasons.forEach(reason => {
+      const isDisReason = reason.value.startsWith('DIS_REASON');
+      const isLipwReason = reason.value.startsWith('LIPW_REASON');
+
+      const shouldBeDisabledByHhData = this.isReasonDisabled(reason, hhData);
+      const shouldBeDisabledByRules = (hasDisRule && isDisReason) || (hasLipwRule && isLipwReason);
+      const shouldBeDisabled = shouldBeDisabledByHhData || shouldBeDisabledByRules;
+      
+      reason.disabled = shouldBeDisabled;
+
+      if (shouldBeDisabled) {
         const index = selectedReasons.indexOf(reason.value);
         if (index > -1) {
           selectedReasons.splice(index, 1);
@@ -1982,7 +1989,7 @@ export class BeneficiaryManage implements OnInit {
         return !(hhData.ableBodiedTotal > 0);
 
       case 'LIPW_REASON_2': 
-        return !(hhData.ableBodied_18_35 > 0); 
+        return !(hhData.ableBodied_18_35 > 0);
 
       case 'LIPW_REASON_3': 
         return !(hhData.ableBodied_18_35 > 0);

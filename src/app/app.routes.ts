@@ -24,6 +24,7 @@ import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiar
 import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
 import { Profile } from './pages/profile/profile';
 import { Unauthorized } from './components/unauthorized/unauthorized';
+import { UnderConstruction } from './pages/under-construction/under-construction';
 
 export const routes: Routes = [
   {
@@ -226,7 +227,12 @@ export const routes: Routes = [
   },
   {
     path: 'under-construction',
+    component: UnderConstruction,
+  },
+  {
+    path: 'id-card',
     component: BeneficiaryIdCard,
+    canActivate: [routeGuard],
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
