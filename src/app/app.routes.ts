@@ -25,6 +25,7 @@ import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/b
 import { Profile } from './pages/profile/profile';
 import { Unauthorized } from './components/unauthorized/unauthorized';
 import { UnderConstruction } from './pages/under-construction/under-construction';
+import { RedirectLink } from './pages/adjudication/redirect-link/redirect-link';
 
 export const routes: Routes = [
   {
@@ -233,6 +234,10 @@ export const routes: Routes = [
     path: 'id-card',
     component: BeneficiaryIdCard,
     canActivate: [routeGuard],
+  },
+  {
+    path: 'redirect-link',
+    component: RedirectLink,
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
