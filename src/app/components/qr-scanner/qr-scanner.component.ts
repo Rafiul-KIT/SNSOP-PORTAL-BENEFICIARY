@@ -43,7 +43,7 @@ import { QrScannerService } from '../../services/qr-scanner.service';
         <p-button 
           [label]="cancelButtonLabel" 
           icon="fas fa-times" 
-          severity="secondary" 
+          severity="danger" 
           (onClick)="close()"
           [outlined]="true">
         </p-button>
