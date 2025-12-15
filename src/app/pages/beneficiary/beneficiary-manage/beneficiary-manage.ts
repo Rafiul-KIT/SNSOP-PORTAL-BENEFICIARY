@@ -257,6 +257,7 @@ export class BeneficiaryManage implements OnInit {
       .get('supportType')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((val) => {
+        this.beneficiaryForm.get('selectionReasons')?.setValue([]);
         this.filterReasons(val);
         this.beneficiaryForm.updateValueAndValidity();
       });

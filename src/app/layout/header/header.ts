@@ -44,9 +44,9 @@ export class Header {
       link: environment.portals.masterSettings,
       icon: 'fas fa-cog',
     },
-    { label: 'Survey CTO', 
+    { label: 'Survey CTO',
       link: environment.portals.surveyCTO,
-      icon: 'fas fa-poll' 
+      icon: 'fas fa-poll'
     },
   ];
 
@@ -112,7 +112,7 @@ export class Header {
         label: 'Beneficiary',
         icon: 'fas fa-people-group',
         items: [
-          
+
           {
             label: 'Beneficiary Update',
             icon: 'fas fa-user-gear',
