@@ -147,8 +147,8 @@ export class Header {
           {
             label: 'Pending Verification',
             icon: 'fas fa-list',
-            // routerLink: 'pending-beneficiary/list',
-            routerLink: 'under-construction',
+            routerLink: 'pending-beneficiary/list',
+            // routerLink: 'under-construction',
           },
         ],
       },
