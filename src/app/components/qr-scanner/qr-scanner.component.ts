@@ -19,18 +19,18 @@ import { QrScannerService } from '../../services/qr-scanner.service';
   imports: [CommonModule, DialogModule, ButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p-dialog 
-      [(visible)]="visible" 
-      [modal]="true" 
-      [closable]="true" 
-      [closeOnEscape]="true"
+    <p-dialog
+      [(visible)]="visible"
+      [modal]="true"
+      [closable]="false"
+      [closeOnEscape]="false"
       [draggable]="false"
       [resizable]="false"
       [header]="dialogHeader"
       [style]="dialogStyle"
       (onShow)="onDialogShow()"
       (onHide)="onDialogHide()">
-      
+
       <div class="qr-scanner-container">
         <div id="qr-reader" class="qr-reader"></div>
         <p class="text-center mt-3 text-muted scan-instruction">
@@ -40,10 +40,10 @@ import { QrScannerService } from '../../services/qr-scanner.service';
       </div>
 
       <ng-template pTemplate="footer">
-        <p-button 
-          [label]="cancelButtonLabel" 
-          icon="fas fa-times" 
-          severity="danger" 
+        <p-button
+          [label]="cancelButtonLabel"
+          icon="fas fa-times"
+          severity="danger"
           (onClick)="close()"
           [outlined]="true">
         </p-button>
@@ -170,7 +170,7 @@ export class QrScannerComponent implements OnDestroy {
 
   async startScanner() {
     this.isScanning = true;
-    
+
     try {
       await this.qrScanner.startScanning(
         'qr-reader',
@@ -187,7 +187,7 @@ export class QrScannerComponent implements OnDestroy {
   handleScanSuccess(decodedText: string) {
     console.log('QR Code scanned:', decodedText);
     this.onScanSuccess.emit(decodedText);
-    
+
     if (this.autoClose) {
       this.close();
     }

@@ -2,262 +2,261 @@
 <app-loader></app-loader>
 } @else {
 <div class="breadcrumb-wrapper">
-    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
 </div>
 
 <div class="card p-3 mb-2">
-    <form [formGroup]="searchForm" class="row g-3">
-        <div class="col-md-3">
-            <p-floatlabel variant="on">
-                <input pInputText class="form-control" formControlName="applicationId" />
-                <label>Application ID</label>
-            </p-floatlabel>
-        </div>
+  <form [formGroup]="searchForm" class="row g-3">
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" formControlName="applicationId" appQrInput
+          (qrScanClick)="openQrScanner()" />
+        <label>Application ID</label>
+      </p-floatlabel>
+    </div>
 
-        <div class="col-md-3">
-            <p-floatlabel variant="on">
-                <input pInputText class="form-control" formControlName="firstName" />
-                <label>First Name</label>
-            </p-floatlabel>
-        </div>
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" formControlName="firstName" />
+        <label>First Name</label>
+      </p-floatlabel>
+    </div>
 
-        @if (advanceSearchPanelVisible) {
-        <div class="col-md-3">
-            <p-floatlabel variant="on">
-                <input pInputText class="form-control" formControlName="middleName" />
-                <label>Middle Name</label>
-            </p-floatlabel>
-        </div>
-        }
+    @if (advanceSearchPanelVisible) {
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" formControlName="middleName" />
+        <label>Middle Name</label>
+      </p-floatlabel>
+    </div>
+    }
 
-        <div class="col-md-3">
-            <p-floatlabel variant="on">
-                <input pInputText class="form-control" formControlName="lastName" />
-                <label>Last Name</label>
-            </p-floatlabel>
-        </div>
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" formControlName="lastName" />
+        <label>Last Name</label>
+      </p-floatlabel>
+    </div>
 
-        <div class="col-md-3">
-            <p-floatlabel variant="on">
-                <label>Phone Number</label>
-                <input pInputText class="form-control" formControlName="phoneNumber" />
-            </p-floatlabel>
-        </div>
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <label>Phone Number</label>
+        <input pInputText class="form-control" formControlName="phoneNumber" />
+      </p-floatlabel>
+    </div>
 
-        @if (advanceSearchPanelVisible) {
-        <!-- State -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="states" optionLabel="name" formControlName="state"
-                    (onChange)="onStateChange($event.value)" />
-                <label>State</label>
-            </p-floatlabel>
-        </div>
+    @if (advanceSearchPanelVisible) {
+    <!-- State -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="states" optionLabel="name" formControlName="state"
+          (onChange)="onStateChange($event.value)" />
+        <label>State</label>
+      </p-floatlabel>
+    </div>
 
-        <!-- County -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="counties" optionLabel="name" formControlName="county"
-                    (onChange)="onCountyChange($event.value)" [disabled]="!searchForm.get('state')?.value" />
-                <label>County</label>
-            </p-floatlabel>
-        </div>
+    <!-- County -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="counties" optionLabel="name" formControlName="county"
+          (onChange)="onCountyChange($event.value)" [disabled]="!searchForm.get('state')?.value" />
+        <label>County</label>
+      </p-floatlabel>
+    </div>
 
-        <!-- Payam -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="payams" optionLabel="name" formControlName="payam"
-                    (onChange)="onPayamChange($event.value)" [disabled]="!searchForm.get('county')?.value" />
-                <label>Payam</label>
-            </p-floatlabel>
-        </div>
+    <!-- Payam -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event.value)"
+          [disabled]="!searchForm.get('county')?.value" />
+        <label>Payam</label>
+      </p-floatlabel>
+    </div>
 
-        <!-- Boma -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="bomas" optionLabel="name" formControlName="boma"
-                    [disabled]="!searchForm.get('payam')?.value" />
-                <label>Boma</label>
-            </p-floatlabel>
-        </div>
+    <!-- Boma -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="bomas" optionLabel="name" formControlName="boma"
+          [disabled]="!searchForm.get('payam')?.value" />
+        <label>Boma</label>
+      </p-floatlabel>
+    </div>
 
-        <!-- Gender -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="genderOptions" optionLabel="name" optionValue="id"
-                    formControlName="gender"></p-select>
-                <label>Gender</label>
-            </p-floatlabel>
-        </div>
+    <!-- Gender -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="genderOptions" optionLabel="name" optionValue="id" formControlName="gender"></p-select>
+        <label>Gender</label>
+      </p-floatlabel>
+    </div>
 
-        <!-- Registration Phase -->
-        <div class="col-md-3">
-            <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="registrationPhaseOptions" optionLabel="name" optionValue="id"
-                    formControlName="registrationPhase"></p-select>
-                <label>Registration Phase</label>
-            </p-floatlabel>
-        </div>
+    <!-- Registration Phase -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="registrationPhaseOptions" optionLabel="name" optionValue="id"
+          formControlName="registrationPhase"></p-select>
+        <label>Registration Phase</label>
+      </p-floatlabel>
+    </div>
 
-        }
+    }
 
-        <div class="col-12 text-end">
-            <p-button [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'" icon="fas fa-filter"
-                severity="warn" class="me-2" size="small" outlined="true"
-                (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"></p-button>
+    <div class="col-12 text-end">
+      <p-button [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'" icon="fas fa-filter"
+        severity="warn" class="me-2" size="small" outlined="true"
+        (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"></p-button>
 
-            <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small"
-                (onClick)="resetForm()" outlined="true"></p-button>
+      <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small" (onClick)="resetForm()"
+        outlined="true"></p-button>
 
-            <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
-                (onClick)="searchBeneficiaries()"></p-button>
-        </div>
-    </form>
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
+        (onClick)="searchBeneficiaries()"></p-button>
+    </div>
+  </form>
 </div>
 <div class="paginator-container" style="position: relative; padding-bottom: 60px;">
-    <p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
-        [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="applicationId"
-        [rowTrackBy]="trackByAppId" size="small" [(selection)]="selectedBeneficiaries" selectionMode="multiple">
-        <!-- TABLE HEADER -->
-        <ng-template pTemplate="header">
-            <tr>
-                <th colspan="12" class="text-end">
-                    <p class="fw-bold mb-2">
-                        Showing <kbd>{{ beneficiaries.length }}</kbd> of
-                        <kbd>{{ totalRecords }}</kbd> beneficiaries
-                    </p>
-                </th>
-            </tr>
-            <tr>
-                <!-- Select All Checkbox -->
-                <th style="min-width: 8rem; ">
-                    <div class="d-flex align-items-center gap-2">
+  <p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
+    [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="applicationId" [rowTrackBy]="trackByAppId"
+    size="small" [(selection)]="selectedBeneficiaries" selectionMode="multiple">
+    <!-- TABLE HEADER -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th colspan="12" class="text-end">
+          <p class="fw-bold mb-2">
+            Showing <kbd>{{ beneficiaries.length }}</kbd> of
+            <kbd>{{ totalRecords }}</kbd> beneficiaries
+          </p>
+        </th>
+      </tr>
+      <tr>
+        <!-- Select All Checkbox -->
+        <th style="min-width: 8rem; ">
+          <div class="d-flex align-items-center gap-2">
 
-                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        <label class="me-2 mb-0 fw-semibold text-primery" style="font-size: 0.9rem;">
-                            Select All
-                        </label>
-                    </div>
-                </th>
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            <label class="me-2 mb-0 fw-semibold text-primery" style="font-size: 0.9rem;">
+              Select All
+            </label>
+          </div>
+        </th>
 
 
-                <th>Application ID</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Age</th>
-                <th>Registration Phase</th>
-                <th>Phone</th>
-                <th>State</th>
-                <th>County</th>
-                <th>Payam</th>
-                <th>Boma</th>
-                <th class="text-center" [style]="{ width: '185px' }">Action</th>
-            </tr>
-        </ng-template>
+        <th>Application ID</th>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>Registration Phase</th>
+        <th>Phone</th>
+        <th>State</th>
+        <th>County</th>
+        <th>Payam</th>
+        <th>Boma</th>
+        <th class="text-center" [style]="{ width: '185px' }">Action</th>
+      </tr>
+    </ng-template>
 
-        <!-- TABLE BODY -->
-        <ng-template pTemplate="body" let-b>
-            <tr [pSelectableRow]="b">
-                <td>
-                    <p-tableCheckbox [value]="b"></p-tableCheckbox>
-                </td>
+    <!-- TABLE BODY -->
+    <ng-template pTemplate="body" let-b>
+      <tr [pSelectableRow]="b">
+        <td>
+          <p-tableCheckbox [value]="b"></p-tableCheckbox>
+        </td>
 
-                <td>{{ b.applicationId }}</td>
-                <td>{{ b.fullName }}</td>
-                <td>{{ b.respondentGender }}</td>
-                <td>{{ b.respondentAge }}</td>
-                <td>{{ b.registrationPhase }}</td>
-                <td>{{ b.respondentPhoneNo }}</td>
-                <td>{{ b.stateName }}</td>
-                <td>{{ b.countyName }}</td>
-                <td>{{ b.payamName }}</td>
-                <td>{{ b.bomaName }}</td>
+        <td>{{ b.applicationId }}</td>
+        <td>{{ b.fullName }}</td>
+        <td>{{ b.respondentGender }}</td>
+        <td>{{ b.respondentAge }}</td>
+        <td>{{ b.registrationPhase }}</td>
+        <td>{{ b.respondentPhoneNo }}</td>
+        <td>{{ b.stateName }}</td>
+        <td>{{ b.countyName }}</td>
+        <td>{{ b.payamName }}</td>
+        <td>{{ b.bomaName }}</td>
 
-                <td class="text-center">
-                    <p-button type="button" icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body"
-                        (onClick)="editBeneficiary(b)" size="small" outlined="true" severity="secondary" class="me-2" />
-                </td>
-            </tr>
-        </ng-template>
+        <td class="text-center">
+          <p-button type="button" icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body"
+            (onClick)="editBeneficiary(b)" size="small" outlined="true" severity="secondary" class="me-2" />
+        </td>
+      </tr>
+    </ng-template>
 
-        <!-- EMPTY MESSAGE -->
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="12" class="text-center text-danger">
-                    <b>No beneficiaries found!</b>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
-    <div class="paginator-wrapper">
-        <p-paginator class="paginator-sticky" style="margin-bottom: 10px;" [rows]="pageSize"
-            [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)"
-            [first]="currentPage * pageSize"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
-        </p-paginator>
-        <!-- Approve button visually inside paginator -->
-        <p-button label="Approve Selected" icon="fas fa-check" size="small" severity="primary"
-            (onClick)="approveSelected()" class="approve-btn">
-        </p-button>
+    <!-- EMPTY MESSAGE -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="12" class="text-center text-danger">
+          <b>No beneficiaries found!</b>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <div class="paginator-wrapper">
+    <p-paginator class="paginator-sticky" style="margin-bottom: 10px;" [rows]="pageSize" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="currentPage * pageSize"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    </p-paginator>
+    <!-- Approve button visually inside paginator -->
+    <p-button label="Approve Selected" icon="fas fa-check" size="small" severity="primary" (onClick)="approveSelected()"
+      class="approve-btn">
+    </p-button>
 
-        <!-- Delete Selected button visually inside paginator -->
-        <p-button label="Delete Selected" icon="fas fa-trash" size="small" severity="danger"
-            (onClick)="deleteSelected()" class="delete-btn">
-        </p-button>
-    </div>
+    <!-- Delete Selected button visually inside paginator -->
+    <p-button label="Delete Selected" icon="fas fa-trash" size="small" severity="danger" (onClick)="deleteSelected()"
+      class="delete-btn">
+    </p-button>
+  </div>
 
 </div>
 
 
 
 }
-
+<app-qr-scanner [(visible)]="isScannerVisible" (onScanSuccess)="onQrScanSuccess($event)"></app-qr-scanner>
 <p-toast position="bottom-right"></p-toast>
 
 <p-confirmDialog key="deleteDialog" position="center" [style]="{ width: '500px' }">
-    <ng-template pTemplate="message">
-        <div>
-            <p>
-                Are you sure you want to
-                <strong style="color: red;">delete</strong> the selected beneficiaries?
-            </p>
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: red;">delete</strong> the selected beneficiaries?
+      </p>
 
-            <div class="mt-2">
-                <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
-                    placeholder="Add a comment for deletion."></textarea>
-            </div>
-        </div>
-    </ng-template>
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
+          placeholder="Add a comment for deletion."></textarea>
+      </div>
+    </div>
+  </ng-template>
 </p-confirmDialog>
 
 <p-confirmDialog key="approveDialog" position="center" [style]="{ width: '500px' }">
-    <ng-template pTemplate="message">
-        <div>
-            <p>
-                Are you sure you want to
-                <strong style="color: green;">approve</strong>?
-            </p>
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: green;">approve</strong>?
+      </p>
 
-            <div class="mt-2">
-                <textarea rows="3" [(ngModel)]="approveComment" class="form-control"
-                    placeholder="Optional: Add a comment for approval."></textarea>
-            </div>
-        </div>
-    </ng-template>
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="approveComment" class="form-control"
+          placeholder="Optional: Add a comment for approval."></textarea>
+      </div>
+    </div>
+  </ng-template>
 </p-confirmDialog>
 <p-confirmDialog key="archiveDialog" position="center" [style]="{ width: '500px' }">
-    <ng-template pTemplate="message">
-        <div>
-            <p>
-                Are you sure you want to
-                <strong style="color: red;">archive</strong>
-                {{ beneficiaryToDelete?.fullName }}?
-            </p>
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: red;">archive</strong>
+        {{ beneficiaryToDelete?.fullName }}?
+      </p>
 
-            <div class="mt-2">
-                <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
-                    placeholder="Comment is required for archiving."></textarea>
-            </div>
-        </div>
-    </ng-template>
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="archiveComment" class="form-control"
+          placeholder="Comment is required for archiving."></textarea>
+      </div>
+    </div>
+  </ng-template>
 </p-confirmDialog>
