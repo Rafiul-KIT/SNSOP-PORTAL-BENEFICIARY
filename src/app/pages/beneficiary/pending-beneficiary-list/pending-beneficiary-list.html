@@ -191,7 +191,7 @@
   </p-table>
   <div class="paginator-wrapper">
     <p-paginator class="paginator-sticky" style="margin-bottom: 10px;" [rows]="pageSize" [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="currentPage * pageSize"
+      [rowsPerPageOptions]="[10, 25, 50, 100, 500]" (onPageChange)="onPageChange($event)" [first]="currentPage * pageSize"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
     </p-paginator>
     <!-- Approve button visually inside paginator -->
