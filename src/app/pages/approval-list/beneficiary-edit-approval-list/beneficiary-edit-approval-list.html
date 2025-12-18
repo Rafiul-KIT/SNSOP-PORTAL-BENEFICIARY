@@ -9,7 +9,8 @@
   <form [formGroup]="searchForm" class="row g-3">
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <input pInputText class="form-control" formControlName="applicationId" appQrInput (qrScanClick)="openQrScanner()" />
+        <input pInputText class="form-control" formControlName="applicationId" appQrInput
+          (qrScanClick)="openQrScanner()" />
         <label>Application ID</label>
       </p-floatlabel>
     </div>
@@ -45,8 +46,8 @@
         <label>Middle Name</label>
       </p-floatlabel>
     </div>
-    }
-    <div class="col-md-3">
+    } -->
+    <!-- <div class="col-md-3">
       <p-floatlabel variant="on">
         <input pInputText class="form-control" formControlName="lastName" />
         <label>Last Name</label>
@@ -57,34 +58,48 @@
         <label>Phone Number</label>
         <input pInputText class="form-control" formControlName="phoneNumber" />
       </p-floatlabel>
-    </div>
+    </div> -->
     @if(advanceSearchPanelVisible){
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="states" optionLabel="name" formControlName="state" />
+        <p-select [options]="states" optionLabel="name" formControlName="state"
+          (onChange)="onStateChange($event.value)" />
         <label>State</label>
       </p-floatlabel>
     </div>
+
+    <!-- County -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="counties" optionLabel="name" formControlName="county" />
+        <p-select [options]="counties" optionLabel="name" formControlName="county"
+          (onChange)="onCountyChange($event.value)" [disabled]="!searchForm.get('state')?.value" />
         <label>County</label>
       </p-floatlabel>
     </div>
+
+    <!-- Payam -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="payams" optionLabel="name" formControlName="payam" />
+        <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event.value)"
+          [disabled]="!searchForm.get('county')?.value" />
         <label>Payam</label>
       </p-floatlabel>
     </div>
+
+    <!-- Boma -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
+        <p-select [options]="bomas" optionLabel="name" formControlName="boma"
+          [disabled]="!searchForm.get('payam')?.value" />
         <label>Boma</label>
       </p-floatlabel>
     </div>
-    } -->
+    }
     <div class="col-12 text-end">
+      <p-button [label]="advanceSearchPanelVisible ? 'Basic Search' : 'Advance Search'" icon="fas fa-filter"
+        severity="warn" class="me-2" size="small" outlined="true"
+        (onClick)="advanceSearchPanelVisible = !advanceSearchPanelVisible"></p-button>
+
       <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small" (onClick)="resetForm()"
         outlined="true">
       </p-button>
@@ -98,6 +113,14 @@
 <p-table [value]="beneficiaries" [scrollable]="true" [scrollHeight]="advanceSearchPanelVisible ? '52vh' : '64vh'"
   [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }">
   <ng-template pTemplate="header">
+    <tr>
+      <th colspan="5" class="text-end">
+        <p class="fw-bold mb-2">
+          Showing <kbd>{{ beneficiaries.length }}</kbd> of
+          <kbd>{{ totalRecords }}</kbd> beneficiaries
+        </p>
+      </th>
+    </tr>
     <tr>
       <th>ID</th>
       <th style="width:500px;">Household Number</th>
