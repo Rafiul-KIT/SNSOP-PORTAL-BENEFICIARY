@@ -109,7 +109,51 @@ export class Header {
       },
 
       {
-        label: 'Beneficiary',
+        label: 'Beneficiary Registration',
+        icon: 'fas fa-people-group',
+        items: [
+
+          // {
+          //   label: 'Beneficiary Update',
+          //   icon: 'fas fa-user-gear',
+          //   routerLink: 'beneficiary/list',
+          // },
+          // {
+          //   label: 'Update Approval',
+          //   icon: 'fas fa-user-check',
+          //   routerLink: 'beneficiary-approval/list',
+          // },
+          // {
+          //   label: 'Beneficiary Audit',
+          //   icon: 'fas fa-address-book',
+          //   routerLink: 'beneficiary-audit/list',
+          // },
+          // {
+          //   label: 'Restore Beneficiary',
+          //   icon: 'fas fa-archive',
+          //   routerLink: 'restore/list',
+          // },
+          {
+            label: 'New Registration',
+            icon: 'fas fa-user-plus',
+            // routerLink: 'beneficiary/new-registration',
+            routerLink: 'under-construction',
+          },
+          {
+            label: 'Pending Verification',
+            icon: 'fas fa-list',
+            routerLink: 'pending-beneficiary/list',
+            // routerLink: 'under-construction',
+          },
+          {
+            label: 'Beneficiary List',
+            icon: 'fas fa-users-viewfinder',
+            routerLink: 'beneficiary/view-list',
+          },
+        ],
+      },
+      {
+        label: 'Beneficiary Manage',
         icon: 'fas fa-people-group',
         items: [
 
@@ -117,11 +161,6 @@ export class Header {
             label: 'Beneficiary Update',
             icon: 'fas fa-user-gear',
             routerLink: 'beneficiary/list',
-          },
-          {
-            label: 'Beneficiary View',
-            icon: 'fas fa-users-viewfinder',
-            routerLink: 'beneficiary/view-list',
           },
           {
             label: 'Update Approval',
@@ -138,18 +177,23 @@ export class Header {
             icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
-          {
-            label: 'New Registration',
-            icon: 'fas fa-user-plus',
-            // routerLink: 'beneficiary/new-registration',
-            routerLink: 'under-construction',
-          },
-          {
-            label: 'Pending Verification',
-            icon: 'fas fa-list',
-            routerLink: 'pending-beneficiary/list',
-            // routerLink: 'under-construction',
-          },
+          // {
+          //   label: 'New Registration',
+          //   icon: 'fas fa-user-plus',
+          //   // routerLink: 'beneficiary/new-registration',
+          //   routerLink: 'under-construction',
+          // },
+          // {
+          //   label: 'Pending Verification',
+          //   icon: 'fas fa-list',
+          //   routerLink: 'pending-beneficiary/list',
+          //   // routerLink: 'under-construction',
+          // },
+          // {
+          //   label: 'Beneficiary List',
+          //   icon: 'fas fa-users-viewfinder',
+          //   routerLink: 'beneficiary/view-list',
+          // },
         ],
       },
       {
@@ -164,7 +208,7 @@ export class Header {
         routerLink: 'redirect-link',
       },
       {
-        label: 'Report',
+        label: 'Beneficiary Report',
         icon: 'fas fa-file-alt',
         items: [
           {
