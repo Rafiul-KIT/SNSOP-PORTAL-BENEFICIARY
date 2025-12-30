@@ -26,6 +26,8 @@ import { Profile } from './pages/profile/profile';
 import { Unauthorized } from './components/unauthorized/unauthorized';
 import { UnderConstruction } from './pages/under-construction/under-construction';
 import { RedirectLink } from './pages/adjudication/redirect-link/redirect-link';
+import { BeneficiaryMomoWalletUpdate } from './pages/beneficiary/beneficiary-momo-wallet-update/beneficiary-momo-wallet-update';
+import { BeneficiaryMomoList } from './pages/beneficiary/beneficiary-momo-list/beneficiary-momo-list';
 
 export const routes: Routes = [
   {
@@ -56,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'beneficiary',
-    canActivate: [routeGuard],
+    // canActivate: [routeGuard],
     children: [
       {
         path: 'list',
@@ -87,6 +89,16 @@ export const routes: Routes = [
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
         canActivate: [routeGuard],
+      },
+      {
+        path: 'momo-update/:bid',
+        component: BeneficiaryMomoWalletUpdate,
+        // canActivate: [routeGuard],
+      },
+      {
+        path: 'momo-list',
+        component: BeneficiaryMomoList,
+        // canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],

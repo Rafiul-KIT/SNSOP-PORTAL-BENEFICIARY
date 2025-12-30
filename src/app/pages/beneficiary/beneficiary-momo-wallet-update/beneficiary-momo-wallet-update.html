@@ -1,0 +1,178 @@
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+
+
+<p-toast position="bottom-right" />
+@if(isLoading){
+<app-loader />
+}@else {
+<form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Beneficiary's MOMO Number Update</p-tab>
+      <p-button class="ms-auto p-2" severity="info" type="submit" [disabled]="beneficiaryForm.invalid || isSubmitting"
+        icon="fas fa-save" label="Update" size="small" />
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="container-fluid">
+            <div class="row g-3">
+              <!-- Left: Personal Info -->
+              <div class="col-md-6">
+                <div class="card shadow-sm rounded">
+                  <h5 class="card-header">Personal Information</h5>
+                  <div class="card-body text-center">
+                    <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" width="200" />
+
+                    <table class="table table-bordered table-sm text-start mb-0">
+                      <tbody>
+                        <tr>
+                          <th>Application ID</th>
+                          <td>{{ beneficiaryDetails.applicationId }}</td>
+                        </tr>
+                        <tr>
+                          <th>Name</th>
+                          <td>
+                            {{ beneficiaryDetails.respondentFirstName + ' ' +
+                            (beneficiaryDetails.respondentMiddleName || '') + ' ' + beneficiaryDetails.respondentLastName }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Age</th>
+                          <td>{{ beneficiaryDetails.respondentAge }}</td>
+                        </tr>
+                        <tr>
+                          <th>Gender</th>
+                          <td>{{ beneficiaryDetails.respondentGender }}</td>
+                        </tr>
+                        <tr>
+                          <th>Phone</th>
+                          <td>{{ beneficiaryDetails.respondentPhoneNo }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Geo Location -->
+              <div class="col-md-6">
+                <div class="card shadow-sm rounded mt-3 mt-md-0">
+                  <h5 class="card-header">MOMO Number Update</h5>
+                  <div class="card-body">
+                    <div class="row">
+                      <!-- State -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">State</label>
+                          <p-select formControlName="state" [options]="stateList" optionLabel="name" optionValue="id"
+                            placeholder="Select State" class="w-100" [disabled]="true"></p-select>
+                        </div>
+                      </div>
+
+                      <!-- County -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">County</label>
+                          <p-select formControlName="county" [options]="countyList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('state')?.value" placeholder="Select County"
+                            class="w-100" [disabled]="true"></p-select>
+                        </div>
+                      </div>
+
+                      <!-- Payam -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Payam</label>
+                          <p-select formControlName="payam" [options]="payamList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('county')?.value" placeholder="Select Payam"
+                            class="w-100"></p-select>
+                        </div>
+                      </div>
+
+                      <!-- Boma -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Boma</label>
+                          <p-select formControlName="boma" [options]="bomaList" optionLabel="name" optionValue="id"
+                            [disabled]="!beneficiaryForm.get('payam')?.value" placeholder="Select Boma"
+                            class="w-100"></p-select>
+                        </div>
+                      </div>
+
+                      <!-- Latitude -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Latitude</label>
+                          <input class="w-100" pInputText placeholder="GPS Coordinates (Lat)" formControlName="gpsLat"
+                            [readonly]="true" />
+                        </div>
+                      </div>
+
+                      <!-- Longitude -->
+                      <div class="col-md-6">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Longitude</label>
+                          <input class="w-100" pInputText placeholder="GPS Coordinates (Long)" formControlName="gpsLong"
+                            [readonly]="true" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <!-- </div> -->
+
+              <!-- ===== Comment + Approve/Reject ===== -->
+              <!-- <div class="card shadow-sm rounded mt-3">
+                <div class="card-header bg-gray text-black">Approval Comment</div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="approvalComment" class="form-label">
+                      Comment (optional)
+                    </label>
+                    <textarea
+                      id="approvalComment"
+                      class="form-control"
+                      rows="4"
+                      formControlName="approvalComment"
+                      placeholder="Write a note for approval/rejection..."
+                    ></textarea>
+                  </div>
+
+                  <div class="d-flex gap-2 justify-content-end">
+                    <p-button
+                      severity="danger"
+                      outlined="true"
+                      (onClick)="onReject()"
+                      [disabled]="isLoading || isSubmitting"
+                      icon="fas fa-times"
+                      label="Reject"
+                    />
+                    <p-button
+                      severity="success"
+                      outlined="true"
+                      (onClick)="onApprove()"
+                      [disabled]="isLoading || isSubmitting"
+                      icon="fas fa-check"
+                      label="Approve"
+                    />
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- Submit Button -->
+
+            </div>
+          </div>
+
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</form>
+}
