@@ -61,65 +61,38 @@
               <!-- Right: Geo Location -->
               <div class="col-md-6">
                 <div class="card shadow-sm rounded mt-3 mt-md-0">
-                  <h5 class="card-header">MOMO Number Update</h5>
+                  <h5 class="card-header">Wallet Number Update</h5>
                   <div class="card-body">
                     <div class="row">
-                      <!-- State -->
-                      <div class="col-md-6">
+                      <div class="col-md-12">
                         <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">State</label>
-                          <p-select formControlName="state" [options]="stateList" optionLabel="name" optionValue="id"
-                            placeholder="Select State" class="w-100" [disabled]="true"></p-select>
+                          <label class="form-label fw-semibold">Existing Wallet Number</label>
+                          <input class="w-100" pInputText placeholder="Current MOMO Number"
+                            formControlName="currentMomoNumber" [readonly]="true" />
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Update Wallet Number</label>
+                          <div class="p-inputgroup">
+                            <span class="p-inputgroup-addon">+211</span>
+                            <input class="w-100" pInputText placeholder="Enter New MOMO Number (e.g., 771234567)"
+                               formControlName="mobileWalletNumber" />
+                          </div>
+                           @if(beneficiaryForm.get('mobileWalletNumber')?.invalid &&
+                           beneficiaryForm.get('mobileWalletNumber')?.touched){
+                           <small class="p-error">
+                                @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['required']){
+                                    MOMO Number is required.
+                                }
+                                @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['pattern']){
+                                    Please enter a valid 9-digit number.
+                                }
+                           </small>
+                           }
                         </div>
                       </div>
 
-                      <!-- County -->
-                      <div class="col-md-6">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">County</label>
-                          <p-select formControlName="county" [options]="countyList" optionLabel="name" optionValue="id"
-                            [disabled]="!beneficiaryForm.get('state')?.value" placeholder="Select County"
-                            class="w-100" [disabled]="true"></p-select>
-                        </div>
-                      </div>
-
-                      <!-- Payam -->
-                      <div class="col-md-6">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">Payam</label>
-                          <p-select formControlName="payam" [options]="payamList" optionLabel="name" optionValue="id"
-                            [disabled]="!beneficiaryForm.get('county')?.value" placeholder="Select Payam"
-                            class="w-100"></p-select>
-                        </div>
-                      </div>
-
-                      <!-- Boma -->
-                      <div class="col-md-6">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">Boma</label>
-                          <p-select formControlName="boma" [options]="bomaList" optionLabel="name" optionValue="id"
-                            [disabled]="!beneficiaryForm.get('payam')?.value" placeholder="Select Boma"
-                            class="w-100"></p-select>
-                        </div>
-                      </div>
-
-                      <!-- Latitude -->
-                      <div class="col-md-6">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">Latitude</label>
-                          <input class="w-100" pInputText placeholder="GPS Coordinates (Lat)" formControlName="gpsLat"
-                            [readonly]="true" />
-                        </div>
-                      </div>
-
-                      <!-- Longitude -->
-                      <div class="col-md-6">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">Longitude</label>
-                          <input class="w-100" pInputText placeholder="GPS Coordinates (Long)" formControlName="gpsLong"
-                            [readonly]="true" />
-                        </div>
-                      </div>
                     </div>
 
                   </div>
