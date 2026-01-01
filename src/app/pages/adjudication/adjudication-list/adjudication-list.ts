@@ -32,41 +32,23 @@ import { Loader } from '../../../components/loader/loader';
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
 
-interface BeneficiaryDto {
-  applicationId: string;
-  type: 'BENEFICIARY' | 'NOMINEE' | 'ALTERNATE_1' | 'ALTERNATE_2';
-  respondentFirstName: string;
-  respondentMiddleName: string;
-  respondentLastName: string;
-  respondentGender: Gender;
-  respondentId: string;
-  respondentAge: number;
-  respondentPhoneNo: string;
-  address?: {
-    stateId: string;
-    countyId: string;
-    payam: string;
-    boma: string;
-  };
-  registrationPhase: RegPhase;
-}
-
 interface BeneficiaryVm {
   applicationId: string;
   respondentGender: Gender;
   respondentAge: number;
   respondentPhoneNo: string;
   address?: {
-    stateId: string;
-    countyId: string;
-    payam: string;
-    boma: string;
+    stateId: string | number;
+    countyId: string | number;
+    payam: string | number;
+    boma: string | number;
   };
   fullName: string;
   stateName: string;
   countyName: string;
   payamName: string;
   bomaName: string;
+  registrationPhase: any;
 }
 @Component({
   selector: 'app-adjudication-list',
@@ -311,7 +293,7 @@ export class AdjudicationList implements OnInit {
   }
 
   // ---------- Mapping ----------
-  private toVm(list: BeneficiaryDto[]): BeneficiaryVm[] {
+  private toVm(list: any[]): BeneficiaryVm[] {
     return list.map((b) => {
       const fullName = [
         b.respondentFirstName,
@@ -354,10 +336,9 @@ export class AdjudicationList implements OnInit {
     this.isLoading = true;
     const body = this.buildSearchBody(page, size);
     this.api
-      .POST('api/beneficiary/search', body)
+      .POST('api/adjudication/getAdjudicateList', body)
       .then((res: any) => {
         const data = res?.data;
-        console.log(data);
         if (!data) throw new Error('Empty response');
         if (data.operationResult === false) {
           this.messageService.add({
@@ -366,7 +347,7 @@ export class AdjudicationList implements OnInit {
             detail: data.errorMsg || 'No beneficiaries found',
           });
         }
-        const raw: BeneficiaryDto[] = data.beneficiaries || [];
+                const raw: any[] = data.matchList || [];
         this.beneficiaries = this.toVm(raw);
         this.totalRecords = Number(data.total || 0);
       })
@@ -414,7 +395,7 @@ export class AdjudicationList implements OnInit {
   // }
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['match-list', String(b.applicationId)]);
+        this.router.navigate(['/adjudication/match-list', String(b.applicationId)]);
   }
 
 

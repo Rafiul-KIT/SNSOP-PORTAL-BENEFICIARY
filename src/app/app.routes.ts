@@ -58,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'beneficiary',
-    // canActivate: [routeGuard],
+    canActivate: [routeGuard],
     children: [
       {
         path: 'list',
@@ -93,12 +93,12 @@ export const routes: Routes = [
       {
         path: 'momo-update/:bid',
         component: BeneficiaryMomoWalletUpdate,
-        // canActivate: [routeGuard],
+        canActivate: [routeGuard],
       },
       {
         path: 'momo-list',
         component: BeneficiaryMomoList,
-        // canActivate: [routeGuard],
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -235,8 +235,8 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
-  { path: 'unauthorized', 
-    component: Unauthorized 
+  { path: 'unauthorized',
+    component: Unauthorized
   },
   {
     path: 'under-construction',

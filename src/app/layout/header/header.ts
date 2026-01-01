@@ -177,6 +177,11 @@ export class Header {
             icon: 'fas fa-archive',
             routerLink: 'restore/list',
           },
+          {
+            label: 'Mobile Wallet Update',
+            icon: 'fas fa-user-gear',
+            routerLink: 'beneficiary/momo-list',
+          },
           // {
           //   label: 'New Registration',
           //   icon: 'fas fa-user-plus',
@@ -204,8 +209,8 @@ export class Header {
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        // routerLink: 'adjudication/list',
-        routerLink: 'redirect-link',
+        routerLink: 'adjudication/list',
+        // routerLink: 'redirect-link',
       },
       {
         label: 'Beneficiary Report',
