@@ -2,7 +2,7 @@
     <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
 </div>
 
-@if (!isLoading) {
+@if (isLoading) {
 <app-loader></app-loader>
 } @else {
 @if (beneficiaryMatchList != null) {
@@ -27,7 +27,7 @@
                                         @if (beneficiaryPhoto != '') {
                                         <img [src]="beneficiaryPhoto" alt="" height="100" />
                                         } @else {
-                                        <img src="assets/dummy.png" alt="" />
+                                        <img src="images/dummyHuman.jpg" alt="" />
                                         }
                                         <kbd class="mt-2 d-block">Profile Image</kbd>
                                     </td>
@@ -187,7 +187,7 @@
                                     <tbody>
                                         <tr>
                                             <td colspan="2" rowspan="4" style="vertical-align: middle;">
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.photo || 'assets/dummy.png'"
+                                                <img [src]="allBiometrciDataFromMatchList[i]?.photo || 'images/dummyHuman.jpg'"
                                                     alt="" height="100" class="cursor-zoom"
                                                     pTooltip="Click to see comparison"
                                                     (click)="imagePreviewModal(beneficiaryPhoto, allBiometrciDataFromMatchList[i]?.photo, 'Profile Image')" />
