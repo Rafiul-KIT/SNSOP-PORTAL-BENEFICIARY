@@ -13,3 +13,23 @@
 input[pInputText] {
     width: 100%;
 }
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}

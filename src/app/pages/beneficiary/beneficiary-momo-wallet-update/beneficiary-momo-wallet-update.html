@@ -66,33 +66,63 @@
                     <div class="row">
                       <div class="col-md-12">
                         <div class="w-100 mb-3">
+                          <label class="form-label fw-semibold">Has Mobile Wallet</label>
+                          <p-toggleButton formControlName="hasMobileWallet" onLabel="Yes" offLabel="No" styleClass="w-100" />
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="w-100 mb-3">
                           <label class="form-label fw-semibold">Existing Wallet Number</label>
                           <input class="w-100" pInputText placeholder="Current MOMO Number"
                             formControlName="currentMomoNumber" [readonly]="true" />
                         </div>
                       </div>
-                      <div class="col-md-12">
-                        <div class="w-100 mb-3">
-                          <label class="form-label fw-semibold">Update Wallet Number</label>
-                          <div class="p-inputgroup">
-                            <span class="p-inputgroup-addon">+211</span>
-                            <input class="w-100" pInputText placeholder="Enter New MOMO Number (e.g., 771234567)"
-                               formControlName="mobileWalletNumber" />
-                          </div>
-                           @if(beneficiaryForm.get('mobileWalletNumber')?.invalid &&
-                           beneficiaryForm.get('mobileWalletNumber')?.touched){
-                           <small class="p-error">
-                                @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['required']){
-                                    MOMO Number is required.
-                                }
-                                @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['pattern']){
-                                    Please enter a valid 9-digit number.
-                                }
-                           </small>
-                           }
-                        </div>
-                      </div>
 
+                      @if (beneficiaryForm.get('hasMobileWallet')?.value) {
+                        <div class="col-md-12">
+                          <div class="w-100 mb-3">
+                            <label class="form-label fw-semibold">Mobile Money Provider</label>
+                            <div class="flex flex-wrap gap-3">
+                              <div class="flex align-items-center">
+                                <p-radioButton name="mobileWalletId" value="0" formControlName="mobileWalletId"
+                                  id="momo" />
+                                <label for="momo" class="ml-2">Momo</label>
+                              </div>
+                              <div class="flex align-items-center">
+                                <p-radioButton name="mobileWalletId" value="1" formControlName="mobileWalletId"
+                                  id="mgurush" />
+                                <label for="mgurush" class="ml-2">mGurush</label>
+                              </div>
+                              <div class="flex align-items-center">
+                                <p-radioButton name="mobileWalletId" value="2" formControlName="mobileWalletId"
+                                  id="digicash" />
+                                <label for="digicash" class="ml-2">DigiCash</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <div class="w-100 mb-3">
+                            <label class="form-label fw-semibold">Update Wallet Number</label>
+                            <div class="p-inputgroup">
+                              <span class="p-inputgroup-addon">+211</span>
+                              <input class="w-100" pInputText placeholder="Enter New MOMO Number (e.g., 771234567)"
+                                formControlName="mobileWalletNumber" />
+                            </div>
+                            @if(beneficiaryForm.get('mobileWalletNumber')?.invalid &&
+                            beneficiaryForm.get('mobileWalletNumber')?.touched){
+                            <small class="p-error">
+                              @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['required']){
+                              MOMO Number is required.
+                              }
+                              @if(beneficiaryForm.get('mobileWalletNumber')?.errors?.['pattern']){
+                              Please enter a valid 9-digit number.
+                              }
+                            </small>
+                            }
+                          </div>
+                        </div>
+                      }
                     </div>
 
                   </div>

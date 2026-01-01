@@ -12,6 +12,8 @@ import { ApiService } from '../../../services/api.service';
 import { Toast } from "primeng/toast";
 import { BeneficiaryDto } from '../../../models/beneficiary';
 import { MessageService } from 'primeng/api';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @Component({
   selector: 'app-beneficiary-momo-wallet-update',
@@ -24,7 +26,9 @@ import { MessageService } from 'primeng/api';
     InputTextModule,
     Loader,
     ButtonModule,
-    Toast
+    Toast,
+    ToggleButtonModule,
+    RadioButtonModule,
   ],
   templateUrl: './beneficiary-momo-wallet-update.html',
   styleUrl: './beneficiary-momo-wallet-update.scss',
@@ -60,7 +64,26 @@ export class BeneficiaryMomoWalletUpdate implements OnInit {
     if (!id) return;
     this.beneficiaryForm = this.fb.group({
       currentMomoNumber: [{ value: '', disabled: true }],
+      hasMobileWallet: [false],
+      mobileWalletId: [{ value: null, disabled: true }],
       mobileWalletNumber: ['', [Validators.required, Validators.pattern('^[0-9]{9}$')]],
+    });
+
+    this.beneficiaryForm.get('hasMobileWallet')?.valueChanges.subscribe(value => {
+      const mobileWalletIdControl = this.beneficiaryForm.get('mobileWalletId');
+      const mobileWalletNumberControl = this.beneficiaryForm.get('mobileWalletNumber');
+      if (value) {
+        mobileWalletIdControl?.setValidators([Validators.required]);
+        mobileWalletIdControl?.enable();
+        mobileWalletNumberControl?.setValidators([Validators.required, Validators.pattern('^[0-9]{9}$')]);
+      } else {
+        mobileWalletIdControl?.clearValidators();
+        mobileWalletIdControl?.disable();
+        mobileWalletNumberControl?.clearValidators();
+      }
+      mobileWalletIdControl?.updateValueAndValidity();
+      mobileWalletNumberControl?.updateValueAndValidity();
+      this.beneficiaryForm.updateValueAndValidity(); // Ensure parent form validity is updated
     });
     this.fetchBeneficiaryDetails(id);
   }
@@ -86,6 +109,18 @@ export class BeneficiaryMomoWalletUpdate implements OnInit {
           currentMomoNumber: displayMomo
         });
       }
+      this.beneficiaryForm.patchValue({
+        hasMobileWallet: this.beneficiaryDetails.hasMobileWallet,
+      });
+
+      // Manually enable mobileWalletId control if hasMobileWallet is true
+      if (this.beneficiaryDetails.hasMobileWallet) {
+        this.beneficiaryForm.get('mobileWalletId')?.enable();
+      }
+
+      this.beneficiaryForm.patchValue({
+        mobileWalletId: this.beneficiaryDetails.mobileMoneyProvider?.toString() ?? null,
+      });
 
     } catch (err) {
       console.error('Error fetching beneficiary details:', err);
@@ -94,65 +129,77 @@ export class BeneficiaryMomoWalletUpdate implements OnInit {
       this.cdr.detectChanges();
     }
   }
-  private buildMomoUpdatePayload(): BeneficiaryDto {
-    const wphone = this.beneficiaryForm.value.mobileWalletNumber;
-    
-    // Create a deep copy to avoid mutating the original object
-    const payload: BeneficiaryDto = JSON.parse(JSON.stringify(this.beneficiaryDetails));
+  private buildFieldUpdatePayload() {
+    const formValues = this.beneficiaryForm.value;
+    const fieldList: { fieldName: string; fieldValue: any; }[] = [];
 
-    // Update the mobileWalletNumber
-    payload.mobileWalletNumber = wphone ? `+211${wphone}` : null;
-    
+    fieldList.push({
+      fieldName: 'hasMobileWallet',
+      fieldValue: formValues.hasMobileWallet ? 1 : 0,
+    });
+
+    if (formValues.hasMobileWallet) {
+      fieldList.push({
+        fieldName: 'mobileWalletId',
+        fieldValue: formValues.mobileWalletId !== null ? parseInt(formValues.mobileWalletId, 10) : null,
+      });
+      fieldList.push({
+        fieldName: 'mobileWalletNumber',
+        fieldValue: `+211${formValues.mobileWalletNumber}`,
+      });
+    } else {
+      fieldList.push({
+        fieldName: 'mobileWalletId',
+        fieldValue: null,
+      });
+      fieldList.push({
+        fieldName: 'mobileWalletNumber',
+        fieldValue: null,
+      });
+    }
+
+    const payload = {
+      requestId: null,
+      createdBy: this.beneficiaryDetails.createdBy,
+      updatedBy: this.beneficiaryDetails.updatedBy,
+      householdNumber: this.beneficiaryDetails.applicationId,
+      fieldList: fieldList,
+    };
     return payload;
   }
+
 
   onSubmit() {
     if (!this.beneficiaryForm.valid) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validation',
-        detail: 'Please enter a valid MOMO number.',
+        detail: 'Please fill all the required fields.',
       });
       return;
     }
 
-    const singleBeneficiaryPayload = this.buildMomoUpdatePayload();
-    const requestBody = { beneficiaries: [singleBeneficiaryPayload] };
+    const requestBody = this.buildFieldUpdatePayload();
+    console.log('Request Body:', requestBody);
 
     this.isSubmitting = true;
     this.isLoading = true;
 
     this.api
-      .POST('api/beneficiary/update/batch', requestBody)
+      .POST('api/beneficiary/update/fields', requestBody)
       .then((res: any) => {
-        const responses = res?.bulkResponse || res?.data?.bulkResponse || [];
-        if (!responses.length) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Update Failed',
-            detail: 'No response returned from server.',
-          });
-          return;
-        }
-        const first = responses[0];
-        if (first.result === 'SUCCESS') {
+        if (res.status === 200) {
           this.messageService.add({
             severity: 'success',
             summary: 'Update Successful',
-            detail: 'Beneficiary edit request sent successfully!',
+            detail: 'Beneficiary wallet information updated successfully!',
           });
           setTimeout(() => this.router.navigate(['/beneficiary/list']), 3000);
-        } else if (first.result === 'FAILED') {
+        } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Update Failed',
-            detail: first.errorMessage || 'Unknown error occurred',
-          });
-        } else {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Update Status',
-            detail: `Unexpected result: ${first.result}`,
+            detail: res?.data?.message || 'Unknown error occurred',
           });
         }
       })
