@@ -1,24 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { LoadingSpinner } from "../../../components/loading-spinner/loading-spinner";
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { LoadingSpinner } from '../../../components/loading-spinner/loading-spinner';
 import { CommonModule } from '@angular/common';
+import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-image-compare-preview',
-  standalone: true,                               
-  imports: [LoadingSpinner,CommonModule],                        
+  standalone: true,
+  imports: [LoadingSpinner, CommonModule, Button],
   templateUrl: './image-compare-preview.html',
-  styleUrls: ['./image-compare-preview.scss']       
+  styleUrls: ['./image-compare-preview.scss'],
 })
 export class ImageComparePreview implements OnInit {
-
   isLoading: boolean = true;
   primaryImage: string = '';
   secondaryImage: string = '';
 
   constructor(
-    private conf: DynamicDialogConfig
-  ) { }
+    private conf: DynamicDialogConfig,
+    private ref: DynamicDialogRef
+  ) {}
 
   ngOnInit(): void {
     // console.log(this.conf.data);
@@ -26,5 +27,7 @@ export class ImageComparePreview implements OnInit {
     this.secondaryImage = this.conf.data.secondary;
     this.isLoading = false;
   }
-
+  closeDialog() {
+    this.ref.close();
+  }
 }

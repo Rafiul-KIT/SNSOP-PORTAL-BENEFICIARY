@@ -1,16 +1,19 @@
 <div *ngIf="isLoading; else mainContent">
-    <app-loading-spinner />
+  <app-loading-spinner />
 </div>
 
 <ng-template #mainContent>
-    <div class="row">
-        <div class="col-12 col-sm-6">
-            <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Primary Image</h5>
-            <img [src]="primaryImage" alt="" class="img-thumbnail" />
-        </div>
-        <div class="col-12 col-sm-6">
-            <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Image from Match List</h5>
-            <img [src]="secondaryImage" alt="" class="img-thumbnail" />
-        </div>
+  <div class="row">
+    <div class="col-12 col-sm-6">
+      <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Primary Image</h5>
+      <img [src]="primaryImage" alt="" class="img-thumbnail" />
     </div>
+    <div class="col-12 col-sm-6">
+      <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Image from Match List</h5>
+      <img [src]="secondaryImage" alt="" class="img-thumbnail" />
+    </div>
+  </div>
+  <div class="mt-3 text-end">
+    <p-button label="Close" (click)="closeDialog()" styleClass="p-button-secondary"></p-button>
+  </div>
 </ng-template>

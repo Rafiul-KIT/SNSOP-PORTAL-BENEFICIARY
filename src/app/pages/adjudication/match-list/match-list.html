@@ -1,5 +1,5 @@
 <div class="breadcrumb-wrapper">
-    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+  <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
 </div>
 
 @if (isLoading) {
@@ -7,328 +7,337 @@
 } @else {
 @if (beneficiaryMatchList != null) {
 <div class="mt-3">
-    <div class="row">
-        <!-- LEFT: Primary beneficiary card -->
-        <div class="col-12 col-md-4 col-lg-5">
-            <div class="card">
-                <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">Primary Beneficiary Information</h5>
-                    <button type="button" class="btn btn-primary btn-sm" (click)="printPdf()">
-                        <i class="fas fa-file-pdf"></i> Print PDF
-                    </button>
-                </div>
-
-                <div class="card-body primary-scroller">
-                    <div class="table-responsive">
-                        <table class="table text-center">
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" rowspan="4" style="vertical-align: middle;">
-                                        @if (beneficiaryPhoto != '') {
-                                        <img [src]="beneficiaryPhoto" alt="" height="100" />
-                                        } @else {
-                                        <img src="images/dummyHuman.jpg" alt="" />
-                                        }
-                                        <kbd class="mt-2 d-block">Profile Image</kbd>
-                                    </td>
-                                    <th colspan="5" class="text-center">Right Hand Finger</th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img [src]="beneficiaryRightHandFingerPrints.RT" height="40" />
-                                        <br /><kbd>Thumb</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryRightHandFingerPrints.RI" height="40" />
-                                        <br /><kbd>Index</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryRightHandFingerPrints.RM" height="40" />
-                                        <br /><kbd>Middle</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryRightHandFingerPrints.RR" height="40" />
-                                        <br /><kbd>Ring</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryRightHandFingerPrints.RL" height="40" />
-                                        <br /><kbd>Little</kbd>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th colspan="5" class="text-center">Left Hand Finger</th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img [src]="beneficiaryLeftHandFingerPrints.LT" height="40" />
-                                        <br /><kbd>Thumb</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryLeftHandFingerPrints.LI" height="40" />
-                                        <br /><kbd>Index</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryLeftHandFingerPrints.LM" height="40" />
-                                        <br /><kbd>Middle</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryLeftHandFingerPrints.LR" height="40" />
-                                        <br /><kbd>Ring</kbd>
-                                    </td>
-                                    <td>
-                                        <img [src]="beneficiaryLeftHandFingerPrints.LL" height="40" />
-                                        <br /><kbd>Little</kbd>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped mb-0">
-                            <tbody>
-                                <tr>
-                                    <th width="220">Application Id</th>
-                                    <td>{{ beneficiaryMatchList.primary.applicationId }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Type</th>
-                                    <td>{{ beneficiaryMatchList.primary.type == 'BENEFICIARY' ? 'BENEFICIARY' :
-                                        'ALTERNATE' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>First Name</th>
-                                    <td>{{ beneficiaryMatchList.primary.respondentFirstName }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Middle Name</th>
-                                    <td>{{ beneficiaryMatchList.primary.respondentMiddleName }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Last Name</th>
-                                    <td>{{ beneficiaryMatchList.primary.respondentLastName }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Gender</th>
-                                    <td>{{
-                                        lookupService.getGenderEnumByValue(beneficiaryMatchList.primary.respondentGender)
-                                        }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Phone No</th>
-                                    <td>{{ beneficiaryMatchList.primary.respondentPhoneNo }}</td>
-                                </tr>
-                                <tr>
-                                    <th>State Name</th>
-                                    <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
-                                        lookupService.getStateNameById(beneficiaryMatchList.primary.address.stateId) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>County Name</th>
-                                    <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
-                                        lookupService.getCountyNameById(beneficiaryMatchList.primary.address.countyId)
-                                        }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Payam Name</th>
-                                    <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
-                                        lookupService.getPayamNameById(beneficiaryMatchList.primary.address.payam) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Boma Name</th>
-                                    <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
-                                        lookupService.getBomaNameById(beneficiaryMatchList.primary.address.boma) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div> <!-- card-body -->
-            </div> <!-- card -->
+  <div class="row">
+    <!-- LEFT: Primary beneficiary card -->
+    <div class="col-12 col-md-4 col-lg-5">
+      <div class="card">
+        <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <h5 class="m-0">Primary Beneficiary Information</h5>
+          <button type="button" class="btn btn-primary btn-sm" (click)="printPdf()">
+            <i class="fas fa-file-pdf"></i> Print PDF
+          </button>
         </div>
 
-        <!-- RIGHT: Matches in Tabs + paginator -->
-        <div class="col-12 col-md-8 col-lg-7">
-            <div class="d-flex justify-content-between align-items-center">
-                <div></div>
-                <span class="text-muted">Total Matched Records: <b>{{ totalRecords }}</b></span>
-            </div>
+        <div class="card-body primary-scroller">
+          <div class="table-responsive">
+            <table class="table text-center">
+              <tbody>
+                <tr>
+                  <td colspan="2" rowspan="4" style="vertical-align: middle;">
+                    @if (beneficiaryPhoto != '') {
+                    <img [src]="beneficiaryPhoto" alt="" height="100" />
+                    } @else {
+                    <img src="images/dummyHuman.jpg" alt="" />
+                    }
+                    <kbd class="mt-2 d-block">Profile Image</kbd>
+                  </td>
+                  <th colspan="5" class="text-center">Right Hand Finger</th>
+                </tr>
+                <tr>
+                  <td>
+                    <img [src]="beneficiaryRightHandFingerPrints.RT" height="40" />
+                    <br /><kbd>Thumb</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryRightHandFingerPrints.RI" height="40" />
+                    <br /><kbd>Index</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryRightHandFingerPrints.RM" height="40" />
+                    <br /><kbd>Middle</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryRightHandFingerPrints.RR" height="40" />
+                    <br /><kbd>Ring</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryRightHandFingerPrints.RL" height="40" />
+                    <br /><kbd>Little</kbd>
+                  </td>
+                </tr>
+                <tr>
+                  <th colspan="5" class="text-center">Left Hand Finger</th>
+                </tr>
+                <tr>
+                  <td>
+                    <img [src]="beneficiaryLeftHandFingerPrints.LT" height="40" />
+                    <br /><kbd>Thumb</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryLeftHandFingerPrints.LI" height="40" />
+                    <br /><kbd>Index</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryLeftHandFingerPrints.LM" height="40" />
+                    <br /><kbd>Middle</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryLeftHandFingerPrints.LR" height="40" />
+                    <br /><kbd>Ring</kbd>
+                  </td>
+                  <td>
+                    <img [src]="beneficiaryLeftHandFingerPrints.LL" height="40" />
+                    <br /><kbd>Little</kbd>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            @if (isGeneratingPdf) {
-            <p-progressBar [value]="progressValue"></p-progressBar>
-            <p class="text-center mt-2">Generating PDF... {{ progressValue }}%</p>
-            }
-
-            @if (beneficiaryMatchList.matchList.length > 0) {
-            <div class="scroller">
-                <p-tabs>
-                    <p-tablist>
-                        @for (match of beneficiaryMatchList.matchList; track match.applicationId; let i = $index) {
-                        <p-tab [value]="i.toString()">
-                            <div class="d-flex justify-content-between align-items-center w-100">
-                                <span>
-                                    <b>Application Id:</b> {{ match.applicationId }}
-                                    &nbsp;<code
-                                        class="alert alert-success p-0 ps-1 pe-1 m-0">Score: {{ match.score }}</code>
-                                    &nbsp;<code
-                                        class="alert alert-info p-0 ps-1 pe-1 m-0">Match Date: {{ match.matchCreated | date:'dd-MM-yyyy' }}</code>
-                                </span>
-                            </div>
-                        </p-tab>
-                        }
-                    </p-tablist>
-                    <p-tabpanels>
-                        @for (match of beneficiaryMatchList.matchList; track match.applicationId; let i = $index) {
-                        <p-tabpanel [value]="i.toString()">
-                            <!-- TAB CONTENT -->
-                            <div class="table-responsive">
-                                <table class="table text-center">
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="2" rowspan="4" style="vertical-align: middle;">
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.photo || 'images/dummyHuman.jpg'"
-                                                    alt="" height="100" class="cursor-zoom"
-                                                    pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryPhoto, allBiometrciDataFromMatchList[i]?.photo, 'Profile Image')" />
-                                                <kbd class="mt-2 d-block">Profile Image</kbd>
-                                            </td>
-                                            <th colspan="5" class="text-center">Right Hand Finger</th>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RT" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RT, allBiometrciDataFromMatchList[i]?.rightHand?.RT, 'Right Thumb')" />
-                                                <br /><kbd>Thumb</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RI" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RI, allBiometrciDataFromMatchList[i]?.rightHand?.RI, 'Right Index')" />
-                                                <br /><kbd>Index</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RM" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RM, allBiometrciDataFromMatchList[i]?.rightHand?.RM, 'Right Middle')" />
-                                                <br /><kbd>Middle</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RR" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RR, allBiometrciDataFromMatchList[i]?.rightHand?.RR, 'Right Ring')" />
-                                                <br /><kbd>Ring</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RL" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RL, allBiometrciDataFromMatchList[i]?.rightHand?.RL, 'Right Little')" />
-                                                <br /><kbd>Little</kbd>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th colspan="5" class="text-center">Left Hand Finger</th>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LT" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LT, allBiometrciDataFromMatchList[i]?.leftHand?.LT, 'Left Thumb')" />
-                                                <br /><kbd>Thumb</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LI" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LI, allBiometrciDataFromMatchList[i]?.leftHand?.LI, 'Left Index')" />
-                                                <br /><kbd>Index</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LM" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LM, allBiometrciDataFromMatchList[i]?.leftHand?.LM, 'Left Middle')" />
-                                                <br /><kbd>Middle</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LR" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LR, allBiometrciDataFromMatchList[i]?.leftHand?.LR, 'Left Ring')" />
-                                                <br /><kbd>Ring</kbd>
-                                            </td>
-                                            <td>
-                                                <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LL" height="40"
-                                                    class="cursor-zoom" pTooltip="Click to see comparison"
-                                                    (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LL, allBiometrciDataFromMatchList[i]?.leftHand?.LL, 'Left Little')" />
-                                                <br /><kbd>Little</kbd>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th width="220">Application Id</th>
-                                            <td colspan="3">{{ match.applicationId }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th width="220">Type</th>
-                                            <td colspan="3">{{ match.type }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>First Name</th>
-                                            <td colspan="3">{{ match.respondentFirstName }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Middle Name</th>
-                                            <td colspan="3">{{ match.respondentMiddleName }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Last Name</th>
-                                            <td colspan="3">{{ match.respondentLastName }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Gender</th>
-                                            <td>{{ lookupService.getGenderEnumByValue(match.respondentGender) }}</td>
-                                            <th width="220">Phone No</th>
-                                            <td>{{ match.respondentPhoneNo }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>State Name</th>
-                                            <td>{{ (match.address==null) ? 'N/A' :
-                                                lookupService.getStateNameById(match.address.stateId) }}</td>
-                                            <th>County Name</th>
-                                            <td>{{ (match.address==null) ? 'N/A' :
-                                                lookupService.getCountyNameById(match.address.countyId) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Payam Name</th>
-                                            <td>{{ (match.address==null) ? 'N/A' :
-                                                lookupService.getPayamNameById(match.address.payam) }}</td>
-                                            <th>Boma Name</th>
-                                            <td>{{ (match.address==null) ? 'N/A' :
-                                                lookupService.getBomaNameById(match.address.boma) }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </p-tabpanel>
-                        }
-                    </p-tabpanels>
-                </p-tabs>
-
-
-                <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="currentPage * pageSize"
-                    [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onPageChange($event)" [appendTo]="'body'">
-                </p-paginator>
-            </div>
-            } @else {
-            <p class="text-center mt-3 text-muted">No Match Found!</p>
-            }
-        </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped mb-0">
+              <tbody>
+                <tr>
+                  <th width="220">Application Id</th>
+                  <td>{{ beneficiaryMatchList.primary.applicationId }}</td>
+                </tr>
+                <tr>
+                  <th>Type</th>
+                  <td>{{ beneficiaryMatchList.primary.type == 'BENEFICIARY' ? 'BENEFICIARY' :
+                    'ALTERNATE' }}</td>
+                </tr>
+                <tr>
+                  <th>First Name</th>
+                  <td>{{ beneficiaryMatchList.primary.respondentFirstName }}</td>
+                </tr>
+                <tr>
+                  <th>Middle Name</th>
+                  <td>{{ beneficiaryMatchList.primary.respondentMiddleName }}</td>
+                </tr>
+                <tr>
+                  <th>Last Name</th>
+                  <td>{{ beneficiaryMatchList.primary.respondentLastName }}</td>
+                </tr>
+                <tr>
+                  <th>Gender</th>
+                  <td>{{
+                    lookupService.getGenderEnumByValue(beneficiaryMatchList.primary.respondentGender)
+                    }}</td>
+                </tr>
+                <tr>
+                  <th>Phone No</th>
+                  <td>{{ beneficiaryMatchList.primary.respondentPhoneNo }}</td>
+                </tr>
+                <tr>
+                  <th>State Name</th>
+                  <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
+                    lookupService.getStateNameById(beneficiaryMatchList.primary.address.stateId) }}
+                  </td>
+                </tr>
+                <tr>
+                  <th>County Name</th>
+                  <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
+                    lookupService.getCountyNameById(beneficiaryMatchList.primary.address.countyId)
+                    }}</td>
+                </tr>
+                <tr>
+                  <th>Payam Name</th>
+                  <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
+                    lookupService.getPayamNameById(beneficiaryMatchList.primary.address.payam) }}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Boma Name</th>
+                  <td>{{ (beneficiaryMatchList.primary.address==null) ? 'N/A' :
+                    lookupService.getBomaNameById(beneficiaryMatchList.primary.address.boma) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div> <!-- card-body -->
+      </div> <!-- card -->
     </div>
+
+    <!-- RIGHT: Matches in Tabs + paginator -->
+    <div class="col-12 col-md-8 col-lg-7">
+      <div class="d-flex justify-content-between align-items-center">
+        <div></div>
+        <span class="text-muted">Total Matched Records: <b>{{ totalRecords }}</b></span>
+      </div>
+
+      @if (isGeneratingPdf) {
+      <p-progressBar [value]="progressValue"></p-progressBar>
+      <p class="text-center mt-2">Generating PDF... {{ progressValue }}%</p>
+      }
+
+      @if (beneficiaryMatchList.matchList.length > 0) {
+      <div class="scroller">
+        <p-tabs>
+          <p-tablist>
+            @for (match of beneficiaryMatchList.matchList; track match.applicationId; let i = $index) {
+            <p-tab [value]="i.toString()">
+              <div class="d-flex justify-content-between align-items-center w-100">
+                <span>
+                  <b>Application Id:</b> {{ match.applicationId }}
+                  &nbsp;<code class="alert alert-success p-0 ps-1 pe-1 m-0">Score: {{ match.score }}</code>
+                  &nbsp;<code
+                    class="alert alert-info p-0 ps-1 pe-1 m-0">Match Date: {{ match.matchCreated | date:'dd-MM-yyyy' }}</code>
+                </span>
+                <div>
+
+                  <button type="button" class="btn btn-outline-success btn-sm me-2" pTooltip="Mark As Matched"
+                    tooltipPosition="top" (click)="adjudicate(true, match.applicationId)">
+                    <i class="fas fa-user-check"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm" pTooltip="Mark As Not Matched"
+                    tooltipPosition="left" (click)="adjudicate(false, match.applicationId)">
+                    <i class="fas fa-user-xmark"></i>
+                  </button>
+                </div>
+              </div>
+            </p-tab>
+            }
+          </p-tablist>
+          <p-tabpanels>
+            @for (match of beneficiaryMatchList.matchList; track match.applicationId; let i = $index) {
+            <p-tabpanel [value]="i.toString()">
+              <!-- TAB CONTENT -->
+              <div class="table-responsive">
+                <table class="table text-center">
+                  <tbody>
+                    <tr>
+                      <td colspan="2" rowspan="4" style="vertical-align: middle;">
+                        <img [src]="allBiometrciDataFromMatchList[i]?.photo || 'images/dummyHuman.jpg'" alt=""
+                          height="100" class="cursor-zoom" pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryPhoto, allBiometrciDataFromMatchList[i]?.photo, 'Profile Image')" />
+                        <kbd class="mt-2 d-block">Profile Image</kbd>
+                      </td>
+                      <th colspan="5" class="text-center">Right Hand Finger</th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RT" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RT, allBiometrciDataFromMatchList[i]?.rightHand?.RT, 'Right Thumb')" />
+                        <br /><kbd>Thumb</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RI" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RI, allBiometrciDataFromMatchList[i]?.rightHand?.RI, 'Right Index')" />
+                        <br /><kbd>Index</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RM" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RM, allBiometrciDataFromMatchList[i]?.rightHand?.RM, 'Right Middle')" />
+                        <br /><kbd>Middle</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RR" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RR, allBiometrciDataFromMatchList[i]?.rightHand?.RR, 'Right Ring')" />
+                        <br /><kbd>Ring</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.rightHand?.RL" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.RL, allBiometrciDataFromMatchList[i]?.rightHand?.RL, 'Right Little')" />
+                        <br /><kbd>Little</kbd>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th colspan="5" class="text-center">Left Hand Finger</th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LT" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LT, allBiometrciDataFromMatchList[i]?.leftHand?.LT, 'Left Thumb')" />
+                        <br /><kbd>Thumb</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LI" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LI, allBiometrciDataFromMatchList[i]?.leftHand?.LI, 'Left Index')" />
+                        <br /><kbd>Index</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LM" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LM, allBiometrciDataFromMatchList[i]?.leftHand?.LM, 'Left Middle')" />
+                        <br /><kbd>Middle</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LR" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LR, allBiometrciDataFromMatchList[i]?.leftHand?.LR, 'Left Ring')" />
+                        <br /><kbd>Ring</kbd>
+                      </td>
+                      <td>
+                        <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LL" height="40" class="cursor-zoom"
+                          pTooltip="Click to see comparison"
+                          (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LL, allBiometrciDataFromMatchList[i]?.leftHand?.LL, 'Left Little')" />
+                        <br /><kbd>Little</kbd>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0">
+                  <tbody>
+                    <tr>
+                      <th width="220">Application Id</th>
+                      <td colspan="3">{{ match.applicationId }}</td>
+                    </tr>
+                    <tr>
+                      <th width="220">Type</th>
+                      <td colspan="3">{{ match.type }}</td>
+                    </tr>
+                    <tr>
+                      <th>First Name</th>
+                      <td colspan="3">{{ match.respondentFirstName }}</td>
+                    </tr>
+                    <tr>
+                      <th>Middle Name</th>
+                      <td colspan="3">{{ match.respondentMiddleName }}</td>
+                    </tr>
+                    <tr>
+                      <th>Last Name</th>
+                      <td colspan="3">{{ match.respondentLastName }}</td>
+                    </tr>
+                    <tr>
+                      <th>Gender</th>
+                      <td>{{ lookupService.getGenderEnumByValue(match.respondentGender) }}</td>
+                      <th width="220">Phone No</th>
+                      <td>{{ match.respondentPhoneNo }}</td>
+                    </tr>
+                    <tr>
+                      <th>State Name</th>
+                      <td>{{ (match.address==null) ? 'N/A' :
+                        lookupService.getStateNameById(match.address.stateId) }}</td>
+                      <th>County Name</th>
+                      <td>{{ (match.address==null) ? 'N/A' :
+                        lookupService.getCountyNameById(match.address.countyId) }}</td>
+                    </tr>
+                    <tr>
+                      <th>Payam Name</th>
+                      <td>{{ (match.address==null) ? 'N/A' :
+                        lookupService.getPayamNameById(match.address.payam) }}</td>
+                      <th>Boma Name</th>
+                      <td>{{ (match.address==null) ? 'N/A' :
+                        lookupService.getBomaNameById(match.address.boma) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </p-tabpanel>
+            }
+          </p-tabpanels>
+        </p-tabs>
+
+
+        <p-paginator [rows]="pageSize" [totalRecords]="totalRecords" [first]="currentPage * pageSize"
+          [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onPageChange($event)" [appendTo]="'body'">
+        </p-paginator>
+      </div>
+      } @else {
+      <p class="text-center mt-3 text-muted">No Match Found!</p>
+      }
+    </div>
+  </div>
 </div>
 }
 }

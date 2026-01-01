@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -75,6 +75,7 @@ export class MatchList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -141,11 +142,13 @@ export class MatchList implements OnInit {
           }
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       })
       .catch((err) => {
         console.error('Error Fetching Data:', err);
         this.beneficiaryMatchList = null;
         this.isLoading = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -290,6 +293,7 @@ export class MatchList implements OnInit {
                 life: 2000,
               });
               this.isLoading = false;
+              this.cdr.markForCheck();
             }
           })
           .catch((err) => {
@@ -301,6 +305,7 @@ export class MatchList implements OnInit {
               life: 2000,
             });
             this.isLoading = false;
+            this.cdr.markForCheck();
           });
       },
     });
@@ -373,6 +378,7 @@ export class MatchList implements OnInit {
               document
                 .querySelector('.scroller')
                 ?.scrollTo({ top: 0, behavior: 'smooth' });
+              this.cdr.markForCheck();
             }, 300);
           });
         }
@@ -380,6 +386,7 @@ export class MatchList implements OnInit {
       .catch((err) => {
         console.error('Error fetching all matched data:', err);
         this.isGeneratingPdf = false;
+        this.cdr.markForCheck();
       });
   }
 
