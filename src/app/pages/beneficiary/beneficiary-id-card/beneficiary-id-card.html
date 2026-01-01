@@ -108,8 +108,11 @@
       <p-button label="Reset" icon="fas fa-refresh" severity="danger" class="me-2" size="small" (onClick)="resetForm()"
         outlined="true"></p-button>
 
-      <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small" class="me-2"
         (onClick)="searchBeneficiaries()"></p-button>
+
+      <p-button label="Bulk ID Card Downlaod" icon="fas fa-download" severity="primary" size="small"
+        (onClick)="downloadBulkIDCard()"></p-button>
     </div>
   </form>
 </div>
@@ -120,7 +123,7 @@
 
   <ng-template pTemplate="header">
     <tr>
-      <th colspan="11" class="text-end">
+      <th colspan="12" class="text-end">
         <p class="fw-bold mb-2">
           Showing <kbd>{{ beneficiaries.length }}</kbd> of
           <kbd>{{ totalRecords }}</kbd> beneficiaries
@@ -128,6 +131,13 @@
       </th>
     </tr>
     <tr>
+      <th class="text-center" style="width: 4rem;">
+        <label class="fw-bold">ALL</label><br>
+        <p-checkbox [(ngModel)]="allSelected" (onChange)="onSelectAllChange($event)" [binary]="true"
+          pTooltip="Select all on this page" tooltipPosition="top" />
+        
+        
+      </th>
       <th>Application ID</th>
       <th>Name</th>
       <th>Gender</th>
@@ -144,6 +154,10 @@
 
   <ng-template pTemplate="body" let-b>
     <tr>
+      <td class="text-center">
+        <p-checkbox [(ngModel)]="b.isSelected" (onChange)="onRowSelectChange($event, b.applicationId)"
+          [binary]="true" />
+      </td>
       <td>{{ b.applicationId }}</td>
       <td>{{ b.fullName }}</td>
       <td>{{ b.respondentGender }}</td>
@@ -172,7 +186,7 @@
 
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="11" class="text-center text-danger">
+      <td colspan="12" class="text-center text-danger">
         <b>No beneficiaries found!</b>
       </td>
     </tr>

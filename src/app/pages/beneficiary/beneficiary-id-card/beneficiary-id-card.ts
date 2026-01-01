@@ -29,6 +29,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ApiService } from '../../../services/api.service';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
 import Swal from 'sweetalert2';
+import { CheckboxModule } from 'primeng/checkbox';
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
@@ -69,6 +70,7 @@ interface BeneficiaryVm {
   countyName: string;
   payamName: string;
   bomaName: string;
+  isSelected?: boolean;
 }
 
 
@@ -93,6 +95,7 @@ interface BeneficiaryVm {
     Loader,
     QrScannerComponent,
     QrInputDirective,
+    CheckboxModule,
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -124,6 +127,9 @@ export class BeneficiaryIdCard implements OnInit {
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
   isScannerVisible = false;
+
+  selectedApplicationIds = new Set<string>();
+  allSelected = false;
 
 
   constructor(
@@ -362,6 +368,7 @@ export class BeneficiaryIdCard implements OnInit {
           ? this.lookup.getBomaNameById(b.address.boma) ||
           String(b.address.boma)
           : '',
+          isSelected: false
       };
     });
   }
@@ -369,6 +376,9 @@ export class BeneficiaryIdCard implements OnInit {
   // ---------- Data loading ----------
   fetchPage(page: number, size: number) {
     this.isLoading = true;
+    this.selectedApplicationIds.clear();
+    this.allSelected = false;
+
     const body = this.buildSearchBody(page, size);
     this.api
       .POST('api/beneficiary/search', body)
@@ -417,7 +427,41 @@ export class BeneficiaryIdCard implements OnInit {
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
+  // ---------- Selection ----------
+  onSelectAllChange(event: any) {
+    const isChecked = event.checked;
+    this.allSelected = isChecked;
 
+    this.beneficiaries.forEach(b=>{
+      b.isSelected = isChecked;
+    if (isChecked) {
+      this.selectedApplicationIds.add(b.applicationId);
+    } else {
+      this.selectedApplicationIds.delete(b.applicationId);
+    }
+  });
+    this.cdr.markForCheck();
+  }
+
+  onRowSelectChange(event: any, applicationId: string) {
+    if (event.checked) {
+      this.selectedApplicationIds.add(applicationId);
+    } else {
+      this.selectedApplicationIds.delete(applicationId);
+    }
+
+    // if (this.beneficiaries.length > 0) {
+    //   this.allSelected = this.beneficiaries.every(b => this.selectedApplicationIds.has(b.applicationId));
+    // } else {
+    //   this.allSelected = false;
+    // }
+    this.allSelected = this.beneficiaries.length > 0 && this.beneficiaries.every(b=>b.isSelected);
+    this.cdr.markForCheck();
+  }
+
+  // isSelected(applicationId: string): boolean {
+  //   return this.selectedApplicationIds.has(applicationId);
+  // }
 
   // ---------- Actions ----------
   editBeneficiary(b: BeneficiaryVm) {
@@ -567,7 +611,68 @@ export class BeneficiaryIdCard implements OnInit {
       });
   }
 
+  downloadBulkIDCard() {
+    const selectedIds = Array.from(this.selectedApplicationIds);
 
+    if (selectedIds.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Selection',
+        text: 'Please select at least one beneficiary to download ID cards in bulk.',
+      });
+      return;
+    }
+
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.api.POST('api/v1/id-cards/download/bulk', selectedIds, 'global', { responseType: 'blob' })
+      .then((res: any) => {
+        if (!res.data || res.data.size === 0) {
+          throw new Error("Empty response from server");
+        }
+        const blob = new Blob([res.data], { type: 'application/zip' });
+
+        const contentDisposition = res.headers['content-disposition'];
+        let filename = 'beneficiary_id_cards.zip';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1];
+          }
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+        this.selectedApplicationIds.clear();
+        this.allSelected = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Download Started',
+          detail: `Bulk ID card download for ${selectedIds.length} beneficiaries has started.`,
+        });
+        this.cdr.markForCheck();
+      })
+      .catch(err => {
+        console.error('Bulk ID card download error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: 'An error occurred while downloading bulk ID cards. Please try again.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
+  }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }
