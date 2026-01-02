@@ -1,3 +1,4 @@
+import { Tag } from 'primeng/tag';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -14,7 +15,7 @@ import { ApiService } from '../../../services/api.service';
 import { LookupService } from '../../../services/lookup.service';
 import { ImageComparePreview } from '../image-compare-preview/image-compare-preview';
 import { TableModule } from 'primeng/table';
-import { TabsModule } from 'primeng/tabs';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Loader } from '../../../components/loader/loader';
 
 @Component({
@@ -28,8 +29,9 @@ import { Loader } from '../../../components/loader/loader';
     ProgressBarModule,
     TooltipModule,
     TableModule,
-    TabsModule,
     Loader,
+    ConfirmDialogModule,
+    Tag,
   ],
   templateUrl: './match-list.html',
   styleUrls: ['./match-list.scss'],
@@ -75,7 +77,7 @@ export class MatchList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -97,8 +99,6 @@ export class MatchList implements OnInit {
     };
 
     this.fetchBeneficiaryMatchList(this.currentApplicationId);
-
-
   }
 
   fetchBeneficiaryMatchList(
@@ -128,7 +128,6 @@ export class MatchList implements OnInit {
     this.apiService
       .POST('api/adjudication/getMatchList/v2', payload)
       .then((res) => {
-
         if (res.status === 200) {
           this.beneficiaryMatchList = res.data;
           this.totalRecords = res.data.totalMatched || 0;
@@ -254,9 +253,28 @@ export class MatchList implements OnInit {
     secondaryImage: string,
     title: string
   ): void {
+    // 1. Collect all primary fingerprint images into an array
+    const allPrimaryFingerprints = [
+      this.beneficiaryRightHandFingerPrints.RT,
+      this.beneficiaryRightHandFingerPrints.RI,
+      this.beneficiaryRightHandFingerPrints.RM,
+      this.beneficiaryRightHandFingerPrints.RR,
+      this.beneficiaryRightHandFingerPrints.RL,
+      this.beneficiaryLeftHandFingerPrints.LT,
+      this.beneficiaryLeftHandFingerPrints.LI,
+      this.beneficiaryLeftHandFingerPrints.LM,
+      this.beneficiaryLeftHandFingerPrints.LR,
+      this.beneficiaryLeftHandFingerPrints.LL,
+    ];
+
+    // 2. Reorder the array to put the clicked image first.
+    const sortedPrimaryImages = [...allPrimaryFingerprints].sort((a) => {
+        return a === primaryImage ? -1 : 1;
+    });
+
     this.ref = this.dialogService.open(ImageComparePreview, {
       data: {
-        primary: primaryImage,
+        primary: sortedPrimaryImages, // Pass the full, reordered array
         secondary: secondaryImage,
       },
       header: `Image Comparison: (${title})`,
@@ -272,10 +290,13 @@ export class MatchList implements OnInit {
       }?`,
       header: 'Adjudication Confirmation',
       icon: 'pi pi-exclamation-triangle',
-      acceptIcon: 'fas fa-check me-2',
-      rejectIcon: 'fas fa-times me-2',
-      rejectButtonStyleClass: 'btn btn-danger',
-      acceptButtonStyleClass: 'btn btn-success',
+
+      acceptLabel: 'Yes',
+      rejectLabel: 'No',
+
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+
       accept: () => {
         this.isLoading = true;
         const payload = {
@@ -354,7 +375,8 @@ export class MatchList implements OnInit {
 
             allMatchList.forEach((match: any, index: number) => {
               const score = match.score || 'N/A';
-              const photo = biometricData[index]?.photo || 'images/dummyHuman.jpg';
+              const photo =
+                biometricData[index]?.photo || 'images/dummyHuman.jpg';
 
               doc.addPage();
               this.addBeneficiaryPage(

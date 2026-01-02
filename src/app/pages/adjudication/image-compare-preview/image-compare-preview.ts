@@ -13,8 +13,9 @@ import { Button } from 'primeng/button';
 })
 export class ImageComparePreview implements OnInit {
   isLoading: boolean = true;
-  primaryImage: string = '';
+  primaryImages: string[] = [];
   secondaryImage: string = '';
+  activePrimaryImage: string = '';
 
   constructor(
     private conf: DynamicDialogConfig,
@@ -22,11 +23,20 @@ export class ImageComparePreview implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log(this.conf.data);
-    this.primaryImage = this.conf.data.primary;
+    this.primaryImages = this.conf.data.primary;
     this.secondaryImage = this.conf.data.secondary;
+    
+    if (this.primaryImages && this.primaryImages.length > 0) {
+      this.activePrimaryImage = this.primaryImages[0];
+    }
+    
     this.isLoading = false;
   }
+
+  setActivePrimaryImage(image: string): void {
+    this.activePrimaryImage = image;
+  }
+
   closeDialog() {
     this.ref.close();
   }

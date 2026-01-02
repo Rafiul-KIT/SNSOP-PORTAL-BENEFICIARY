@@ -20,3 +20,14 @@
     background-color: white;
     padding: 10px 0;
 }
+
+:host ::ng-deep .p-accordion .p-accordion-header .p-accordion-header-link {
+    justify-content: space-between;
+    align-items: center;
+}
+
+:host ::ng-deep .p-accordion .p-accordion-header a .me-5 {
+    margin-right: 0 !important;
+}
+
+
