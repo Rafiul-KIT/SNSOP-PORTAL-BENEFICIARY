@@ -1,0 +1,200 @@
+<!-- beneficiary-momo-wallet-update.html -->
+
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+
+<p-toast position="bottom-right" />
+
+@if (isLoading) {
+  <app-loader />
+} @else {
+  <form [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()">
+
+    <!-- Header row -->
+    <div class="d-flex align-items-center justify-content-between mb-2 form-action-bar">
+      <h5 class="mb-0">Beneficiary's MOMO Number Update</h5>
+
+      <p-button
+        severity="info"
+        type="submit"
+        class="p-2"
+        [disabled]="beneficiaryForm.invalid || isSubmitting"
+        icon="fas fa-save"
+        label="Update"
+        size="small">
+      </p-button>
+    </div>
+
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">Wallet Number Update</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div style="height: calc(100vh - 210px); overflow-y: auto">
+            <div class="container-fluid">
+              <div class="row g-3">
+
+                <!-- Left: Personal Info -->
+                <div class="col-md-6">
+                  <div class="card shadow-sm rounded">
+                    <h5 class="card-header">Personal Information</h5>
+                    <div class="card-body text-center">
+                      <img [src]="beneficiaryPhoto" class="img-thumbnail mb-3" width="200" />
+
+                      <table class="table table-bordered table-sm text-start mb-0">
+                        <tbody>
+                          <tr>
+                            <th>Application ID</th>
+                            <td>{{ beneficiaryDetails.applicationId }}</td>
+                          </tr>
+                          <tr>
+                            <th>Name</th>
+                            <td>
+                              {{ (beneficiaryDetails.respondentFirstName || '') + ' ' +
+                              (beneficiaryDetails.respondentMiddleName || '') + ' ' +
+                              (beneficiaryDetails.respondentLastName || '') }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Age</th>
+                            <td>{{ beneficiaryDetails.respondentAge }}</td>
+                          </tr>
+                          <tr>
+                            <th>Gender</th>
+                            <td>{{ beneficiaryDetails.respondentGender }}</td>
+                          </tr>
+                          <tr>
+                            <th>Phone</th>
+                            <td>{{ beneficiaryDetails.respondentPhoneNo }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right: Wallet update -->
+                <div class="col-md-6">
+                  <div class="card shadow-sm rounded mt-3 mt-md-0">
+                    <h5 class="card-header">Wallet Number Update</h5>
+
+                    <div class="card-body">
+                      <div class="row g-3">
+
+                        <!-- Row 1: Has wallet (left) + Provider (right) -->
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold d-block">Has mobile wallet?</label>
+
+                          <div class="form-check form-check-inline">
+                            <input
+                              class="form-check-input"
+                              type="radio"
+                              name="hasMobileWallet"
+                              id="hasWalletYes"
+                              [value]="true"
+                              formControlName="hasMobileWallet" />
+                            <label class="form-check-label" for="hasWalletYes">Yes</label>
+                          </div>
+
+                          <div class="form-check form-check-inline">
+                            <input
+                              class="form-check-input"
+                              type="radio"
+                              name="hasMobileWallet"
+                              id="hasWalletNo"
+                              [value]="false"
+                              formControlName="hasMobileWallet" />
+                            <label class="form-check-label" for="hasWalletNo">No</label>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6">
+                          <div
+                            class="logic-field"
+                            [class.logic-disabled]="!beneficiaryForm.get('hasMobileWallet')?.value">
+
+                            <p-floatlabel variant="on" class="w-100">
+                              <p-select
+                                id="mobileWalletId"
+                                formControlName="mobileWalletId"
+                                class="w-100"
+                                [options]="mobileMoneyOptions"
+                                optionLabel="label"
+                                optionValue="value"
+                                [ngClass]="{
+                                  'is-invalid':
+                                    beneficiaryForm.get('mobileWalletId')?.invalid &&
+                                    beneficiaryForm.get('mobileWalletId')?.touched
+                                }">
+                              </p-select>
+                              <label for="mobileWalletId">Mobile Money Provider</label>
+                            </p-floatlabel>
+
+                            @if (beneficiaryForm.get('mobileWalletId')?.invalid && beneficiaryForm.get('mobileWalletId')?.touched) {
+                              <small class="text-danger">Provider is required.</small>
+                            }
+                          </div>
+                        </div>
+
+                        <!-- Row 2: Existing (left) + New number (right) -->
+                        <div class="col-md-6">
+                          <label class="form-label fw-semibold">Current Wallet Number</label>
+                          <input
+                            class="w-100"
+                            pInputText
+                            placeholder="No Current Wallet Number"
+                            formControlName="currentMomoNumber"
+                            [readonly]="true" />
+                        </div>
+
+                        <div class="col-md-6">
+                          <div
+                            class="logic-field"
+                            [class.logic-disabled]="!beneficiaryForm.get('hasMobileWallet')?.value">
+                            <label for="mobileWalletNumber" class="form-label fw-semibold">New Mobile Wallet Number</label>
+                            <p-floatlabel variant="on" class="w-100 momo-floatlabel">
+                              <div class="input-group momo-input-group">
+                                <span class="input-group-text bg-light border-end-0 momo-prefix">+211</span>
+                                <input
+                                  pInputText
+                                  id="mobileWalletNumber"
+                                  formControlName="mobileWalletNumber"
+                                  class="form-control border-start-0 momo-input"
+                                  maxlength="9"
+                                  placeholder="Enter 9-digit number"
+                                  [ngClass]="{
+                                    'is-invalid':
+                                      beneficiaryForm.get('mobileWalletNumber')?.invalid &&
+                                      beneficiaryForm.get('mobileWalletNumber')?.touched
+                                  }" />
+                              </div>
+
+                            </p-floatlabel>
+
+                            @if (beneficiaryForm.get('mobileWalletNumber')?.invalid && beneficiaryForm.get('mobileWalletNumber')?.touched) {
+                              <small class="text-danger">
+                                @if (beneficiaryForm.get('mobileWalletNumber')?.errors?.['required']) { Wallet number is required. }
+                                @if (beneficiaryForm.get('mobileWalletNumber')?.errors?.['pattern']) { Must be a valid 9-digit number. }
+                              </small>
+                            }
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+
+  </form>
+}

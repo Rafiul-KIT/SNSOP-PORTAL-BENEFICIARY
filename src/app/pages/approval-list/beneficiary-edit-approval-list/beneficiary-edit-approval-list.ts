@@ -1,3 +1,5 @@
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -21,6 +23,7 @@ import { SelectModule } from 'primeng/select';
 import { Loader } from '../../../components/loader/loader';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ApiService } from '../../../services/api.service';
+import { LookupService, LookupItem } from '../../../services/lookup.service';
 
 interface Location {
   name: string;
@@ -64,6 +67,8 @@ interface Beneficiary {
     SelectModule,
     Loader,
     RouterModule,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   providers: [MessageService, ConfirmationService],
 })
@@ -72,10 +77,10 @@ export class BeneficiaryEditApprovalList implements OnInit {
   bid!: string;
   mode: 'edit' | 'migrate' | 'create' | 'archive' | undefined;
   searchForm!: FormGroup;
-  states: Location[] = [];
-  counties: Location[] = [];
-  payams: Location[] = [];
-  bomas: Location[] = [];
+  states: LookupItem[] = [];
+  counties: LookupItem[] = [];
+  payams: LookupItem[] = [];
+  bomas: LookupItem[] = [];
   beneficiaries: Beneficiary[] = [];
   breadcrumbItems: any[] = [];
   breadcrumbHome: any;
@@ -83,6 +88,7 @@ export class BeneficiaryEditApprovalList implements OnInit {
   pageSize = 10;
   advanceSearchPanelVisible: boolean = false;
   totalRecords = 0;
+  isScannerVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -91,16 +97,90 @@ export class BeneficiaryEditApprovalList implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private lookup: LookupService
   ) { }
+
+   private async loadLookups() {
+    // Warm the caches (Promises)
+    await Promise.all([
+      this.lookup.getOrFetchStateList(),
+      this.lookup.fetchAllCountyList(),
+      this.lookup.fetchAllPayamList(),
+      this.lookup.fetchAllBomaList(),
+    ]);
+
+    // Now read from the sync getters
+    this.states = this.lookup.getStateList();
+    this.counties = this.lookup.getAllCountyList();
+    this.payams = this.lookup.getAllPayamList();
+    this.bomas = this.lookup.getAllBomaList();
+    this.cdr.markForCheck();
+  }
 
   ngOnInit() {
     this.bid = this.route.snapshot.paramMap.get('bid')!;
     this.mode = this.route.snapshot.queryParamMap.get('mode') as any;
+    this.loadLookups();
     this.initForm();
     this.loadBeneficiaries(this.currentPage, this.pageSize);
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
     this.breadcrumbItems = [{ label: 'Approval List' }];
+  }
+
+   // ---------- dependent dropdowns ----------
+  onStateChange(state: LookupItem | null) {
+    if (state?.id) {
+      this.lookup.getCountyListByStateId(state.id).then((list) => {
+        this.counties = list;
+        this.payams = [];
+        this.bomas = [];
+        this.searchForm.patchValue({ county: null, payam: null, boma: null });
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.counties = [];
+      this.payams = [];
+      this.bomas = [];
+    }
+  }
+
+  onCountyChange(county: LookupItem | null) {
+    if (county?.id) {
+      this.lookup.getPayamListByCountyId(county.id).then((list) => {
+        this.payams = list;
+        this.bomas = [];
+        this.searchForm.patchValue({ payam: null, boma: null });
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.payams = [];
+      this.bomas = [];
+    }
+  }
+
+  onPayamChange(payam: LookupItem | null) {
+    if (payam?.id) {
+      this.lookup.getBomaListByPayamId(payam.id).then((list) => {
+        this.bomas = list;
+        this.searchForm.patchValue({ boma: null });
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.bomas = [];
+    }
+  }
+
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
   }
 
   initForm() {
@@ -110,10 +190,10 @@ export class BeneficiaryEditApprovalList implements OnInit {
       // middleName: [''],
       // lastName: [''],
       // phoneNumber: [''],
-      // state: [null],
-      // county: [null],
-      // payam: [null],
-      // boma: [null],
+      state: [null as LookupItem | null],
+      county: [null as LookupItem | null],
+      payam: [null as LookupItem | null],
+      boma: [null as LookupItem | null],
       taskType: [null],
       approvalStatus: [null],
       applicationId: null,
@@ -124,11 +204,16 @@ export class BeneficiaryEditApprovalList implements OnInit {
   loadBeneficiaries(page: number, size: number) {
     this.isLoading = true;
 
+    const { state, county, payam, boma, ...rest } = this.searchForm.value;
     const payload = {
-      ...this.searchForm.value,
+      ...rest,
+      stateId: state?.id ?? null,
+      countyId: county?.id ?? null,
+      payam: payam?.id ?? null,
+      boma: boma?.id ?? null,
       approvalStatus: this.searchForm.value.approvalStatus ?? null,
-      page: page,  // Correct page number
-      size: size,  // Correct page size
+      page: page, // Correct page number
+      size: size, // Correct page size
     };
 
     this.apiService

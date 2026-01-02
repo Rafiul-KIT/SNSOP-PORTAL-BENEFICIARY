@@ -1,6 +1,6 @@
 <div class="report-container">
   <p-table [value]="householdSurveyData()" [tableStyle]="{ 'width': '100%' }">
-  
+
     <ng-template pTemplate="header">
       <tr>
         <th class="text-center" style="background-color: cadetblue; color: white">Date</th>
@@ -16,21 +16,33 @@
         <td class="text-center">{{ row.date }}</td>
         <td class="text-center">
           @if (row.parent_file) {
-            <a href="{{ downloadLocation }}{{ row.parent_file }}">Download</a>
+            @if (downloadingFile() === row.parent_file) {
+              <app-loader></app-loader>
+            } @else {
+              <button type="button" class="btn btn-primary btn-sm" (click)="downloadReport(row.parent_file)" [disabled]="downloadingFile()">Download</button>
+            }
           } @else {
             <span>N/A</span>
           }
         </td>
         <td class="text-center">
           @if (row.af_file) {
-            <a href="{{ downloadLocation }}{{ row.af_file }}">Download</a>
+            @if (downloadingFile() === row.af_file) {
+              <app-loader></app-loader>
+            } @else {
+              <button type="button" class="btn btn-primary btn-sm" (click)="downloadReport(row.af_file)" [disabled]="downloadingFile()">Download</button>
+            }
           } @else {
             <span>N/A</span>
           }
         </td>
         <td class="text-center">
           @if (row.all_file) {
-            <a href="{{ downloadLocation }}{{ row.all_file }}">Download</a>
+            @if (downloadingFile() === row.all_file) {
+              <app-loader></app-loader>
+            } @else {
+              <button type="button" class="btn btn-primary btn-sm" (click)="downloadReport(row.all_file)" [disabled]="downloadingFile()">Download</button>
+            }
           } @else {
             <span>N/A</span>
           }
@@ -38,7 +50,7 @@
       </tr>
     </ng-template>
 
-  
+
     <ng-template pTemplate="emptymessage">
       <tr>
         <td colspan="4">Nothing Found.</td>

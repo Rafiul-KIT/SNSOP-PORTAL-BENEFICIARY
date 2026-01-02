@@ -6,11 +6,13 @@ export const environment = {
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/', // your Spring Boot backend in dev
   portals: {
     master: 'https://localhost:4010',
-    masterSettings: 'https://localhost:4010/#/home/portals',
+    masterSettings: 'https://localhost:4010/#/user-management/users',
+    surveyCTO: 'https://localhost:4010/#/survey-cto',
     beneficiary: 'https://localhost:4020',
     payment: 'https://localhost:4030',
     grm: 'https://localhost:4040',
     report: 'https://localhost:4050',
   },
+  authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
   cookie_name:'mis_ta'
 };

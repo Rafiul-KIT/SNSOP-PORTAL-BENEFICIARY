@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Tag } from 'primeng/tag';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -14,7 +15,7 @@ import { ApiService } from '../../../services/api.service';
 import { LookupService } from '../../../services/lookup.service';
 import { ImageComparePreview } from '../image-compare-preview/image-compare-preview';
 import { TableModule } from 'primeng/table';
-import { TabsModule } from 'primeng/tabs';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Loader } from '../../../components/loader/loader';
 
 @Component({
@@ -28,8 +29,9 @@ import { Loader } from '../../../components/loader/loader';
     ProgressBarModule,
     TooltipModule,
     TableModule,
-    TabsModule,
     Loader,
+    ConfirmDialogModule,
+    Tag,
   ],
   templateUrl: './match-list.html',
   styleUrls: ['./match-list.scss'],
@@ -43,26 +45,27 @@ export class MatchList implements OnInit {
   progressValue: number = 0;
   isGeneratingPdf: boolean = false;
 
-  beneficiaryPhoto: string = '';
+  beneficiaryPhoto: string = 'images/dummyHuman.jpg';
   beneficiaryRightHandFingerPrints: any = {
-    RT: 'assets/tick.jpg',
-    RI: 'assets/tick.jpg',
-    RM: 'assets/tick.jpg',
-    RR: 'assets/tick.jpg',
-    RL: 'assets/tick.jpg',
+    RT: 'images/no-finger.png',
+    RI: 'images/no-finger.png',
+    RM: 'images/no-finger.png',
+    RR: 'images/no-finger.png',
+    RL: 'images/no-finger.png',
   };
   beneficiaryLeftHandFingerPrints: any = {
-    LT: 'assets/tick.jpg',
-    LI: 'assets/tick.jpg',
-    LM: 'assets/tick.jpg',
-    LR: 'assets/tick.jpg',
-    LL: 'assets/tick.jpg',
+    LT: 'images/no-finger.png',
+    LI: 'images/no-finger.png',
+    LM: 'images/no-finger.png',
+    LR: 'images/no-finger.png',
+    LL: 'images/no-finger.png',
   };
 
   allBiometrciDataFromMatchList: any[] = [];
   currentPage: number = 0;
   pageSize: number = 10;
   totalRecords: number = 0;
+  private currentApplicationId: string | null = null;
 
   ref: DynamicDialogRef | undefined;
 
@@ -72,10 +75,13 @@ export class MatchList implements OnInit {
     public lookupService: LookupService,
     public dialogService: DialogService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.currentApplicationId = this.route.snapshot.paramMap.get('id');
     this.items = [
       {
         label: 'Adjudication',
@@ -92,16 +98,23 @@ export class MatchList implements OnInit {
       routerLink: '/dashboard',
     };
 
-    this.activatedRoute.params.subscribe((prms) => {
-      this.fetchBeneficiaryMatchList(prms['aId']);
-    });
+    this.fetchBeneficiaryMatchList(this.currentApplicationId);
   }
 
   fetchBeneficiaryMatchList(
-    applicationId: string,
+    applicationId: string | null,
     page: number = 0,
     size: number = this.pageSize
   ): void {
+    if (!applicationId) {
+      this.isLoading = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Application ID is missing.',
+      });
+      return;
+    }
     this.isLoading = true;
     const payload = {
       ignorePrimary: 0,
@@ -115,8 +128,6 @@ export class MatchList implements OnInit {
     this.apiService
       .POST('api/adjudication/getMatchList/v2', payload)
       .then((res) => {
-        console.log('API Response:', res.data);
-
         if (res.status === 200) {
           this.beneficiaryMatchList = res.data;
           this.totalRecords = res.data.totalMatched || 0;
@@ -130,53 +141,55 @@ export class MatchList implements OnInit {
           }
         }
         this.isLoading = false;
+        this.cdr.markForCheck();
       })
       .catch((err) => {
         console.error('Error Fetching Data:', err);
         this.beneficiaryMatchList = null;
         this.isLoading = false;
+        this.cdr.markForCheck();
       });
   }
 
   getBeneficiaryBiometricFromObject(biometric: any): void {
     this.beneficiaryPhoto = biometric?.photoData
       ? `data:image/png;base64,${biometric.photoData}`
-      : 'assets/dummy.png';
+      : 'images/dummyHuman.jpg';
 
     const right = this.beneficiaryRightHandFingerPrints;
     const left = this.beneficiaryLeftHandFingerPrints;
 
     right.RT = biometric?.rtFingerData
       ? `data:image/png;base64,${biometric.rtFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     right.RI = biometric?.riFingerData
       ? `data:image/png;base64,${biometric.riFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     right.RM = biometric?.rmFingerData
       ? `data:image/png;base64,${biometric.rmFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     right.RR = biometric?.rrFingerData
       ? `data:image/png;base64,${biometric.rrFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     right.RL = biometric?.rsFingerData
       ? `data:image/png;base64,${biometric.rsFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
 
     left.LT = biometric?.ltFingerData
       ? `data:image/png;base64,${biometric.ltFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     left.LI = biometric?.liFingerData
       ? `data:image/png;base64,${biometric.liFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     left.LM = biometric?.lmFingerData
       ? `data:image/png;base64,${biometric.lmFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     left.LR = biometric?.lrFingerData
       ? `data:image/png;base64,${biometric.lrFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
     left.LL = biometric?.lsFingerData
       ? `data:image/png;base64,${biometric.lsFingerData}`
-      : 'assets/tick.jpg';
+      : 'images/no-finger.png';
   }
 
   parseMatchList(matches: any[]): void {
@@ -185,55 +198,51 @@ export class MatchList implements OnInit {
       return {
         photo: biometric.photoData
           ? `data:image/png;base64,${biometric.photoData}`
-          : 'assets/dummy.png',
+          : 'images/dummyHuman.jpg',
         rightHand: {
           RT: biometric.rtFingerData
             ? `data:image/png;base64,${biometric.rtFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           RI: biometric.riFingerData
             ? `data:image/png;base64,${biometric.riFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           RM: biometric.rmFingerData
             ? `data:image/png;base64,${biometric.rmFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           RR: biometric.rrFingerData
             ? `data:image/png;base64,${biometric.rrFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           RL: biometric.rsFingerData
             ? `data:image/png;base64,${biometric.rsFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
         },
         leftHand: {
           LT: biometric.ltFingerData
             ? `data:image/png;base64,${biometric.ltFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           LI: biometric.liFingerData
             ? `data:image/png;base64,${biometric.liFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           LM: biometric.lmFingerData
             ? `data:image/png;base64,${biometric.lmFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           LR: biometric.lrFingerData
             ? `data:image/png;base64,${biometric.lrFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
           LL: biometric.lsFingerData
             ? `data:image/png;base64,${biometric.lsFingerData}`
-            : 'assets/tick.jpg',
+            : 'images/no-finger.png',
         },
       };
     });
   }
 
   onPageChange(event: any): void {
-    console.log('Pagination Event:', event);
     this.currentPage = event.page;
     this.pageSize = event.rows;
 
-    console.log(
-      `Fetching page: ${this.currentPage}, pageSize: ${this.pageSize}`
-    );
     this.fetchBeneficiaryMatchList(
-      this.activatedRoute.snapshot.params['aId'],
+      this.currentApplicationId,
       this.currentPage,
       this.pageSize
     );
@@ -244,9 +253,28 @@ export class MatchList implements OnInit {
     secondaryImage: string,
     title: string
   ): void {
+    // 1. Collect all primary fingerprint images into an array
+    const allPrimaryFingerprints = [
+      this.beneficiaryRightHandFingerPrints.RT,
+      this.beneficiaryRightHandFingerPrints.RI,
+      this.beneficiaryRightHandFingerPrints.RM,
+      this.beneficiaryRightHandFingerPrints.RR,
+      this.beneficiaryRightHandFingerPrints.RL,
+      this.beneficiaryLeftHandFingerPrints.LT,
+      this.beneficiaryLeftHandFingerPrints.LI,
+      this.beneficiaryLeftHandFingerPrints.LM,
+      this.beneficiaryLeftHandFingerPrints.LR,
+      this.beneficiaryLeftHandFingerPrints.LL,
+    ];
+
+    // 2. Reorder the array to put the clicked image first.
+    const sortedPrimaryImages = [...allPrimaryFingerprints].sort((a) => {
+        return a === primaryImage ? -1 : 1;
+    });
+
     this.ref = this.dialogService.open(ImageComparePreview, {
       data: {
-        primary: primaryImage,
+        primary: sortedPrimaryImages, // Pass the full, reordered array
         secondary: secondaryImage,
       },
       header: `Image Comparison: (${title})`,
@@ -262,10 +290,13 @@ export class MatchList implements OnInit {
       }?`,
       header: 'Adjudication Confirmation',
       icon: 'pi pi-exclamation-triangle',
-      acceptIcon: 'fas fa-check me-2',
-      rejectIcon: 'fas fa-times me-2',
-      rejectButtonStyleClass: 'btn btn-danger',
-      acceptButtonStyleClass: 'btn btn-success',
+
+      acceptLabel: 'Yes',
+      rejectLabel: 'No',
+
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+
       accept: () => {
         this.isLoading = true;
         const payload = {
@@ -283,6 +314,7 @@ export class MatchList implements OnInit {
                 life: 2000,
               });
               this.isLoading = false;
+              this.cdr.markForCheck();
             }
           })
           .catch((err) => {
@@ -294,6 +326,7 @@ export class MatchList implements OnInit {
               life: 2000,
             });
             this.isLoading = false;
+            this.cdr.markForCheck();
           });
       },
     });
@@ -320,7 +353,7 @@ export class MatchList implements OnInit {
       .POST('api/adjudication/getMatchList/v2', {
         ignorePrimary: 0,
         page: 0,
-        referenceNo: this.activatedRoute.snapshot.params['aId'],
+        referenceNo: this.currentApplicationId,
         size: totalMatched,
       })
       .then((res) => {
@@ -342,7 +375,8 @@ export class MatchList implements OnInit {
 
             allMatchList.forEach((match: any, index: number) => {
               const score = match.score || 'N/A';
-              const photo = biometricData[index]?.photo || 'assets/dummy.png';
+              const photo =
+                biometricData[index]?.photo || 'images/dummyHuman.jpg';
 
               doc.addPage();
               this.addBeneficiaryPage(
@@ -366,6 +400,7 @@ export class MatchList implements OnInit {
               document
                 .querySelector('.scroller')
                 ?.scrollTo({ top: 0, behavior: 'smooth' });
+              this.cdr.markForCheck();
             }, 300);
           });
         }
@@ -373,6 +408,7 @@ export class MatchList implements OnInit {
       .catch((err) => {
         console.error('Error fetching all matched data:', err);
         this.isGeneratingPdf = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -382,7 +418,7 @@ export class MatchList implements OnInit {
 
       allMatchList.forEach((match, index) => {
         if (match.biometrics && match.biometrics.length > 0) {
-          let photo = 'assets/dummy.png';
+          let photo = 'images/dummyHuman.jpg';
 
           match.biometrics.forEach((biometric: any) => {
             if (
@@ -395,7 +431,7 @@ export class MatchList implements OnInit {
 
           biometricDataArray[index] = { photo };
         } else {
-          biometricDataArray[index] = { photo: 'assets/dummy.png' };
+          biometricDataArray[index] = { photo: 'images/dummyHuman.jpg' };
         }
       });
 

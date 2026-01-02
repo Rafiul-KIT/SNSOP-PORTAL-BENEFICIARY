@@ -25,10 +25,10 @@ import { SelectModule } from 'primeng/select';
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, 
-    LoadingSpinner, Loader, ReportBeneficiaryList, 
-    ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount, 
-    ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey, 
+  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule,
+    LoadingSpinner, Loader, ReportBeneficiaryList,
+    ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount,
+    ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey,
     ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
@@ -39,7 +39,7 @@ export class ReportComponent implements OnInit {
   counties: LookupItem[] = [];
   payams: LookupItem[] = [];
   bomas: LookupItem[] = [];
-  
+
   genderOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
   isLoading: boolean = true;
@@ -198,7 +198,7 @@ export class ReportComponent implements OnInit {
       sortColumn: "ID",
       sortOrder: "DESC"
     };
-    this.apiService.POST('api/user/search', payload).then(res => {
+    this.apiService.POST('api/users/search', payload, 'alt').then(res => {
       if (res.status === 200) {
         this.userList = res.data.users;
       }
@@ -299,7 +299,7 @@ export class ReportComponent implements OnInit {
         endpoint = 'api/report/afis-match-report';
         break;
       case 8:
-        endpoint = 'api/report/file-based-report';
+        endpoint = 'api/report/household-survey-report-files';
         break;
       case 9:
         endpoint = 'api/report/reconciled-summary-report';

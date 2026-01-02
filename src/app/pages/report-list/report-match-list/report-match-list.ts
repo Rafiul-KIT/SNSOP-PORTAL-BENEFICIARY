@@ -6,6 +6,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { LookupService } from '../../../services/lookup.service';
+import { DatePipe } from '@angular/common';
 
 interface Column {
   field: string;
@@ -21,22 +22,19 @@ interface ExportColumn {
 @Component({
   selector: 'app-report-match-list',
   standalone: true,
-  imports: [TableModule, ButtonModule, TooltipModule], 
+  imports: [TableModule, ButtonModule, TooltipModule, DatePipe],
   templateUrl: './report-match-list.html',
   styleUrls: ['./report-match-list.scss'],
 })
 export class ReportMatchList {
-
   reportResult = input<any>(null);
 
- 
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   matchList = signal<any[]>([]);
   isReportGenerating = signal<boolean>(false);
 
-
-  private lookupService = inject(LookupService);
+  public lookupService = inject(LookupService);
 
   async exportPdf() {
     this.isReportGenerating.set(true);
@@ -50,21 +48,39 @@ export class ReportMatchList {
               ? new Date(nowMatch.primary.matchCreated)
               : null;
             const formattedPrimaryMatchDate = primaryMatchDate
-              ? `${String(primaryMatchDate.getDate()).padStart(2, '0')}-${String(primaryMatchDate.getMonth() + 1).padStart(2, '0')}-${primaryMatchDate.getFullYear()}`
+              ? `${String(primaryMatchDate.getDate()).padStart(
+                  2,
+                  '0'
+                )}-${String(primaryMatchDate.getMonth() + 1).padStart(
+                  2,
+                  '0'
+                )}-${primaryMatchDate.getFullYear()}`
               : 'N/A';
 
-            const matchedMatchDate = matched.matchCreated ? new Date(matched.matchCreated) : null;
+            const matchedMatchDate = matched.matchCreated
+              ? new Date(matched.matchCreated)
+              : null;
             const formattedMatchedMatchDate = matchedMatchDate
-              ? `${String(matchedMatchDate.getDate()).padStart(2, '0')}-${String(matchedMatchDate.getMonth() + 1).padStart(2, '0')}-${matchedMatchDate.getFullYear()}`
+              ? `${String(matchedMatchDate.getDate()).padStart(
+                  2,
+                  '0'
+                )}-${String(matchedMatchDate.getMonth() + 1).padStart(
+                  2,
+                  '0'
+                )}-${matchedMatchDate.getFullYear()}`
               : 'N/A';
 
             filteredListForPDF.push({
               primary: '',
               household_number: nowMatch.primary.applicationId,
-              type: nowMatch.primary.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
-              registration_phase: this.lookupService.getRegistrationPhaseEnumByValue(
-                nowMatch.primary.registrationPhase
-              ),
+              type:
+                nowMatch.primary.type === 'BENEFICIARY'
+                  ? 'BENEFICIARY'
+                  : 'ALTERNATE',
+              registration_phase:
+                this.lookupService.getRegistrationPhaseEnumByValue(
+                  nowMatch.primary.registrationPhase
+                ),
               first_name: nowMatch.primary.respondentFirstName,
               middle_name: nowMatch.primary.respondentMiddleName,
               last_name: nowMatch.primary.respondentLastName,
@@ -73,24 +89,34 @@ export class ReportMatchList {
               gender: nowMatch.primary.respondentGender,
               phone: nowMatch.primary.respondentPhoneNo,
               state: nowMatch.primary.address
-                ? this.lookupService.getStateNameById(nowMatch.primary.address.stateId)
+                ? this.lookupService.getStateNameById(
+                    nowMatch.primary.address.stateId
+                  )
                 : 'N/A',
               county: nowMatch.primary.address
-                ? this.lookupService.getCountyNameById(nowMatch.primary.address.countyId)
+                ? this.lookupService.getCountyNameById(
+                    nowMatch.primary.address.countyId
+                  )
                 : 'N/A',
               payam: nowMatch.primary.address
-                ? this.lookupService.getPayamNameById(nowMatch.primary.address.payam)
+                ? this.lookupService.getPayamNameById(
+                    nowMatch.primary.address.payam
+                  )
                 : 'N/A',
               boma: nowMatch.primary.address
-                ? this.lookupService.getBomaNameById(nowMatch.primary.address.boma)
+                ? this.lookupService.getBomaNameById(
+                    nowMatch.primary.address.boma
+                  )
                 : 'N/A',
               match_date: formattedPrimaryMatchDate,
               matched_with: '',
               household_number_m: matched.applicationId,
-              type_m: matched.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
-              registration_phase_m: this.lookupService.getRegistrationPhaseEnumByValue(
-                matched.registrationPhase
-              ),
+              type_m:
+                matched.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
+              registration_phase_m:
+                this.lookupService.getRegistrationPhaseEnumByValue(
+                  matched.registrationPhase
+                ),
               first_name_m: matched.respondentFirstName,
               middle_name_m: matched.respondentMiddleName,
               last_name_m: matched.respondentLastName,
@@ -124,7 +150,6 @@ export class ReportMatchList {
       doc.save(`match_list_${Date.now()}.pdf`);
     } else {
       this.isReportGenerating.set(false);
-      
     }
     this.isReportGenerating.set(false);
   }
@@ -141,21 +166,41 @@ export class ReportMatchList {
               ? new Date(nowMatch.primary.matchCreated)
               : null;
             const formattedPrimaryMatchDate = primaryMatchDate
-              ? `${String(primaryMatchDate.getDate()).padStart(2, '0')}-${String(primaryMatchDate.getMonth() + 1).padStart(2, '0')}-${primaryMatchDate.getFullYear()}`
+              ? `${String(primaryMatchDate.getDate()).padStart(
+                  2,
+                  '0'
+                )}-${String(primaryMatchDate.getMonth() + 1).padStart(
+                  2,
+                  '0'
+                )}-${primaryMatchDate.getFullYear()}`
               : 'N/A';
 
-            const matchedMatchDate = matched.matchCreated ? new Date(matched.matchCreated) : null;
+            const matchedMatchDate = matched.matchCreated
+              ? new Date(matched.matchCreated)
+              : null;
             const formattedMatchedMatchDate = matchedMatchDate
-              ? `${String(matchedMatchDate.getDate()).padStart(2, '0')}-${String(matchedMatchDate.getMonth() + 1).padStart(2, '0')}-${matchedMatchDate.getFullYear()}`
+              ? `${String(matchedMatchDate.getDate()).padStart(
+                  2,
+                  '0'
+                )}-${String(matchedMatchDate.getMonth() + 1).padStart(
+                  2,
+                  '0'
+                )}-${matchedMatchDate.getFullYear()}`
               : 'N/A';
 
             filteredListForXL.push({
               PRIMARY: '',
               'Household Number': nowMatch.primary.applicationId,
-              Type: nowMatch.primary.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
-              'Registration Phase': this.lookupService.getRegistrationPhaseEnumByValue(
-                nowMatch.primary.registrationPhase
-              ),
+              Type:
+                nowMatch.primary.type === 'BENEFICIARY'
+                  ? 'BENEFICIARY'
+                  : 'ALTERNATE',
+              'Registration Phase':
+                nowMatch.primary.registrationPhase === 1
+                  ? 'AF (Additional Financing)'
+                  : nowMatch.primary.registrationPhase === 0
+                  ? 'PP (Parent Project)'
+                  : 'N/A',
               'First Name': nowMatch.primary.respondentFirstName,
               'Middle Name': nowMatch.primary.respondentMiddleName,
               'Last Name': nowMatch.primary.respondentLastName,
@@ -164,24 +209,36 @@ export class ReportMatchList {
               Gender: nowMatch.primary.respondentGender,
               Phone: nowMatch.primary.respondentPhoneNo,
               State: nowMatch.primary.address
-                ? this.lookupService.getStateNameById(nowMatch.primary.address.stateId)
+                ? this.lookupService.getStateNameById(
+                    nowMatch.primary.address.stateId
+                  )
                 : 'N/A',
               County: nowMatch.primary.address
-                ? this.lookupService.getCountyNameById(nowMatch.primary.address.countyId)
+                ? this.lookupService.getCountyNameById(
+                    nowMatch.primary.address.countyId
+                  )
                 : 'N/A',
               Payam: nowMatch.primary.address
-                ? this.lookupService.getPayamNameById(nowMatch.primary.address.payam)
+                ? this.lookupService.getPayamNameById(
+                    nowMatch.primary.address.payam
+                  )
                 : 'N/A',
               Boma: nowMatch.primary.address
-                ? this.lookupService.getBomaNameById(nowMatch.primary.address.boma)
+                ? this.lookupService.getBomaNameById(
+                    nowMatch.primary.address.boma
+                  )
                 : 'N/A',
               'Match Date': formattedPrimaryMatchDate,
               'MATCHED WITH': '',
               'Household Number(M)': matched.applicationId,
-              'Type(M)': matched.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
-              'Registration Phase(M)': this.lookupService.getRegistrationPhaseEnumByValue(
-                matched.registrationPhase
-              ),
+              'Type(M)':
+                matched.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
+              'Registration Phase(M)':
+                matched.registrationPhase === 1
+                  ? 'AF (Additional Financing)'
+                  : matched.registrationPhase === 0
+                  ? 'PP (Parent Project)'
+                  : 'N/A',
               'First Name(M)': matched.respondentFirstName,
               'Middle Name(M)': matched.respondentMiddleName,
               'Last Name(M)': matched.respondentLastName,
@@ -210,17 +267,23 @@ export class ReportMatchList {
 
       const xlsx = await import('xlsx');
       const worksheet = xlsx.utils.json_to_sheet(filteredListForXL);
-      const workbook = { Sheets: { Matchlist: worksheet }, SheetNames: ['Matchlist'] };
-      const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const workbook = {
+        Sheets: { Matchlist: worksheet },
+        SheetNames: ['Matchlist'],
+      };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+      });
       this.saveAsExcelFile(excelBuffer, 'matchlist_report-');
     } else {
       this.isReportGenerating.set(false);
-     
     }
   }
 
   private saveAsExcelFile(buffer: any, fileName: string): void {
-    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const EXCEL_TYPE =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const EXCEL_EXTENSION = '.xlsx';
     const data = new Blob([buffer], { type: EXCEL_TYPE });
     FileSaver.saveAs(data, `${fileName}${Date.now()}${EXCEL_EXTENSION}`);

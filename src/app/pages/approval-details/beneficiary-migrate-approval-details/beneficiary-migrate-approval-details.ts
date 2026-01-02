@@ -12,6 +12,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FormsModule } from '@angular/forms';
 import { LookupService } from '../../../services/lookup.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-beneficiary-migrate-approval-details',
@@ -27,7 +28,8 @@ import { TooltipModule } from 'primeng/tooltip';
     Loader,
     ButtonModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    CardModule
   ],
   standalone: true
 })

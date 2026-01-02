@@ -1,0 +1,33 @@
+.scroller{
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+.primary-scroller{
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+.cursor-zoom{
+    cursor: zoom-in
+}
+
+.p-paginator {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    padding: 10px 0;
+}
+
+:host ::ng-deep .p-accordion .p-accordion-header .p-accordion-header-link {
+    justify-content: space-between;
+    align-items: center;
+}
+
+:host ::ng-deep .p-accordion .p-accordion-header a .me-5 {
+    margin-right: 0 !important;
+}
+
+

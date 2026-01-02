@@ -26,6 +26,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ApiService } from '../../../services/api.service';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
@@ -90,6 +92,8 @@ interface BeneficiaryVm {
     RouterModule,
     TooltipModule,
     Loader,
+    QrInputDirective,
+    QrScannerComponent
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,7 +124,7 @@ export class PendingBeneficiaryList implements OnInit {
   advanceSearchPanelVisible = false;
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
-
+  isScannerVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -131,7 +135,7 @@ export class PendingBeneficiaryList implements OnInit {
     private api: ApiService,
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   private async loadLookups() {
     // Warm the caches (Promises)
@@ -159,11 +163,9 @@ export class PendingBeneficiaryList implements OnInit {
     this.initForm();
     this.initBreadcrumb();
 
-    await this.loadLookups();                // ✅ caches ready + names resolvable
+    await this.loadLookups(); // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
   }
-
-
 
   initForm() {
     this.searchForm = this.fb.group({
@@ -233,7 +235,7 @@ export class PendingBeneficiaryList implements OnInit {
   private buildCriteria(): any[] {
     const f = this.searchForm.value;
     const criteria: any[] = [
-      { fieldName: 'STATUS', operator: 'EQUAL', value: '2' }
+      { fieldName: 'STATUS', operator: 'EQUAL', value: '2' },
     ];
 
     if (f.firstName)
@@ -334,19 +336,19 @@ export class PendingBeneficiaryList implements OnInit {
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
-          String(b.address.stateId)
+            String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) ||
-          String(b.address.countyId)
+            String(b.address.countyId)
           : '',
         payamName: b.address?.payam
           ? this.lookup.getPayamNameById(b.address.payam) ||
-          String(b.address.payam)
+            String(b.address.payam)
           : '',
         bomaName: b.address?.boma
           ? this.lookup.getBomaNameById(b.address.boma) ||
-          String(b.address.boma)
+            String(b.address.boma)
           : '',
       };
     });
@@ -403,15 +405,19 @@ export class PendingBeneficiaryList implements OnInit {
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
-
-
   // ---------- Actions ----------
   editBeneficiary(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['/pending-beneficiary/edit', String(b.applicationId)]);
+    this.router.navigate([
+      '/pending-beneficiary/edit',
+      String(b.applicationId),
+    ]);
   }
   approveSelected() {
-    if (!this.selectedBeneficiaries || this.selectedBeneficiaries.length === 0) {
+    if (
+      !this.selectedBeneficiaries ||
+      this.selectedBeneficiaries.length === 0
+    ) {
       this.messageService.add({
         severity: 'warn',
         summary: 'No Selection',
@@ -434,18 +440,19 @@ export class PendingBeneficiaryList implements OnInit {
   }
 
   handleApproveConfirm() {
-    const householdIds = this.selectedBeneficiaries.map(b => b.applicationId);
+    const householdIds = this.selectedBeneficiaries.map((b) => b.applicationId);
 
     const payload = {
       householdId: householdIds,
       comment: this.approveComment.trim(),
-      enrollmentStatusEnum: 'APPROVED'
+      enrollmentStatusEnum: 'APPROVED',
     };
 
     this.isLoading = true;
     this.cdr.markForCheck();
 
-    this.api.POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+    this.api
+      .POST('api/beneficiary/update/approveBeneficiary/batch', payload)
       .then((res: any) => {
         if (res.status === 200) {
           this.messageService.add({
@@ -460,11 +467,13 @@ export class PendingBeneficiaryList implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Approval Failed',
-            detail: res.errorMsg || 'There was a problem approving the beneficiaries.',
+            detail:
+              res.errorMsg ||
+              'There was a problem approving the beneficiaries.',
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Approve beneficiaries error:', err);
         this.messageService.add({
           severity: 'error',
@@ -477,7 +486,6 @@ export class PendingBeneficiaryList implements OnInit {
         this.cdr.markForCheck();
       });
   }
-
 
   handleArchiveConfirm() {
     // validate comment
@@ -502,12 +510,13 @@ export class PendingBeneficiaryList implements OnInit {
         },
       ],
     };
-
-
   }
 
   deleteSelected() {
-    if (!this.selectedBeneficiaries || this.selectedBeneficiaries.length === 0) {
+    if (
+      !this.selectedBeneficiaries ||
+      this.selectedBeneficiaries.length === 0
+    ) {
       this.messageService.add({
         severity: 'warn',
         summary: 'No Selection',
@@ -538,7 +547,7 @@ export class PendingBeneficiaryList implements OnInit {
       });
       return;
     }
-    const householdIds = this.selectedBeneficiaries.map(b => b.applicationId);
+    const householdIds = this.selectedBeneficiaries.map((b) => b.applicationId);
 
     const payload = {
       householdId: householdIds,
@@ -549,7 +558,8 @@ export class PendingBeneficiaryList implements OnInit {
     this.isLoading = true;
     this.cdr.markForCheck();
 
-    this.api.POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+    this.api
+      .POST('api/beneficiary/update/approveBeneficiary/batch', payload)
       .then((res: any) => {
         if (res.status === 200) {
           this.messageService.add({
@@ -564,11 +574,12 @@ export class PendingBeneficiaryList implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Delete Failed',
-            detail: res.errorMsg || 'There was a problem deleting the beneficiaries.',
+            detail:
+              res.errorMsg || 'There was a problem deleting the beneficiaries.',
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Delete beneficiaries error:', err);
         this.messageService.add({
           severity: 'error',
@@ -580,6 +591,18 @@ export class PendingBeneficiaryList implements OnInit {
         this.isLoading = false;
         this.cdr.markForCheck();
       });
+  }
+
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
   }
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;

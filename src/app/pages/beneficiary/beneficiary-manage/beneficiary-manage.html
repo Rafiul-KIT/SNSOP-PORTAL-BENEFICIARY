@@ -327,8 +327,8 @@
                 <!-- Reg phase -->
                 <div class="col-md-3 mb-1">
                   <p-floatlabel variant="on">
-                    <p-select id="registrationPhase" formControlName="registrationPhase" class="w-100" [options]="registrationPhaseOptions"
-                      optionLabel="name" optionValue="id">
+                    <p-select id="registrationPhase" formControlName="registrationPhase" class="w-100"
+                      [options]="registrationPhaseOptions" optionLabel="name" optionValue="id">
                     </p-select>
                     <label for="registrationPhase">Registration Phase</label>
                   </p-floatlabel>
@@ -409,7 +409,8 @@
                     @for (reason of filteredReasons; track reason.value) {
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" [value]="reason.value"
-                        [checked]="isReasonSelected(reason.value)" [disabled]="true" />
+                        (change)="onReasonChange($event)" [checked]="isReasonSelected(reason.value)"
+                        [disabled]="reason.disabled" />
                       <label class="form-check-label">{{ reason.label }}</label>
                     </div>
                     } @empty {
@@ -470,7 +471,7 @@
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic" readonly/></td>
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_both" readonly/></td>
                     </tr>
-                    
+
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>

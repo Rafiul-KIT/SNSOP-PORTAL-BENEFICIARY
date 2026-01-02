@@ -19,6 +19,7 @@
             <p-tab value="0">Beneficiary Information</p-tab>
             <p-tab value="1">Alternate Information</p-tab>
             <p-tab value="2">Nominee Information</p-tab>
+            <p-tab value="3">Updated By</p-tab>
             @if (isOnTaskDetails && taskId && approvalStatus === 'PENDING') {
             <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
                 <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
@@ -265,9 +266,9 @@
                                                                     (oldDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
                                                                     (oldDetails?.householdMember65?.femaleTotal
-                                                                    || 0) + 
+                                                                    || 0) +
                                                                     (oldDetails?.householdMemberLactating35?.femaleTotal
-                                                                    || 0) + 
+                                                                    || 0) +
                                                                     (oldDetails?.householdMemberLactating64?.femaleTotal
                                                                     || 0)
                                                                     }}
@@ -825,9 +826,9 @@
                                                                     (editedDetails?.householdMember64?.femaleTotal
                                                                     || 0) +
                                                                     (editedDetails?.householdMember65?.femaleTotal
-                                                                    || 0) + 
+                                                                    || 0) +
                                                                     (editedDetails?.householdMemberLactating35?.femaleTotal
-                                                                    || 0) + 
+                                                                    || 0) +
                                                                     (editedDetails?.householdMemberLactating64?.femaleTotal
                                                                     || 0)
                                                                     }}

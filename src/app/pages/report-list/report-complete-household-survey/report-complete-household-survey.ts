@@ -1,8 +1,11 @@
 import { Component, inject, input } from '@angular/core';
 import { signal } from '@angular/core';
+import FileSaver from 'file-saver';
 
 import { TableModule } from 'primeng/table';
 import { LookupService } from '../../../services/lookup.service';
+import { ApiService } from '../../../services/api.service';
+import { Loader } from '../../../components/loader/loader';
 
 interface HouseholdSurveyData {
   date: string;
@@ -14,19 +17,38 @@ interface HouseholdSurveyData {
 @Component({
   selector: 'app-report-complete-household-survey',
   standalone: true,
-  imports: [TableModule], 
+  imports: [TableModule, Loader],
   templateUrl: './report-complete-household-survey.html',
   styleUrls: ['./report-complete-household-survey.scss'],
 })
 export class ReportCompleteHouseholdSurvey {
-
   reportResult = input<any>(null);
 
   householdSurveyData = signal<HouseholdSurveyData[]>([]);
-
-  downloadLocation = 'https://snsopapk.southsudansafetynet.info/download/reports/';
+  downloadingFile = signal<string | null>(null);
 
   private lookupService = inject(LookupService);
+  private apiService = inject(ApiService);
+
+  async downloadReport(fileName: string) {
+    if (this.downloadingFile()) {
+      return;
+    }
+    this.downloadingFile.set(fileName);
+    try {
+      const response = await this.apiService.GET(
+        'api/report/download-household-survey-report',
+        { fileName },
+        'global',
+        { responseType: 'blob' }
+      );
+      FileSaver.saveAs(response.data, fileName);
+    } catch (error) {
+      console.error(`Error downloading file ${fileName}:`, error);
+    } finally {
+      this.downloadingFile.set(null);
+    }
+  }
 
   extractDateFromFileName(fileName: string): string {
     const datePattern = /\d{2}-\d{2}-\d{4}/;
