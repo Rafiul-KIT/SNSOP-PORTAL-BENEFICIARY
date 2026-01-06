@@ -25,11 +25,11 @@ export class ImageComparePreview implements OnInit {
   ngOnInit(): void {
     this.primaryImages = this.conf.data.primary;
     this.secondaryImage = this.conf.data.secondary;
-    
+
     if (this.primaryImages && this.primaryImages.length > 0) {
       this.activePrimaryImage = this.primaryImages[0];
     }
-    
+
     this.isLoading = false;
   }
 

@@ -1,6 +1,8 @@
 img {
     width: 100%;
     height: auto;
+    max-height: 400px; /* Adjust this value if needed */
+    object-fit: contain; /* Ensures the whole image is visible within max-height */
 }
 
 .primary-thumbnail-wrapper {
@@ -9,6 +11,6 @@ img {
 }
 
 .primary-thumbnail.active-thumbnail {
-    border: 3px solid #0d6efd; 
+    border: 3px solid #0d6efd;
     box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
 }

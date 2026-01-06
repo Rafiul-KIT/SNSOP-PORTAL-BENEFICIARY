@@ -13,14 +13,14 @@ describe('ImageComparePreview', () => {
       imports: [ImageComparePreview],
       providers: [
         { provide: DynamicDialogRef, useValue: { close: () => {} } },
-        { 
-          provide: DynamicDialogConfig, 
-          useValue: { 
-            data: { 
-              primary: mockPrimaryImages, 
-              secondary: mockSecondaryImage 
-            } 
-          } 
+        {
+          provide: DynamicDialogConfig,
+          useValue: {
+            data: {
+              primary: mockPrimaryImages,
+              secondary: mockSecondaryImage
+            }
+          }
         }
       ]
     })
