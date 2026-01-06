@@ -209,7 +209,7 @@ export class Header {
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        // routerLink: 'adjudication/list',
+        routerLink: 'adjudication/list',
         // routerLink: 'redirect-link',
       },
       {
