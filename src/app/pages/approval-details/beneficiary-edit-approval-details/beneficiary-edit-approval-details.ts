@@ -26,6 +26,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { FormsModule } from '@angular/forms';
+import { Card } from 'primeng/card';
 
 export interface FingerVm {
   label: string;
@@ -52,7 +53,6 @@ interface BeneficiaryVm {
   mobileWalletNumber?: string | null;
   registrationPhase: string;
 
-
   photo?: string;
   household: any;
   address: any;
@@ -67,21 +67,23 @@ interface BeneficiaryVm {
   householdMemberLactating35: any;
   householdMemberLactating64: any;
 
-  alternates: ({
-    name: string;
-    age: number;
-    gender: string;
-    relationshipWithHouseholdHead: RelationshipWithHead;
-    relationshipOther?: string;
-    nationalId?: string | null;
-    phone: string;
-    documentType?: string;
-    documentTypeOther?: string;
-    photo?: string;
-    biometric?: BiometricDto;
-    rightFingers: FingerVm[];
-    leftFingers: FingerVm[];
-  } | null)[] | null;
+  alternates:
+    | ({
+        name: string;
+        age: number;
+        gender: string;
+        relationshipWithHouseholdHead: RelationshipWithHead;
+        relationshipOther?: string;
+        nationalId?: string | null;
+        phone: string;
+        documentType?: string;
+        documentTypeOther?: string;
+        photo?: string;
+        biometric?: BiometricDto;
+        rightFingers: FingerVm[];
+        leftFingers: FingerVm[];
+      } | null)[]
+    | null;
 
   nominees: {
     name: string;
@@ -89,7 +91,7 @@ interface BeneficiaryVm {
     gender: string;
     relation: string;
     nomineeOccupation: Occupation;
-    otherOccupation?: string
+    otherOccupation?: string;
     relationshipOther?: string;
     photo?: string;
     isReadWrite?: boolean;
@@ -119,25 +121,27 @@ interface ApprovalDetailsResponse {
     ConfirmDialogModule,
     Loader,
     ButtonModule,
-    FormsModule
+    FormsModule,
+    Card,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './beneficiary-edit-approval-details.html',
-  styleUrl: './beneficiary-edit-approval-details.scss'
+  styleUrl: './beneficiary-edit-approval-details.scss',
 })
 export class BeneficiaryEditApprovalDetails {
   approvalComment: string = '';
   isSubmitting = false;
   isLoading = true;
   isOnTaskDetails: boolean = false;
-  oldDetails!: BeneficiaryVm | null;    // ← Old (from /beneficiary/details/{householdId})
+  oldDetails!: BeneficiaryVm | null; // ← Old (from /beneficiary/details/{householdId})
   editedDetails!: BeneficiaryVm | null; // ← Edited (from /approval/details/{taskId})
 
   oldRightFingers: FingerVm[] = [];
   oldLeftFingers: FingerVm[] = [];
   editedRightFingers: FingerVm[] = [];
   editedLeftFingers: FingerVm[] = [];
-
+  user: any;
+  isUserLoading: boolean = false;
   taskId: string | null = null;
   approvalStatus: string = '';
   householdId: string | null = null; // helpful when in task mode
@@ -162,9 +166,7 @@ export class BeneficiaryEditApprovalDetails {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router
-  ) { }
-
-
+  ) {}
 
   openApprovalDialog(isApprove: boolean) {
     if (!this.taskId) {
@@ -179,19 +181,29 @@ export class BeneficiaryEditApprovalDetails {
       key: 'approvalDialog',
       header: isApprove ? 'Confirm Approval' : 'Confirm Rejection',
       icon: isApprove ? 'fas fa-check-circle' : 'fas fa-ban',
-      acceptButtonProps: { label: 'Yes', severity: 'success', disabled: this.isLoading },
-      rejectButtonProps: { label: 'No', severity: 'danger', disabled: this.isLoading },
-      accept: () => this.handleApproval()
+      acceptButtonProps: {
+        label: 'Yes',
+        severity: 'success',
+        disabled: this.isLoading,
+      },
+      rejectButtonProps: {
+        label: 'No',
+        severity: 'danger',
+        disabled: this.isLoading,
+      },
+      accept: () => this.handleApproval(),
     });
   }
 
   private handleApproval() {
-
-    if (!this.isApprove && (!this.approvalComment || !this.approvalComment.trim())) {
+    if (
+      !this.isApprove &&
+      (!this.approvalComment || !this.approvalComment.trim())
+    ) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Comment Required',
-        detail: 'Please provide a reason for rejection before proceeding.'
+        detail: 'Please provide a reason for rejection before proceeding.',
       });
       return;
     }
@@ -201,16 +213,19 @@ export class BeneficiaryEditApprovalDetails {
     const payload = {
       approvalTaskId: this.taskId,
       approved: this.isApprove,
-      comment: this.approvalComment
+      comment: this.approvalComment,
     };
 
-    this.api.POST('/api/approval/doApprove', payload)
+    this.api
+      .POST('/api/approval/doApprove', payload)
       .then(() => {
         const life = 1200;
         this.messageService.add({
           severity: this.isApprove ? 'success' : 'warn',
           summary: this.isApprove ? 'Approved' : 'Rejected',
-          detail: `Task #${this.taskId} ${this.isApprove ? 'approved' : 'rejected'} successfully.`,
+          detail: `Task #${this.taskId} ${
+            this.isApprove ? 'approved' : 'rejected'
+          } successfully.`,
           life,
         });
         this.isLoading = false;
@@ -231,7 +246,10 @@ export class BeneficiaryEditApprovalDetails {
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    const isTaskMode = (this.route.snapshot.queryParamMap.get('taskMode') || '').toLowerCase() === 'true';
+    const isTaskMode =
+      (
+        this.route.snapshot.queryParamMap.get('taskMode') || ''
+      ).toLowerCase() === 'true';
     this.isOnTaskDetails = isTaskMode;
 
     if (isTaskMode) this.taskId = id!;
@@ -254,28 +272,37 @@ export class BeneficiaryEditApprovalDetails {
         const editedDto = approval.taskDetails as BeneficiaryDto;
         this.editedDetails = this.mapToVm(editedDto, false);
         if (editedDto.biometrics) {
-        this.prepareFingerImages(editedDto.biometrics, undefined, 'edited', false); // Pass biometrics and mark as 'edited'
-      } else {
-        console.warn('No biometrics data available for the edited beneficiary.');
-      }
+          this.prepareFingerImages(
+            editedDto.biometrics,
+            undefined,
+            'edited',
+            false
+          ); // Pass biometrics and mark as 'edited'
+        } else {
+          console.warn(
+            'No biometrics data available for the edited beneficiary.'
+          );
+        }
 
         this.setDifferences(approval.differences);
 
-        this.householdId = (editedDto as any).householdId ?? (editedDto as any).beneficiaryId ?? editedDto.applicationId;
+        this.householdId =
+          (editedDto as any).householdId ??
+          (editedDto as any).beneficiaryId ??
+          editedDto.applicationId;
       }
 
       if (approval.oldBeneficiary) {
         const oldDto = approval.oldBeneficiary as BeneficiaryDto;
         this.oldDetails = this.mapToVm(oldDto, true);
         if (oldDto.biometrics) {
-        this.prepareFingerImages(oldDto.biometrics, undefined, 'old', false); // Pass biometrics and mark as 'old'
-      } else {
-        console.warn('No biometrics data available for the old beneficiary.');
-      }
+          this.prepareFingerImages(oldDto.biometrics, undefined, 'old', false); // Pass biometrics and mark as 'old'
+        } else {
+          console.warn('No biometrics data available for the old beneficiary.');
+        }
       } else {
         console.warn('No oldBeneficiary found in approval/details payload.');
       }
-
     } catch (err) {
       console.error(err);
     } finally {
@@ -284,264 +311,361 @@ export class BeneficiaryEditApprovalDetails {
     }
   }
 
+  private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
+    const normalizePhoto = (img?: string): string =>
+      img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
 
-private mapToVm(dto: BeneficiaryDto, isOld: boolean = false): BeneficiaryVm {
-  const normalizePhoto = (img?: string): string =>
-    img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
+    const normalizeFinger = (img?: string): string =>
+      img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
 
-  const normalizeFinger = (img?: string): string =>
-    img ? `data:image/jpeg;base64,${img}` : 'images/tick.jpg';
+    const biometrics = dto.biometrics;
 
-  const biometrics = dto.biometrics;
+    // Prepare finger images based on old or edited data
+    if (isOld) {
+      this.prepareFingerImages(biometrics, undefined, 'old');
+    } else {
+      this.prepareFingerImages(biometrics, undefined, 'edited');
+    }
 
-  // Prepare finger images based on old or edited data
-  if (isOld) {
-    this.prepareFingerImages(biometrics, undefined, 'old');
-  } else {
-    this.prepareFingerImages(biometrics, undefined, 'edited');
-  }
+    // Map the Beneficiary data
+    return {
+      applicationId: dto.applicationId,
+      name: [
+        dto.respondentFirstName,
+        dto.respondentMiddleName,
+        dto.respondentLastName,
+        dto.respondentNickName,
+      ]
+        .filter(Boolean)
+        .join(' '),
+      spouseName: [
+        dto.spouseFirstName,
+        dto.spouseMiddleName,
+        dto.spouseLastName,
+        dto.spouseNickName,
+      ]
+        .filter(Boolean)
+        .join(' '),
+      age: dto.respondentAge,
+      gender: dto.respondentGender,
+      relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      relationshipOther: dto.relationshipOther,
+      respondentMaritalStatus: dto.respondentMaritalStatus,
+      respondentLegalStatus: dto.respondentLegalStatus,
+      respondentId: dto.respondentId,
+      documentType: dto.documentType,
+      mobileMoneyProvider: dto.mobileMoneyProvider,
+      mobileWalletNumber: dto.mobileWalletNumber,
+      registrationPhase: dto.registrationPhase,
+      phone: dto.respondentPhoneNo,
+      photo: normalizePhoto(dto.biometrics?.photoData),
+      household: {
+        incomeSource: dto.householdIncomeSource,
+        incomeSourceOther: dto.incomeSourceOther,
+        monthlyIncome: dto.householdMonthlyAvgIncome ?? null,
+        selectionCriteria: dto.selectionCriteria,
+        selectionReasons: (dto.selectionReason || []).map((r: string) =>
+          this.lookup.getSelectionReasonEnumByValue(r)
+        ),
+        size: dto.householdSize,
+        isReadWrite: dto.isReadWrite,
+        memberReadWrite: dto.memberReadWrite,
+      },
+      householdSize: dto.householdSize ?? 0,
+      householdMember2: dto.householdMember2,
+      householdMember5: dto.householdMember5,
+      householdMember17: dto.householdMember17,
+      householdMember35: dto.householdMember35,
+      householdMember64: dto.householdMember64,
+      householdMember65: dto.householdMember65,
+      householdMemberLactating35: dto.householdMemberLactating35,
+      householdMemberLactating64: dto.householdMemberLactating64,
 
-  // Map the Beneficiary data
-  return {
-    applicationId: dto.applicationId,
-    name: [
-      dto.respondentFirstName,
-      dto.respondentMiddleName,
-      dto.respondentLastName,
-      dto.respondentNickName,
-    ]
-      .filter(Boolean)
-      .join(' '),
-    spouseName: [
-      dto.spouseFirstName,
-      dto.spouseMiddleName,
-      dto.spouseLastName,
-      dto.spouseNickName,
-    ]
-      .filter(Boolean)
-      .join(' '),
-    age: dto.respondentAge,
-    gender: dto.respondentGender,
-    relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
-    relationshipOther: dto.relationshipOther,
-    respondentMaritalStatus: dto.respondentMaritalStatus,
-    respondentLegalStatus: dto.respondentLegalStatus,
-    respondentId: dto.respondentId,
-    documentType: dto.documentType,
-    mobileMoneyProvider: dto.mobileMoneyProvider,
-    mobileWalletNumber: dto.mobileWalletNumber,
-    registrationPhase: dto.registrationPhase,
-    phone: dto.respondentPhoneNo,
-    photo: normalizePhoto(dto.biometrics?.photoData),
-    household: {
-      incomeSource: dto.householdIncomeSource,
-      incomeSourceOther: dto.incomeSourceOther,
-      monthlyIncome: dto.householdMonthlyAvgIncome ?? null,
-      selectionCriteria: dto.selectionCriteria,
-      selectionReasons: (dto.selectionReason || []).map((r: string) =>
-        this.lookup.getSelectionReasonEnumByValue(r)
-      ),
-      size: dto.householdSize,
-      isReadWrite: dto.isReadWrite,
-      memberReadWrite: dto.memberReadWrite,
-    },
-    householdSize: dto.householdSize ?? 0,
-    householdMember2: dto.householdMember2,
-    householdMember5: dto.householdMember5,
-    householdMember17: dto.householdMember17,
-    householdMember35: dto.householdMember35,
-    householdMember64: dto.householdMember64,
-    householdMember65: dto.householdMember65,
-    householdMemberLactating35: dto.householdMemberLactating35,
-    householdMemberLactating64: dto.householdMemberLactating64,
-
-    address: {
-      state:
-        dto.address?.stateId != null
-          ? this.lookup.getStateNameById(String(dto.address.stateId))
+      address: {
+        state:
+          dto.address?.stateId != null
+            ? this.lookup.getStateNameById(String(dto.address.stateId))
+            : '',
+        county:
+          dto.address?.countyId != null
+            ? this.lookup.getCountyNameById(String(dto.address.countyId))
+            : '',
+        payam:
+          dto.address?.payam != null
+            ? this.lookup.getPayamNameById(String(dto.address.payam))
+            : '',
+        boma: dto.address?.boma
+          ? this.lookup.getBomaNameById(dto.address.boma)
           : '',
-      county:
-        dto.address?.countyId != null
-          ? this.lookup.getCountyNameById(String(dto.address.countyId))
-          : '',
-      payam:
-        dto.address?.payam != null
-          ? this.lookup.getPayamNameById(String(dto.address.payam))
-          : '',
-      boma: dto.address?.boma
-        ? this.lookup.getBomaNameById(dto.address.boma)
-        : '',
-      lat: dto.address?.lat,
-      lon: dto.address?.lon,
-    },
+        lat: dto.address?.lat,
+        lon: dto.address?.lon,
+      },
 
- 
-    alternates: [dto.alternatePayee1, dto.alternatePayee2].map((alt) => {
-   
-      if (!alt) return null;
+      alternates: [dto.alternatePayee1, dto.alternatePayee2].map((alt) => {
+        if (!alt) return null;
 
-      const biometrics = alt.biometrics;
+        const biometrics = alt.biometrics;
 
-      // Handle alternates' biometrics separately for old or edited data
-      if (isOld) {
-        this.prepareFingerImages(undefined, biometrics, 'old', true);
-      } else {
-        this.prepareFingerImages(undefined, biometrics, 'edited', true);
-      }
-
-      return {
-        name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
-        age: alt.payeeAge ?? 0,
-        gender: alt.payeeGender,
-        relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
-        relationshipOther: alt.relationshipOther,
-        nationalId: alt.nationalId ?? '',
-        phone: alt.payeePhoneNo ?? '',
-        documentType: alt.documentType,
-        documentTypeOther: alt.documentTypeOther ?? undefined,
-        photo: normalizePhoto(alt.biometrics?.photoData),
-        biometric: alt.biometrics,
-        rightFingers: isOld ? this.oldRightFingers.slice(-5) : this.editedRightFingers.slice(-5),
-        leftFingers: isOld ? this.oldLeftFingers.slice(-5) : this.editedLeftFingers.slice(-5),
-      };
-    }),
-
-    nominees: (() => {
-      const nomineeDtos: any[] = dto.nominees || [];
-
-      // If nomineeIndex is present, build a sparse array based on it.
-      if (nomineeDtos.length > 0 && nomineeDtos[0].nomineeIndex !== undefined) {
-        const sparseNominees: any[] = [];
-        for (const n of nomineeDtos) {
-          sparseNominees[n.nomineeIndex - 1] = { // Adjusted for 1-based index
-            name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
-              .filter(Boolean)
-              .join(' '),
-            age: n.nomineeAge,
-            gender: n.nomineeGender,
-            relation: n.relationshipWithHouseholdHead,
-            relationshipOther: n.relationshipOther,
-            nomineeOccupation: n.nomineeOccupation,
-            otherOccupation: n.otherOccupation,
-            photo: normalizeFinger(n.biometric?.photoData),
-            isReadWrite: n.isReadWrite,
-          };
+        // Handle alternates' biometrics separately for old or edited data
+        if (isOld) {
+          this.prepareFingerImages(undefined, biometrics, 'old', true);
+        } else {
+          this.prepareFingerImages(undefined, biometrics, 'edited', true);
         }
-        return sparseNominees;
+
+        return {
+          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${
+            alt.payeeLastName ?? ''
+          } ${alt.payeeNickName ?? ''}`.trim(),
+          age: alt.payeeAge ?? 0,
+          gender: alt.payeeGender,
+          relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
+          relationshipOther: alt.relationshipOther,
+          nationalId: alt.nationalId ?? '',
+          phone: alt.payeePhoneNo ?? '',
+          documentType: alt.documentType,
+          documentTypeOther: alt.documentTypeOther ?? undefined,
+          photo: normalizePhoto(alt.biometrics?.photoData),
+          biometric: alt.biometrics,
+          rightFingers: isOld
+            ? this.oldRightFingers.slice(-5)
+            : this.editedRightFingers.slice(-5),
+          leftFingers: isOld
+            ? this.oldLeftFingers.slice(-5)
+            : this.editedLeftFingers.slice(-5),
+        };
+      }),
+
+      nominees: (() => {
+        const nomineeDtos: any[] = dto.nominees || [];
+
+        // If nomineeIndex is present, build a sparse array based on it.
+        if (
+          nomineeDtos.length > 0 &&
+          nomineeDtos[0].nomineeIndex !== undefined
+        ) {
+          const sparseNominees: any[] = [];
+          for (const n of nomineeDtos) {
+            sparseNominees[n.nomineeIndex - 1] = {
+              // Adjusted for 1-based index
+              name: [
+                n.nomineeFirstName,
+                n.nomineeMiddleName,
+                n.nomineeLastName,
+                n.nomineeNickName,
+              ]
+                .filter(Boolean)
+                .join(' '),
+              age: n.nomineeAge,
+              gender: n.nomineeGender,
+              relation: n.relationshipWithHouseholdHead,
+              relationshipOther: n.relationshipOther,
+              nomineeOccupation: n.nomineeOccupation,
+              otherOccupation: n.otherOccupation,
+              photo: normalizeFinger(n.biometric?.photoData),
+              isReadWrite: n.isReadWrite,
+            };
+          }
+          return sparseNominees;
+        }
+
+        // Otherwise, do a direct map (old behavior)
+        return nomineeDtos.map((n: NomineeDto) => ({
+          name: [
+            n.nomineeFirstName,
+            n.nomineeMiddleName,
+            n.nomineeLastName,
+            n.nomineeNickName,
+          ]
+            .filter(Boolean)
+            .join(' '),
+          age: n.nomineeAge,
+          gender: n.nomineeGender,
+          relation: n.relationshipWithHouseholdHead,
+          relationshipOther: n.relationshipOther,
+          nomineeOccupation: n.nomineeOccupation,
+          otherOccupation: n.otherOccupation,
+          photo: normalizeFinger(n.biometric?.photoData),
+          isReadWrite: n.isReadWrite,
+        }));
+      })(),
+
+      rightFingers: isOld
+        ? this.oldRightFingers.slice(0, 5)
+        : this.editedRightFingers.slice(0, 5),
+      leftFingers: isOld
+        ? this.oldLeftFingers.slice(0, 5)
+        : this.editedLeftFingers.slice(0, 5),
+    };
+  }
+
+  private prepareFingerImages(
+    bio?: BiometricDto,
+    alternatesBiometrics?: BiometricDto,
+    target: 'old' | 'edited' = 'old',
+    isAlternate: boolean = false
+  ) {
+    const getFingerImage = (wsqField: string | undefined): string => {
+      if (wsqField === 'NEW-FINGERPRINT-ADDED') {
+        return 'images/new-finger.png';
       }
-
-      // Otherwise, do a direct map (old behavior)
-      return nomineeDtos.map((n: NomineeDto) => ({
-        name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
-          .filter(Boolean)
-          .join(' '),
-        age: n.nomineeAge,
-        gender: n.nomineeGender,
-        relation: n.relationshipWithHouseholdHead,
-        relationshipOther: n.relationshipOther,
-        nomineeOccupation: n.nomineeOccupation,
-        otherOccupation: n.otherOccupation,
-        photo: normalizeFinger(n.biometric?.photoData),
-        isReadWrite: n.isReadWrite,
-      }));
-    })(),
-
-    rightFingers: isOld ? this.oldRightFingers.slice(0, 5) : this.editedRightFingers.slice(0, 5),
-    leftFingers: isOld ? this.oldLeftFingers.slice(0, 5) : this.editedLeftFingers.slice(0, 5),
-  };
-}
-
-
-
-private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: BiometricDto, target: 'old' | 'edited' = 'old', isAlternate: boolean = false) {
-  const getFingerImage = (wsqField: string | undefined): string => {
-    if (wsqField === 'NEW-FINGERPRINT-ADDED') {
-      return 'images/new-finger.png';
-    }
-    if (wsqField != null && wsqField !== '') {
-      return 'images/finger.png';
-    }
-    return 'images/no-finger.png';
-  };
-
-  // Prepare Beneficiary's biometric data (right and left fingers)
-  const prepareFingerData = (bioData?: BiometricDto) => {
-    const right = !bioData ? [] : [
-      { label: 'Thumb', image: getFingerImage(bioData.wsqRt), tooltip: 'Right Thumb' },
-      { label: 'Index', image: getFingerImage(bioData.wsqRi), tooltip: 'Right Index' },
-      { label: 'Middle', image: getFingerImage(bioData.wsqRm), tooltip: 'Right Middle' },
-      { label: 'Ring', image: getFingerImage(bioData.wsqRr), tooltip: 'Right Ring' },
-      { label: 'Little', image: getFingerImage(bioData.wsqRs), tooltip: 'Right Little' },
-    ];
-
-    const left = !bioData ? [] : [
-      { label: 'Thumb', image: getFingerImage(bioData.wsqLt), tooltip: 'Left Thumb' },
-      { label: 'Index', image: getFingerImage(bioData.wsqLi), tooltip: 'Left Index' },
-      { label: 'Middle', image: getFingerImage(bioData.wsqLm), tooltip: 'Left Middle' },
-      { label: 'Ring', image: getFingerImage(bioData.wsqLr), tooltip: 'Left Ring' },
-      { label: 'Little', image: getFingerImage(bioData.wsqLs), tooltip: 'Left Little' },
-    ];
-
-    return { right, left };
-  };
-
-  // Beneficiary Finger Images
-  if (bio) {
-    const { right, left } = prepareFingerData(bio);
-    if (target === 'old') {
-      if (isAlternate) {
-        this.oldRightFingers = right;
-        this.oldLeftFingers = left;
-      } else {
-        this.oldRightFingers = right;
-        this.oldLeftFingers = left;
+      if (wsqField != null && wsqField !== '') {
+        return 'images/finger.png';
       }
-    } else {
-      if (isAlternate) {
-        this.editedRightFingers = right;
-        this.editedLeftFingers = left;
+      return 'images/no-finger.png';
+    };
+
+    // Prepare Beneficiary's biometric data (right and left fingers)
+    const prepareFingerData = (bioData?: BiometricDto) => {
+      const right = !bioData
+        ? []
+        : [
+            {
+              label: 'Thumb',
+              image: getFingerImage(bioData.wsqRt),
+              tooltip: 'Right Thumb',
+            },
+            {
+              label: 'Index',
+              image: getFingerImage(bioData.wsqRi),
+              tooltip: 'Right Index',
+            },
+            {
+              label: 'Middle',
+              image: getFingerImage(bioData.wsqRm),
+              tooltip: 'Right Middle',
+            },
+            {
+              label: 'Ring',
+              image: getFingerImage(bioData.wsqRr),
+              tooltip: 'Right Ring',
+            },
+            {
+              label: 'Little',
+              image: getFingerImage(bioData.wsqRs),
+              tooltip: 'Right Little',
+            },
+          ];
+
+      const left = !bioData
+        ? []
+        : [
+            {
+              label: 'Thumb',
+              image: getFingerImage(bioData.wsqLt),
+              tooltip: 'Left Thumb',
+            },
+            {
+              label: 'Index',
+              image: getFingerImage(bioData.wsqLi),
+              tooltip: 'Left Index',
+            },
+            {
+              label: 'Middle',
+              image: getFingerImage(bioData.wsqLm),
+              tooltip: 'Left Middle',
+            },
+            {
+              label: 'Ring',
+              image: getFingerImage(bioData.wsqLr),
+              tooltip: 'Left Ring',
+            },
+            {
+              label: 'Little',
+              image: getFingerImage(bioData.wsqLs),
+              tooltip: 'Left Little',
+            },
+          ];
+
+      return { right, left };
+    };
+
+    // Beneficiary Finger Images
+    if (bio) {
+      const { right, left } = prepareFingerData(bio);
+      if (target === 'old') {
+        if (isAlternate) {
+          this.oldRightFingers = right;
+          this.oldLeftFingers = left;
+        } else {
+          this.oldRightFingers = right;
+          this.oldLeftFingers = left;
+        }
       } else {
-        this.editedRightFingers = right;
-        this.editedLeftFingers = left;
+        if (isAlternate) {
+          this.editedRightFingers = right;
+          this.editedLeftFingers = left;
+        } else {
+          this.editedRightFingers = right;
+          this.editedLeftFingers = left;
+        }
+      }
+    }
+
+    // Alternates Finger Images (if present)
+    if (alternatesBiometrics) {
+      const { right, left } = prepareFingerData(alternatesBiometrics);
+
+      if (target === 'old') {
+        if (isAlternate) {
+          this.oldRightFingers = right;
+          this.oldLeftFingers = left;
+        } else {
+          this.oldRightFingers = right;
+          this.oldLeftFingers = left;
+        }
+      } else {
+        if (isAlternate) {
+          this.editedRightFingers = right;
+          this.editedLeftFingers = left;
+        } else {
+          this.editedRightFingers = right;
+          this.editedLeftFingers = left;
+        }
       }
     }
   }
 
-  // Alternates Finger Images (if present)
-  if (alternatesBiometrics) {
-    const { right, left } = prepareFingerData(alternatesBiometrics);
+  async loadUserDetails(userId: number): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    try {
+      this.isUserLoading = true;
+      this.cdr.detectChanges();
 
-    if (target === 'old') {
-      if (isAlternate) {
-        this.oldRightFingers = right;
-        this.oldLeftFingers = left;
-      } else {
-        this.oldRightFingers = right;
-        this.oldLeftFingers = left;
+      const url = `api/users/findOne?id=${userId}`;
+      const axiosResponse = await this.api.GET<any>(url, {}, 'alt');
+      const res = axiosResponse.data;
+
+      if (res) {
+        this.user = res;
       }
-    } else {
-      if (isAlternate) {
-        this.editedRightFingers = right;
-        this.editedLeftFingers = left;
-      } else {
-        this.editedRightFingers = right;
-        this.editedLeftFingers = left;
-      }
+    } catch (err: any) {
+      console.error('Failed to load user details', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details from server.',
+      });
+    } finally {
+      this.isUserLoading = false;
+      this.cdr.detectChanges();
     }
   }
-}
 
-
-
-
-  private async loadTaskDetails(taskId: string): Promise<ApprovalDetailsResponse> {
+  private async loadTaskDetails(
+    taskId: string
+  ): Promise<ApprovalDetailsResponse> {
     const res: any = await this.api.GET(`api/approval/details/${taskId}`);
     this.approvalStatus = res?.approvalStatus || '';
-   
+
+    if (res.data.updatedBy) {
+      await this.loadUserDetails(res.data.updatedBy);
+    }
+
     return (res?.data || {}) as ApprovalDetailsResponse;
   }
-
-
 
   get nomineeCount(): number {
     const oldLen = this.oldDetails?.nominees?.length ?? 0;
@@ -556,7 +680,6 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
 
   // (optional) trackBy to keep DOM stable
   trackIndex = (_: number, i: number) => i;
-
 
   //--obaydur start--
   differences: Record<string, string> = {};
@@ -577,14 +700,16 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
   /** True if ANY of the given paths changed. */
   isChanged(paths: string | string[]): boolean {
     const arr = Array.isArray(paths) ? paths : [paths];
-    return arr.some(p => this.candidatesFor(p).some(c => this.diffKeySet.has(c)));
+    return arr.some((p) =>
+      this.candidatesFor(p).some((c) => this.diffKeySet.has(c))
+    );
   }
 
   /** True if any key in differences starts with ANY of the given prefixes. */
   isChangedPrefix(prefixes: string | string[]): boolean {
     const arr = Array.isArray(prefixes) ? prefixes : [prefixes];
     for (const k of this.diffKeySet) {
-      if (arr.some(p => k.startsWith(p))) return true;
+      if (arr.some((p) => k.startsWith(p))) return true;
     }
     return false;
   }
@@ -592,7 +717,7 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
   /** Return a tooltip string (merged if multiple) for changed paths. */
   diffTip(paths: string | string[]): string | undefined {
     const arr = Array.isArray(paths) ? paths : [paths];
-    const msgs = new Set<string>();   // ✅ avoid duplicates
+    const msgs = new Set<string>(); // ✅ avoid duplicates
     for (const p of arr) {
       for (const c of this.candidatesFor(p)) {
         const v = this.differences[c];
@@ -616,14 +741,26 @@ private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: Biometric
   }
 
   altFingerPath(i: number, hand: 'right' | 'left', j: number) {
-    const mapRight = ['rtFingerData', 'riFingerData', 'rmFingerData', 'rrFingerData', 'rsFingerData'];
-    const mapLeft = ['ltFingerData', 'liFingerData', 'lmFingerData', 'lrFingerData', 'lsFingerData'];
-    return `alternatePayee${i + 1}.biometric.${hand === 'right' ? mapRight[j] : mapLeft[j]}`;
+    const mapRight = [
+      'rtFingerData',
+      'riFingerData',
+      'rmFingerData',
+      'rrFingerData',
+      'rsFingerData',
+    ];
+    const mapLeft = [
+      'ltFingerData',
+      'liFingerData',
+      'lmFingerData',
+      'lrFingerData',
+      'lsFingerData',
+    ];
+    return `alternatePayee${i + 1}.biometric.${
+      hand === 'right' ? mapRight[j] : mapLeft[j]
+    }`;
   }
 
   nomineePath(i: number, field: string) {
     return `nominees[${i}].${field}`;
   }
-
-
 }

@@ -195,22 +195,30 @@
     <p-tabpanel value="1">
       <div class="col-12 col-md-6 col-lg-12">
         <p-card>
+          @if(isUserLoading){
+          <app-loader />
+          }@else if(user){
           <div class="card-body">
             <dl class="row">
               <dt class="col-sm-3">Name</dt>
-              <dd class="col-sm-9">{{ 0 }}</dd>
+              <dd class="col-sm-9">{{ user.fullName || 'N/A' }}</dd>
 
               <dt class="col-sm-3">Email</dt>
-              <dd class="col-sm-9">{{ 0 }}</dd>
+              <dd class="col-sm-9">{{ user.email || 'N/A' }}</dd>
 
               <dt class="col-sm-3">Role</dt>
-              <dd class="col-sm-9">{{ 0 }}</dd>
+              <dd class="col-sm-9">{{ user.role || 'N/A' }}</dd>
             </dl>
 
             <div class="text-end mt-3">
               <!-- Add action buttons or more content here -->
             </div>
           </div>
+          }@else {
+          <div class="card-body">
+            <p>User details not available.</p>
+          </div>
+          }
         </p-card>
       </div>
     </p-tabpanel>

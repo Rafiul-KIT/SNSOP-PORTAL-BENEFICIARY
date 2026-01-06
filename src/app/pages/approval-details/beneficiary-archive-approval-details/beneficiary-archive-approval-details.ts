@@ -25,6 +25,7 @@ import {
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { Card } from 'primeng/card';
 
 export interface FingerVm {
   label: string;
@@ -49,7 +50,6 @@ interface BeneficiaryVm {
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string | null;
   registrationPhase: string;
-
 
   photo?: string;
   household: any;
@@ -95,8 +95,6 @@ interface BeneficiaryVm {
   comment: string;
 }
 
-
-
 @Component({
   standalone: true,
   selector: 'app-beneficiary-archive-approval-details',
@@ -114,11 +112,11 @@ interface BeneficiaryVm {
     ConfirmDialogModule,
     Loader,
     ButtonModule,
-    FormsModule
+    FormsModule,
+    Card,
   ],
   providers: [MessageService, ConfirmationService],
 })
-
 export class BeneficiaryArchiveApprovalDetails implements OnInit {
   approvalComment: string = '';
   isSubmitting = false;
@@ -130,6 +128,8 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
   leftFingers: any[] = [];
   isApprove: boolean = true;
   approvalStatus: string = '';
+  user: any;
+  isUserLoading: boolean = false;
 
   items = [
     {
@@ -149,7 +149,7 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private confirmationService: ConfirmationService
-  ) { }
+  ) {}
 
   openApprovalDialog(isApprove: boolean) {
     if (!this.taskId) {
@@ -164,14 +164,25 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
       key: 'approvalDialog',
       header: isApprove ? 'Confirm Approval' : 'Confirm Rejection',
       icon: isApprove ? 'fas fa-check-circle' : 'fas fa-ban',
-      acceptButtonProps: { label: 'Yes', severity: 'success', disabled: this.isLoading },
-      rejectButtonProps: { label: 'No', severity: 'danger', disabled: this.isLoading },
+      acceptButtonProps: {
+        label: 'Yes',
+        severity: 'success',
+        disabled: this.isLoading,
+      },
+      rejectButtonProps: {
+        label: 'No',
+        severity: 'danger',
+        disabled: this.isLoading,
+      },
       accept: () => this.handleApproval(),
     });
   }
 
   private handleApproval() {
-    if (!this.isApprove && (!this.approvalComment || !this.approvalComment.trim())) {
+    if (
+      !this.isApprove &&
+      (!this.approvalComment || !this.approvalComment.trim())
+    ) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Comment Required',
@@ -185,16 +196,19 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
     const payload = {
       approvalTaskId: this.taskId,
       approved: this.isApprove,
-      comment: this.approvalComment
+      comment: this.approvalComment,
     };
 
-    this.api.POST('/api/approval/doApprove', payload)
+    this.api
+      .POST('/api/approval/doApprove', payload)
       .then(() => {
         const life = 5000;
         this.messageService.add({
           severity: this.isApprove ? 'success' : 'warn',
           summary: this.isApprove ? 'Approved' : 'Rejected',
-          detail: `Archiving request for ${this.beneficiaryDetails?.name} ${this.isApprove ? 'approved' : 'rejected'} successfully.`,
+          detail: `Archiving request for ${this.beneficiaryDetails?.name} ${
+            this.isApprove ? 'approved' : 'rejected'
+          } successfully.`,
           life,
         });
         this.isLoading = false;
@@ -212,7 +226,6 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
         });
       });
   }
-
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -255,16 +268,48 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
       });
   }
 
+  async loadUserDetails(userId: number): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    try {
+      this.isUserLoading = true;
+      this.cdr.detectChanges();
+
+      const url = `api/users/findOne?id=${userId}`;
+      const axiosResponse = await this.api.GET<any>(url, {}, 'alt');
+      const res = axiosResponse.data;
+
+      if (res) {
+        this.user = res;
+      }
+    } catch (err: any) {
+      console.error('Failed to load user details', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details from server.',
+      });
+    } finally {
+      this.isUserLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   fetchTaskDetails(taskId: string) {
     this.isLoading = true;
     this.api
       .GET(`api/approval/details/${taskId}`)
-      .then((res: any) => {
+      .then(async (res: any) => {
         this.approvalStatus = res?.data?.approvalStatus || '';
         const dto = res?.data?.taskDetails as BeneficiaryDto; // 👈 use taskDetails
         this.beneficiaryDetails = this.mapToVm(dto);
-        this.beneficiaryDetails.comment = res?.data?.comment || dto?.comment || '';
+        this.beneficiaryDetails.comment =
+          res?.data?.comment || dto?.comment || '';
         this.prepareFingerImages(dto.biometrics);
+        if (res.data.updatedBy) {
+          await this.loadUserDetails(res.data.updatedBy);
+        }
       })
       .catch((err) => console.error('Error loading task details:', err))
       .finally(() => {
@@ -273,143 +318,152 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
       });
   }
 
+  private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
+    // Helper functions to normalize images
+    const normalizePhoto = (img?: string): string =>
+      img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
 
-private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
-  // Helper functions to normalize images
-  const normalizePhoto = (img?: string): string =>
-    img ? `data:image/jpeg;base64,${img}` : 'images/dummyHuman.jpg';
+    const normalizeFinger = (img?: string): string =>
+      img ? `data:image/jpeg;base64,${img}` : 'images/finger.png';
 
-  const normalizeFinger = (img?: string): string =>
-    img ? `data:image/jpeg;base64,${img}` : 'images/finger.png';
+    // Handle the biometric data processing for the beneficiary
+    this.prepareFingerImages(dto.biometrics);
 
-  // Handle the biometric data processing for the beneficiary
-  this.prepareFingerImages(dto.biometrics);
-
-  return {
-    applicationId: dto.applicationId,
-    name: [
-      dto.respondentFirstName,
-      dto.respondentMiddleName,
-      dto.respondentLastName,
-      dto.respondentNickName,
-    ]
-      .filter(Boolean)
-      .join(' '),
-
-    spouseName: [
-      dto.spouseFirstName,
-      dto.spouseMiddleName,
-      dto.spouseLastName,
-      dto.spouseNickName,
-    ]
-      .filter(Boolean)
-      .join(' '),
-    age: dto.respondentAge,
-    gender: dto.respondentGender,
-    relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
-    relationshipOther: dto.relationshipOther,
-    respondentMaritalStatus: dto.respondentMaritalStatus,
-    respondentLegalStatus: dto.respondentLegalStatus,
-    respondentId: dto.respondentId,
-    documentType: dto.documentType,
-    mobileMoneyProvider: dto.mobileMoneyProvider,
-    mobileWalletNumber: dto.mobileWalletNumber,
-    registrationPhase: dto.registrationPhase,
-
-    phone: dto.respondentPhoneNo,
-    photo: normalizePhoto(dto.biometrics?.photoData),
-
-    household: {
-      incomeSource: dto.householdIncomeSource,
-      incomeSourceOther: dto.incomeSourceOther,
-      monthlyIncome: dto.householdMonthlyAvgIncome,
-      selectionCriteria: dto.selectionCriteria,
-      selectionReasons: (dto.selectionReason || []).map((r: string) =>
-        this.lookup.getSelectionReasonEnumByValue(r)
-      ),
-      size: dto.householdSize,
-      isReadWrite: dto.isReadWrite,
-      memberReadWrite: dto.memberReadWrite,
-    },
-    householdSize: dto.householdSize ?? 0,
-    householdMember2: dto.householdMember2,
-    householdMember5: dto.householdMember5,
-    householdMember17: dto.householdMember17,
-    householdMember35: dto.householdMember35,
-    householdMember64: dto.householdMember64,
-    householdMember65: dto.householdMember65,
-
-    address: {
-      state:
-        dto.address?.stateId != null
-          ? this.lookup.getStateNameById(String(dto.address.stateId))
-          : '',
-      county:
-        dto.address?.countyId != null
-          ? this.lookup.getCountyNameById(String(dto.address.countyId))
-          : '',
-      payam:
-        dto.address?.payam != null
-          ? this.lookup.getPayamNameById(String(dto.address.payam))
-          : '',
-      boma: dto.address?.boma
-        ? this.lookup.getBomaNameById(dto.address.boma)
-        : '',
-      lat: dto.address?.lat,
-      lon: dto.address?.lon,
-    },
-
-    // Process alternates biometrics
-    alternates: [dto.alternatePayee1, dto.alternatePayee2]
-      .filter((alt): alt is AlternatePayeeDto => !!alt)
-      .map((alt) => {
-        const biometrics = alt.biometrics;
-
-        // Call prepareFingerImages for each alternate's biometrics
-        this.prepareFingerImages(undefined, biometrics); // Use `null` for beneficiary's biometrics
-
-        return {
-          name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${alt.payeeLastName ?? ''} ${alt.payeeNickName ?? ''}`.trim(),
-          age: alt.payeeAge ?? 0,
-          gender: alt.payeeGender,
-          relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
-          relationshipOther: alt.relationshipOther,
-          nationalId: alt.nationalId ?? '',
-          phone: alt.payeePhoneNo ?? '',
-          documentType: alt.documentType,
-          photo: normalizePhoto(alt.biometrics?.photoData),
-          biometrics: alt.biometrics,
-
-          // Alternate-specific finger sets
-          rightFingers: this.rightFingers.slice(-5), // Use the last 5 right fingers
-          leftFingers: this.leftFingers.slice(-5),   // Use the last 5 left fingers
-        };
-      }),
-
-    // Nominees
-    nominees: (dto.nominees || []).map((n: NomineeDto) => ({
-      name: [n.nomineeFirstName, n.nomineeMiddleName, n.nomineeLastName, n.nomineeNickName]
+    return {
+      applicationId: dto.applicationId,
+      name: [
+        dto.respondentFirstName,
+        dto.respondentMiddleName,
+        dto.respondentLastName,
+        dto.respondentNickName,
+      ]
         .filter(Boolean)
         .join(' '),
-      age: n.nomineeAge,
-      gender: n.nomineeGender,
-      relation: n.relationshipWithHouseholdHead,
-      relationshipOther: n.relationshipOther,
-      nomineeOccupation: n.nomineeOccupation,
-      photo: normalizeFinger(n.biometric?.photoData),
-      isReadWrite: n.isReadWrite,
-    })),
 
-    // Beneficiary finger images
-    rightFingers: this.rightFingers.slice(0, 5), // Get the first 5 right fingers
-    leftFingers: this.leftFingers.slice(0, 5), // Get the first 5 left fingers
-    comment: dto.comment,
-  };
-}
+      spouseName: [
+        dto.spouseFirstName,
+        dto.spouseMiddleName,
+        dto.spouseLastName,
+        dto.spouseNickName,
+      ]
+        .filter(Boolean)
+        .join(' '),
+      age: dto.respondentAge,
+      gender: dto.respondentGender,
+      relationshipWithHouseholdHead: dto.relationshipWithHouseholdHead,
+      relationshipOther: dto.relationshipOther,
+      respondentMaritalStatus: dto.respondentMaritalStatus,
+      respondentLegalStatus: dto.respondentLegalStatus,
+      respondentId: dto.respondentId,
+      documentType: dto.documentType,
+      mobileMoneyProvider: dto.mobileMoneyProvider,
+      mobileWalletNumber: dto.mobileWalletNumber,
+      registrationPhase: dto.registrationPhase,
 
+      phone: dto.respondentPhoneNo,
+      photo: normalizePhoto(dto.biometrics?.photoData),
 
-  private prepareFingerImages(bio?: BiometricDto, alternatesBiometrics?: BiometricDto) {
-    const checkForWsq = (wsqField: string | undefined): boolean => wsqField != null && wsqField !== '';
+      household: {
+        incomeSource: dto.householdIncomeSource,
+        incomeSourceOther: dto.incomeSourceOther,
+        monthlyIncome: dto.householdMonthlyAvgIncome,
+        selectionCriteria: dto.selectionCriteria,
+        selectionReasons: (dto.selectionReason || []).map((r: string) =>
+          this.lookup.getSelectionReasonEnumByValue(r)
+        ),
+        size: dto.householdSize,
+        isReadWrite: dto.isReadWrite,
+        memberReadWrite: dto.memberReadWrite,
+      },
+      householdSize: dto.householdSize ?? 0,
+      householdMember2: dto.householdMember2,
+      householdMember5: dto.householdMember5,
+      householdMember17: dto.householdMember17,
+      householdMember35: dto.householdMember35,
+      householdMember64: dto.householdMember64,
+      householdMember65: dto.householdMember65,
+
+      address: {
+        state:
+          dto.address?.stateId != null
+            ? this.lookup.getStateNameById(String(dto.address.stateId))
+            : '',
+        county:
+          dto.address?.countyId != null
+            ? this.lookup.getCountyNameById(String(dto.address.countyId))
+            : '',
+        payam:
+          dto.address?.payam != null
+            ? this.lookup.getPayamNameById(String(dto.address.payam))
+            : '',
+        boma: dto.address?.boma
+          ? this.lookup.getBomaNameById(dto.address.boma)
+          : '',
+        lat: dto.address?.lat,
+        lon: dto.address?.lon,
+      },
+
+      // Process alternates biometrics
+      alternates: [dto.alternatePayee1, dto.alternatePayee2]
+        .filter((alt): alt is AlternatePayeeDto => !!alt)
+        .map((alt) => {
+          const biometrics = alt.biometrics;
+
+          // Call prepareFingerImages for each alternate's biometrics
+          this.prepareFingerImages(undefined, biometrics); // Use `null` for beneficiary's biometrics
+
+          return {
+            name: `${alt.payeeFirstName ?? ''} ${alt.payeeMiddleName ?? ''} ${
+              alt.payeeLastName ?? ''
+            } ${alt.payeeNickName ?? ''}`.trim(),
+            age: alt.payeeAge ?? 0,
+            gender: alt.payeeGender,
+            relationshipWithHouseholdHead: alt.relationshipWithHouseholdHead,
+            relationshipOther: alt.relationshipOther,
+            nationalId: alt.nationalId ?? '',
+            phone: alt.payeePhoneNo ?? '',
+            documentType: alt.documentType,
+            photo: normalizePhoto(alt.biometrics?.photoData),
+            biometrics: alt.biometrics,
+
+            // Alternate-specific finger sets
+            rightFingers: this.rightFingers.slice(-5), // Use the last 5 right fingers
+            leftFingers: this.leftFingers.slice(-5), // Use the last 5 left fingers
+          };
+        }),
+
+      // Nominees
+      nominees: (dto.nominees || []).map((n: NomineeDto) => ({
+        name: [
+          n.nomineeFirstName,
+          n.nomineeMiddleName,
+          n.nomineeLastName,
+          n.nomineeNickName,
+        ]
+          .filter(Boolean)
+          .join(' '),
+        age: n.nomineeAge,
+        gender: n.nomineeGender,
+        relation: n.relationshipWithHouseholdHead,
+        relationshipOther: n.relationshipOther,
+        nomineeOccupation: n.nomineeOccupation,
+        photo: normalizeFinger(n.biometric?.photoData),
+        isReadWrite: n.isReadWrite,
+      })),
+
+      // Beneficiary finger images
+      rightFingers: this.rightFingers.slice(0, 5), // Get the first 5 right fingers
+      leftFingers: this.leftFingers.slice(0, 5), // Get the first 5 left fingers
+      comment: dto.comment,
+    };
+  }
+
+  private prepareFingerImages(
+    bio?: BiometricDto,
+    alternatesBiometrics?: BiometricDto
+  ) {
+    const checkForWsq = (wsqField: string | undefined): boolean =>
+      wsqField != null && wsqField !== '';
 
     // Prepare for beneficiary's biometric data
     if (bio) {
@@ -417,27 +471,37 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       this.rightFingers = [
         {
           label: 'Thumb',
-          image: checkForWsq(bio.wsqRt) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqRt)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Thumb',
         },
         {
           label: 'Index',
-          image: checkForWsq(bio.wsqRi) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqRi)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Index',
         },
         {
           label: 'Middle',
-          image: checkForWsq(bio.wsqRm) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqRm)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Middle',
         },
         {
           label: 'Ring',
-          image: checkForWsq(bio.wsqRr) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqRr)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Ring',
         },
         {
           label: 'Little',
-          image: checkForWsq(bio.wsqRs) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqRs)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Little',
         },
       ];
@@ -446,27 +510,37 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       this.leftFingers = [
         {
           label: 'Thumb',
-          image: checkForWsq(bio.wsqLt) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqLt)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Thumb',
         },
         {
           label: 'Index',
-          image: checkForWsq(bio.wsqLi) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqLi)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Index',
         },
         {
           label: 'Middle',
-          image: checkForWsq(bio.wsqLm) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqLm)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Middle',
         },
         {
           label: 'Ring',
-          image: checkForWsq(bio.wsqLr) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqLr)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Ring',
         },
         {
           label: 'Little',
-          image: checkForWsq(bio.wsqLs) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(bio.wsqLs)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Little',
         },
       ];
@@ -482,27 +556,37 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       this.rightFingers = this.rightFingers.concat([
         {
           label: 'Thumb',
-          image: checkForWsq(alternatesBiometrics.wsqRt) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqRt)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Thumb',
         },
         {
           label: 'Index',
-          image: checkForWsq(alternatesBiometrics.wsqRi) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqRi)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Index',
         },
         {
           label: 'Middle',
-          image: checkForWsq(alternatesBiometrics.wsqRm) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqRm)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Middle',
         },
         {
           label: 'Ring',
-          image: checkForWsq(alternatesBiometrics.wsqRr) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqRr)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Ring',
         },
         {
           label: 'Little',
-          image: checkForWsq(alternatesBiometrics.wsqRs) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqRs)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Right Little',
         },
       ]);
@@ -511,32 +595,40 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       this.leftFingers = this.leftFingers.concat([
         {
           label: 'Thumb',
-          image: checkForWsq(alternatesBiometrics.wsqLt) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqLt)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Thumb',
         },
         {
           label: 'Index',
-          image: checkForWsq(alternatesBiometrics.wsqLi) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqLi)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Index',
         },
         {
           label: 'Middle',
-          image: checkForWsq(alternatesBiometrics.wsqLm) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqLm)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Middle',
         },
         {
           label: 'Ring',
-          image: checkForWsq(alternatesBiometrics.wsqLr) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqLr)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Ring',
         },
         {
           label: 'Little',
-          image: checkForWsq(alternatesBiometrics.wsqLs) ? 'images/finger.png' : 'images/no-finger.png',
+          image: checkForWsq(alternatesBiometrics.wsqLs)
+            ? 'images/finger.png'
+            : 'images/no-finger.png',
           tooltip: 'Left Little',
         },
       ]);
     }
   }
-
-
 }
