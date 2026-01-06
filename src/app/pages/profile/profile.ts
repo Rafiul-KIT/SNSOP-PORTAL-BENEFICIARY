@@ -131,7 +131,7 @@ export class Profile implements OnInit {
         username?: string;
         roleId?: number;
       };
-     
+
         this.user = user;
         let mappedRoleId: number | null = null;
         if (typeof user.roleId === 'number') {
@@ -153,11 +153,11 @@ export class Profile implements OnInit {
           emailReceiver: !!user.emailReceiver,
           password: '',
         };
-        console.log(res); 
+        console.log(res);
         this.initialFormValue = formValue;
         this.userRegistrationForm.reset(formValue, { emitEvent: false });
         this.isFormUnchanged = true;
-        console.log(res); 
+        console.log(res);
 
         // set footer status info
         this.userDetails = {

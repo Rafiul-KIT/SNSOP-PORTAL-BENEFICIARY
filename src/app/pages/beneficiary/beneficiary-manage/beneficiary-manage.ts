@@ -1880,7 +1880,7 @@ export class BeneficiaryManage implements OnInit {
       const shouldBeDisabledByHhData = this.isReasonDisabled(reason, hhData);
       const shouldBeDisabledByRules = (hasDisRule && isDisReason) || (hasLipwRule && isLipwReason);
       const shouldBeDisabled = shouldBeDisabledByHhData || shouldBeDisabledByRules;
-      
+
       reason.disabled = shouldBeDisabled;
 
       if (shouldBeDisabled) {
@@ -1986,16 +1986,16 @@ export class BeneficiaryManage implements OnInit {
       case 'DIS_REASON_5':
         return !(hhData.female_18_64_total > 0 && hhData.ableBodied_18_64 === 0);
 
-      case 'LIPW_REASON_1': 
+      case 'LIPW_REASON_1':
         return !(hhData.ableBodiedTotal > 0);
 
-      case 'LIPW_REASON_2': 
+      case 'LIPW_REASON_2':
         return !(hhData.ableBodied_18_35 > 0);
 
-      case 'LIPW_REASON_3': 
+      case 'LIPW_REASON_3':
         return !(hhData.ableBodied_18_35 > 0);
 
-      case 'LIPW_REASON_4': 
+      case 'LIPW_REASON_4':
         return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
 
       case 'LIPW_REASON_5':

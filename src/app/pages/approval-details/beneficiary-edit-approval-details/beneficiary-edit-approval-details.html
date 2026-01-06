@@ -2,1604 +2,1622 @@
 
 
 
-    <div class="breadcrumb-wrapper">
-        <!-- Breadcrumb content -->
-        <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+  <div class="breadcrumb-wrapper">
+    <!-- Breadcrumb content -->
+    <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
 
-        <!-- Fixed buttons in the breadcrumb section -->
+    <!-- Fixed buttons in the breadcrumb section -->
 
-    </div>
-    @if (isLoading) {
-    <app-loader />
-    } @else {
-    @if (oldDetails || editedDetails) {
+  </div>
+  @if (isLoading) {
+  <app-loader />
+  } @else {
+  @if (oldDetails || editedDetails) {
 
-    <p-tabs value="0">
-        <p-tablist>
-            <p-tab value="0">Beneficiary Information</p-tab>
-            <p-tab value="1">Alternate Information</p-tab>
-            <p-tab value="2">Nominee Information</p-tab>
-            <p-tab value="3">Updated By</p-tab>
-            @if (isOnTaskDetails && taskId && approvalStatus === 'PENDING') {
-            <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
-                <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
-                    size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Beneficiary Information</p-tab>
+      <p-tab value="1">Alternate Information</p-tab>
+      <p-tab value="2">Nominee Information</p-tab>
+      <p-tab value="3">Updated By</p-tab>
+      @if (isOnTaskDetails && taskId && approvalStatus === 'PENDING') {
+      <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
+        <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
+          size="small" severity="primary" class="me-1" label="Approve" (onClick)="openApprovalDialog(true)" />
 
-                <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
-                    size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
-            </div>
+        <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
+          size="small" severity="danger" label="Reject" (onClick)="openApprovalDialog(false)" />
+      </div>
 
-            <!-- <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
+      <!-- <div style="position: absolute; top: 10px; right: 5px; z-index: 99;">
                 <p-button type="button" icon="fas fa-check" pTooltip="Approve" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="primary" class="me-1" label="Approve" />
 
                 <p-button type="button" icon="fas fa-ban" pTooltip="Reject" tooltipPosition="bottom" appendTo="body"
                     size="small" severity="danger" label="Reject" />
             </div> -->
-            }
+      }
 
 
-        </p-tablist>
+    </p-tablist>
 
-        <p-tabpanels>
-            <!-- =========================
+    <p-tabpanels>
+      <!-- =========================
                TAB: Beneficiary Information
           ========================== -->
-            <p-tabpanel value="0">
-                <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
-                    <div class="row g-2">
-                        <!-- Personal Info -->
-                        <div class="col-12 col-md-6">
-                            <div class="card shadow-sm rounded">
-                                <div class="card-header bg-gray text-black ">
-                                    <strong> Personal Information (Old) </strong>
-                                </div>
-                                <div class="card-body text-center">
-                                    <img [src]="oldDetails?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
-                                        width="200" />
-                                    <table class="table table-bordered table-sm text-start mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th>Application ID</th>
-                                                <td>{{ oldDetails?.applicationId }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td>{{ oldDetails?.name }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td>{{ oldDetails?.age }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td>{{ oldDetails?.gender }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Relationship</th>
-                                                <td>
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(oldDetails?.relationshipWithHouseholdHead)
-                                                    }}
-                                                    @if (
-                                                    oldDetails?.relationshipWithHouseholdHead === 'OTHER' &&
-                                                    oldDetails?.relationshipOther
-                                                    ) {
-                                                    ({{ oldDetails?.relationshipOther }})
-                                                    }
-                                                </td>
-                                            </tr>
+      <p-tabpanel value="0">
+        <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="row g-2">
+            <!-- Personal Info -->
+            <div class="col-12 col-md-6">
+              <div class="card shadow-sm rounded">
+                <div class="card-header bg-gray text-black ">
+                  <strong> Personal Information (Old) </strong>
+                </div>
+                <div class="card-body text-center">
+                  <img [src]="oldDetails?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3" width="200" />
+                  <table class="table table-bordered table-sm text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Application ID</th>
+                        <td>{{ oldDetails?.applicationId }}</td>
+                      </tr>
+                      <tr>
+                        <th>Name</th>
+                        <td>{{ oldDetails?.name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ oldDetails?.age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ oldDetails?.gender }}</td>
+                      </tr>
+                      <tr>
+                        <th>Relationship</th>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(oldDetails?.relationshipWithHouseholdHead)
+                          }}
+                          @if (
+                          oldDetails?.relationshipWithHouseholdHead === 'OTHER' &&
+                          oldDetails?.relationshipOther
+                          ) {
+                          ({{ oldDetails?.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
 
-                                            <tr>
-                                                <th>Marital Status</th>
-                                                <td>{{ oldDetails?.respondentMaritalStatus }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Spouse Name</th>
-                                                <td>{{ oldDetails?.spouseName }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Legal Status</th>
-                                                <td>{{ oldDetails?.respondentLegalStatus }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>ID Number (Type)</th>
-                                                <td>
-                                                    {{ oldDetails?.respondentId }}
-                                                    @if (oldDetails?.documentType) {
-                                                    ({{ lookup.getDocumentTypeEnumByValue(oldDetails?.documentType) }})
-                                                    @if (
-                                                    oldDetails?.documentType === 'OTHER' &&
-                                                    oldDetails?.documentTypeOther
-                                                    ) {
-                                                    ({{ oldDetails?.documentTypeOther }})
-                                                    }
-                                                    }
-                                                </td>
-                                            </tr>
+                      <tr>
+                        <th>Marital Status</th>
+                        <td>{{ oldDetails?.respondentMaritalStatus }}</td>
+                      </tr>
+                      <tr>
+                        <th>Spouse Name</th>
+                        <td>{{ oldDetails?.spouseName }}</td>
+                      </tr>
+                      <tr>
+                        <th>Legal Status</th>
+                        <td>{{ oldDetails?.respondentLegalStatus }}</td>
+                      </tr>
+                      <tr>
+                        <th>ID Number (Type)</th>
+                        <td>
+                          {{ oldDetails?.respondentId }}
+                          @if (oldDetails?.documentType) {
+                          ({{ lookup.getDocumentTypeEnumByValue(oldDetails?.documentType) }})
+                          @if (
+                          oldDetails?.documentType === 'OTHER' &&
+                          oldDetails?.documentTypeOther
+                          ) {
+                          ({{ oldDetails?.documentTypeOther }})
+                          }
+                          }
+                        </td>
+                      </tr>
 
-                                            <tr>
-                                                <th>Mobile Money Provider</th>
-                                                <td>{{ oldDetails?.mobileMoneyProvider }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Mobile Wallet Number</th>
-                                                <td>{{ oldDetails?.mobileWalletNumber }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Registration Phase</th>
-                                                <td>{{ oldDetails?.registrationPhase }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Phone</th>
-                                                <td>{{ oldDetails?.phone }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                      <tr>
+                        <th>Mobile Money Provider</th>
+                        <td>{{ oldDetails?.mobileMoneyProvider }}</td>
+                      </tr>
+                      <tr>
+                        <th>Mobile Wallet Number</th>
+                        <td>{{ oldDetails?.mobileWalletNumber }}</td>
+                      </tr>
+                      <tr>
+                        <th>Registration Phase</th>
+                        <td>{{ oldDetails?.registrationPhase }}</td>
+                      </tr>
+                      <tr>
+                        <th>Phone</th>
+                        <td>{{ oldDetails?.phone }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-                            <div class="card shadow-sm rounded mt-2">
-                                <div class="card-header bg-gray text-black">
-                                    Biometric Fingerprints
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered text-center mb-0">
-                                            <tbody>
-                                                <tr>
-                                                    <th colspan="5">Right Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of oldRightFingers; track f) {
-                                                    <td>
-                                                        <img [pTooltip]="f.tooltip" tooltipPosition="top"
-                                                            [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="5">Left Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of oldLeftFingers; track f) {
-                                                    <td>
-                                                        <img [pTooltip]="f.tooltip" tooltipPosition="top"
-                                                            [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+              <div class="card shadow-sm rounded mt-2">
+                <div class="card-header bg-gray text-black">
+                  Biometric Fingerprints
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered text-center mb-0">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of oldRightFingers; track f) {
+                          <td>
+                            <img [pTooltip]="f.tooltip" tooltipPosition="top" [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of oldLeftFingers; track f) {
+                          <td>
+                            <img [pTooltip]="f.tooltip" tooltipPosition="top" [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
 
 
-                            <!-- Fingerprints -->
+              <!-- Fingerprints -->
 
-                            <div class="card mt-2">
-                                <p-accordion value="0">
-                                    <!-- Household -->
-                                    <p-accordion-panel value="0">
-                                        <p-accordion-header>Household Information (Old)</p-accordion-header>
-                                        <p-accordion-content>
-                                            <div class="card shadow-sm rounded">
-                                                <div class="card-body">
-                                                    <table class="table table-sm table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>Income Source</th>
-                                                                <td>
-                                                                    {{
-                                                                    lookup.getIncomeSourceEnumByValue(
-                                                                    oldDetails?.household?.incomeSource
-                                                                    )
-                                                                    }}
-                                                                    @if (
-                                                                    oldDetails?.household?.incomeSource === 'OTHER' &&
-                                                                    oldDetails?.household?.incomeSourceOther
-                                                                    ) {
-                                                                    ({{ oldDetails?.household?.incomeSourceOther }})
-                                                                    }
-                                                                </td>
-                                                            </tr>
+              <div class="card mt-2">
+                <p-accordion value="0">
+                  <!-- Household -->
+                  <p-accordion-panel value="0">
+                    <p-accordion-header>Household Information (Old)</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th>Income Source</th>
+                                <td>
+                                  {{
+                                  lookup.getIncomeSourceEnumByValue(
+                                  oldDetails?.household?.incomeSource
+                                  )
+                                  }}
+                                  @if (
+                                  oldDetails?.household?.incomeSource === 'OTHER' &&
+                                  oldDetails?.household?.incomeSourceOther
+                                  ) {
+                                  ({{ oldDetails?.household?.incomeSourceOther }})
+                                  }
+                                </td>
+                              </tr>
 
 
-                                                            <tr>
-                                                                <th>Monthly Avg Income</th>
-                                                                <td>
-                                                                    {{ oldDetails?.household?.monthlyIncome
-                                                                    || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Selection Criteria</th>
-                                                                <td>
-                                                                    {{
-                                                                    oldDetails?.household?.selectionCriteria
-                                                                    || '-' }}
-                                                                </td>
-                                                            </tr>
+                              <tr>
+                                <th>Monthly Avg Income</th>
+                                <td>
+                                  {{ oldDetails?.household?.monthlyIncome
+                                  || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Selection Criteria</th>
+                                <td>
+                                  {{
+                                  oldDetails?.household?.selectionCriteria
+                                  || '-' }}
+                                </td>
+                              </tr>
 
-                                                            <tr>
-                                                                <th>Selection Reasons</th>
-                                                                <td>
-                                                                    @if
-                                                                    (oldDetails?.household?.selectionReasons?.length)
-                                                                    {
-                                                                    <ul>
-                                                                        @for (r of
-                                                                        oldDetails?.household.selectionReasons;
-                                                                        track r; let i = $index) {
-                                                                        <li>{{ i + 1 }}. {{ r }}</li>
-                                                                        }
-                                                                    </ul>
-                                                                    } @else { N/A }
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                              <tr>
+                                <th>Selection Reasons</th>
+                                <td>
+                                  @if
+                                  (oldDetails?.household?.selectionReasons?.length)
+                                  {
+                                  <ul>
+                                    @for (r of
+                                    oldDetails?.household.selectionReasons;
+                                    track r; let i = $index) {
+                                    <li>{{ i + 1 }}. {{ r }}</li>
+                                    }
+                                  </ul>
+                                  } @else { N/A }
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
 
-                                                    <table class="table table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th colspan="8"
-                                                                    class="bg-secondary text-light text-center">
-                                                                    Total Member: {{ oldDetails?.householdSize }}
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">Female Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember2?.femaleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.femaleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.femaleTotal
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember35?.femaleTotal
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember64?.femaleTotal
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember65?.femaleTotal
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMemberLactating35?.femaleTotal
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMemberLactating64?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th colspan="8" class="bg-secondary text-light text-center">
+                                  Total Member: {{ oldDetails?.householdSize }}
+                                </th>
+                              </tr>
+                              <tr>
+                                <th class="table-label">Female Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember2?.femaleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.femaleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.femaleTotal
+                                  || 0) +
+                                  (oldDetails?.householdMember35?.femaleTotal
+                                  || 0) +
+                                  (oldDetails?.householdMember64?.femaleTotal
+                                  || 0) +
+                                  (oldDetails?.householdMember65?.femaleTotal
+                                  || 0) +
+                                  (oldDetails?.householdMemberLactating35?.femaleTotal
+                                  || 0) +
+                                  (oldDetails?.householdMemberLactating64?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">Male Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember2?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.maleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
+                                <th class="table-label">Male Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember2?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.maleTotal ||
+                                  0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">Chronically ill Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember2?.maleBoth || 0)
-                                                                    +
-                                                                    (oldDetails?.householdMember2?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember2?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember2?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember5?.maleBoth || 0)
-                                                                    +
-                                                                    (oldDetails?.householdMember5?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember5?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember17?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember17?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember35?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember35?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember64?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember64?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember65?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember65?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.femaleChronicalIll
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
+                                <th class="table-label">Chronically ill Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember2?.maleBoth || 0)
+                                  +
+                                  (oldDetails?.householdMember2?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember2?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember2?.femaleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember5?.maleBoth || 0)
+                                  +
+                                  (oldDetails?.householdMember5?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember5?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.femaleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember17?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember17?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.femaleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember35?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember35?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.femaleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember64?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember64?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.femaleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember65?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.maleChronicalIll
+                                  || 0) +
+                                  (oldDetails?.householdMember65?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.femaleChronicalIll
+                                  || 0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">Member with Disability</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember2?.maleBoth || 0)
-                                                                    +
-                                                                    (oldDetails?.householdMember2?.maleDisable ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember2?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember2?.femaleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember5?.maleBoth || 0)
-                                                                    +
-                                                                    (oldDetails?.householdMember5?.maleDisable ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.femaleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember17?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.maleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember17?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.femaleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember35?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.maleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember35?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.femaleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember64?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.maleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember64?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.femaleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember65?.maleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.maleDisable
-                                                                    || 0) +
-                                                                    (oldDetails?.householdMember65?.femaleBoth ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.femaleDisable
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                <th class="table-label">Member with Disability</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember2?.maleBoth || 0)
+                                  +
+                                  (oldDetails?.householdMember2?.maleDisable ||
+                                  0) +
+                                  (oldDetails?.householdMember2?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember2?.femaleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember5?.maleBoth || 0)
+                                  +
+                                  (oldDetails?.householdMember5?.maleDisable ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.femaleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember17?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.maleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember17?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.femaleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember35?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.maleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember35?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.femaleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember64?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.maleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember64?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.femaleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember65?.maleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.maleDisable
+                                  || 0) +
+                                  (oldDetails?.householdMember65?.femaleBoth ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.femaleDisable
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
 
-                                                    <table class="table table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th class="table-label">0–2 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember2?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember2?.femaleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th class="table-label">0–2 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember2?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember2?.femaleTotal ||
+                                  0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">3–5 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember5?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember5?.femaleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
+                                <th class="table-label">3–5 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember5?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember5?.femaleTotal ||
+                                  0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">6–17 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember17?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember17?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">18–35 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember35?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember35?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
+                                <th class="table-label">6–17 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember17?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember17?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th class="table-label">18–35 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember35?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember35?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">36–64 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember64?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember64?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
+                                <th class="table-label">36–64 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember64?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember64?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
 
-                                                                <th class="table-label">64+ Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (oldDetails?.householdMember65?.maleTotal ||
-                                                                    0) +
-                                                                    (oldDetails?.householdMember65?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">Lactating Women (18-35)</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{ oldDetails?.householdMemberLactating35?.femaleTotal || 0 }}
-                                                                </td>
+                                <th class="table-label">64+ Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (oldDetails?.householdMember65?.maleTotal ||
+                                  0) +
+                                  (oldDetails?.householdMember65?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th class="table-label">Lactating Women (18-35)</th>
+                                <td width="75px" class="text-center">
+                                  {{ oldDetails?.householdMemberLactating35?.femaleTotal || 0 }}
+                                </td>
 
-                                                                <th class="table-label">Lactating Women (36-64)</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{ oldDetails?.householdMemberLactating64?.femaleTotal || 0 }}
-                                                                </td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <table class="table table-bordered mb-0 mt-3">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>
-                                                                    Not including yourself, how many other members
-                                                                    of your household are between 18 and 35 and
-                                                                    can read and write
-                                                                </th>
-                                                                <td class="text-center">
-                                                                    {{
-                                                                    oldDetails?.household?.memberReadWrite
-                                                                    ?? 0 }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    Respondent Can read/Write (Any Language)
-                                                                </th>
-                                                                <td class="text-center">
-                                                                    {{ oldDetails?.household?.isReadWrite
-                                                                    === true ? 'Yes' :
-                                                                    oldDetails?.household?.isReadWrite ===
-                                                                    false ? 'No' : '-' }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </p-accordion-content>
-                                    </p-accordion-panel>
-
-                                    <!-- Address -->
-                                    <p-accordion-panel value="1">
-                                        <p-accordion-header>Address Information (Old)</p-accordion-header>
-                                        <p-accordion-content>
-                                            <div class="card shadow-sm rounded">
-                                                <div class="card-body">
-                                                    <table class="table table-sm table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th style="width: 180px">State</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.state || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>County</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.county || '-'
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Payam</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.payam || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Boma</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.boma || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Latitude</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.lat || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Longitude</th>
-                                                                <td>
-                                                                    {{ oldDetails?.address?.lon || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </p-accordion-content>
-                                    </p-accordion-panel>
-                                </p-accordion>
-                            </div>
+                                <th class="table-label">Lactating Women (36-64)</th>
+                                <td width="75px" class="text-center">
+                                  {{ oldDetails?.householdMemberLactating64?.femaleTotal || 0 }}
+                                </td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table class="table table-bordered mb-0 mt-3">
+                            <tbody>
+                              <tr>
+                                <th>
+                                  Not including yourself, how many other members
+                                  of your household are between 18 and 35 and
+                                  can read and write
+                                </th>
+                                <td class="text-center">
+                                  {{
+                                  oldDetails?.household?.memberReadWrite
+                                  ?? 0 }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>
+                                  Respondent Can read/Write (Any Language)
+                                </th>
+                                <td class="text-center">
+                                  {{ oldDetails?.household?.isReadWrite
+                                  === true ? 'Yes' :
+                                  oldDetails?.household?.isReadWrite ===
+                                  false ? 'No' : '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="card shadow-sm rounded">
-                                <div class="card-header bg-gray text-black">
-                                    <strong>Personal Information (Edited)</strong>
-                                </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
 
-                                <div class="card-body text-center">
-                                    <img [src]="editedDetails?.photo || 'images/dummyHuman.jpg'"
-                                        class="img-thumbnail mb-3" width="200" />
-                                    <table class="table table-bordered table-sm text-start mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th>Application ID</th>
-                                                <td>{{ editedDetails?.applicationId }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td [ngClass]="changedClass(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
-                                                    [pTooltip]="diffTip(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
-                                                    tooltipPosition="top">
-                                                    {{ editedDetails?.name }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td [ngClass]="changedClass('respondentAge')"
-                                                    [pTooltip]="diffTip('respondentAge')">
-                                                    {{ editedDetails?.age }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td [ngClass]="changedClass('respondentGender')"
-                                                    [pTooltip]="diffTip('respondentGender')">
-                                                    {{ editedDetails?.gender }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Relationship</th>
-                                                <td [ngClass]="changedClass('relationshipWithHouseholdHead')"
-                                                    [pTooltip]="diffTip('relationshipWithHouseholdHead')">
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(
-                                                    editedDetails?.relationshipWithHouseholdHead
-                                                    )
-                                                    }}
-                                                    @if (
-                                                    editedDetails?.relationshipWithHouseholdHead === 'OTHER' &&
-                                                    editedDetails?.relationshipOther
-                                                    ) {
-                                                    ({{ editedDetails?.relationshipOther }})
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>Marital Status</th>
-                                                <td [ngClass]="changedClass('respondentMaritalStatus')"
-                                                    [pTooltip]="diffTip('respondentMaritalStatus')">
-                                                    {{ editedDetails?.respondentMaritalStatus }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Spouse Name</th>
-                                                <td [ngClass]="changedClass(['spouseFirstName','spouseMiddleName','spouseLastName'])"
-                                                    [pTooltip]="diffTip(['spouseFirstName','spouseMiddleName','spouseLastName'])">
-                                                    {{ editedDetails?.spouseName }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Legal Status</th>
-                                                <td [ngClass]="changedClass('respondentLegalStatus')"
-                                                    [pTooltip]="diffTip('respondentLegalStatus')">
-                                                    {{ editedDetails?.respondentLegalStatus }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>ID Number (Type)</th>
-                                                <td [ngClass]="changedClass(['respondentId','documentType'])"
-                                                    [pTooltip]="diffTip(['respondentId','documentType'])">
-                                                    {{ editedDetails?.respondentId }}
-                                                    @if (editedDetails?.documentType) {
-                                                    ({{ lookup.getDocumentTypeEnumByValue(editedDetails?.documentType)
-                                                    }})
-                                                    @if (
-                                                    editedDetails?.documentType === 'OTHER' &&
-                                                    editedDetails?.documentTypeOther
-                                                    ) {
-                                                    ({{ editedDetails?.documentTypeOther }})
-                                                    }
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>Mobile Money Provider</th>
-                                                <td [ngClass]="changedClass('mobileMoneyProvider')"
-                                                    [pTooltip]="diffTip('mobileMoneyProvider')">
-                                                    {{ editedDetails?.mobileMoneyProvider }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Mobile Wallet Number</th>
-                                                <td [ngClass]="changedClass('mobileWalletNumber')"
-                                                    [pTooltip]="diffTip('mobileWalletNumber')">
-                                                    {{ editedDetails?.mobileWalletNumber }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Registration Phase</th>
-                                                <td [ngClass]="changedClass('registrationPhase')"
-                                                    [pTooltip]="diffTip('registrationPhase')">
-                                                    {{ editedDetails?.registrationPhase }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Phone</th>
-                                                <td [ngClass]="changedClass('respondentPhoneNo')"
-                                                    [pTooltip]="diffTip('respondentPhoneNo')">
-                                                    {{ editedDetails?.phone }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="card shadow-sm rounded mt-2">
-                                <div class="card-header bg-gray text-black">
-                                    Biometric Fingerprints
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered text-center mb-0">
-                                            <tbody>
-                                                <tr>
-                                                    <th colspan="5">Right Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    <td *ngFor="let f of editedRightFingers; let i = index"
-                                                        [ngClass]="changedClass(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])"
-                                                        [pTooltip]="diffTip(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])">
-                                                        <img [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="5">Left Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    <td *ngFor="let f of editedLeftFingers; let i = index"
-                                                        [ngClass]="changedClass(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])"
-                                                        [pTooltip]="diffTip(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])">
-                                                        <img [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <!-- Fingerprints -->
-
-                            <div class="card mt-2">
-                                <p-accordion value="0">
-                                    <!-- Household -->
-                                    <p-accordion-panel value="0">
-                                        <p-accordion-header>Household Information (Edited)</p-accordion-header>
-                                        <p-accordion-content>
-                                            <div class="card shadow-sm rounded">
-                                                <div class="card-body">
-                                                    <table class="table table-sm table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>Income Source</th>
-                                                                <td [ngClass]="changedClass('householdIncomeSource')"
-                                                                    [pTooltip]="diffTip('householdIncomeSource')">
-                                                                    {{
-                                                                    lookup.getIncomeSourceEnumByValue(
-                                                                    editedDetails?.household?.incomeSource
-                                                                    )
-                                                                    }}
-                                                                    @if (
-                                                                    editedDetails?.household?.incomeSource === 'OTHER'
-                                                                    &&
-                                                                    editedDetails?.household?.incomeSourceOther
-                                                                    ) {
-                                                                    ({{ editedDetails?.household?.incomeSourceOther }})
-                                                                    }
-                                                                </td>
-                                                            </tr>
-
-
-                                                            <tr>
-                                                                <th>Monthly Avg Income</th>
-                                                                <td [ngClass]="changedClass('householdMonthlyAvgIncome')"
-                                                                    [pTooltip]="diffTip('householdMonthlyAvgIncome')">
-                                                                    {{ editedDetails?.household?.monthlyIncome || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Selection Criteria</th>
-                                                                <td [ngClass]="changedClass('selectionCriteria')"
-                                                                    [pTooltip]="diffTip('selectionCriteria')">
-                                                                    {{ editedDetails?.household?.selectionCriteria ||
-                                                                    '-' }}
-                                                                </td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th>Selection Reasons</th>
-                                                                <td [ngClass]="changedClass('selectionReason')"
-                                                                    [pTooltip]="diffTip('selectionReason')">
-                                                                    @if
-                                                                    (editedDetails?.household?.selectionReasons?.length)
-                                                                    {
-                                                                    <ul>
-                                                                        @for (r of
-                                                                        editedDetails?.household.selectionReasons;
-                                                                        track r; let i = $index) {
-                                                                        <li>{{ i + 1 }}. {{ r }}</li>
-                                                                        }
-                                                                    </ul>
-                                                                    } @else { N/A }
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-
-                                                    <table class="table table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th colspan="8" class="bg-secondary text-center"
-                                                                    [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
-                                                                    [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
-                                                                    <span class="text-light">
-                                                                        Total Member: {{ editedDetails?.householdSize }}
-                                                                    </span>
-                                                                </th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">Female Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember2?.femaleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.femaleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.femaleTotal
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember35?.femaleTotal
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember64?.femaleTotal
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember65?.femaleTotal
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMemberLactating35?.femaleTotal
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMemberLactating64?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">Male Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember2?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.maleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">Chronically ill Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember2?.maleBoth || 0)
-                                                                    +
-                                                                    (editedDetails?.householdMember2?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember2?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember2?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember5?.maleBoth || 0)
-                                                                    +
-                                                                    (editedDetails?.householdMember5?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember5?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember17?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember17?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember35?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember35?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember64?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember64?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.femaleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember65?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.maleChronicalIll
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember65?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.femaleChronicalIll
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">Member with Disability</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember2?.maleBoth || 0)
-                                                                    +
-                                                                    (editedDetails?.householdMember2?.maleDisable ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember2?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember2?.femaleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember5?.maleBoth || 0)
-                                                                    +
-                                                                    (editedDetails?.householdMember5?.maleDisable ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.femaleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember17?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.maleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember17?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.femaleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember35?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.maleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember35?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.femaleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember64?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.maleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember64?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.femaleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember65?.maleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.maleDisable
-                                                                    || 0) +
-                                                                    (editedDetails?.householdMember65?.femaleBoth ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.femaleDisable
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-
-                                                    <table class="table table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th class="table-label">0–2 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember2?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember2?.femaleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">3–5 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember5?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember5?.femaleTotal ||
-                                                                    0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">6–17 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember17?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember17?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">18–35 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember35?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember35?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">36–64 Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember64?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember64?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-
-                                                                <th class="table-label">64+ Yrs Old Member</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{
-                                                                    (editedDetails?.householdMember65?.maleTotal ||
-                                                                    0) +
-                                                                    (editedDetails?.householdMember65?.femaleTotal
-                                                                    || 0)
-                                                                    }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="table-label">Lactating Women (18-35)</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{ editedDetails?.householdMemberLactating35?.femaleTotal || 0 }}
-                                                                </td>
-
-                                                                <th class="table-label">Lactating Women (36-64)</th>
-                                                                <td width="75px" class="text-center">
-                                                                    {{ editedDetails?.householdMemberLactating64?.femaleTotal || 0 }}
-                                                                </td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-
-
-                                                    <table class="table table-bordered mb-0 mt-3">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>
-                                                                    Not including yourself, how many other members
-                                                                    of your household are between 18 and 35 and
-                                                                    can read and write
-                                                                </th>
-                                                                <td class="text-center">
-                                                                    {{
-                                                                    editedDetails?.household?.memberReadWrite
-                                                                    ?? 0 }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    Respondent Can read/Write (Any Language)
-                                                                </th>
-                                                                <td class="text-center">
-                                                                    {{ editedDetails?.household?.isReadWrite
-                                                                    === true ? 'Yes' :
-                                                                    editedDetails?.household?.isReadWrite ===
-                                                                    false ? 'No' : '-' }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </p-accordion-content>
-                                    </p-accordion-panel>
-
-                                    <!-- Address -->
-                                    <p-accordion-panel value="1">
-                                        <p-accordion-header>Address Information (Edited)</p-accordion-header>
-                                        <p-accordion-content>
-                                            <div class="card shadow-sm rounded">
-                                                <div class="card-body">
-                                                    <table class="table table-sm table-bordered mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>State</th>
-                                                                <td [ngClass]="changedClass('address.stateId')"
-                                                                    [pTooltip]="diffTip('address.stateId')">
-                                                                    {{ editedDetails?.address?.state || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>County</th>
-                                                                <td [ngClass]="changedClass('address.countyId')"
-                                                                    [pTooltip]="diffTip('address.countyId')">
-                                                                    {{ editedDetails?.address?.county || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Payam</th>
-                                                                <td [ngClass]="changedClass('address.payam')"
-                                                                    [pTooltip]="diffTip('address.payam')">
-                                                                    {{ editedDetails?.address?.payam || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Boma</th>
-                                                                <td [ngClass]="changedClass('address.boma')"
-                                                                    [pTooltip]="diffTip('address.boma')">
-                                                                    {{ editedDetails?.address?.boma || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Latitude</th>
-                                                                <td [ngClass]="changedClass(['address.location.lat','address.lat'])"
-                                                                    [pTooltip]="diffTip(['address.location.lat','address.lat'])">
-                                                                    {{ editedDetails?.address?.lat || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Longitude</th>
-                                                                <td [ngClass]="changedClass(['address.location.lon','address.lon'])"
-                                                                    [pTooltip]="diffTip(['address.location.lon','address.lon'])">
-                                                                    {{ editedDetails?.address?.lon || '-' }}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </p-accordion-content>
-                                    </p-accordion-panel>
-                                </p-accordion>
-                            </div>
+                  <!-- Address -->
+                  <p-accordion-panel value="1">
+                    <p-accordion-header>Address Information (Old)</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th style="width: 180px">State</th>
+                                <td>
+                                  {{ oldDetails?.address?.state || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>County</th>
+                                <td>
+                                  {{ oldDetails?.address?.county || '-'
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Payam</th>
+                                <td>
+                                  {{ oldDetails?.address?.payam || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Boma</th>
+                                <td>
+                                  {{ oldDetails?.address?.boma || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Latitude</th>
+                                <td>
+                                  {{ oldDetails?.address?.lat || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Longitude</th>
+                                <td>
+                                  {{ oldDetails?.address?.lon || '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
-                    </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                </p-accordion>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="card shadow-sm rounded">
+                <div class="card-header bg-gray text-black">
+                  <strong>Personal Information (Edited)</strong>
+                </div>
+
+                <div class="card-body text-center">
+                  <img [src]="editedDetails?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3" width="200" />
+                  <table class="table table-bordered table-sm text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Application ID</th>
+                        <td>{{ editedDetails?.applicationId }}</td>
+                      </tr>
+                      <tr>
+                        <th>Name</th>
+                        <td
+                          [ngClass]="changedClass(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
+                          [pTooltip]="diffTip(['respondentFirstName','respondentMiddleName','respondentLastName','respondentNickName'])"
+                          tooltipPosition="top">
+                          {{ editedDetails?.name }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td [ngClass]="changedClass('respondentAge')" [pTooltip]="diffTip('respondentAge')">
+                          {{ editedDetails?.age }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td [ngClass]="changedClass('respondentGender')" [pTooltip]="diffTip('respondentGender')">
+                          {{ editedDetails?.gender }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Relationship</th>
+                        <td [ngClass]="changedClass('relationshipWithHouseholdHead')"
+                          [pTooltip]="diffTip('relationshipWithHouseholdHead')">
+                          {{
+                          lookup.getRelationshipEnumByValue(
+                          editedDetails?.relationshipWithHouseholdHead
+                          )
+                          }}
+                          @if (
+                          editedDetails?.relationshipWithHouseholdHead === 'OTHER' &&
+                          editedDetails?.relationshipOther
+                          ) {
+                          ({{ editedDetails?.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Marital Status</th>
+                        <td [ngClass]="changedClass('respondentMaritalStatus')"
+                          [pTooltip]="diffTip('respondentMaritalStatus')">
+                          {{ editedDetails?.respondentMaritalStatus }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Spouse Name</th>
+                        <td [ngClass]="changedClass(['spouseFirstName','spouseMiddleName','spouseLastName'])"
+                          [pTooltip]="diffTip(['spouseFirstName','spouseMiddleName','spouseLastName'])">
+                          {{ editedDetails?.spouseName }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Legal Status</th>
+                        <td [ngClass]="changedClass('respondentLegalStatus')"
+                          [pTooltip]="diffTip('respondentLegalStatus')">
+                          {{ editedDetails?.respondentLegalStatus }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>ID Number (Type)</th>
+                        <td [ngClass]="changedClass(['respondentId','documentType'])"
+                          [pTooltip]="diffTip(['respondentId','documentType'])">
+                          {{ editedDetails?.respondentId }}
+                          @if (editedDetails?.documentType) {
+                          ({{ lookup.getDocumentTypeEnumByValue(editedDetails?.documentType)
+                          }})
+                          @if (
+                          editedDetails?.documentType === 'OTHER' &&
+                          editedDetails?.documentTypeOther
+                          ) {
+                          ({{ editedDetails?.documentTypeOther }})
+                          }
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Mobile Money Provider</th>
+                        <td [ngClass]="changedClass('mobileMoneyProvider')" [pTooltip]="diffTip('mobileMoneyProvider')">
+                          {{ editedDetails?.mobileMoneyProvider }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Mobile Wallet Number</th>
+                        <td [ngClass]="changedClass('mobileWalletNumber')" [pTooltip]="diffTip('mobileWalletNumber')">
+                          {{ editedDetails?.mobileWalletNumber }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Registration Phase</th>
+                        <td [ngClass]="changedClass('registrationPhase')" [pTooltip]="diffTip('registrationPhase')">
+                          {{ editedDetails?.registrationPhase }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Phone</th>
+                        <td [ngClass]="changedClass('respondentPhoneNo')" [pTooltip]="diffTip('respondentPhoneNo')">
+                          {{ editedDetails?.phone }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card shadow-sm rounded mt-2">
+                <div class="card-header bg-gray text-black">
+                  Biometric Fingerprints
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered text-center mb-0">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          <td *ngFor="let f of editedRightFingers; let i = index"
+                            [ngClass]="changedClass(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])"
+                            [pTooltip]="diffTip(['biometric.rtFingerData','biometric.riFingerData','biometric.rmFingerData','biometric.rrFingerData','biometric.rsFingerData'][i])">
+                            <img [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          <td *ngFor="let f of editedLeftFingers; let i = index"
+                            [ngClass]="changedClass(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])"
+                            [pTooltip]="diffTip(['biometric.ltFingerData','biometric.liFingerData','biometric.lmFingerData','biometric.lrFingerData','biometric.lsFingerData'][i])">
+                            <img [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
 
 
-                    <!-- =========================
+              <!-- Fingerprints -->
+
+              <div class="card mt-2">
+                <p-accordion value="0">
+                  <!-- Household -->
+                  <p-accordion-panel value="0">
+                    <p-accordion-header>Household Information (Edited)</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th>Income Source</th>
+                                <td [ngClass]="changedClass('householdIncomeSource')"
+                                  [pTooltip]="diffTip('householdIncomeSource')">
+                                  {{
+                                  lookup.getIncomeSourceEnumByValue(
+                                  editedDetails?.household?.incomeSource
+                                  )
+                                  }}
+                                  @if (
+                                  editedDetails?.household?.incomeSource === 'OTHER'
+                                  &&
+                                  editedDetails?.household?.incomeSourceOther
+                                  ) {
+                                  ({{ editedDetails?.household?.incomeSourceOther }})
+                                  }
+                                </td>
+                              </tr>
+
+
+                              <tr>
+                                <th>Monthly Avg Income</th>
+                                <td [ngClass]="changedClass('householdMonthlyAvgIncome')"
+                                  [pTooltip]="diffTip('householdMonthlyAvgIncome')">
+                                  {{ editedDetails?.household?.monthlyIncome || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Selection Criteria</th>
+                                <td [ngClass]="changedClass('selectionCriteria')"
+                                  [pTooltip]="diffTip('selectionCriteria')">
+                                  {{ editedDetails?.household?.selectionCriteria ||
+                                  '-' }}
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Selection Reasons</th>
+                                <td [ngClass]="changedClass('selectionReason')" [pTooltip]="diffTip('selectionReason')">
+                                  @if
+                                  (editedDetails?.household?.selectionReasons?.length)
+                                  {
+                                  <ul>
+                                    @for (r of
+                                    editedDetails?.household.selectionReasons;
+                                    track r; let i = $index) {
+                                    <li>{{ i + 1 }}. {{ r }}</li>
+                                    }
+                                  </ul>
+                                  } @else { N/A }
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th colspan="8" class="bg-secondary text-center"
+                                  [ngClass]="changedClassPrefix(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])"
+                                  [pTooltip]="diffTip(['householdMember2','householdMember5','householdMember17','householdMember35','householdMember64','householdMember65'])">
+                                  <span class="text-light">
+                                    Total Member: {{ editedDetails?.householdSize }}
+                                  </span>
+                                </th>
+                              </tr>
+                              <tr>
+                                <th class="table-label">Female Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember2?.femaleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.femaleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.femaleTotal
+                                  || 0) +
+                                  (editedDetails?.householdMember35?.femaleTotal
+                                  || 0) +
+                                  (editedDetails?.householdMember64?.femaleTotal
+                                  || 0) +
+                                  (editedDetails?.householdMember65?.femaleTotal
+                                  || 0) +
+                                  (editedDetails?.householdMemberLactating35?.femaleTotal
+                                  || 0) +
+                                  (editedDetails?.householdMemberLactating64?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Male Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember2?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.maleTotal ||
+                                  0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Chronically ill Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember2?.maleBoth || 0)
+                                  +
+                                  (editedDetails?.householdMember2?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember2?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember2?.femaleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember5?.maleBoth || 0)
+                                  +
+                                  (editedDetails?.householdMember5?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember5?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.femaleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember17?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember17?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.femaleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember35?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember35?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.femaleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember64?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember64?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.femaleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember65?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.maleChronicalIll
+                                  || 0) +
+                                  (editedDetails?.householdMember65?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.femaleChronicalIll
+                                  || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">Member with Disability</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember2?.maleBoth || 0)
+                                  +
+                                  (editedDetails?.householdMember2?.maleDisable ||
+                                  0) +
+                                  (editedDetails?.householdMember2?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember2?.femaleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember5?.maleBoth || 0)
+                                  +
+                                  (editedDetails?.householdMember5?.maleDisable ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.femaleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember17?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.maleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember17?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.femaleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember35?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.maleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember35?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.femaleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember64?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.maleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember64?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.femaleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember65?.maleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.maleDisable
+                                  || 0) +
+                                  (editedDetails?.householdMember65?.femaleBoth ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.femaleDisable
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class="table table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th class="table-label">0–2 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember2?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember2?.femaleTotal ||
+                                  0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">3–5 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember5?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember5?.femaleTotal ||
+                                  0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">6–17 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember17?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember17?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th class="table-label">18–35 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember35?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember35?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">36–64 Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember64?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember64?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+
+                                <th class="table-label">64+ Yrs Old Member</th>
+                                <td width="75px" class="text-center">
+                                  {{
+                                  (editedDetails?.householdMember65?.maleTotal ||
+                                  0) +
+                                  (editedDetails?.householdMember65?.femaleTotal
+                                  || 0)
+                                  }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th class="table-label">Lactating Women (18-35)</th>
+                                <td width="75px" class="text-center">
+                                  {{ editedDetails?.householdMemberLactating35?.femaleTotal || 0 }}
+                                </td>
+
+                                <th class="table-label">Lactating Women (36-64)</th>
+                                <td width="75px" class="text-center">
+                                  {{ editedDetails?.householdMemberLactating64?.femaleTotal || 0 }}
+                                </td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+
+                          <table class="table table-bordered mb-0 mt-3">
+                            <tbody>
+                              <tr>
+                                <th>
+                                  Not including yourself, how many other members
+                                  of your household are between 18 and 35 and
+                                  can read and write
+                                </th>
+                                <td class="text-center">
+                                  {{
+                                  editedDetails?.household?.memberReadWrite
+                                  ?? 0 }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>
+                                  Respondent Can read/Write (Any Language)
+                                </th>
+                                <td class="text-center">
+                                  {{ editedDetails?.household?.isReadWrite
+                                  === true ? 'Yes' :
+                                  editedDetails?.household?.isReadWrite ===
+                                  false ? 'No' : '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+
+                  <!-- Address -->
+                  <p-accordion-panel value="1">
+                    <p-accordion-header>Address Information (Edited)</p-accordion-header>
+                    <p-accordion-content>
+                      <div class="card shadow-sm rounded">
+                        <div class="card-body">
+                          <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                              <tr>
+                                <th>State</th>
+                                <td [ngClass]="changedClass('address.stateId')" [pTooltip]="diffTip('address.stateId')">
+                                  {{ editedDetails?.address?.state || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>County</th>
+                                <td [ngClass]="changedClass('address.countyId')"
+                                  [pTooltip]="diffTip('address.countyId')">
+                                  {{ editedDetails?.address?.county || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Payam</th>
+                                <td [ngClass]="changedClass('address.payam')" [pTooltip]="diffTip('address.payam')">
+                                  {{ editedDetails?.address?.payam || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Boma</th>
+                                <td [ngClass]="changedClass('address.boma')" [pTooltip]="diffTip('address.boma')">
+                                  {{ editedDetails?.address?.boma || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Latitude</th>
+                                <td [ngClass]="changedClass(['address.location.lat','address.lat'])"
+                                  [pTooltip]="diffTip(['address.location.lat','address.lat'])">
+                                  {{ editedDetails?.address?.lat || '-' }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Longitude</th>
+                                <td [ngClass]="changedClass(['address.location.lon','address.lon'])"
+                                  [pTooltip]="diffTip(['address.location.lon','address.lon'])">
+                                  {{ editedDetails?.address?.lon || '-' }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                </p-accordion>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- =========================
                  Accordion inside the same tab
                  (Household, Address, Alternate)
             ========================== -->
-                    <!-- <div class="mt-3">
+          <!-- <div class="mt-3">
 
         </div> -->
-                </div>
-            </p-tabpanel>
+        </div>
+      </p-tabpanel>
 
-            <!-- =========================
+      <!-- =========================
            TAB: Alternate Information
       ========================== -->
-            <p-tabpanel value="1">
-                <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
-                    <div class="row g-3">
-                        <!-- ===== Left Column: OLD ===== -->
-                        <div class="col-12 col-md-6">
-                            @if (!oldDetails?.alternates?.length) {
-                            <div class="alert alert-gray text-center mb-0">
-                                No Alternate Payee Information Provided (Old)
-                            </div>
-                            } @else {
-                            @for (alt of oldDetails!.alternates; track alt; let i = $index) {
-                            @if (alt === null) {
-                            <div class="card shadow-sm rounded mb-3" style="height: 785px;">
-                                <div class="card-header  text-center">
-                                    Alternate {{ i + 1 }} (Old)
-                                </div>
-                                <div class="card-body text-center d-flex align-items-center justify-content-center"
-                                    style="min-height: 200px;">
-                                    <div>
-                                        <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
-                                        <h5 class="mt-3 text-danger">No Alternate Data</h5>
-                                        <p class="text-muted">This alternate has No Data</p>
-                                    </div>
-                                </div>
-                            </div>
-                            } @else {
-
-                            <div class="card shadow-sm rounded mb-3" style="height:auto;">
-                                <div class="card-header bg-gray text-black text-center">
-                                    Alternate {{ i + 1 }} (Old)
-                                </div>
-                                <div class="card-body text-center">
-                                    <img [src]="alt?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
-                                        width="200" />
-
-                                    @if (alt?.biometric) {
-                                    <div class="table-responsive mb-3">
-                                        <table class="table table-bordered text-center">
-                                            <tbody>
-                                                <tr>
-                                                    <th colspan="5">Right Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of alt?.rightFingers; track f) {
-                                                    <td>
-                                                        <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="5">Left Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of alt?.leftFingers; track f) {
-                                                    <td>
-                                                        <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    }
-
-                                    <table class="table table-sm table-bordered text-start mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th style="width: 160px">Name</th>
-                                                <td>{{ alt?.name || '-' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td>{{ alt?.age }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td>{{ alt?.gender || '-' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Alternate Relationship</th>
-                                                <td>
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(
-                                                    alt?.relationshipWithHouseholdHead
-                                                    )
-                                                    }}
-                                                    @if (
-                                                    alt?.relationshipWithHouseholdHead === 'OTHER' &&
-                                                    alt?.relationshipOther
-                                                    ) {
-                                                    ({{ alt?.relationshipOther }})
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>ID</th>
-                                                <td>{{ alt?.nationalId || '-' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Document Type</th>
-                                                <td>
-                                                    {{ lookup.getDocumentTypeEnumByValue(alt?.documentType) }}
-                                                    @if (alt?.documentType === 'OTHER' && alt?.documentTypeOther) {
-                                                    ({{ alt?.documentTypeOther }})
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>Phone</th>
-                                                <td>{{ alt?.phone || '-' }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            }
-                            }
-                            }
-                        </div>
-
-                        <!-- ===== Right Column: EDITED ===== -->
-                        <div class="col-12 col-md-6">
-                            @if (editedDetails?.alternates === null) {
-                            <div class="alert alert-gray text-center mb-0">
-                                No Alternate Payee Information Provided (Edited)
-                            </div>
-                            } @else {
-                            @for (alt of editedDetails!.alternates; track alt; let i = $index) {
-
-                            @if (alt === null) {
-                            <div class="card shadow-sm rounded mb-3" style="height: 785px;">
-                                <div class="card-header  text-center">
-                                    Alternate {{ i + 1 }} (Edited)
-                                </div>
-                                <div class="card-body text-center d-flex align-items-center justify-content-center"
-                                    style="min-height: 200px;">
-                                    <div>
-                                        <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
-                                        <h5 class="mt-3 text-danger">No Alternate Data</h5>
-                                        <p class="text-muted">This alternate has No Data</p>
-                                    </div>
-                                </div>
-                            </div>
-                            } @else {
-                            <div class="card shadow-sm rounded mb-3" style="height:auto;">
-                                <div class="card-header bg-gray text-black text-center">
-                                    Alternate {{ i + 1 }} (Edited)
-                                </div>
-                                <div class="card-body text-center">
-                                    <img [src]="alt.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3"
-                                        width="200" [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
-                                        [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
-
-
-                                    @if (alt.biometric) {
-                                    <div class="table-responsive mb-3">
-                                        <table class="table table-bordered text-center">
-                                            <tbody>
-                                                <tr>
-                                                    <th colspan="5">Right Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of alt.rightFingers; track f; let j = $index) {
-                                                    <td [ngClass]="changedClass(altFingerPath(i,'right',j))"
-                                                        [pTooltip]="diffTip(altFingerPath(i,'right',j))">
-                                                        <img [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="5">Left Hand Finger</th>
-                                                </tr>
-                                                <tr>
-                                                    @for (f of alt.leftFingers; track f; let j = $index) {
-                                                    <td [ngClass]="changedClass(altFingerPath(i,'left',j))"
-                                                        [pTooltip]="diffTip(altFingerPath(i,'left',j))">
-                                                        <img [src]="f.image" height="40" /><br />
-                                                        <kbd>{{ f.label }}</kbd>
-                                                    </td>
-                                                    }
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    }
-
-                                    <table class="table table-sm table-bordered text-start mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th style="width: 160px">Name</th>
-                                                <td [ngClass]="changedClass([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])"
-                                                    [pTooltip]="diffTip([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])">
-                                                    {{ alt.name || '-' }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td [ngClass]="changedClass(altPath(i,'payeeAge'))"
-                                                    [pTooltip]="diffTip(altPath(i,'payeeAge'))">
-                                                    {{ alt.age }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td [ngClass]="changedClass(altPath(i,'payeeGender'))"
-                                                    [pTooltip]="diffTip(altPath(i,'payeeGender'))">
-                                                    {{ alt.gender || '-' }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Alternate Relationship</th>
-                                                <td [ngClass]="changedClass(altPath(i, 'relationshipWithHouseholdHead'))"
-                                                    [pTooltip]="diffTip(altPath(i, 'relationshipWithHouseholdHead'))">
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
-                                                    }}
-                                                    @if (
-                                                    alt.relationshipWithHouseholdHead === 'OTHER' &&
-                                                    alt.relationshipOther
-                                                    ) {
-                                                    ({{ alt.relationshipOther }})
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>ID</th>
-                                                <td [ngClass]="changedClass(altPath(i,'nationalId'))"
-                                                    [pTooltip]="diffTip(altPath(i,'nationalId'))">
-                                                    {{ alt.nationalId || '-' }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Document Type</th>
-                                                <td [ngClass]="changedClass(altPath(i, 'documentType'))"
-                                                    [pTooltip]="diffTip(altPath(i, 'documentType'))">
-                                                    {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
-                                                    @if (alt.documentType === 'OTHER' && alt.documentTypeOther) {
-                                                    ({{ alt.documentTypeOther }})
-                                                    }
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <th>Phone</th>
-                                                <td [ngClass]="changedClass(altPath(i,'payeePhoneNo'))"
-                                                    [pTooltip]="diffTip(altPath(i,'payeePhoneNo'))">
-                                                    {{ alt.phone || '-' }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            }
-                            }
-                            }
-                        </div>
-                    </div>
+      <p-tabpanel value="1">
+        <div class="p-2" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="row g-3">
+            <!-- ===== Left Column: OLD ===== -->
+            <div class="col-12 col-md-6">
+              @if (!oldDetails?.alternates?.length) {
+              <div class="alert alert-gray text-center mb-0">
+                No Alternate Payee Information Provided (Old)
+              </div>
+              } @else {
+              @for (alt of oldDetails!.alternates; track alt; let i = $index) {
+              @if (alt === null) {
+              <div class="card shadow-sm rounded mb-3" style="height: 785px;">
+                <div class="card-header  text-center">
+                  Alternate {{ i + 1 }} (Old)
                 </div>
-            </p-tabpanel>
+                <div class="card-body text-center d-flex align-items-center justify-content-center"
+                  style="min-height: 200px;">
+                  <div>
+                    <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                    <h5 class="mt-3 text-danger">No Alternate Data</h5>
+                    <p class="text-muted">This alternate has No Data</p>
+                  </div>
+                </div>
+              </div>
+              } @else {
+
+              <div class="card shadow-sm rounded mb-3" style="height:auto;">
+                <div class="card-header bg-gray text-black text-center">
+                  Alternate {{ i + 1 }} (Old)
+                </div>
+                <div class="card-body text-center">
+                  <img [src]="alt?.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3" width="200" />
+
+                  @if (alt?.biometric) {
+                  <div class="table-responsive mb-3">
+                    <table class="table table-bordered text-center">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt?.rightFingers; track f) {
+                          <td>
+                            <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt?.leftFingers; track f) {
+                          <td>
+                            <img [src]="f.image" [pTooltip]="f.tooltip" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  }
+
+                  <table class="table table-sm table-bordered text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th style="width: 160px">Name</th>
+                        <td>{{ alt?.name || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ alt?.age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ alt?.gender || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Alternate Relationship</th>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(
+                          alt?.relationshipWithHouseholdHead
+                          )
+                          }}
+                          @if (
+                          alt?.relationshipWithHouseholdHead === 'OTHER' &&
+                          alt?.relationshipOther
+                          ) {
+                          ({{ alt?.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>ID</th>
+                        <td>{{ alt?.nationalId || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Document Type</th>
+                        <td>
+                          {{ lookup.getDocumentTypeEnumByValue(alt?.documentType) }}
+                          @if (alt?.documentType === 'OTHER' && alt?.documentTypeOther) {
+                          ({{ alt?.documentTypeOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Phone</th>
+                        <td>{{ alt?.phone || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              }
+              }
+              }
+            </div>
+
+            <!-- ===== Right Column: EDITED ===== -->
+            <div class="col-12 col-md-6">
+              @if (editedDetails?.alternates === null) {
+              <div class="alert alert-gray text-center mb-0">
+                No Alternate Payee Information Provided (Edited)
+              </div>
+              } @else {
+              @for (alt of editedDetails!.alternates; track alt; let i = $index) {
+
+              @if (alt === null) {
+              <div class="card shadow-sm rounded mb-3" style="height: 785px;">
+                <div class="card-header  text-center">
+                  Alternate {{ i + 1 }} (Edited)
+                </div>
+                <div class="card-body text-center d-flex align-items-center justify-content-center"
+                  style="min-height: 200px;">
+                  <div>
+                    <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                    <h5 class="mt-3 text-danger">No Alternate Data</h5>
+                    <p class="text-muted">This alternate has No Data</p>
+                  </div>
+                </div>
+              </div>
+              } @else {
+              <div class="card shadow-sm rounded mb-3" style="height:auto;">
+                <div class="card-header bg-gray text-black text-center">
+                  Alternate {{ i + 1 }} (Edited)
+                </div>
+                <div class="card-body text-center">
+                  <img [src]="alt.photo || 'images/dummyHuman.jpg'" class="img-thumbnail mb-3" width="200"
+                    [ngClass]="changedClass(altPath(i,'biometric.photoData'))"
+                    [pTooltip]="diffTip(altPath(i,'biometric.photoData'))" />
+
+
+                  @if (alt.biometric) {
+                  <div class="table-responsive mb-3">
+                    <table class="table table-bordered text-center">
+                      <tbody>
+                        <tr>
+                          <th colspan="5">Right Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt.rightFingers; track f; let j = $index) {
+                          <td [ngClass]="changedClass(altFingerPath(i,'right',j))"
+                            [pTooltip]="diffTip(altFingerPath(i,'right',j))">
+                            <img [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                        <tr>
+                          <th colspan="5">Left Hand Finger</th>
+                        </tr>
+                        <tr>
+                          @for (f of alt.leftFingers; track f; let j = $index) {
+                          <td [ngClass]="changedClass(altFingerPath(i,'left',j))"
+                            [pTooltip]="diffTip(altFingerPath(i,'left',j))">
+                            <img [src]="f.image" height="40" /><br />
+                            <kbd>{{ f.label }}</kbd>
+                          </td>
+                          }
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  }
+
+                  <table class="table table-sm table-bordered text-start mb-0">
+                    <tbody>
+                      <tr>
+                        <th style="width: 160px">Name</th>
+                        <td
+                          [ngClass]="changedClass([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])"
+                          [pTooltip]="diffTip([altPath(i,'payeeFirstName'), altPath(i,'payeeMiddleName'), altPath(i,'payeeLastName'), altPath(i,'payeeNickName')])">
+                          {{ alt.name || '-' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td [ngClass]="changedClass(altPath(i,'payeeAge'))" [pTooltip]="diffTip(altPath(i,'payeeAge'))">
+                          {{ alt.age }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td [ngClass]="changedClass(altPath(i,'payeeGender'))"
+                          [pTooltip]="diffTip(altPath(i,'payeeGender'))">
+                          {{ alt.gender || '-' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Alternate Relationship</th>
+                        <td [ngClass]="changedClass(altPath(i, 'relationshipWithHouseholdHead'))"
+                          [pTooltip]="diffTip(altPath(i, 'relationshipWithHouseholdHead'))">
+                          {{
+                          lookup.getRelationshipEnumByValue(alt.relationshipWithHouseholdHead)
+                          }}
+                          @if (
+                          alt.relationshipWithHouseholdHead === 'OTHER' &&
+                          alt.relationshipOther
+                          ) {
+                          ({{ alt.relationshipOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>ID</th>
+                        <td [ngClass]="changedClass(altPath(i,'nationalId'))"
+                          [pTooltip]="diffTip(altPath(i,'nationalId'))">
+                          {{ alt.nationalId || '-' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Document Type</th>
+                        <td [ngClass]="changedClass(altPath(i, 'documentType'))"
+                          [pTooltip]="diffTip(altPath(i, 'documentType'))">
+                          {{ lookup.getDocumentTypeEnumByValue(alt.documentType) }}
+                          @if (alt.documentType === 'OTHER' && alt.documentTypeOther) {
+                          ({{ alt.documentTypeOther }})
+                          }
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Phone</th>
+                        <td [ngClass]="changedClass(altPath(i,'payeePhoneNo'))"
+                          [pTooltip]="diffTip(altPath(i,'payeePhoneNo'))">
+                          {{ alt.phone || '-' }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              }
+              }
+              }
+            </div>
+          </div>
+        </div>
+      </p-tabpanel>
 
 
 
 
 
-            <!-- =========================
+      <!-- =========================
                TAB: Nominee Information
           ========================== -->
-            <p-tabpanel value="2">
-                <div class="p-3" style="height: calc(100vh - 210px); overflow-y: auto">
-                    <div class="row">
-                        <!-- When both are empty -->
-                        @if (nomineeCount === 0) {
-                        <div class="col-12">
-                            <div class="alert alert-warning text-center">
-                                No Nominee Information Provided
-                            </div>
-                        </div>
-                        } @else {
+      <p-tabpanel value="2">
+        <div class="p-3" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="row">
+            <!-- When both are empty -->
+            @if (nomineeCount === 0) {
+            <div class="col-12">
+              <div class="alert alert-warning text-center">
+                No Nominee Information Provided
+              </div>
+            </div>
+            } @else {
 
-                        <!-- Build a paired grid by index -->
-                        @for (i of range(nomineeCount); track trackIndex($index, i)) {
+            <!-- Build a paired grid by index -->
+            @for (i of range(nomineeCount); track trackIndex($index, i)) {
 
-                        <!-- Left: OLD -->
-                        <div class="col-12 col-md-6">
-                            @if (oldDetails?.nominees?.[i]) {
-                            <div class="card shadow-sm rounded mb-3">
-                                <div class="card-header bg-gray text-black text-center">
-                                    Nominee {{ i + 1 }} (Old)
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td>{{ oldDetails!.nominees[i].name }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td>{{ oldDetails!.nominees[i].age }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td>{{ oldDetails!.nominees[i].gender }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Relation</th>
-                                                <td>
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(oldDetails!.nominees[i].relation)
-                                                    }}
-                                                    {{ oldDetails!.nominees[i].relation === 'OTHER'
-                                                    ? '(' + oldDetails!.nominees[i].relationshipOther + ')'
-                                                    : '' }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Occupation</th>
-                                                <td>{{ oldDetails!.nominees[i].nomineeOccupation }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Other Occupation</th>
-                                                <td>{{ oldDetails!.nominees[i].otherOccupation }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Can read/Write</th>
-                                                <td>
-                                                    {{
-                                                    oldDetails!.nominees[i].isReadWrite === true ? 'Yes' :
-                                                    oldDetails!.nominees[i].isReadWrite === false ? 'No' : '-'
-                                                    }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            } @else {
-                            <div class="alert alert-gray text-center">No data (Old)</div>
-                            }
-                        </div>
-
-                        <!-- Right: EDITED -->
-                        <div class="col-12 col-md-6">
-                            @if (editedDetails?.nominees?.[i]) {
-                            <div class="card shadow-sm rounded mb-3">
-                                <div class="card-header bg-gray text-black text-center">
-                                    Nominee {{ i + 1 }} (Edited)
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'),nomineePath(i,'nomineeNickName')])"
-                                                    [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'), nomineePath(i,'nomineeNickName')])">
-                                                    {{ editedDetails!.nominees[i].name }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Age</th>
-                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeAge'))"
-                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeAge'))">
-                                                    {{ editedDetails!.nominees[i].age }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeGender'))"
-                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeGender'))">
-                                                    {{ editedDetails!.nominees[i].gender }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Relation</th>
-                                                <td [ngClass]="changedClass([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])"
-                                                    [pTooltip]="diffTip([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])">
-                                                    {{
-                                                    lookup.getRelationshipEnumByValue(editedDetails!.nominees[i].relation)
-                                                    }}
-                                                    {{ editedDetails!.nominees[i].relation === 'OTHER' ? '(' +
-                                                    editedDetails!.nominees[i].relationshipOther + ')' : '' }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Occupation</th>
-                                                <td [ngClass]="changedClass(nomineePath(i,'nomineeOccupation'))"
-                                                    [pTooltip]="diffTip(nomineePath(i,'nomineeOccupation'))">
-                                                    {{ editedDetails!.nominees[i].nomineeOccupation }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Other Occupation</th>
-                                                <td [ngClass]="changedClass(nomineePath(i,'otherOccupation'))"
-                                                    [pTooltip]="diffTip(nomineePath(i,'otherOccupation'))">
-                                                    {{ editedDetails!.nominees[i].otherOccupation }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Can read/Write</th>
-                                                <td [ngClass]="changedClass(nomineePath(i,'isReadWrite'))"
-                                                    [pTooltip]="diffTip(nomineePath(i,'isReadWrite'))">
-                                                    {{ editedDetails!.nominees[i].isReadWrite === true ? 'Yes' :
-                                                    editedDetails!.nominees[i].isReadWrite === false ? 'No' : '-' }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            } @else {
-                                @if (oldDetails?.nominees?.[i]) {
-                                    <div class="card shadow-sm rounded mb-3">
-                                        <div class="card-header bg-gray text-black text-center">
-                                            Nominee {{ i + 1 }} (Edited)
-                                        </div>
-                                        <div class="card-body text-center d-flex align-items-center justify-content-center"
-                                            style="min-height: 242px;">
-                                            <div>
-                                                <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
-                                                <h5 class="mt-3 text-danger">Nominee Deleted</h5>
-                                                <p class="text-muted">This nominee has been removed.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                } @else {
-                                    <div class="alert alert-gray text-center">No data (Edited)</div>
-                                }
-                            }
-                        </div>
-                        }
-                        }
-                    </div>
+            <!-- Left: OLD -->
+            <div class="col-12 col-md-6">
+              @if (oldDetails?.nominees?.[i]) {
+              <div class="card shadow-sm rounded mb-3">
+                <div class="card-header bg-gray text-black text-center">
+                  Nominee {{ i + 1 }} (Old)
                 </div>
-            </p-tabpanel>
+                <div class="card-body">
+                  <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Name</th>
+                        <td>{{ oldDetails!.nominees[i].name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td>{{ oldDetails!.nominees[i].age }}</td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td>{{ oldDetails!.nominees[i].gender }}</td>
+                      </tr>
+                      <tr>
+                        <th>Relation</th>
+                        <td>
+                          {{
+                          lookup.getRelationshipEnumByValue(oldDetails!.nominees[i].relation)
+                          }}
+                          {{ oldDetails!.nominees[i].relation === 'OTHER'
+                          ? '(' + oldDetails!.nominees[i].relationshipOther + ')'
+                          : '' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Occupation</th>
+                        <td>{{ oldDetails!.nominees[i].nomineeOccupation }}</td>
+                      </tr>
+                      <tr>
+                        <th>Other Occupation</th>
+                        <td>{{ oldDetails!.nominees[i].otherOccupation }}</td>
+                      </tr>
+                      <tr>
+                        <th>Can read/Write</th>
+                        <td>
+                          {{
+                          oldDetails!.nominees[i].isReadWrite === true ? 'Yes' :
+                          oldDetails!.nominees[i].isReadWrite === false ? 'No' : '-'
+                          }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              } @else {
+              <div class="alert alert-gray text-center">No data (Old)</div>
+              }
+            </div>
+
+            <!-- Right: EDITED -->
+            <div class="col-12 col-md-6">
+              @if (editedDetails?.nominees?.[i]) {
+              <div class="card shadow-sm rounded mb-3">
+                <div class="card-header bg-gray text-black text-center">
+                  Nominee {{ i + 1 }} (Edited)
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                      <tr>
+                        <th>Name</th>
+                        <td
+                          [ngClass]="changedClass([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'),nomineePath(i,'nomineeNickName')])"
+                          [pTooltip]="diffTip([nomineePath(i,'nomineeFirstName'), nomineePath(i,'nomineeMiddleName'), nomineePath(i,'nomineeLastName'), nomineePath(i,'nomineeNickName')])">
+                          {{ editedDetails!.nominees[i].name }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Age</th>
+                        <td [ngClass]="changedClass(nomineePath(i,'nomineeAge'))"
+                          [pTooltip]="diffTip(nomineePath(i,'nomineeAge'))">
+                          {{ editedDetails!.nominees[i].age }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Gender</th>
+                        <td [ngClass]="changedClass(nomineePath(i,'nomineeGender'))"
+                          [pTooltip]="diffTip(nomineePath(i,'nomineeGender'))">
+                          {{ editedDetails!.nominees[i].gender }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Relation</th>
+                        <td
+                          [ngClass]="changedClass([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])"
+                          [pTooltip]="diffTip([nomineePath(i,'relationshipWithHouseholdHead'), nomineePath(i,'relationshipOther')])">
+                          {{
+                          lookup.getRelationshipEnumByValue(editedDetails!.nominees[i].relation)
+                          }}
+                          {{ editedDetails!.nominees[i].relation === 'OTHER' ? '(' +
+                          editedDetails!.nominees[i].relationshipOther + ')' : '' }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Occupation</th>
+                        <td [ngClass]="changedClass(nomineePath(i,'nomineeOccupation'))"
+                          [pTooltip]="diffTip(nomineePath(i,'nomineeOccupation'))">
+                          {{ editedDetails!.nominees[i].nomineeOccupation }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Other Occupation</th>
+                        <td [ngClass]="changedClass(nomineePath(i,'otherOccupation'))"
+                          [pTooltip]="diffTip(nomineePath(i,'otherOccupation'))">
+                          {{ editedDetails!.nominees[i].otherOccupation }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Can read/Write</th>
+                        <td [ngClass]="changedClass(nomineePath(i,'isReadWrite'))"
+                          [pTooltip]="diffTip(nomineePath(i,'isReadWrite'))">
+                          {{ editedDetails!.nominees[i].isReadWrite === true ? 'Yes' :
+                          editedDetails!.nominees[i].isReadWrite === false ? 'No' : '-' }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              } @else {
+              @if (oldDetails?.nominees?.[i]) {
+              <div class="card shadow-sm rounded mb-3">
+                <div class="card-header bg-gray text-black text-center">
+                  Nominee {{ i + 1 }} (Edited)
+                </div>
+                <div class="card-body text-center d-flex align-items-center justify-content-center"
+                  style="min-height: 242px;">
+                  <div>
+                    <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                    <h5 class="mt-3 text-danger">Nominee Deleted</h5>
+                    <p class="text-muted">This nominee has been removed.</p>
+                  </div>
+                </div>
+              </div>
+              } @else {
+              <div class="alert alert-gray text-center">No data (Edited)</div>
+              }
+              }
+            </div>
+            }
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="3">
+        <div class="col-12 col-md-6 col-lg-12">
+          <p-card>
+            @if(isUserLoading){
+            <app-loader />
+            }@else if(user){
+            <div class="card-body">
+              <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">{{ user.fullName || 'N/A' }}</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">{{ user.email || 'N/A' }}</dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">{{ user.role || 'N/A' }}</dd>
+              </dl>
+
+              <div class="text-end mt-3">
+                <!-- Add action buttons or more content here -->
+              </div>
+            </div>
+            }@else {
+            <div class="card-body">
+              <p>User details not available.</p>
+            </div>
+            }
+          </p-card>
+        </div>
+      </p-tabpanel>
 
 
 
-        </p-tabpanels>
-    </p-tabs>
+    </p-tabpanels>
+  </p-tabs>
 
-    <!-- ===== Actions: Comment + Approve/Reject ===== -->
-    <!--<hr class="my-4" />
+  <!-- ===== Actions: Comment + Approve/Reject ===== -->
+  <!--<hr class="my-4" />
   <div class="card shadow-sm rounded">
     <div class="card-header bg-gray text-black">Approval Comment</div>
     <div class="card-body">
@@ -1615,27 +1633,26 @@
       </div>
     </div>
   </div>-->
-    } }
+  } }
 
 
-    <p-toast position="bottom-right" />
-    <!-- <p-confirmDialog [style]="{ width: '450px' }" /> -->
-    <p-confirmDialog #cd key="approvalDialog" [style]="{width: '500px'}">
-        <ng-template pTemplate="message">
-            <div>
-                <p>
-                    Are you sure you want to
-                    <strong [ngStyle]="{ color: isApprove ? 'green' : 'red' }">
-                        {{ isApprove ? 'approve' : 'reject' }}
-                    </strong>
-                    task #{{ taskId }}?
-                </p>
-                <textarea rows="3" [(ngModel)]="approvalComment" class="form-control mt-2"
-                    placeholder="Enter comment : ">
+  <p-toast position="bottom-right" />
+  <!-- <p-confirmDialog [style]="{ width: '450px' }" /> -->
+  <p-confirmDialog #cd key="approvalDialog" [style]="{width: '500px'}">
+    <ng-template pTemplate="message">
+      <div>
+        <p>
+          Are you sure you want to
+          <strong [ngStyle]="{ color: isApprove ? 'green' : 'red' }">
+            {{ isApprove ? 'approve' : 'reject' }}
+          </strong>
+          task #{{ taskId }}?
+        </p>
+        <textarea rows="3" [(ngModel)]="approvalComment" class="form-control mt-2" placeholder="Enter comment : ">
       </textarea>
-            </div>
-        </ng-template>
-    </p-confirmDialog>
+      </div>
+    </ng-template>
+  </p-confirmDialog>
 
 
 
