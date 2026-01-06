@@ -48,27 +48,27 @@
                         <tbody>
                           <tr>
                             <th>Application ID</th>
-                            <td>{{ beneficiaryDetails?.applicationId }}</td>
+                            <td>{{ beneficiaryDetails.applicationId }}</td>
                           </tr>
                           <tr>
                             <th>Name</th>
                             <td>
-                              {{ (beneficiaryDetails?.respondentFirstName || '') + ' ' +
-                              (beneficiaryDetails?.respondentMiddleName || '') + ' ' +
-                              (beneficiaryDetails?.respondentLastName || '') }}
+                              {{ (beneficiaryDetails.respondentFirstName || '') + ' ' +
+                              (beneficiaryDetails.respondentMiddleName || '') + ' ' +
+                              (beneficiaryDetails.respondentLastName || '') }}
                             </td>
                           </tr>
                           <tr>
                             <th>Age</th>
-                            <td>{{ beneficiaryDetails?.respondentAge }}</td>
+                            <td>{{ beneficiaryDetails.respondentAge }}</td>
                           </tr>
                           <tr>
                             <th>Gender</th>
-                            <td>{{ beneficiaryDetails?.respondentGender }}</td>
+                            <td>{{ beneficiaryDetails.respondentGender }}</td>
                           </tr>
                           <tr>
                             <th>Phone</th>
-                            <td>{{ beneficiaryDetails?.respondentPhoneNo }}</td>
+                            <td>{{ beneficiaryDetails.respondentPhoneNo }}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -171,7 +171,7 @@
                                       beneficiaryForm.get('mobileWalletNumber')?.touched
                                   }" />
                               </div>
-                              
+
                             </p-floatlabel>
 
                             @if (beneficiaryForm.get('mobileWalletNumber')?.invalid && beneficiaryForm.get('mobileWalletNumber')?.touched) {
