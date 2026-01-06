@@ -425,7 +425,7 @@ export class BeneficiaryViewList implements OnInit {
   }
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['/beneficiary/details', String(b.applicationId)]);
+    this.router.navigate(['/beneficiary/details-view', String(b.applicationId)]);
   }
 
 

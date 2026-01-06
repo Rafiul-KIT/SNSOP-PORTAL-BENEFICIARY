@@ -28,6 +28,7 @@ import { UnderConstruction } from './pages/under-construction/under-construction
 import { RedirectLink } from './pages/adjudication/redirect-link/redirect-link';
 import { BeneficiaryMomoWalletUpdate } from './pages/beneficiary/beneficiary-momo-wallet-update/beneficiary-momo-wallet-update';
 import { BeneficiaryMomoList } from './pages/beneficiary/beneficiary-momo-list/beneficiary-momo-list';
+import { BeneficiaryDetailsView } from './pages/beneficiary/beneficiary-details-view/beneficiary-details-view';
 
 export const routes: Routes = [
   {
@@ -68,6 +69,11 @@ export const routes: Routes = [
       {
         path: 'view-list',
         component: BeneficiaryViewList,
+        canActivate: [routeGuard],
+      },
+      {
+        path: 'details-view/:id',
+        component: BeneficiaryDetailsView,
         canActivate: [routeGuard],
       },
       {

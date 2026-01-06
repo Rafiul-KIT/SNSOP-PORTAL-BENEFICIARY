@@ -1,0 +1,12 @@
+/* beneficiary-details.scss */
+.scroll-container {
+  /* Adjust 120px if your header/breadcrumb is taller/shorter */
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  // padding-right: 0.5rem; /* optional, keeps content off the scrollbar */
+}
+
+/* Optional: ensure TabView panel itself can scroll if it overflows */
+:host ::ng-deep .p-tabview-panels {
+  overflow: visible; /* or auto if you want inner scrolling instead */
+}
