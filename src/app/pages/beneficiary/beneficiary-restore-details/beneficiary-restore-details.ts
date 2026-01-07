@@ -132,13 +132,13 @@ export class BeneficiaryRestoreDetails implements OnInit {
 
     items = [
       {
-        label: 'Beneficiary List',
-        icon: 'fas fa-users me-2',
+        label: 'Restore Beneficiary',
+        icon: 'fas fa-archive',
         routerLink: '/restore/list',
       },
-      { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
+      { label: 'Beneficiary Details', icon: 'fas fa-user' },
     ];
-    home = { icon: 'fas fa-home me-2', routerLink: '/' };
+    home = { icon: 'fas fa-home', routerLink: '/' };
 
     constructor(
       private route: ActivatedRoute,

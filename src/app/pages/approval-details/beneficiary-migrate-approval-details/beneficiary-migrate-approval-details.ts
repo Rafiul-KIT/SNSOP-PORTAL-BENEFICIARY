@@ -48,14 +48,14 @@ export class BeneficiaryMigrateApprovalDetails {
 
   items = [
     {
-      label: 'Approval List',
-      icon: 'fas fa-users me-2',
+      label: 'Update Approval',
+      icon: 'fas fa-user-check',
       routerLink: '/beneficiary-approval/list',
     },
-    { label: 'Beneficiary Migration Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Migration Details', icon: 'fas fa-user' },
   ];
 
-  home = { icon: 'fas fa-home me-2', routerLink: '/' };
+  home = { icon: 'fas fa-home', routerLink: '/' };
   beneficiaryPhoto = 'images/dummyHuman.jpg';
 
   constructor(

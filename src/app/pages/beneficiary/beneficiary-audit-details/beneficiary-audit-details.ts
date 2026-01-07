@@ -135,11 +135,11 @@ export class BeneficiaryAuditDetails implements OnInit {
 
   items = [
     {
-      label: 'Beneficiary Audit List',
-      icon: 'fas fa-users me-2',
+      label: 'Beneficiary Audit',
+      icon: 'fas fa-address-book',
       routerLink: '/beneficiary-audit/list',
     },
-    { label: 'Beneficiary Audit Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Audit Details', icon: 'fas fa-user' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
   userInfo: {

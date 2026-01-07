@@ -185,7 +185,11 @@ export class PendingBeneficiaryList implements OnInit {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Pending Beneficiary List' }];
+    this.breadcrumbItems = [
+      {
+        label: 'Pending Verification', icon: 'fas fa-users-viewfinder'
+      }
+    ];
   }
 
   // ---------- dependent dropdowns ----------

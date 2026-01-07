@@ -145,11 +145,11 @@ export class BeneficiaryManage implements OnInit {
 
   items = [
     {
-      label: 'Beneficiary List',
-      icon: 'fas fa-users me-2',
+      label: 'Beneficiary Update',
+      icon: 'fas fa-user-gear',
       routerLink: '/beneficiary/list',
     },
-    { label: 'Manage Beneficiary', icon: 'fas fa-user-pen me-2' },
+    { label: 'Manage Beneficiary', icon: 'fas fa-user-pen' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 

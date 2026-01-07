@@ -150,13 +150,13 @@ export class BeneficiaryEditApprovalDetails {
 
   items = [
     {
-      label: 'Approval List',
-      icon: 'fas fa-users me-2',
+      label: 'Update Approval',
+      icon: 'fas fa-user-check',
       routerLink: '/beneficiary-approval/list',
     },
-    { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Details', icon: 'fas fa-user' },
   ];
-  home = { icon: 'fas fa-home me-2', routerLink: '/' };
+  home = { icon: 'fas fa-home', routerLink: '/' };
 
   constructor(
     private route: ActivatedRoute,

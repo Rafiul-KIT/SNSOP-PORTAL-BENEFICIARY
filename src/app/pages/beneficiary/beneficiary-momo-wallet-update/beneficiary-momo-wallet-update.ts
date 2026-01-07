@@ -50,14 +50,14 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
 
   items = [
     {
-      label: 'Beneficiary List',
-      icon: 'fas fa-users me-2',
+      label: 'Beneficiary list',
+      icon: 'fas fa-users',
       routerLink: '/beneficiary/momo-list',
     },
-    { label: 'MOMO Number Update', icon: 'fas fa-user-plus me-2' },
+    { label: 'Wallet Number Update', icon: 'fas fa-user-cog' },
   ];
 
-  home = { icon: 'fas fa-home me-2', routerLink: '/' };
+  home = { icon: 'fas fa-home', routerLink: '/' };
 
   beneficiaryForm!: FormGroup;
   beneficiaryDetails!: BeneficiaryDto;

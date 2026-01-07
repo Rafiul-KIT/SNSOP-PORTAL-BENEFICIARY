@@ -141,13 +141,13 @@ export class Header {
           },
           {
             label: 'Pending Verification',
-            icon: 'fas fa-list',
+            icon: 'fas fa-users-viewfinder',
             routerLink: 'pending-beneficiary/list',
             // routerLink: 'under-construction',
           },
           {
             label: 'Beneficiary List',
-            icon: 'fas fa-users-viewfinder',
+            icon: 'fas fa-users',
             routerLink: 'beneficiary/view-list',
           },
         ],
@@ -209,7 +209,7 @@ export class Header {
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        // routerLink: 'adjudication/list',
+        routerLink: 'adjudication/list',
         // routerLink: 'redirect-link',
       },
       {

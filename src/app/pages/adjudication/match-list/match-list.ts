@@ -85,16 +85,16 @@ export class MatchList implements OnInit {
     this.items = [
       {
         label: 'Adjudication',
-        icon: 'fas fa-users-viewfinder me-2',
+        icon: 'fas fa-users-viewfinder',
         routerLink: '/adjudication-list',
       },
       {
         label: 'Match List',
-        icon: 'fas fa-people-arrows me-2',
+        icon: 'fas fa-people-arrows',
       },
     ];
     this.home = {
-      icon: 'fas fa-home me-2',
+      icon: 'fas fa-home',
       routerLink: '/dashboard',
     };
 

@@ -162,7 +162,7 @@ export class PendingBeneficiaryManage implements OnInit {
 
   items = [
     {
-      label: 'Pending Beneficiary List',
+      label: 'Pending Verification',
       icon: 'fas fa-users me-2',
       routerLink: '/pending-beneficiary/list',
     },
@@ -988,7 +988,7 @@ export class PendingBeneficiaryManage implements OnInit {
           nationalId: a.nationalId?.trim() || '',
           payeePhoneNo: altPhone ? `+211${altPhone}` : null,
         });
-        
+
         if (payload.alternatePayee2.documentType === 'NONE') {
             payload.alternatePayee2.documentTypeOther = null;
             payload.alternatePayee2.nationalId = '';

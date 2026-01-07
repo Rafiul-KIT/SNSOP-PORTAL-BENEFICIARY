@@ -194,7 +194,7 @@ export class BeneficiaryRestore implements OnInit {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Restore Beneficiary', icon:'fas fa-archive' }];
   }
 
   // ---------- dependent dropdowns ----------

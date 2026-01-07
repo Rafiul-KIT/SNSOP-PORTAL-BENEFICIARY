@@ -205,7 +205,7 @@ export class BeneficiaryIdCard implements OnInit {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Beneficiary List', icon: 'fas fa-users' }];
   }
 
   // ---------- dependent dropdowns ----------

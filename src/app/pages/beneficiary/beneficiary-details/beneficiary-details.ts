@@ -135,10 +135,10 @@ export class BeneficiaryDetails implements OnInit {
   items = [
     {
       label: 'Beneficiary Update',
-      icon: 'fas fa-users me-2',
+      icon: 'fas fa-user-gear',
       routerLink: '/beneficiary/list',
     },
-    { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Details', icon: 'fas fa-user' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 

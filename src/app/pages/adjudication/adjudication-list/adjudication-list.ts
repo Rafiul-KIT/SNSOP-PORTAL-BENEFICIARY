@@ -164,7 +164,7 @@ export class AdjudicationList implements OnInit {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Adjudication List' }];
+    this.breadcrumbItems = [{ icon: 'fas fa-users-viewfinder', label: 'Adjudication' }];
   }
 
   // ---------- dependent dropdowns ----------
