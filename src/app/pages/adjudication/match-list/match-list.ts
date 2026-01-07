@@ -86,7 +86,7 @@ export class MatchList implements OnInit {
       {
         label: 'Adjudication',
         icon: 'fas fa-users-viewfinder',
-        routerLink: '/adjudication-list',
+        routerLink: '/adjudication/list',
       },
       {
         label: 'Match List',
