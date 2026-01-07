@@ -195,7 +195,7 @@
                         <td colspan="2" rowspan="4" style="vertical-align: middle;">
                           <img [src]="allBiometrciDataFromMatchList[i]?.photo || 'images/dummyHuman.jpg'" alt=""
                             height="100" class="cursor-zoom" pTooltip="Click to see comparison"
-                            (click)="imagePreviewModal(beneficiaryPhoto, allBiometrciDataFromMatchList[i]?.photo, 'Profile Image')" />
+                            (click)="imagePreviewModal(beneficiaryPhoto, allBiometrciDataFromMatchList[i]?.photo, 'Profile Image', true)" />
                           <kbd class="mt-2 d-block">Profile Image</kbd>
                         </td>
                         <th colspan="5" class="text-center">Right Hand Finger</th>
@@ -257,7 +257,7 @@
                         <td>
                           <img [src]="allBiometrciDataFromMatchList[i]?.leftHand?.LR" height="40" class="cursor-zoom"
                             pTooltip="Click to see comparison"
-                            (click)="imagePreviewModal(beneficiaryRightHandFingerPrints.LR, allBiometrciDataFromMatchList[i]?.leftHand?.LR, 'Left Ring')" />
+                            (click)="imagePreviewModal(beneficiaryLeftHandFingerPrints.LR, allBiometrciDataFromMatchList[i]?.leftHand?.LR, 'Left Ring')" />
                           <br /><kbd>Ring</kbd>
                         </td>
                         <td>

@@ -251,30 +251,36 @@ export class MatchList implements OnInit {
   imagePreviewModal(
     primaryImage: string,
     secondaryImage: string,
-    title: string
+    title: string,
+    isProfile: boolean = false
   ): void {
-    // 1. Collect all primary fingerprint images into an array
-    const allPrimaryFingerprints = [
-      this.beneficiaryRightHandFingerPrints.RT,
-      this.beneficiaryRightHandFingerPrints.RI,
-      this.beneficiaryRightHandFingerPrints.RM,
-      this.beneficiaryRightHandFingerPrints.RR,
-      this.beneficiaryRightHandFingerPrints.RL,
-      this.beneficiaryLeftHandFingerPrints.LT,
-      this.beneficiaryLeftHandFingerPrints.LI,
-      this.beneficiaryLeftHandFingerPrints.LM,
-      this.beneficiaryLeftHandFingerPrints.LR,
-      this.beneficiaryLeftHandFingerPrints.LL,
-    ];
+    let primaryImages: string[];
+    if (isProfile) {
+      primaryImages = [primaryImage];
+    } else {
+      // 1. Collect all primary fingerprint images into an array
+      const allPrimaryFingerprints = [
+        this.beneficiaryRightHandFingerPrints.RT,
+        this.beneficiaryRightHandFingerPrints.RI,
+        this.beneficiaryRightHandFingerPrints.RM,
+        this.beneficiaryRightHandFingerPrints.RR,
+        this.beneficiaryRightHandFingerPrints.RL,
+        this.beneficiaryLeftHandFingerPrints.LT,
+        this.beneficiaryLeftHandFingerPrints.LI,
+        this.beneficiaryLeftHandFingerPrints.LM,
+        this.beneficiaryLeftHandFingerPrints.LR,
+        this.beneficiaryLeftHandFingerPrints.LL,
+      ];
 
-    // 2. Reorder the array to put the clicked image first.
-    const sortedPrimaryImages = [...allPrimaryFingerprints].sort((a) => {
+      // 2. Reorder the array to put the clicked image first.
+      primaryImages = [...allPrimaryFingerprints].sort((a) => {
         return a === primaryImage ? -1 : 1;
-    });
+      });
+    }
 
     this.ref = this.dialogService.open(ImageComparePreview, {
       data: {
-        primary: sortedPrimaryImages, // Pass the full, reordered array
+        primary: primaryImages, // Pass the full, reordered array
         secondary: secondaryImage,
       },
       header: `Image Comparison: (${title})`,
