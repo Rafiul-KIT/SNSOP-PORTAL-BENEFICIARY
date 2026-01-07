@@ -420,27 +420,13 @@ export class MatchList implements OnInit {
 
   fetchAllBiometricData(allMatchList: any[]): Promise<any[]> {
     return new Promise((resolve) => {
-      const biometricDataArray: any[] = [];
-
-      allMatchList.forEach((match, index) => {
-        if (match.biometrics && match.biometrics.length > 0) {
-          let photo = 'images/dummyHuman.jpg';
-
-          match.biometrics.forEach((biometric: any) => {
-            if (
-              biometric.biometricType === 'PHOTO' &&
-              biometric.biometricData
-            ) {
-              photo = `data:image/png;base64,${biometric.biometricData}`;
-            }
-          });
-
-          biometricDataArray[index] = { photo };
-        } else {
-          biometricDataArray[index] = { photo: 'images/dummyHuman.jpg' };
-        }
+      const biometricDataArray = allMatchList.map((match) => {
+        const biometric = match.biometric || {};
+        const photo = biometric.photoData
+          ? `data:image/png;base64,${biometric.photoData}`
+          : 'images/dummyHuman.jpg';
+        return { photo };
       });
-
       resolve(biometricDataArray);
     });
   }
