@@ -147,6 +147,8 @@ export class BeneficiaryAuditDetails implements OnInit {
     timestamp: string;
     revisionType: string;
   } | null = null;
+  isUserLoading = false;
+  user: any = null;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -236,7 +238,35 @@ export class BeneficiaryAuditDetails implements OnInit {
         timestamp: record.timestamp,
         revisionType: record.revisionType,
       };
+      this.loadUserDetails(record.userId);
 
+      this.cdr.detectChanges();
+    }
+  }
+  async loadUserDetails(userId: number): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    try {
+      this.isUserLoading = true;
+      this.cdr.detectChanges();
+
+      const url = `api/users/findOne?id=${userId}`;
+      const axiosResponse = await this.api.GET<any>(url, {}, 'alt');
+      const res = axiosResponse.data;
+
+      if (res) {
+        this.user = res;
+      }
+    } catch (err: any) {
+      console.error('Failed to load user details', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details from server.',
+      });
+    } finally {
+      this.isUserLoading = false;
       this.cdr.detectChanges();
     }
   }
