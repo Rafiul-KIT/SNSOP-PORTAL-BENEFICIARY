@@ -1710,7 +1710,8 @@ export class BeneficiaryManage implements OnInit {
     return (fg: AbstractControl): ValidationErrors | null => {
       const m = +fg.get('m18_35_total')?.value || 0;
       const f = +fg.get('f18_35_total')?.value || 0;
-      const total = m + f;
+      const l = +fg.get('f18_35_lactating_total')?.value || 0;
+      const total = m + f + l;
       const lit = +fg.get('literate1835Count')?.value || 0;
       if (lit < 0) return { literateInvalid: 'Add How Many Can Read Write ?' };
       if (lit > total)
