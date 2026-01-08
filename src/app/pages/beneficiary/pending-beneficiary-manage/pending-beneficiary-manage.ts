@@ -1053,9 +1053,9 @@ export class PendingBeneficiaryManage implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Update Successful',
-            detail: 'Beneficiary edit request sent successfully!',
+            detail: 'Beneficiary updated successfully!',
           });
-          setTimeout(() => this.router.navigate(['/beneficiary/list']), 3000);
+          setTimeout(() => this.router.navigate(['pending-beneficiary/list']), 3000);
         } else if (first.result === 'FAILED') {
           this.messageService.add({
             severity: 'error',
