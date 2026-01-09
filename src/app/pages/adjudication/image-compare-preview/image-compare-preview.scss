@@ -8,6 +8,12 @@ img {
 .primary-thumbnail-wrapper {
     cursor: pointer;
     width: 80px;
+
+    p {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 0.8em;
+    }
 }
 
 .primary-thumbnail.active-thumbnail {

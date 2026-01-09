@@ -1,45 +1,42 @@
 @if (isLoading) {
-  <app-loading-spinner />
+<app-loading-spinner />
 } @else {
-  <!-- Main Comparison View -->
-  <div class="row">
-    <div class="col-6">
-      <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Primary Image</h5>
-      <img [src]="activePrimaryImage" alt="Active Primary Image" class="img-thumbnail" />
-    </div>
-    <div class="col-6">
-      <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Image from Match List</h5>
-      <img [src]="secondaryImage" alt="Image from Match List" class="img-thumbnail" />
-    </div>
+<!-- Main Comparison View -->
+<div class="row">
+  <div class="col-6">
+    <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Primary Image</h5>
+    <img [src]="activePrimaryImage" alt="Active Primary Image" class="img-thumbnail" />
   </div>
+  <div class="col-6">
+    <h5 class="mb-1 p-2 d-block text-center alert alert-primary">Image from Match List</h5>
+    <img [src]="secondaryImage" alt="Image from Match List" class="img-thumbnail" />
+  </div>
+</div>
 
-  <hr />
+<hr />
 
-  <!-- Primary Image Gallery -->
-  @if (primaryImages.length > 1) {
-    <h6 class="mt-3 mb-2 text-center">All Primary Fingerprints</h6>
-    <div class="row">
-      <div class="col-12">
-        <div class="d-flex flex-wrap justify-content-center">
-          @for (image of primaryImages; track image) {
-            <div
-              class="primary-thumbnail-wrapper m-1"
-              (click)="setActivePrimaryImage(image)"
-            >
-              <img
-                [src]="image"
-                alt="Primary Thumbnail"
-                class="img-thumbnail primary-thumbnail"
-                [class.active-thumbnail]="image === activePrimaryImage"
-              />
-            </div>
-          }
-        </div>
+<!-- Primary Image Gallery -->
+@if (primaryImages.length > 1) {
+<h6 class="mt-3 mb-2 text-center">All Primary Fingerprints</h6>
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex flex-wrap justify-content-center">
+      @for (image of primaryImages; track image; let i = $index) {
+      <div class="primary-thumbnail-wrapper m-1" (click)="setActivePrimaryImage(image)">
+        <img [src]="image" alt="Primary Thumbnail" class="img-thumbnail primary-thumbnail"
+          [class.active-thumbnail]="image === activePrimaryImage" />
+        <p class="text-center" style="background-color: rgb(0, 0, 0); color: white; border-radius: 5px;">
+          {{ fingerprintNames[i] }}
+        </p>
+
       </div>
+      }
     </div>
-  }
-
-  <div class="mt-3 text-end">
-    <p-button label="Close" (click)="closeDialog()" styleClass="p-button-secondary"></p-button>
   </div>
+</div>
+}
+
+<div class="mt-3 text-end">
+  <p-button label="Close" (click)="closeDialog()" styleClass="p-button-secondary"></p-button>
+</div>
 }
