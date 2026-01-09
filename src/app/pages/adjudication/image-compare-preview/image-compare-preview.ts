@@ -17,6 +17,19 @@ export class ImageComparePreview implements OnInit {
   secondaryImage: string = '';
   activePrimaryImage: string = '';
 
+  fingerprintNames: string[] = [
+    'R-Thumb',
+    'R-Index',
+    'R-Middle',
+    'R-Ring',
+    'R-Little',
+    'L-Thumb',
+    'L-Index',
+    'L-Middle',
+    'L-Ring',
+    'L-Little',
+  ];
+
   constructor(
     private conf: DynamicDialogConfig,
     private ref: DynamicDialogRef
@@ -41,3 +54,4 @@ export class ImageComparePreview implements OnInit {
     this.ref.close();
   }
 }
+
