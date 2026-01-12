@@ -1,6 +1,6 @@
 import { Tag } from 'primeng/tag';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -17,6 +17,7 @@ import { ImageComparePreview } from '../image-compare-preview/image-compare-prev
 import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Loader } from '../../../components/loader/loader';
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-match-list',
@@ -32,6 +33,7 @@ import { Loader } from '../../../components/loader/loader';
     Loader,
     ConfirmDialogModule,
     Tag,
+    Toast,
   ],
   templateUrl: './match-list.html',
   styleUrls: ['./match-list.scss'],
@@ -77,7 +79,8 @@ export class MatchList implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -321,6 +324,9 @@ export class MatchList implements OnInit {
               });
               this.isLoading = false;
               this.cdr.markForCheck();
+              setTimeout(() => {
+                this.router.navigate(['/adjudication/list']);
+              }, 2000);
             }
           })
           .catch((err) => {
@@ -333,6 +339,9 @@ export class MatchList implements OnInit {
             });
             this.isLoading = false;
             this.cdr.markForCheck();
+            setTimeout(() => {
+              this.router.navigate(['/adjudication/list']);
+            }, 2000);
           });
       },
     });
