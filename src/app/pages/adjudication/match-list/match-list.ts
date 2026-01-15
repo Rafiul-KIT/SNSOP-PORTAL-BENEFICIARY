@@ -69,7 +69,7 @@ export class MatchList implements OnInit {
   totalRecords: number = 0;
   private currentApplicationId: string | null = null;
 
-  ref: DynamicDialogRef | undefined;
+  ref: DynamicDialogRef | undefined | null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
