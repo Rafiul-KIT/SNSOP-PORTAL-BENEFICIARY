@@ -43,7 +43,7 @@ export class ReportAgeGroupGenderWiseBeneficiaryCount {
 
   public lookupService = inject(LookupService);
 
-  async exportPdf() {
+  private async createPdfDoc() {
     // Prepare the filtered list for PDF export by mapping the beneficiary data
     const filteredListForPDF: any[] = this.beneficiaryList().map((element: any) => ({
       State: element.stateId > 0 ? this.lookupService.getStateNameById(element.stateId) : '-',
@@ -79,7 +79,16 @@ export class ReportAgeGroupGenderWiseBeneficiaryCount {
       ),
     });
 
-    // Save the PDF with a unique filename
+    return doc;
+  }
+
+  async previewPdf() {
+    const doc = await this.createPdfDoc();
+    doc.output('dataurlnewwindow');
+  }
+
+  async exportPdf() {
+    const doc = await this.createPdfDoc();
     doc.save(`age_group_gender_wise_beneficiary_count_${Date.now()}.pdf`);
   }
 

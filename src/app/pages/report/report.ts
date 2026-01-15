@@ -94,7 +94,7 @@ export class ReportComponent implements OnInit {
     switch (reportType) {
       case 1:
         this.reportForm = new FormGroup({
-          size: new FormControl(10, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl(''),
           countyId: new FormControl(''),
@@ -114,13 +114,13 @@ export class ReportComponent implements OnInit {
         break;
       case 3:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
         });
         break;
       case 4:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -130,7 +130,7 @@ export class ReportComponent implements OnInit {
         break;
       case 5:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -141,7 +141,7 @@ export class ReportComponent implements OnInit {
         break;
       case 6:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           page: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -169,7 +169,7 @@ export class ReportComponent implements OnInit {
           bomaId: new FormControl('', Validators.required),
           scheme: new FormControl('ALL', Validators.required),
           paymentStatus: new FormControl('ALL', Validators.required),
-          size: new FormControl(1000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           paymentCycle: new FormControl('1', Validators.required)
         });
         break;
@@ -194,7 +194,7 @@ export class ReportComponent implements OnInit {
   getStaffList = (): void => {
     const payload = {
       page: 0,
-      size: 500,
+      size: -1,
       sortColumn: "ID",
       sortOrder: "DESC"
     };

@@ -33,11 +33,9 @@ export class ReportBeneficiaryList {
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
 
-
   public lookupService = inject(LookupService);
 
-  // Export to PDF
-  async exportPdf() {
+  private async createPdfDoc() {
     const { jsPDF } = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
 
@@ -90,6 +88,17 @@ export class ReportBeneficiaryList {
       body: bodyData,
     });
 
+    return doc;
+  }
+  
+  async previewPdf() {
+    const doc = await this.createPdfDoc();
+    doc.output('dataurlnewwindow');
+  }
+
+  // Export to PDF
+  async exportPdf() {
+    const doc = await this.createPdfDoc();
     doc.save(`beneficiary_list_${Date.now()}.pdf`);
   }
 

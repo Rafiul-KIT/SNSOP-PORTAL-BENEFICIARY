@@ -37,7 +37,7 @@ export class ReportLocationWiseNomineeCount {
   public lookupService = inject(LookupService);
 
 
-  async exportPdf() {
+  private async createPdfDoc() {
     // Dynamically import jsPDF and autoTable
     const { jsPDF } = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
@@ -49,12 +49,12 @@ export class ReportLocationWiseNomineeCount {
     // Check if the data is not empty
     if (!nomineeData || nomineeData.length === 0) {
       console.error("No data to export.");
-      return;
+      return undefined; // Return undefined if no data
     }
   
     if (!exportColumns || exportColumns.length === 0) {
       console.error("No columns defined for export.");
-      return;
+      return undefined; // Return undefined if no columns
     }
   
     // Create a new jsPDF instance
@@ -84,8 +84,21 @@ export class ReportLocationWiseNomineeCount {
       theme: 'grid',
     });
   
-    // Save the PDF with a unique filename
-    doc.save(`location_wise_nominee_count_${Date.now()}.pdf`);
+    return doc;
+  }
+
+  async previewPdf() {
+    const doc = await this.createPdfDoc();
+    if (doc) {
+      doc.output('dataurlnewwindow');
+    }
+  }
+
+  async exportPdf() {
+    const doc = await this.createPdfDoc();
+    if (doc) {
+      doc.save(`location_wise_nominee_count_${Date.now()}.pdf`);
+    }
   }
 
 
