@@ -94,7 +94,7 @@ export class Dashboard implements OnInit {
     datasets: [],
   };
 
-  setCategory(value: number | string) {
+  setCategory(value: number | string | undefined) {
     // PrimeNG emits the tab's [value], not an event object
     this.activeCategory = Number(value);
 
