@@ -292,7 +292,7 @@ export class MatchList implements OnInit {
     });
   }
 
-  adjudicate(status: boolean, applicationId: string): void {
+  adjudicate(status: boolean, currentApplicationId: string): void {
     this.confirmationService.confirm({
       message: `Are you sure you want to mark this as ${
         status ? 'Matched' : 'Not Matched'
@@ -310,7 +310,7 @@ export class MatchList implements OnInit {
         this.isLoading = true;
         const payload = {
           approval: status,
-          referenceId: applicationId,
+          referenceId: this.currentApplicationId,
         };
         this.apiService
           .POST('api/adjudication/adjudicate', payload)
@@ -325,7 +325,7 @@ export class MatchList implements OnInit {
               this.isLoading = false;
               this.cdr.markForCheck();
               setTimeout(() => {
-                this.router.navigate(['/adjudication/list']);
+                // this.router.navigate(['/adjudication/list']);
               }, 2000);
             }
           })
@@ -340,7 +340,7 @@ export class MatchList implements OnInit {
             this.isLoading = false;
             this.cdr.markForCheck();
             setTimeout(() => {
-              this.router.navigate(['/adjudication/list']);
+              // this.router.navigate(['/adjudication/list']);
             }, 2000);
           });
       },
