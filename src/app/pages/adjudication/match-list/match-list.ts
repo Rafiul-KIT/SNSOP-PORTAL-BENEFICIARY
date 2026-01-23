@@ -325,7 +325,7 @@ export class MatchList implements OnInit {
               this.isLoading = false;
               this.cdr.markForCheck();
               setTimeout(() => {
-                // this.router.navigate(['/adjudication/list']);
+                this.router.navigate(['/adjudication/list']);
               }, 2000);
             }
           })
@@ -340,7 +340,7 @@ export class MatchList implements OnInit {
             this.isLoading = false;
             this.cdr.markForCheck();
             setTimeout(() => {
-              // this.router.navigate(['/adjudication/list']);
+              this.router.navigate(['/adjudication/list']);
             }, 2000);
           });
       },
