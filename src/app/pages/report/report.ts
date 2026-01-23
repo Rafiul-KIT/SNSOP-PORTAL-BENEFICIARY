@@ -96,7 +96,7 @@ export class ReportComponent implements OnInit {
         this.reportForm = new FormGroup({
           size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
-          stateId: new FormControl(''),
+          stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
