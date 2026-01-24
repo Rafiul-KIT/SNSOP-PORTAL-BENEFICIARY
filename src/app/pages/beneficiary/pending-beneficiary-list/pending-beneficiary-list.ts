@@ -31,6 +31,7 @@ import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
+type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryDto {
   applicationId: string;
@@ -39,6 +40,7 @@ interface BeneficiaryDto {
   respondentMiddleName: string;
   respondentLastName: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentId: string;
   respondentAge: number;
   respondentPhoneNo: string;
@@ -54,6 +56,7 @@ interface BeneficiaryDto {
 interface BeneficiaryVm {
   applicationId: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentAge: number;
   respondentPhoneNo: string;
   registrationPhase: RegPhase;
@@ -111,6 +114,7 @@ export class PendingBeneficiaryList implements OnInit {
   approveComment: string = '';
 
   genderOptions: LookupItem[] = [];
+  criteriaOptions: LookupItem[] = []
   registrationPhaseOptions: LookupItem[] = [];
 
   beneficiaries: BeneficiaryVm[] = [];
@@ -154,6 +158,7 @@ export class PendingBeneficiaryList implements OnInit {
 
     // Use MALE/FEMALE ids, not 0/1
     this.genderOptions = this.lookup.getGenderListbyId();
+    this.criteriaOptions = this.lookup.getSelectionCriteriaListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
     this.cdr.markForCheck();
@@ -180,6 +185,7 @@ export class PendingBeneficiaryList implements OnInit {
       boma: [null as LookupItem | null],
       gender: [null as Gender | null],
       registrationPhase: [null as RegPhase | null],
+      criteria: [null as Criteria | null],
     });
   }
 
@@ -297,6 +303,12 @@ export class PendingBeneficiaryList implements OnInit {
         operator: 'EQUAL',
         value: f.gender,
       });
+    if (f.criteria)
+      criteria.push({
+        fieldName: 'SELECTION_CRITERIA',
+        operator: 'LIKE',
+        value: f.criteria,
+      });
 
     return criteria;
   }
@@ -311,6 +323,7 @@ export class PendingBeneficiaryList implements OnInit {
       respondentId: null,
       registrationPhase: f.registrationPhase || null,
       respondentGender: f.gender || null,
+       selectionCriteria: f.criteria || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',
@@ -337,6 +350,7 @@ export class PendingBeneficiaryList implements OnInit {
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,
         registrationPhase: b.registrationPhase,
+        selectionCriteria: b.selectionCriteria,
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
