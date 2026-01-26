@@ -217,7 +217,7 @@ export class Header {
         icon: 'fas fa-file-alt',
         items: [
           {
-            label: 'Total Beneficiary List Report',
+            label: 'Boma Wise Beneficiary List Report',
             icon: 'fas fa-file-alt',
             routerLink: 'report/boma-wise-beneficiary-list',
           },

@@ -97,7 +97,7 @@ export class ReportComponent implements OnInit {
           size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
-          countyId: new FormControl(''),
+          countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
           registrationPhase: new FormControl('')
