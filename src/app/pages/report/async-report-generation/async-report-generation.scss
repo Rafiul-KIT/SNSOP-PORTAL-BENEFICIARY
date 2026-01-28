@@ -1,0 +1,271 @@
+.async-report-wrapper {
+  padding: 0 1rem 2rem 1rem;
+}
+
+// Stats Cards Section
+.stats-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #fdfdfd 100%);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card {
+  cursor: default;
+  font-size: 0.9rem;
+  min-height: 70px;
+  border-radius: 8px !important;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+  .stat-number {
+    font-size: 1.4rem;
+    color: #000;
+    font-weight: 700;
+  }
+
+  i {
+    opacity: 0.7;
+  }
+}
+
+// Card Styling
+.card {
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: visible;
+  min-height: 580px;
+
+  .card-header {
+    background: linear-gradient(135deg, #f3fafd 100%);
+    color: rgb(8, 8, 8);
+    border: none;
+    padding: 12px 20px;
+
+    .header-title {
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: 0.3px;
+    }
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+// Report Form Styling
+.report-form {
+  .mb-3 {
+    margin-bottom: 1rem !important;
+  }
+
+
+}
+
+// Alert styling for report description
+.alert-light {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+
+  small {
+    color: #6c757d;
+  }
+}
+
+// PrimeNG Component Overrides
+:host ::ng-deep {
+  // Select component
+  .p-select {
+    width: 100%;
+    border-radius: 6px;
+
+    &.p-disabled {
+      opacity: 0.6;
+    }
+  }
+
+  // Float label
+  .p-floatlabel {
+    width: 100%;
+
+    label {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Table styling
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background-color: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      padding: 0.875rem 1rem;
+      border-bottom: 2px solid #dee2e6;
+      font-size: 0.9rem;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    .p-datatable-tbody > tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .p-datatable-emptymessage td {
+      border: none;
+    }
+  }
+
+  // Caption styling
+  .p-datatable-header {
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  // Paginator styling
+  .p-paginator {
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+  }
+
+  // Tag styling
+  .p-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+
+    .p-tag-icon {
+      margin-right: 0.25rem;
+      font-size: 0.7rem;
+    }
+  }
+
+  // Progress bar
+  .p-progressbar {
+    height: 6px;
+    border-radius: 3px;
+
+    .p-progressbar-value {
+      border-radius: 3px;
+    }
+  }
+
+  // Toast styling
+  .p-toast {
+    .p-toast-message {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  // Confirm dialog
+  .p-confirmdialog {
+    .p-dialog-header {
+      padding: 1rem 1.5rem;
+    }
+
+    .p-dialog-content {
+      padding: 0 1.5rem 1rem;
+    }
+
+    .p-dialog-footer {
+      padding: 0.75rem 1.5rem 1rem;
+    }
+  }
+
+  // Button styling
+  .p-button {
+    &.p-button-rounded {
+      border-radius: 50%;
+    }
+
+    &.p-button-sm {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.75rem;
+
+      .p-button-icon {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// Generating overlay
+.generating-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+}
+
+// Empty state icon
+.fa-folder-open,
+.fa-arrow-up {
+  display: block;
+}
+
+// Spinner animation
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .async-report-wrapper {
+    padding: 0 0.5rem 1rem 0.5rem;
+  }
+
+  .stats-section {
+    padding: 10px;
+
+    .d-flex {
+      flex-direction: column;
+
+      .stat-card {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .stat-card {
+    min-height: 55px;
+
+    .stat-number {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .card .card-body {
+    padding: 1rem;
+  }
+
+  :host ::ng-deep {
+    .p-datatable {
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
