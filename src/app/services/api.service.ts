@@ -5,14 +5,15 @@ import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-type BaseKey = 'global' | 'alt';
+type BaseKey = 'global' | 'alt' | 'report';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   // ---- Base URLs ----
-  private globalApi = environment.globalApi;              // e.g. https://api.yourdomain.com
-  private altApi    = environment.authBackend;          // <-- hardcode here if you want
-  // OR: private altApi = environment.altApi;
+  private globalApi = environment.globalApi;              
+  private altApi    = environment.authBackend;          
+
+  private reportApi = environment.reportApi;             
 
   public ACCESS_TOKEN = environment.cookie_name;
 
@@ -25,9 +26,10 @@ export class ApiService {
     headers: { 'Content-Type': 'application/json' },
   };
 
-  // ---- Two axios clients ----
+  // ---- Three axios clients ----
   private axiosGlobal: AxiosInstance = axios.create({ baseURL: this.globalApi });
   private axiosAlt:    AxiosInstance = axios.create({ baseURL: this.altApi });
+  private axiosReport: AxiosInstance = axios.create({ baseURL: this.reportApi });
 
   constructor(private cookies: CookieService, private router: Router) {
     const token = this.cookies.get(this.ACCESS_TOKEN);
@@ -37,11 +39,13 @@ export class ApiService {
 
       this.axiosGlobal.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       this.axiosAlt.defaults.headers.common['Authorization']    = `Bearer ${token}`;
+      this.axiosReport.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
-    // Attach interceptors to BOTH instances
+    // Attach interceptors to ALL instances
     this.attachInterceptors(this.axiosGlobal);
     this.attachInterceptors(this.axiosAlt);
+    this.attachInterceptors(this.axiosReport);
   }
 
   private attachInterceptors(inst: AxiosInstance) {
@@ -76,7 +80,9 @@ export class ApiService {
   }
 
   private client(base: BaseKey): AxiosInstance {
-    return base === 'alt' ? this.axiosAlt : this.axiosGlobal;
+    if (base === 'alt') return this.axiosAlt;
+    if (base === 'report') return this.axiosReport;
+    return this.axiosGlobal;
   }
 
   logout = () => {

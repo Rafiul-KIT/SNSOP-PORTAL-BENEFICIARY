@@ -124,7 +124,7 @@
                             <p-floatlabel variant="on" class="w-100">
                                 <p-select [options]="stateList" optionLabel="name" [(ngModel)]="selectedState"
                                     [ngModelOptions]="{standalone: true}" (onChange)="onStateChange($event.value)"
-                                    [filter]="true" filterBy="name" [showClear]="true" class="w-100" />
+                                     [showClear]="true" class="w-100" />
                                 <label>State</label>
                             </p-floatlabel>
                         </div>
@@ -136,7 +136,7 @@
                             <p-floatlabel variant="on" class="w-100">
                                 <p-select [options]="countyList" optionLabel="name" [(ngModel)]="selectedCounty"
                                     [ngModelOptions]="{standalone: true}" (onChange)="onCountyChange($event.value)"
-                                    [filter]="true" filterBy="name" [showClear]="true"
+                                     [showClear]="true"
                                     [disabled]="!selectedState" class="w-100" />
                                 <label>County</label>
                             </p-floatlabel>
@@ -149,7 +149,7 @@
                             <p-floatlabel variant="on" class="w-100">
                                 <p-select [options]="payamList" optionLabel="name" [(ngModel)]="selectedPayam"
                                     [ngModelOptions]="{standalone: true}" (onChange)="onPayamChange($event.value)"
-                                    [filter]="true" filterBy="name" [showClear]="true"
+                                    [showClear]="true"
                                     [disabled]="!selectedCounty" class="w-100" />
                                 <label>Payam</label>
                             </p-floatlabel>
@@ -162,7 +162,7 @@
                             <p-floatlabel variant="on" class="w-100">
                                 <p-select [options]="bomaList" optionLabel="name" [(ngModel)]="selectedBoma"
                                     [ngModelOptions]="{standalone: true}" (onChange)="onBomaChange($event.value)"
-                                    [filter]="true" filterBy="name" [showClear]="true"
+                                     [showClear]="true"
                                     [disabled]="!selectedPayam" class="w-100" />
                                 <label>Boma</label>
                             </p-floatlabel>
@@ -213,6 +213,15 @@
                         }
                     </form>
 
+                    <!-- Format Selection -->
+                    <div class="mb-3">
+                        <p-floatlabel variant="on" class="w-100">
+                            <p-select [options]="formatOptions" optionLabel="name" optionValue="id"
+                                [(ngModel)]="selectedFormat" class="w-100" />
+                            <label>Format</label>
+                        </p-floatlabel>
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="d-flex gap-2 mt-3">
                         <p-button label="Reset" icon="fas fa-undo" severity="secondary" size="small"
@@ -237,6 +246,41 @@
                     <span class="header-title"><i class="fas fa-list me-2"></i>Report History</span>
                     <p-button icon="fas fa-sync-alt" severity="secondary" size="small" [rounded]="true" [text]="true"
                         (onClick)="refreshReports()" pTooltip="Refresh" tooltipPosition="left"></p-button>
+                </div>
+                <!-- Filter Section -->
+                <div class="card-body pb-0">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-filter me-2 text-secondary"></i>
+                        <span class="fw-semibold text-secondary">Filters</span>
+                        @if (filterStatus || filterStartDate || filterEndDate) {
+                        <p-button icon="fas fa-times" label="Clear" severity="secondary" size="small"
+                            [text]="true" (onClick)="clearFilters()" class="ms-auto"></p-button>
+                        }
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="statusFilterOptions" optionLabel="name" optionValue="id"
+                                    [(ngModel)]="filterStatus" (onChange)="onFilterStatusChange()"
+                                     class="w-100" />
+                                <!-- <label>Status</label> -->
+                            </p-floatlabel>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" [(ngModel)]="filterStartDate"
+                                    (change)="onDateRangeFilter()" placeholder="">
+                                <label>Start Date</label>
+                            </p-floatlabel>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" [(ngModel)]="filterEndDate"
+                                    (change)="onDateRangeFilter()" placeholder="">
+                                <label>End Date</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <p-table [value]="paginatedReports" [tableStyle]="{ 'min-width': '100%' }"
@@ -315,6 +359,7 @@
                         [first]="currentPage * pageSize"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
                     </p-paginator>
+                   
                 </div>
             </div>
         </div>
