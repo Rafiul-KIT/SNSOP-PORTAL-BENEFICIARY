@@ -153,7 +153,7 @@ export class ReportBeneficiaryList {
     }
 
     const filteredListForXL: any[] = [];
-    allData.forEach((elem: any) => {
+    allData.forEach((elem: any, index: number) => {
       const selectionReasonList = elem.selectionReason || [];
       const selectionReasonValues: string[] = selectionReasonList.map(
         (reason: string, idx: number) =>
@@ -161,6 +161,7 @@ export class ReportBeneficiaryList {
       );
 
       let columns: any = {
+        "Serial": index + 1,
         "State Name": this.lookupService.getStateNameById(elem.address?.stateId) ?? '',
         "County Name": this.lookupService.getCountyNameById(elem.address?.countyId) ?? '',
         "Payam Name": this.lookupService.getPayamNameById(elem.address?.payam) ?? '',
