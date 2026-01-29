@@ -537,7 +537,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       }
 
       const data = response.data;
-      const reports = Array.isArray(data) ? data : data.reports || [];
+      const reports = Array.isArray(data) ? data : data.content || [];
       const mappedReports: AsyncReportItem[] = reports.map((report: any) => ({
         requestId: report.id || report.requestId,
         reportType: report.reportType,
