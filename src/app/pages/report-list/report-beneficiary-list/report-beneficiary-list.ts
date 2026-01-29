@@ -247,7 +247,7 @@ export class ReportBeneficiaryList {
         "Does respondent read and write": elem.isReadWrite ?? '',
         "How many members in the HH are between 18 and 35 and can read and write": elem.memberReadWrite ?? '',
 
-        "Alternate One Household Name": "-",
+        // "Alternate One Household Name": "-",
         "Alternate One First Name": elem.alternatePayee1?.payeeFirstName ?? '',
         "Alternate One Middle Name": elem.alternatePayee1?.payeeMiddleName ?? '',
         "Alternate One Last Name": elem.alternatePayee1?.payeeLastName ?? '',
@@ -260,7 +260,7 @@ export class ReportBeneficiaryList {
         "Alternate One Relationship": elem.relationshipOther ? elem.relationshipOther : (this.lookupService.getRelationshipEnumByValue(elem.alternatePayee1?.relationshipWithHouseholdHead) ?? ''),
         "Alternate One Gender": elem.alternatePayee1?.payeeGender ?? '',
 
-        "Alternate Two Household Name": "-",
+        // "Alternate Two Household Name": "-",
         "Alternate Two First Name": elem.alternatePayee2?.payeeFirstName ?? '',
         "Alternate Two Middle Name": elem.alternatePayee2?.payeeMiddleName ?? '',
         "Alternate Two Last Name": elem.alternatePayee2?.payeeLastName ?? '',
