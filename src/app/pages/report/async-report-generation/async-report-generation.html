@@ -6,7 +6,7 @@
 <p-confirmDialog></p-confirmDialog>
 
 @if (isLoading) {
-<app-loading-spinner />
+<app-loader />
 } @else {
 <div class="async-report-wrapper">
     <!-- Stats Cards Section -->
@@ -281,7 +281,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        @if (report.status === 'COMPLETED' && report.downloadUrl) {
+                                        @if (report.status === 'COMPLETED' && report.filePath) {
                                         <p-button icon="fas fa-download" severity="success" size="small" [rounded]="true"
                                             [outlined]="true" (onClick)="downloadReport(report)" pTooltip="Download"
                                             tooltipPosition="top"></p-button>
