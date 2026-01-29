@@ -16,6 +16,8 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { LoadingSpinner } from '../../../components/loading-spinner/loading-spinner';
 import { Loader } from '../../../components/loader/loader';
+import { ApiService } from '../../../services/api.service';
+import { environment } from '../../../../environments/environment';
 
 export interface ReportType {
   id: number;
@@ -73,7 +75,7 @@ interface ReportStats {
     InputTextModule,
     TagModule,
     PaginatorModule,
-    
+
     Loader
   ],
   providers: [MessageService, ConfirmationService],
@@ -81,7 +83,6 @@ interface ReportStats {
   styleUrl: './async-report-generation.scss',
 })
 export class AsyncReportGeneration implements OnInit, OnDestroy {
-  private readonly baseUrl = 'https://devgwapp.southsudansafetynet.info/';
 
   // Breadcrumb
   items: MenuItem[] | undefined;
@@ -145,7 +146,14 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   ];
 
   selectedReportType: ReportType | null = null;
+  selectedFormat: string = 'EXCEL';
   reportForm: FormGroup = new FormGroup({});
+
+  formatOptions = [
+    { id: 'PDF', name: 'PDF' },
+    { id: 'EXCEL', name: 'EXCEL' },
+    { id: 'CSV', name: 'CSV' }
+  ];
 
   // Lookup data for cascading dropdowns
   stateList: LookupItem[] = [];
@@ -172,6 +180,20 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     failed: 0
   });
 
+  // Filters
+  filterStatus: string = '';
+  filterStartDate: string = '';
+  filterEndDate: string = '';
+
+  statusFilterOptions = [
+    { id: '', name: 'All Status' },
+    { id: 'PENDING', name: 'Pending' },
+    { id: 'IN_PROGRESS', name: 'In Progress' },
+    { id: 'COMPLETED', name: 'Completed' },
+    { id: 'FAILED', name: 'Failed' },
+    { id: 'CANCELLED', name: 'Cancelled' }
+  ];
+
   // Pagination
   pageSize: number = 10;
   currentPage: number = 0;
@@ -180,7 +202,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private api: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -198,14 +221,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
   private async fetchStates(): Promise<LookupItem[]> {
     try {
-        const response = await fetch(`${this.baseUrl}api/lookup/geo/search`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lookupType: 'STATE', size: -1 }),
-        });
-        if (!response.ok) throw new Error('Failed to fetch states');
-        const data = await response.json();
-        return data.lookups || [];
+        const response = await this.api.POST('api/lookup/geo/search', { lookupType: 'STATE', size: -1 });
+        return response.data.lookups || [];
     } catch (err) {
         console.error('Error fetching states:', err);
         return [];
@@ -332,16 +349,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       sortOrder: 'DESC'
     };
     try {
-      const response = await fetch(`${this.baseUrl}api/users/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      this.userList = data.users || [];
+      const response = await this.api.POST('api/users/search', payload);
+      this.userList = response.data.users || [];
     } catch (err) {
       console.error('Error fetching staff list:', err);
       this.userList = [];
@@ -365,14 +374,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}api/lookup/geo/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lookupType: 'COUNTY', parentId: state.id, size: -1 })
-      });
-      if (!response.ok) throw new Error('Failed to fetch counties');
-      const data = await response.json();
-      this.countyList = data.lookups || [];
+      const response = await this.api.POST('api/lookup/geo/search', { lookupType: 'COUNTY', parentId: state.id, size: -1 });
+      this.countyList = response.data.lookups || [];
     } catch (err) {
       console.error('Error fetching counties:', err);
       this.countyList = [];
@@ -394,14 +397,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}api/lookup/geo/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lookupType: 'PAYAM', parentId: county.id, size: -1 })
-      });
-      if (!response.ok) throw new Error('Failed to fetch payams');
-      const data = await response.json();
-      this.payamList = data.lookups || [];
+      const response = await this.api.POST('api/lookup/geo/search', { lookupType: 'PAYAM', parentId: county.id, size: -1 });
+      this.payamList = response.data.lookups || [];
     } catch (err) {
       console.error('Error fetching payams:', err);
       this.payamList = [];
@@ -411,7 +408,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   async onPayamChange(payam: LookupItem): Promise<void> {
     this.selectedPayam = payam;
     this.reportForm.patchValue({ payamId: payam?.id || '' });
-    
+
     this.bomaList = [];
     this.selectedBoma = null;
     this.reportForm.patchValue({ bomaId: '' });
@@ -421,14 +418,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}api/lookup/geo/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lookupType: 'BOMA', parentId: payam.id, size: -1 })
-      });
-      if (!response.ok) throw new Error('Failed to fetch bomas');
-      const data = await response.json();
-      this.bomaList = data.lookups || [];
+      const response = await this.api.POST('api/lookup/geo/search', { lookupType: 'BOMA', parentId: payam.id, size: -1 });
+      this.bomaList = response.data.lookups || [];
     } catch (err) {
       console.error('Error fetching bomas:', err);
       this.bomaList = [];
@@ -455,17 +446,12 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     const parameters = this.buildReportParameters();
     const payload = {
       reportType: this.selectedReportType.reportTypeEnum,
-      format: 'EXCEL',
+      format: this.selectedFormat,
       parameters: parameters,
-      // requestedBy: 1564
     };
 
     try {
-      const response = await fetch(`${this.baseUrl}api/reports`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      const response = await this.api.POST('api/reports', payload, 'report');
 
       if (response.status === 200 || response.status === 201 || response.status === 202) {
         this.messageService.add({
@@ -476,15 +462,14 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
         await this.loadAsyncReports();
         this.resetForm();
       } else {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to start report generation.' }));
-        throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+        throw new Error(`HTTP Error: ${response.status}`);
       }
     } catch (err: any) {
       console.error('Error generating report:', err);
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: err.message || 'Failed to start report generation'
+        detail: err?.response?.data?.message || err.message || 'Failed to start report generation'
       });
     } finally {
       this.isGenerating = false;
@@ -527,21 +512,39 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     return `${day}-${month}-${year}`;
   }
 
+  private parseDateTime(value: any): string {
+    if (!value) return '';
+    if (Array.isArray(value)) {
+      const [year, month, day, hour = 0, minute = 0, second = 0] = value;
+      return new Date(year, month - 1, day, hour, minute, second).toISOString();
+    }
+    return value;
+  }
+
   async loadAsyncReports(): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}api/reports/all`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      let response;
+
+      if (this.filterStatus) {
+        response = await this.api.GET(`api/reports/status/${this.filterStatus}`, undefined, 'report');
+      } else if (this.filterStartDate && this.filterEndDate) {
+        response = await this.api.GET('api/reports/date-range', {
+          startDate: new Date(this.filterStartDate).toISOString(),
+          endDate: new Date(this.filterEndDate).toISOString()
+        }, 'report');
+      } else {
+        response = await this.api.GET('api/reports/all', undefined, 'report');
       }
-      const data = await response.json();
+
+      const data = response.data;
       const reports = Array.isArray(data) ? data : data.reports || [];
       const mappedReports: AsyncReportItem[] = reports.map((report: any) => ({
-        requestId: report.requestId || report.id,
+        requestId: report.id || report.requestId,
         reportType: report.reportType,
         reportName: this.getReportNameByType(report.reportType),
         status: report.status,
-        createdAt: report.createdAt,
-        completedAt: report.completedAt,
+        createdAt: this.parseDateTime(report.createdAt),
+        completedAt: this.parseDateTime(report.completedAt),
         filePath: report.filePath || report.downloadUrl,
         errorMessage: report.errorMessage,
         parameters: report.parameters,
@@ -551,11 +554,34 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       }));
       this.asyncReports.set(mappedReports);
       this.updateReportStats(mappedReports);
+      this.currentPage = 0;
     } catch (err) {
       console.error('Error loading async reports:', err);
     } finally {
       this.cdr.markForCheck();
     }
+  }
+
+  onFilterStatusChange(): void {
+    if (this.filterStatus) {
+      this.filterStartDate = '';
+      this.filterEndDate = '';
+    }
+    this.loadAsyncReports();
+  }
+
+  onDateRangeFilter(): void {
+    if (this.filterStartDate && this.filterEndDate) {
+      this.filterStatus = '';
+      this.loadAsyncReports();
+    }
+  }
+
+  clearFilters(): void {
+    this.filterStatus = '';
+    this.filterStartDate = '';
+    this.filterEndDate = '';
+    this.loadAsyncReports();
   }
 
   private updateReportStats(reports: AsyncReportItem[]): void {
@@ -575,7 +601,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     return type?.name || reportType || 'Unknown Report';
   }
 
-  downloadReport(report: AsyncReportItem): void {
+  async downloadReport(report: AsyncReportItem): Promise<void> {
     if (!report.filePath) {
       this.messageService.add({
         severity: 'warn',
@@ -585,7 +611,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       return;
     }
 
-    const fileName = report.filePath.split('/').pop();
+    const fileName = report.filePath.split(/[/\\]/).pop();
 
     if (!fileName) {
         this.messageService.add({
@@ -595,15 +621,30 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
         });
         return;
     }
-    
-    const downloadUrl = `${this.baseUrl}api/reports/download/report/${fileName}`;
-    window.open(downloadUrl, '_blank');
 
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Download Started',
-      detail: 'Your report download has started'
-    });
+    try {
+      const response = await this.api.GET(`api/reports/download/report/${fileName}`, undefined, 'report', { responseType: 'blob' });
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${report.reportName || fileName}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Download Started',
+        detail: 'Your report download has started'
+      });
+    } catch (err: any) {
+      console.error('Error downloading report:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.response?.data?.message || err.message || 'Failed to download report'
+      });
+    }
   }
 
   confirmDelete(report: AsyncReportItem): void {
@@ -621,12 +662,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
   async deleteReport(report: AsyncReportItem): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}api/reports/${report.requestId}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await this.api.DELETE(`api/reports/${report.requestId}`, 'report');
       this.messageService.add({
         severity: 'success',
         summary: 'Deleted',
@@ -638,13 +674,14 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: err.message || 'Failed to delete report'
+        detail: err?.response?.data?.message || err.message || 'Failed to delete report'
       });
     }
   }
 
   resetForm(): void {
     this.selectedReportType = null;
+    this.selectedFormat = 'EXCEL';
     this.reportForm = new FormGroup({});
     this.countyList = [];
     this.payamList = [];
