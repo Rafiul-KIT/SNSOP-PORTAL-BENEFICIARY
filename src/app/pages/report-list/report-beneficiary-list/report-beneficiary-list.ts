@@ -1,9 +1,10 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, signal, untracked } from '@angular/core';
 
 import { saveAs } from 'file-saver';
 
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { LookupService } from '../../../services/lookup.service';
+import { ApiService } from '../../../services/api.service';
 
 interface Column {
   field: string;
@@ -25,26 +26,38 @@ interface ExportColumn {
 })
 export class ReportBeneficiaryList {
   reportResult = input<any>(null);
-  onPageChange = output<PaginatorState>();
+  searchCriteria = input<any>(null);
+  endpoint = input<string>('');
 
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
+  displayedList = signal<any[]>([]);
+  isExporting = signal(false);
 
   totalRecords = signal(0);
   rows = signal(10);
   first = signal(0);
 
   public lookupService = inject(LookupService);
+  private apiService = inject(ApiService);
 
   constructor() {
     effect(() => {
       const result = this.reportResult();
       if (result) {
         this.beneficiaryList.set(result.data ?? []);
-        this.totalRecords.set(result.totalCount ?? 0);
+        this.totalRecords.set(result.data?.length ?? 0);
+        this.first.set(0);
+        untracked(() => this.sliceList());
       }
     });
+  }
+
+  private sliceList() {
+    const start = this.first();
+    const end = start + this.rows();
+    this.displayedList.set(this.beneficiaryList().slice(start, end));
   }
 
   private async createPdfDoc() {
@@ -116,8 +129,31 @@ export class ReportBeneficiaryList {
 
   // Export to Excel
   async exportExcel() {
+    const criteria = this.searchCriteria();
+    const ep = this.endpoint();
+
+    let allData: any[] = [];
+
+    if (criteria && ep) {
+      try {
+        this.isExporting.set(true);
+        const payload = { ...criteria, size: -1, from: 0 };
+        const res = await this.apiService.POST(ep, payload);
+        if (res.status === 200) {
+          allData = res.data?.data ?? [];
+        }
+      } catch (err) {
+        console.error('Failed to fetch all data for CSV export:', err);
+        allData = this.beneficiaryList();
+      } finally {
+        this.isExporting.set(false);
+      }
+    } else {
+      allData = this.beneficiaryList();
+    }
+
     const filteredListForXL: any[] = [];
-    this.beneficiaryList().forEach((elem: any) => {
+    allData.forEach((elem: any) => {
       const selectionReasonList = elem.selectionReason || [];
       const selectionReasonValues: string[] = selectionReasonList.map(
         (reason: string, idx: number) =>
@@ -364,6 +400,6 @@ export class ReportBeneficiaryList {
   handlePageChange(event: PaginatorState) {
     this.first.set(event.first ?? 0);
     this.rows.set(event.rows ?? 10);
-    this.onPageChange.emit(event);
+    this.sliceList();
   }
 }

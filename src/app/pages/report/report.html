@@ -282,7 +282,7 @@
     <div class="mt-3">
         @if (!reportOptions) {
         @if (reportBeneficiaryListResult) {
-        <app-report-beneficiary-list [reportResult]="reportBeneficiaryListResult" />
+        <app-report-beneficiary-list [reportResult]="reportBeneficiaryListResult" [searchCriteria]="reportForm.value" [endpoint]="determineEndpoint()" />
         }
         @if (reportStaffWiseBeneficiaryCountResult) {
         <app-report-staff-wise-beneficiary-count [reportResult]="reportStaffWiseBeneficiaryCountResult" />
