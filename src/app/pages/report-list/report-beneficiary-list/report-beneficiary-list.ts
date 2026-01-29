@@ -129,6 +129,7 @@ export class ReportBeneficiaryList {
         "County Name": this.lookupService.getCountyNameById(elem.address?.countyId) ?? '',
         "Payam Name": this.lookupService.getPayamNameById(elem.address?.payam) ?? '',
         "Boma Name": this.lookupService.getBomaNameById(elem.address?.boma) ?? '',
+        "Application ID": elem.applicationId ?? '',
         "Respondent First Name": elem.respondentFirstName ?? '',
         "Respondent Middle Name": elem.respondentMiddleName ?? '',
         "Respondent Last Name": elem.respondentLastName ?? '',
