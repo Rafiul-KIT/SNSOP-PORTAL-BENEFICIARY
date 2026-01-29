@@ -1,9 +1,8 @@
-import { Component, inject, input } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 
 import { saveAs } from 'file-saver';
 
-import { MenuItem } from 'primeng/api';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { LookupService } from '../../../services/lookup.service';
 
 interface Column {
@@ -20,20 +19,33 @@ interface ExportColumn {
 @Component({
   selector: 'app-report-beneficiary-list',
   standalone: true,
-  imports: [],
+  imports: [PaginatorModule],
   templateUrl: './report-beneficiary-list.html',
   styleUrls: ['./report-beneficiary-list.scss'],
 })
 export class ReportBeneficiaryList {
-
   reportResult = input<any>(null);
-
+  onPageChange = output<PaginatorState>();
 
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
 
+  totalRecords = signal(0);
+  rows = signal(10);
+  first = signal(0);
+
   public lookupService = inject(LookupService);
+
+  constructor() {
+    effect(() => {
+      const result = this.reportResult();
+      if (result) {
+        this.beneficiaryList.set(result.data ?? []);
+        this.totalRecords.set(result.totalCount ?? 0);
+      }
+    });
+  }
 
   private async createPdfDoc() {
     const { jsPDF } = await import('jspdf');
@@ -347,8 +359,11 @@ export class ReportBeneficiaryList {
     this.exportColumns.set(
       this.cols().map((col) => ({ title: col.header, dataKey: col.field }))
     );
+  }
 
-
-    this.beneficiaryList.set(this.reportResult()?.data ?? []);
+  handlePageChange(event: PaginatorState) {
+    this.first.set(event.first ?? 0);
+    this.rows.set(event.rows ?? 10);
+    this.onPageChange.emit(event);
   }
 }

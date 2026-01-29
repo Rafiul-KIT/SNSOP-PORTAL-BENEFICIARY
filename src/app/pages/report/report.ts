@@ -94,7 +94,7 @@ export class ReportComponent implements OnInit {
     switch (reportType) {
       case 1:
         this.reportForm = new FormGroup({
-          size: new FormControl(-1, Validators.required),
+          size: new FormControl(10, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl('', Validators.required),

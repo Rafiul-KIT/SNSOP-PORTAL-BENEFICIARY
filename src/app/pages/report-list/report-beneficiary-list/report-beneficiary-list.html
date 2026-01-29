@@ -39,7 +39,18 @@
         }
       </tbody>
     </table>
+
+    <p-paginator
+      (onPageChange)="handlePageChange($event)"
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="totalRecords()"
+      [rowsPerPageOptions]="[10, 20, 50, 100]"
+    ></p-paginator>
+
   } @else {
-    <p>Nothing Found.</p>
+    <tr>
+        <td colspan="12" class="text-center">Nothing Found.</td>
+    </tr>
   }
 </div>
