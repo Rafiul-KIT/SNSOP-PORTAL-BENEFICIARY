@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
@@ -69,6 +70,7 @@ interface ReportStats {
     TooltipModule,
     ToastModule,
     ConfirmDialogModule,
+    DialogModule,
     ProgressBarModule,
     SelectModule,
     FloatLabelModule,
@@ -170,6 +172,11 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
   // Generated reports list
   asyncReports = signal<AsyncReportItem[]>([]);
+
+  // Download progress dialog
+  showDownloadDialog: boolean = false;
+  downloadProgressValue: number = 0;
+  downloadingReportName: string = '';
 
   // Report statistics
   reportStats = signal<ReportStats>({
@@ -622,8 +629,23 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
         return;
     }
 
+    // Show download progress dialog
+    this.downloadingReportName = report.reportName || fileName;
+    this.downloadProgressValue = 0;
+    this.showDownloadDialog = true;
+    this.cdr.markForCheck();
+
     try {
-      const response = await this.api.GET(`api/reports/download/report/${fileName}`, undefined, 'report', { responseType: 'blob' });
+      const response = await this.api.GET(`api/reports/download/report/${fileName}`, undefined, 'report', {
+        responseType: 'blob',
+        onDownloadProgress: (progressEvent: any) => {
+          if (progressEvent.total) {
+            this.downloadProgressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            this.cdr.markForCheck();
+          }
+        }
+      });
+
       const blob = new Blob([response.data]);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -634,8 +656,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
       this.messageService.add({
         severity: 'info',
-        summary: 'Download Started',
-        detail: 'Your report download has started'
+        summary: 'Download Complete',
+        detail: 'Your report has been downloaded successfully'
       });
     } catch (err: any) {
       console.error('Error downloading report:', err);
@@ -644,6 +666,11 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
         summary: 'Error',
         detail: err?.response?.data?.message || err.message || 'Failed to download report'
       });
+    } finally {
+      this.showDownloadDialog = false;
+      this.downloadProgressValue = 0;
+      this.downloadingReportName = '';
+      this.cdr.markForCheck();
     }
   }
 

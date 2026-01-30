@@ -289,16 +289,16 @@
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width: 5%">Serial</th>
-                                <th style="width: 35%">Report Name</th>
+                                <th style="width: 30%">Report Name</th>
                                 <th style="width: 15%">Status</th>
                                 <th style="width: 20%">Created</th>
-                                <th style="width: 25%">Actions</th>
+                                <th style="width: 30%">Actions</th>
                             </tr>
                         </ng-template>
 
                         <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
                             <tr>
-                                <td>{{ rowIndex + 1 }}</td>
+                                <td>{{ (currentPage * pageSize) + rowIndex + 1 }}</td>
                                 <td>
                                     <div class="d-flex flex-column">
                                         <span class="fw-medium">{{ report.reportName }}</span>
@@ -325,16 +325,14 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        @if (report.status === 'COMPLETED' && report.filePath) {
-                                        <p-button icon="fas fa-download" severity="success" size="small" [rounded]="true"
-                                            [outlined]="true" (onClick)="downloadReport(report)" pTooltip="Download"
-                                            tooltipPosition="top"></p-button>
-                                        }
-                                        @if (report.status === 'PENDING' || report.status === 'IN_PROGRESS') {
-                                        <p-button icon="fas fa-hourglass-half" severity="info" size="small"
-                                            [rounded]="true" [outlined]="true" [disabled]="true"
-                                            pTooltip="Processing" tooltipPosition="top"></p-button>
-                                        }
+                                        <p-button icon="fas fa-download"
+                                            [severity]="report.status === 'COMPLETED' ? 'success' : 'secondary'"
+                                            size="small" [rounded]="true"
+                                            [outlined]="true"
+                                            (onClick)="downloadReport(report)"
+                                            [pTooltip]="report.status === 'COMPLETED' ? 'Download' : 'Available after completion'"
+                                            tooltipPosition="top"
+                                            [disabled]="report.status !== 'COMPLETED'"></p-button>
                                         <p-button icon="fas fa-trash" severity="danger" size="small" [rounded]="true"
                                             [outlined]="true" (onClick)="confirmDelete(report)" pTooltip="Delete"
                                             tooltipPosition="top"
@@ -370,4 +368,16 @@
     </div>
     }
 </div>
+
+<!-- Download Progress Dialog -->
+<p-dialog header="Downloading Report" [(visible)]="showDownloadDialog" [modal]="true"
+    [closable]="false" [draggable]="false" [resizable]="false"
+    [style]="{ width: '400px' }">
+    <div class="d-flex flex-column align-items-center gap-3 py-2">
+        <i class="fas fa-file-download fa-2x text-primary"></i>
+        <span class="fw-medium text-center">{{ downloadingReportName }}</span>
+        <p-progressBar [value]="downloadProgressValue" [showValue]="true" class="w-100"></p-progressBar>
+        <small class="text-muted">Please wait while the file is being downloaded...</small>
+    </div>
+</p-dialog>
 }
