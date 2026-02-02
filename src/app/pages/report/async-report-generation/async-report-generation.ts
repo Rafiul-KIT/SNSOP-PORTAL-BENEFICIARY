@@ -93,6 +93,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   // Loading states
   isLoading: boolean = true;
   isGenerating: boolean = false;
+  isLoadingReports: boolean = false;
 
   // Report types dropdown
   reportTypes: ReportType[] = [
@@ -529,13 +530,14 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   }
 
   async loadAsyncReports(): Promise<void> {
+    this.isLoadingReports = true;
     try {
       let response;
 
       const paginationParams = {
         page: this.currentPage,
         size: this.pageSize,
-        sort: 'createdAt,desc'
+        // sort: 'createdAt,desc'
       };
 
       if (this.filterStatus) {
@@ -572,6 +574,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     } catch (err) {
       console.error('Error loading async reports:', err);
     } finally {
+      this.isLoadingReports = false;
       this.cdr.markForCheck();
     }
   }
