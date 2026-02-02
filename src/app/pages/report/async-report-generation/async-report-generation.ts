@@ -149,12 +149,12 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   ];
 
   selectedReportType: ReportType | null = null;
-  selectedFormat: string = 'EXCEL';
+  selectedFormat: string = 'CSV';
   reportForm: FormGroup = new FormGroup({});
 
   formatOptions = [
     { id: 'PDF', name: 'PDF' },
-    { id: 'EXCEL', name: 'EXCEL' },
+    // { id: 'EXCEL', name: 'EXCEL' },
     { id: 'CSV', name: 'CSV' }
   ];
 
@@ -662,9 +662,9 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      const extMap: Record<string, string> = { PDF: 'pdf', EXCEL: 'xlsx', CSV: 'csv' };
+      const extMap: Record<string, string> = { PDF: 'pdf', CSV: 'csv' };
       const formatKey = report.format ? report.format.toUpperCase() : '';
-      const ext = extMap[formatKey] || report.format?.toLowerCase() || 'xlsx';
+      const ext = extMap[formatKey] || report.format?.toLowerCase() || 'csv';
       link.download = `${report.reportName || fileName}.${ext}`;
       link.click();
       window.URL.revokeObjectURL(url);
