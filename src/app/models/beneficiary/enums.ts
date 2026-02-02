@@ -57,6 +57,8 @@ export type NotParticipationReason =
   | 'REASON_OTHER';
 
 export type MobileMoneyProvider = 'MOMO' | 'MGURUSH' | 'DIGICASH';
+export type PaymentMethod = 'CASH' | 'MOBILE_WALLET';
+
 export type Occupation =
   | 'FORMAL_JOB'
   | 'CASUAL_WORK'

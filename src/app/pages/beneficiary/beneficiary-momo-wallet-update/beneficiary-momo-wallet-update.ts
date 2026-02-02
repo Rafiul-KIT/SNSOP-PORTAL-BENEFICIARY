@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { Toast } from 'primeng/toast';
-import { BeneficiaryDto } from '../../../models/beneficiary';
+import { BeneficiaryDto, PaymentMethod } from '../../../models/beneficiary';
 import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { ToggleButtonModule } from 'primeng/togglebutton';
@@ -62,13 +62,18 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
   beneficiaryForm!: FormGroup;
   beneficiaryDetails!: BeneficiaryDto;
 
+  // properties to store initial state
+  private initialHasMobileWallet: boolean = false;
+  private initialMobileMoneyProvider: string | null = null;
+  private initialMobileWalletNumber: string | null = null;
+  private initialPaymentMethod: 'cash' | 'mobile_wallet' = 'cash';
+
   beneficiaryPhoto = 'images/dummyHuman.jpg';
 
-  // ✅ dropdown values are integers 0/1/2
   mobileMoneyOptions = [
-    { label: 'Momo', value: 0 },
-    { label: 'mGurush', value: 1 },
-    { label: 'DigiCash', value: 2 },
+    { label: 'Momo', value: 'MOMO' },
+    { label: 'mGurush', value: 'MGURUSH' },
+    { label: 'DigiCash', value: 'DIGICASH' },
   ];
 
   constructor(
@@ -96,8 +101,9 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
     this.beneficiaryForm = this.fb.group({
       currentMomoNumber: [{ value: '', disabled: true }],
       hasMobileWallet: [false], // ✅ boolean
-      mobileWalletId: [{ value: null, disabled: true }], // ✅ number 0/1/2
+      mobileMoneyProvider: [{ value: null, disabled: true }],
       mobileWalletNumber: [{ value: '', disabled: true }],
+      paymentMethod: ['cash', Validators.required], // Added payment method form control
     });
 
     this.beneficiaryForm
@@ -116,47 +122,41 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // API returns provider string: MOMO/MGURUSH/DIGICASH
-  private providerStringToId(provider?: string | null): number | null {
-    if (!provider) return null;
-
-    switch (provider.toUpperCase()) {
-      case 'MOMO':
-        return 0;
-      case 'MGURUSH':
-        return 1;
-      case 'DIGICASH':
-        return 2;
-      default:
-        return null;
-    }
-  }
-
   private updateWalletValidators(hasWallet: boolean): void {
-    const mobileWalletIdControl = this.beneficiaryForm.get('mobileWalletId');
+    const mobileMoneyProviderControl = this.beneficiaryForm.get('mobileMoneyProvider');
     const mobileWalletNumberControl = this.beneficiaryForm.get('mobileWalletNumber');
 
     if (hasWallet) {
-      mobileWalletIdControl?.setValidators([Validators.required]);
-      mobileWalletIdControl?.enable({ emitEvent: false });
+      mobileMoneyProviderControl?.setValidators([Validators.required]);
+      mobileMoneyProviderControl?.enable({ emitEvent: false });
 
       mobileWalletNumberControl?.setValidators([
-        Validators.required,
         Validators.pattern('^[0-9]{9}$'),
       ]);
       mobileWalletNumberControl?.enable({ emitEvent: false });
     } else {
-      mobileWalletIdControl?.clearValidators();
-      mobileWalletIdControl?.disable({ emitEvent: false });
-      mobileWalletIdControl?.reset(null, { emitEvent: false });
+      mobileMoneyProviderControl?.clearValidators();
+      mobileMoneyProviderControl?.disable({ emitEvent: false });
+      mobileMoneyProviderControl?.reset(null, { emitEvent: false });
 
       mobileWalletNumberControl?.clearValidators();
       mobileWalletNumberControl?.disable({ emitEvent: false });
       mobileWalletNumberControl?.reset('', { emitEvent: false });
     }
 
-    mobileWalletIdControl?.updateValueAndValidity({ emitEvent: false });
+    mobileMoneyProviderControl?.updateValueAndValidity({ emitEvent: false });
     mobileWalletNumberControl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  isUnchanged(): boolean {
+    const formValues = this.beneficiaryForm.getRawValue();
+
+    if (formValues.hasMobileWallet !== this.initialHasMobileWallet) return false;
+    if (formValues.paymentMethod !== this.initialPaymentMethod) return false;
+    if (formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) return false;
+    if (formValues.mobileWalletNumber.trim() !== '') return false; // a new number has been entered
+
+    return true; // if we reach here, nothing has changed
   }
 
   async fetchBeneficiaryDetails(applicationId: string) {
@@ -166,33 +166,45 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
 
       this.beneficiaryDetails = dto;
 
+      // --- Unified State Initialization ---
+      // This block sets the initial state and patches the form in one go to ensure consistency.
+
+      // 1. Determine Payment Method (with default)
+      let paymentMethod: 'cash' | 'mobile_wallet' = 'cash'; // Default to 'cash'
+      if (dto.paymentMethod === 'MOBILE_WALLET') {
+        paymentMethod = 'mobile_wallet';
+      }
+
+      // 2. Determine other wallet values
+      const hasMobileWallet = !!dto?.hasMobileWallet;
+      const provider = dto?.mobileMoneyProvider || null;
+      const mobileWalletNumber = dto?.mobileWalletNumber || null;
+      let currentMomoDisplay = '';
+      if (mobileWalletNumber) {
+        currentMomoDisplay = mobileWalletNumber.startsWith('+211')
+          ? mobileWalletNumber
+          : `+211${mobileWalletNumber}`;
+      }
+
+      // 3. Store all initial values
+      this.initialHasMobileWallet = hasMobileWallet;
+      this.initialMobileMoneyProvider = provider;
+      this.initialMobileWalletNumber = mobileWalletNumber;
+      this.initialPaymentMethod = paymentMethod;
+
+      // 4. Patch the form with the same values
+      this.beneficiaryForm.patchValue({
+        hasMobileWallet: hasMobileWallet,
+        mobileMoneyProvider: provider,
+        currentMomoNumber: currentMomoDisplay,
+        paymentMethod: paymentMethod,
+      }, { emitEvent: false });
+
+      // 5. Set photo and update validators
       if (dto?.biometrics?.photoData) {
         this.beneficiaryPhoto = 'data:image/png;base64,' + dto.biometrics.photoData;
       }
-
-      // Existing wallet number display
-      if (dto?.mobileWalletNumber) {
-        let display = dto.mobileWalletNumber;
-        if (!display.startsWith('+211')) display = '+211' + display;
-
-        this.beneficiaryForm.patchValue({ currentMomoNumber: display }, { emitEvent: false });
-      } else {
-        this.beneficiaryForm.patchValue({ currentMomoNumber: '' }, { emitEvent: false });
-      }
-
-      // ✅ patch hasWallet and provider (string -> int)
-      const providerId = this.providerStringToId(dto?.mobileMoneyProvider);
-
-      this.beneficiaryForm.patchValue(
-        {
-          hasMobileWallet: !!dto?.hasMobileWallet,
-          mobileWalletId: providerId,
-        },
-        { emitEvent: false }
-      );
-
-      // since emitEvent:false, subscription won't fire
-      this.updateWalletValidators(!!dto?.hasMobileWallet);
+      this.updateWalletValidators(hasMobileWallet);
 
       this.beneficiaryForm.updateValueAndValidity({ emitEvent: false });
     } catch (err) {
@@ -210,27 +222,52 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
 
   private buildFieldUpdatePayload() {
     const formValues = this.beneficiaryForm.getRawValue();
-
     const fieldList: { fieldName: string; fieldValue: any }[] = [];
 
-    fieldList.push({
-      fieldName: 'hasMobileWallet',
-      fieldValue: formValues.hasMobileWallet ? 1 : 0,
-    });
-
-    if (formValues.hasMobileWallet) {
+    // 1. Check hasMobileWallet
+    if (formValues.hasMobileWallet !== this.initialHasMobileWallet) {
       fieldList.push({
-        fieldName: 'mobileWalletId',
-        fieldValue: formValues.mobileWalletId, // ✅ 0/1/2 integer
+        fieldName: 'hasMobileWallet',
+        fieldValue: formValues.hasMobileWallet ? 1 : 0,
       });
+    }
 
+    // 2. Check paymentMethod
+    if (formValues.paymentMethod !== this.initialPaymentMethod) {
+      let paymentMethodForApi: PaymentMethod = 'CASH';
+      if (formValues.paymentMethod === 'mobile_wallet') {
+        paymentMethodForApi = 'MOBILE_WALLET';
+      }
+      fieldList.push({
+        fieldName: 'paymentMethod',
+        fieldValue: paymentMethodForApi,
+      });
+    }
+
+    // 3. Check mobileMoneyProvider - only if hasMobileWallet is true
+    if (formValues.hasMobileWallet && formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) {
+      fieldList.push({
+        fieldName: 'mobileMoneyProvider',
+        fieldValue: formValues.mobileMoneyProvider,
+      });
+    }
+
+    // 4. Check for a new mobileWalletNumber
+    if (formValues.hasMobileWallet && formValues.mobileWalletNumber.trim() !== '') {
       fieldList.push({
         fieldName: 'mobileWalletNumber',
         fieldValue: `+211${formValues.mobileWalletNumber}`,
       });
-    } else {
-      fieldList.push({ fieldName: 'mobileWalletId', fieldValue: null });
-      fieldList.push({ fieldName: 'mobileWalletNumber', fieldValue: null });
+    }
+
+    // If hasMobileWallet was turned off, we need to null out the wallet fields
+    if (this.initialHasMobileWallet && !formValues.hasMobileWallet) {
+        fieldList.push({ fieldName: 'mobileMoneyProvider', fieldValue: null });
+        fieldList.push({ fieldName: 'mobileWalletNumber', fieldValue: null });
+    }
+    
+    if (fieldList.length === 0) {
+      return null; // No changes detected
     }
 
     return {
@@ -248,12 +285,21 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validation',
-        detail: 'Please fill all required fields.',
+        detail: 'Please fill all required fields correctly.',
       });
       return;
     }
 
     const requestBody = this.buildFieldUpdatePayload();
+
+    if (!requestBody) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Changes',
+        detail: 'No changes detected to update.',
+      });
+      return;
+    }
 
     this.isSubmitting = true;
     this.isLoading = true;
