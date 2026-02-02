@@ -283,7 +283,7 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <p-table [value]="paginatedReports" [tableStyle]="{ 'min-width': '100%' }"
+                    <p-table [value]="asyncReports()" [tableStyle]="{ 'min-width': '100%' }"
                         [scrollable]="true" scrollHeight="420px">
 
                         <ng-template pTemplate="header">

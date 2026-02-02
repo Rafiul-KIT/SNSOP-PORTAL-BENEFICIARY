@@ -532,19 +532,27 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     try {
       let response;
 
+      const paginationParams = {
+        page: this.currentPage,
+        size: this.pageSize,
+        sort: 'createdAt,desc'
+      };
+
       if (this.filterStatus) {
-        response = await this.api.GET(`api/reports/status/${this.filterStatus}`, undefined, 'report');
+        response = await this.api.GET(`api/reports/status/${this.filterStatus}`, paginationParams, 'report');
       } else if (this.filterStartDate && this.filterEndDate) {
         response = await this.api.GET('api/reports/date-range', {
           startDate: new Date(this.filterStartDate).toISOString(),
-          endDate: new Date(this.filterEndDate).toISOString()
+          endDate: new Date(this.filterEndDate).toISOString(),
+          ...paginationParams
         }, 'report');
       } else {
-        response = await this.api.GET('api/reports/all', undefined, 'report');
+        response = await this.api.GET('api/reports/all', paginationParams, 'report');
       }
 
       const data = response.data;
       const reports = Array.isArray(data) ? data : data.content || [];
+      this.totalRecords = data.totalElements ?? (Array.isArray(data) ? data.length : 0);
       const mappedReports: AsyncReportItem[] = reports.map((report: any) => ({
         requestId: report.id || report.requestId,
         reportType: report.reportType,
@@ -561,7 +569,6 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       }));
       this.asyncReports.set(mappedReports);
       this.updateReportStats(mappedReports);
-      this.currentPage = 0;
     } catch (err) {
       console.error('Error loading async reports:', err);
     } finally {
@@ -574,12 +581,14 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       this.filterStartDate = '';
       this.filterEndDate = '';
     }
+    this.currentPage = 0;
     this.loadAsyncReports();
   }
 
   onDateRangeFilter(): void {
     if (this.filterStartDate && this.filterEndDate) {
       this.filterStatus = '';
+      this.currentPage = 0;
       this.loadAsyncReports();
     }
   }
@@ -588,19 +597,19 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
     this.filterStatus = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
+    this.currentPage = 0;
     this.loadAsyncReports();
   }
 
   private updateReportStats(reports: AsyncReportItem[]): void {
     const stats: ReportStats = {
-      total: reports.length,
+      total: this.totalRecords,
       pending: reports.filter(r => r.status === 'PENDING').length,
       inProgress: reports.filter(r => r.status === 'IN_PROGRESS').length,
       completed: reports.filter(r => r.status === 'COMPLETED').length,
       failed: reports.filter(r => r.status === 'FAILED').length
     };
     this.reportStats.set(stats);
-    this.totalRecords = reports.length;
   }
 
   private getReportNameByType(reportType: string): string {
@@ -650,7 +659,10 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${report.reportName || fileName}.xlsx`;
+      const extMap: Record<string, string> = { PDF: 'pdf', EXCEL: 'xlsx', CSV: 'csv' };
+      const formatKey = report.format ? report.format.toUpperCase() : '';
+      const ext = extMap[formatKey] || report.format?.toLowerCase() || 'xlsx';
+      link.download = `${report.reportName || fileName}.${ext}`;
       link.click();
       window.URL.revokeObjectURL(url);
 
@@ -761,12 +773,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   onPageChange(event: any): void {
     this.currentPage = event.page;
     this.pageSize = event.rows;
-  }
-
-  get paginatedReports(): AsyncReportItem[] {
-    const start = this.currentPage * this.pageSize;
-    const end = start + this.pageSize;
-    return this.asyncReports().slice(start, end);
+    this.loadAsyncReports();
   }
 
   // Registration phase options for dropdown
