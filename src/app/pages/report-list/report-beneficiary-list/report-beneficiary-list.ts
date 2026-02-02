@@ -1,10 +1,10 @@
-import { Component, inject, input } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, effect, inject, input, signal, untracked } from '@angular/core';
 
 import { saveAs } from 'file-saver';
 
-import { MenuItem } from 'primeng/api';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { LookupService } from '../../../services/lookup.service';
+import { ApiService } from '../../../services/api.service';
 
 interface Column {
   field: string;
@@ -20,20 +20,45 @@ interface ExportColumn {
 @Component({
   selector: 'app-report-beneficiary-list',
   standalone: true,
-  imports: [],
+  imports: [PaginatorModule],
   templateUrl: './report-beneficiary-list.html',
   styleUrls: ['./report-beneficiary-list.scss'],
 })
 export class ReportBeneficiaryList {
-
   reportResult = input<any>(null);
-
+  searchCriteria = input<any>(null);
+  endpoint = input<string>('');
 
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
+  displayedList = signal<any[]>([]);
+  isExporting = signal(false);
+
+  totalRecords = signal(0);
+  rows = signal(10);
+  first = signal(0);
 
   public lookupService = inject(LookupService);
+  private apiService = inject(ApiService);
+
+  constructor() {
+    effect(() => {
+      const result = this.reportResult();
+      if (result) {
+        this.beneficiaryList.set(result.data ?? []);
+        this.totalRecords.set(result.data?.length ?? 0);
+        this.first.set(0);
+        untracked(() => this.sliceList());
+      }
+    });
+  }
+
+  private sliceList() {
+    const start = this.first();
+    const end = start + this.rows();
+    this.displayedList.set(this.beneficiaryList().slice(start, end));
+  }
 
   private async createPdfDoc() {
     const { jsPDF } = await import('jspdf');
@@ -104,8 +129,31 @@ export class ReportBeneficiaryList {
 
   // Export to Excel
   async exportExcel() {
+    const criteria = this.searchCriteria();
+    const ep = this.endpoint();
+
+    let allData: any[] = [];
+
+    if (criteria && ep) {
+      try {
+        this.isExporting.set(true);
+        const payload = { ...criteria, size: -1, from: 0 };
+        const res = await this.apiService.POST(ep, payload);
+        if (res.status === 200) {
+          allData = res.data?.data ?? [];
+        }
+      } catch (err) {
+        console.error('Failed to fetch all data for CSV export:', err);
+        allData = this.beneficiaryList();
+      } finally {
+        this.isExporting.set(false);
+      }
+    } else {
+      allData = this.beneficiaryList();
+    }
+
     const filteredListForXL: any[] = [];
-    this.beneficiaryList().forEach((elem: any) => {
+    allData.forEach((elem: any, index: number) => {
       const selectionReasonList = elem.selectionReason || [];
       const selectionReasonValues: string[] = selectionReasonList.map(
         (reason: string, idx: number) =>
@@ -113,10 +161,12 @@ export class ReportBeneficiaryList {
       );
 
       let columns: any = {
+        "Serial": index + 1,
         "State Name": this.lookupService.getStateNameById(elem.address?.stateId) ?? '',
         "County Name": this.lookupService.getCountyNameById(elem.address?.countyId) ?? '',
         "Payam Name": this.lookupService.getPayamNameById(elem.address?.payam) ?? '',
         "Boma Name": this.lookupService.getBomaNameById(elem.address?.boma) ?? '',
+        "Application ID": elem.applicationId ?? '',
         "Respondent First Name": elem.respondentFirstName ?? '',
         "Respondent Middle Name": elem.respondentMiddleName ?? '',
         "Respondent Last Name": elem.respondentLastName ?? '',
@@ -198,7 +248,7 @@ export class ReportBeneficiaryList {
         "Does respondent read and write": elem.isReadWrite ?? '',
         "How many members in the HH are between 18 and 35 and can read and write": elem.memberReadWrite ?? '',
 
-        "Alternate One Household Name": "-",
+        // "Alternate One Household Name": "-",
         "Alternate One First Name": elem.alternatePayee1?.payeeFirstName ?? '',
         "Alternate One Middle Name": elem.alternatePayee1?.payeeMiddleName ?? '',
         "Alternate One Last Name": elem.alternatePayee1?.payeeLastName ?? '',
@@ -211,7 +261,7 @@ export class ReportBeneficiaryList {
         "Alternate One Relationship": elem.relationshipOther ? elem.relationshipOther : (this.lookupService.getRelationshipEnumByValue(elem.alternatePayee1?.relationshipWithHouseholdHead) ?? ''),
         "Alternate One Gender": elem.alternatePayee1?.payeeGender ?? '',
 
-        "Alternate Two Household Name": "-",
+        // "Alternate Two Household Name": "-",
         "Alternate Two First Name": elem.alternatePayee2?.payeeFirstName ?? '',
         "Alternate Two Middle Name": elem.alternatePayee2?.payeeMiddleName ?? '',
         "Alternate Two Last Name": elem.alternatePayee2?.payeeLastName ?? '',
@@ -346,8 +396,11 @@ export class ReportBeneficiaryList {
     this.exportColumns.set(
       this.cols().map((col) => ({ title: col.header, dataKey: col.field }))
     );
+  }
 
-
-    this.beneficiaryList.set(this.reportResult()?.data ?? []);
+  handlePageChange(event: PaginatorState) {
+    this.first.set(event.first ?? 0);
+    this.rows.set(event.rows ?? 10);
+    this.sliceList();
   }
 }

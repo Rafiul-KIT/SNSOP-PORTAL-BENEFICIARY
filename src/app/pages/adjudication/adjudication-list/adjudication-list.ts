@@ -222,56 +222,56 @@ export class AdjudicationList implements OnInit {
 
     if (f.firstName)
       criteria.push({
-        fieldName: 'RESPONDENT_FIRST_NAME',
+        fieldName: 'firstName',
         operator: 'LIKE',
         value: f.firstName.trim(),
       });
     if (f.middleName)
       criteria.push({
-        fieldName: 'RESPONDENT_MIDDLE_NAME',
+        fieldName: 'middleName',
         operator: 'LIKE',
         value: f.middleName.trim(),
       });
     if (f.lastName)
       criteria.push({
-        fieldName: 'RESPONDENT_LAST_NAME',
+        fieldName: 'lastName',
         operator: 'LIKE',
         value: f.lastName.trim(),
       });
     if (f.phoneNumber)
       criteria.push({
-        fieldName: 'RESPONDENT_PHONE_NO',
+        fieldName: 'phoneNo',
         operator: 'LIKE',
         value: f.phoneNumber.trim(),
       });
 
     if (f.state?.id)
       criteria.push({
-        fieldName: 'STATE_ID',
+        fieldName: 'state',
         operator: 'EQUAL',
         value: f.state.id,
       });
     if (f.county?.id)
       criteria.push({
-        fieldName: 'COUNTY_ID',
+        fieldName: 'county',
         operator: 'EQUAL',
         value: f.county.id,
       });
     if (f.payam?.id)
       criteria.push({
-        fieldName: 'PAYAM_ID',
+        fieldName: 'payam',
         operator: 'EQUAL',
         value: f.payam.id,
       });
     if (f.boma?.id)
       criteria.push({
-        fieldName: 'BOMA_ID',
+        fieldName: 'boma',
         operator: 'EQUAL',
         value: f.boma.id,
       });
     if (f.gender)
       criteria.push({
-        fieldName: 'RESPONDENT_GENDER',
+        fieldName: 'gender',
         operator: 'EQUAL',
         value: f.gender,
       });
@@ -289,13 +289,17 @@ export class AdjudicationList implements OnInit {
     const f = this.searchForm.value;
     return {
       applicationId: f.applicationId ? f.applicationId.trim() : null,
-      respondentFirstName: f.firstName ? f.firstName.trim() : null,
-      respondentMiddleName: f.middleName ? f.middleName.trim() : null,
-      respondentLastName: f.lastName ? f.lastName.trim() : null,
+      firstName: f.firstName ? f.firstName.trim() : null,
+      middleName: f.middleName ? f.middleName.trim() : null,
+      lastName: f.lastName ? f.lastName.trim() : null,
+      state: f.state?.id || null,
+      county: f.county?.id || null,
+      payam: f.payam?.id || null,
+      boma: f.boma?.id || null,
       respondentId: null,
       registrationPhase: f.registrationPhase || null,
-      respondentGender: f.gender || null,
-       selectionCriteria: f.criteria || null,
+      gender: f.gender || null,
+      selectionCriteria: f.criteria || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',

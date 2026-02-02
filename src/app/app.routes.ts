@@ -222,6 +222,13 @@ export const routes: Routes = [
           reportTitle: 'Complete Household Survey Report',
         },
       },
+      {
+        path: 'async-report-generation',
+        loadComponent: () =>
+          import('./pages/report/async-report-generation/async-report-generation').then(
+            (m) => m.AsyncReportGeneration
+          ),
+      },
     ],
   },
   {

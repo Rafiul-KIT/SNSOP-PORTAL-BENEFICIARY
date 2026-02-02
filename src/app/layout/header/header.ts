@@ -246,6 +246,11 @@ export class Header {
             icon: 'fas fa-file-alt',
             routerLink: 'report/complete-household-survey',
           },
+          {
+            label: 'Async Report Generation',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/async-report-generation',
+          },
         ],
       },
       { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },

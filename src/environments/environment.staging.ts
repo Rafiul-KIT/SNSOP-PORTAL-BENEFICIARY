@@ -14,5 +14,6 @@ export const environment = {
     report: 'https://newmis.southsudansafetynet.info/trial/report',
   },
     authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
+  reportApi: 'https://devgwapp.southsudansafetynet.info/mis_report/',
   cookie_name:'mis_ta'
 };
