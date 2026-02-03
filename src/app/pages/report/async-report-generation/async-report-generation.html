@@ -290,6 +290,7 @@
                             <tr>
                                 <th style="width: 5%">Serial</th>
                                 <th style="width: 30%">Report Name</th>
+                                 <th style="width: 15%">Format</th>
                                 <th style="width: 15%">Status</th>
                                 <th style="width: 20%">Created At</th>
                                 <th style="width: 30%">Actions</th>
@@ -309,6 +310,7 @@
                                         }
                                     </div>
                                 </td>
+                                    <td>{{ report.format }}</td>
                                 <td>
                                     <p-tag [value]="report.status" [severity]="getStatusSeverity(report.status)"></p-tag>
                                     @if (report.status === 'FAILED' && report.errorMessage) {
