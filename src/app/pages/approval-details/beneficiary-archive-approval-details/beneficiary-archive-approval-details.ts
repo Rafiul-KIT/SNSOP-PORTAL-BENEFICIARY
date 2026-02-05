@@ -22,6 +22,7 @@ import {
   RelationshipWithHead,
   Occupation,
 } from '../../../models/beneficiary';
+import Swal from 'sweetalert2';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
@@ -201,28 +202,42 @@ export class BeneficiaryArchiveApprovalDetails implements OnInit {
 
     this.api
       .POST('/api/approval/doApprove', payload)
-      .then(() => {
-        const life = 5000;
-        this.messageService.add({
-          severity: this.isApprove ? 'success' : 'warn',
-          summary: this.isApprove ? 'Approved' : 'Rejected',
-          detail: `Archiving request for ${this.beneficiaryDetails?.name} ${
-            this.isApprove ? 'approved' : 'rejected'
-          } successfully.`,
-          life,
-        });
+      .then((res: any) => {
         this.isLoading = false;
-        setTimeout(() => {
+        this.cdr.detectChanges();
+
+        const operationResult = res?.data?.operationResult;
+        const isSuccess = operationResult === 'SUCCESS';
+
+        const responseMessage =
+          res?.data?.message ||
+          `Archiving request for ${this.beneficiaryDetails?.name} ${
+            isSuccess ? 'approved' : 'rejected'
+          } successfully.`;
+
+        Swal.fire({
+          icon: isSuccess ? 'success' : 'warning',
+          title: isSuccess ? 'Approved' : 'Rejected',
+          text: responseMessage,
+          confirmButtonText: 'OK',
+        }).then(() => {
           this.router.navigate(['/beneficiary-approval/list']);
-        }, life);
+        });
       })
       .catch((err: any) => {
         console.error(err);
         this.isLoading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: `Failed to ${this.isApprove ? 'approve' : 'reject'} task`,
+        this.cdr.detectChanges();
+
+        const errorMessage =
+          err?.response?.data?.message ||
+          `Failed to ${this.isApprove ? 'approve' : 'reject'} task`;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          confirmButtonText: 'OK',
         });
       });
   }
