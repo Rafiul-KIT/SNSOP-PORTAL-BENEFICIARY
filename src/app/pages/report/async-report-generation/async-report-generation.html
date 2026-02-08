@@ -1,0 +1,383 @@
+<div class="breadcrumb-wrapper">
+    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+
+<p-toast position="bottom-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+@if (isLoading) {
+<app-loader />
+} @else {
+<div class="async-report-wrapper">
+    <!-- Stats Cards Section -->
+    <div class="stats-section mb-3">
+        <div class="d-flex gap-3 justify-content-between flex-wrap">
+            <!-- Total Reports -->
+            <div class="alert alert-primary d-flex align-items-center justify-content-between mb-0 p-3 flex-fill stat-card">
+                <div class="d-flex flex-column">
+                    <div class="stat-number">{{ reportStats().total }}</div>
+                    <span class="fw-bold mt-1">Total</span>
+                </div>
+                <i class="fas fa-file-alt fa-lg"></i>
+            </div>
+
+            <!-- Pending -->
+            <div class="alert alert-warning d-flex align-items-center justify-content-between mb-0 p-3 flex-fill stat-card">
+                <div class="d-flex flex-column">
+                    <div class="stat-number">{{ reportStats().pending }}</div>
+                    <span class="fw-bold mt-1">Pending</span>
+                </div>
+                <i class="fas fa-clock fa-lg"></i>
+            </div>
+
+            <!-- In Progress -->
+            <div class="alert alert-info d-flex align-items-center justify-content-between mb-0 p-3 flex-fill stat-card">
+                <div class="d-flex flex-column">
+                    <div class="stat-number">{{ reportStats().inProgress }}</div>
+                    <span class="fw-bold mt-1">Processing</span>
+                </div>
+                <i class="fas fa-sync-alt fa-lg"></i>
+            </div>
+
+            <!-- Completed -->
+            <div class="alert alert-success d-flex align-items-center justify-content-between mb-0 p-3 flex-fill stat-card">
+                <div class="d-flex flex-column">
+                    <div class="stat-number">{{ reportStats().completed }}</div>
+                    <span class="fw-bold mt-1">Completed</span>
+                </div>
+                <i class="fas fa-check fa-lg"></i>
+            </div>
+
+            <!-- Failed -->
+            <div class="alert alert-danger d-flex align-items-center justify-content-between mb-0 p-3 flex-fill stat-card">
+                <div class="d-flex flex-column">
+                    <div class="stat-number">{{ reportStats().failed }}</div>
+                    <span class="fw-bold mt-1">Failed</span>
+                </div>
+                <i class="fas fa-times fa-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    @if (!isGenerating) {
+    <div class="row">
+        <!-- Report Generation Form Section -->
+        <div class="col-12 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <span class="header-title"><i class="fas fa-plus-circle me-2"></i>Generate Report</span>
+                </div>
+                <div class="card-body">
+                    <!-- Report Type Selection -->
+                    <div class="mb-3">
+                        <p-floatlabel variant="on" class="w-100">
+                            <p-select [options]="reportTypes" optionLabel="name" [(ngModel)]="selectedReportType"
+                                (onChange)="onReportTypeChange($event.value)" [showClear]="true" class="w-100">
+                            </p-select>
+                            <label>Report Type</label>
+                        </p-floatlabel>
+                    </div>
+
+                    <!-- Selected Report Description -->
+                    @if (selectedReportType) {
+                    <div class="alert alert-light mb-3 py-2">
+                        <small>{{ selectedReportType.description }}</small>
+                    </div>
+
+                    <!-- Dynamic Form Fields -->
+                    <form novalidate [formGroup]="reportForm" class="report-form">
+                        <!-- Staff Username (for Staff Report) -->
+                        @if (reportForm.get('staffUserName')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="userList" optionLabel="fullName" optionValue="username"
+                                    formControlName="staffUserName" [filter]="true" filterBy="fullName"
+                                    class="w-100" />
+                                <label>Staff Member</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- From Date -->
+                        @if (reportForm.get('fromDate')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" formControlName="fromDate" placeholder="">
+                                <label>From Date</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- To Date -->
+                        @if (reportForm.get('toDate')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" formControlName="toDate" placeholder="">
+                                <label>To Date</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- State -->
+                        @if (reportForm.get('stateId')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="stateList" optionLabel="name" [(ngModel)]="selectedState"
+                                    [ngModelOptions]="{standalone: true}" (onChange)="onStateChange($event.value)"
+                                     [showClear]="true" class="w-100" />
+                                <label>State</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- County -->
+                        @if (reportForm.get('countyId')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="countyList" optionLabel="name" [(ngModel)]="selectedCounty"
+                                    [ngModelOptions]="{standalone: true}" (onChange)="onCountyChange($event.value)"
+                                     [showClear]="true"
+                                    [disabled]="!selectedState" class="w-100" />
+                                <label>County</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Payam -->
+                        @if (reportForm.get('payamId')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="payamList" optionLabel="name" [(ngModel)]="selectedPayam"
+                                    [ngModelOptions]="{standalone: true}" (onChange)="onPayamChange($event.value)"
+                                    [showClear]="true"
+                                    [disabled]="!selectedCounty" class="w-100" />
+                                <label>Payam</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Boma -->
+                        @if (reportForm.get('bomaId')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="bomaList" optionLabel="name" [(ngModel)]="selectedBoma"
+                                    [ngModelOptions]="{standalone: true}" (onChange)="onBomaChange($event.value)"
+                                     [showClear]="true"
+                                    [disabled]="!selectedPayam" class="w-100" />
+                                <label>Boma</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Scheme (for Reconciliation Detail) -->
+                        @if (reportForm.get('scheme')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="schemeOptions" optionLabel="name" optionValue="id"
+                                    formControlName="scheme" class="w-100" />
+                                <label>Scheme</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Payment Status (for Reconciliation Detail) -->
+                        @if (reportForm.get('paymentStatus')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="paymentStatusOptions" optionLabel="name" optionValue="id"
+                                    formControlName="paymentStatus" class="w-100" />
+                                <label>Payment Status</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Payment Cycle -->
+                        @if (reportForm.get('paymentCycle')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="paymentCycleOptions" optionLabel="name" optionValue="id"
+                                    formControlName="paymentCycle" class="w-100" />
+                                <label>Payment Cycle</label>
+                            </p-floatlabel>
+                        </div>
+                        }
+
+                        <!-- Registration Phase -->
+                        @if (reportForm.get('registrationPhase')) {
+                        <div class="mb-3">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="registrationPhaseOptions" optionLabel="name" optionValue="id"
+                                    formControlName="registrationPhase" class="w-100" />
+                            </p-floatlabel>
+                        </div>
+                        }
+                    </form>
+
+                    <!-- Format Selection -->
+                    <div class="mb-3">
+                        <p-floatlabel variant="on" class="w-100">
+                            <p-select [options]="formatOptions" optionLabel="name" optionValue="id"
+                                [(ngModel)]="selectedFormat" class="w-100" />
+                            <label>Format</label>
+                        </p-floatlabel>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 mt-3">
+                        <p-button label="Reset" icon="fas fa-undo" severity="secondary" size="small"
+                            (onClick)="resetForm()" [outlined]="true" class="flex-fill"></p-button>
+                        <p-button label="Generate" icon="fas fa-play" severity="success"
+                            size="small" (onClick)="generateReport()" class="flex-fill"></p-button>
+                    </div>
+                    } @else {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-arrow-up fa-2x mb-3 text-primary"></i>
+                        <p class="mb-0">Select a report type above</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Generated Reports List Section -->
+        <div class="col-12 col-lg-8 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="header-title"><i class="fas fa-list me-2"></i>Report History</span>
+                    <p-button icon="fas fa-sync-alt" severity="secondary" size="small" [rounded]="true" [text]="true"
+                        (onClick)="refreshReports()" pTooltip="Refresh" tooltipPosition="left"></p-button>
+                </div>
+                <!-- Filter Section -->
+                <div class="card-body pb-0">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-filter me-2 text-secondary"></i>
+                        <span class="fw-semibold text-secondary">Filters</span>
+                        @if (filterStatus || filterStartDate || filterEndDate) {
+                        <p-button icon="fas fa-times" label="Clear" severity="secondary" size="small"
+                            [text]="true" (onClick)="clearFilters()" class="ms-auto"></p-button>
+                        }
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <p-select [options]="statusFilterOptions" optionLabel="name" optionValue="id"
+                                    [(ngModel)]="filterStatus" (onChange)="onFilterStatusChange()"
+                                     class="w-100" />
+                                <!-- <label>Status</label> -->
+                            </p-floatlabel>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" [(ngModel)]="filterStartDate"
+                                    (change)="onDateRangeFilter()" placeholder="">
+                                <label>Start Date</label>
+                            </p-floatlabel>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <p-floatlabel variant="on" class="w-100">
+                                <input type="date" pInputText class="form-control w-100" [(ngModel)]="filterEndDate"
+                                    (change)="onDateRangeFilter()" placeholder="">
+                                <label>End Date</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <p-table [value]="asyncReports()" [tableStyle]="{ 'min-width': '100%' }"
+                        [scrollable]="true" scrollHeight="420px" [loading]="isLoadingReports">
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 5%">Serial</th>
+                                <th style="width: 30%">Report Name</th>
+                                <th style="width: 15%">Status</th>
+                                <th style="width: 20%">Created At</th>
+                                <th style="width: 30%">Actions</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-report let-rowIndex="rowIndex">
+                            <tr>
+                                <td>{{ (currentPage * pageSize) + rowIndex + 1 }}</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-medium">{{ report.reportName }}</span>
+                                        @if (report.completedAt) {
+                                        <small class="text-success">
+                                            Done: {{ report.completedAt | date:'short' }}
+                                        </small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <p-tag [value]="report.status" [severity]="getStatusSeverity(report.status)"></p-tag>
+                                    @if (report.status === 'FAILED' && report.errorMessage) {
+                                    <i class="fas fa-info-circle text-danger ms-1"
+                                        [pTooltip]="report.errorMessage" tooltipPosition="top"></i>
+                                    }
+                                    @if (report.status === 'IN_PROGRESS' && report.progress) {
+                                    <p-progressBar [value]="report.progress" [showValue]="true"
+                                        class="mt-1"></p-progressBar>
+                                    }
+                                </td>
+                                <td>
+                                    <small>{{ report.createdAt | date:'short' }}</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <p-button icon="fas fa-download"
+                                            [severity]="report.status === 'COMPLETED' ? 'success' : 'secondary'"
+                                            size="small" [rounded]="true"
+                                            [outlined]="true"
+                                            (onClick)="downloadReport(report)"
+                                            [pTooltip]="report.status === 'COMPLETED' ? 'Download' : 'Available after completion'"
+                                            tooltipPosition="top"
+                                            [disabled]="report.status !== 'COMPLETED'"></p-button>
+                                        <!-- <p-button icon="fas fa-trash" severity="danger" size="small" [rounded]="true"
+                                            [outlined]="true" (onClick)="confirmDelete(report)" pTooltip="Delete"
+                                            tooltipPosition="top"
+                                            [disabled]="report.status === 'IN_PROGRESS'"></p-button> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="fas fa-folder-open fa-3x text-muted mb-5"></i>
+                                    <p class="text-muted mb-0">No reports yet</p>
+                                    <small class="text-muted">Generate your first report using the form</small>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <p-paginator [rows]="pageSize" [totalRecords]="totalRecords"
+                        [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)"
+                        [first]="currentPage * pageSize"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+                    </p-paginator>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    } @else {
+    <div class="generating-overlay">
+        <app-loader MESSAGE="Generating report..."></app-loader>
+    </div>
+    }
+</div>
+
+<!-- Download Progress Dialog -->
+<p-dialog header="Downloading Report" [(visible)]="showDownloadDialog" [modal]="true"
+    [closable]="false" [draggable]="false" [resizable]="false"
+    [style]="{ width: '400px' }">
+    <div class="d-flex flex-column align-items-center gap-3 py-2">
+        <i class="fas fa-file-download fa-2x text-primary"></i>
+        <span class="fw-medium text-center">{{ downloadingReportName }}</span>
+        <p-progressBar [value]="downloadProgressValue" [showValue]="true" class="w-100"></p-progressBar>
+        <small class="text-muted">Please wait while the file is being downloaded...</small>
+    </div>
+</p-dialog>
+}

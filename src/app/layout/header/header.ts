@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./header.scss'],
 })
 export class Header {
+
   showPortalOptions = false;
   showUsermenu = false;
   menuList: any[] = [];
@@ -43,7 +44,10 @@ export class Header {
       link: environment.portals.masterSettings,
       icon: 'fas fa-cog',
     },
-    { label: 'Survey CTO', icon: 'fas fa-poll' },
+    { label: 'Survey CTO',
+      link: environment.portals.surveyCTO,
+      icon: 'fas fa-poll'
+    },
   ];
 
   constructor(
@@ -105,19 +109,58 @@ export class Header {
       },
 
       {
-        label: 'Beneficiary',
+        label: 'Beneficiary Registration',
         icon: 'fas fa-people-group',
         items: [
-          
+
+          // {
+          //   label: 'Beneficiary Update',
+          //   icon: 'fas fa-user-gear',
+          //   routerLink: 'beneficiary/list',
+          // },
+          // {
+          //   label: 'Update Approval',
+          //   icon: 'fas fa-user-check',
+          //   routerLink: 'beneficiary-approval/list',
+          // },
+          // {
+          //   label: 'Beneficiary Audit',
+          //   icon: 'fas fa-address-book',
+          //   routerLink: 'beneficiary-audit/list',
+          // },
+          // {
+          //   label: 'Restore Beneficiary',
+          //   icon: 'fas fa-archive',
+          //   routerLink: 'restore/list',
+          // },
+          {
+            label: 'New Registration',
+            icon: 'fas fa-user-plus',
+            // routerLink: 'beneficiary/new-registration',
+            routerLink: 'under-construction',
+          },
+          {
+            label: 'Pending Verification',
+            icon: 'fas fa-users-viewfinder',
+            routerLink: 'pending-beneficiary/list',
+            // routerLink: 'under-construction',
+          },
+          {
+            label: 'Beneficiary List',
+            icon: 'fas fa-users',
+            routerLink: 'beneficiary/view-list',
+          },
+        ],
+      },
+      {
+        label: 'Beneficiary Manage',
+        icon: 'fas fa-people-group',
+        items: [
+
           {
             label: 'Beneficiary Update',
             icon: 'fas fa-user-gear',
             routerLink: 'beneficiary/list',
-          },
-          {
-            label: 'Beneficiary View',
-            icon: 'fas fa-users-viewfinder',
-            routerLink: 'beneficiary/view-list',
           },
           {
             label: 'Update Approval',
@@ -135,65 +178,80 @@ export class Header {
             routerLink: 'restore/list',
           },
           {
-            label: 'New Registration',
-            icon: 'fas fa-user-plus',
-            // routerLink: 'beneficiary/new-registration',
-            routerLink: 'under-construction',
+            label: 'Mobile Wallet Update',
+            icon: 'fas fa-user-gear',
+            routerLink: 'beneficiary/momo-list',
           },
-          {
-            label: 'Pending Verification',
-            icon: 'fas fa-list',
-            // routerLink: 'pending-beneficiary/list',
-            routerLink: 'under-construction',
-          },
-        ],
-      },
-      {
-        label: 'Adjudication',
-        icon: 'fas fa-users-viewfinder',
-        // routerLink: 'adjudication/list',
-        routerLink: 'under-construction',
-      },
-      {
-        label: 'Report',
-        icon: 'fas fa-file-alt',
-        items: [
-          {
-            label: 'Boma Wise Beneficiary List Report',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/boma-wise-beneficiary-list',
-          },
-          {
-            label: 'Boma & Data Entry Staff Wise Registration Report',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/data-entry-wise-registration',
-          },
-          {
-            label: 'Boma Wise Age Group Report',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/boma-wise-age-group',
-          },
-          {
-            label: 'Households Interested in Component 2 Report',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/interested-in-component2',
-          },
-          {
-            label: 'Report for Biometric Match List',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/biometric-match-list',
-          },
-          {
-            label: 'Complete Household Survey Report',
-            icon: 'fas fa-file-alt',
-            // routerLink: 'report/complete-household-survey',
-          },
+          // {
+          //   label: 'New Registration',
+          //   icon: 'fas fa-user-plus',
+          //   // routerLink: 'beneficiary/new-registration',
+          //   routerLink: 'under-construction',
+          // },
+          // {
+          //   label: 'Pending Verification',
+          //   icon: 'fas fa-list',
+          //   routerLink: 'pending-beneficiary/list',
+          //   // routerLink: 'under-construction',
+          // },
+          // {
+          //   label: 'Beneficiary List',
+          //   icon: 'fas fa-users-viewfinder',
+          //   routerLink: 'beneficiary/view-list',
+          // },
         ],
       },
       {
         label: 'Beneficiary ID Cards',
         icon: 'fas fa-id-card',
         routerLink: 'id-card',
+      },
+      {
+        label: 'Adjudication',
+        icon: 'fas fa-users-viewfinder',
+        routerLink: 'adjudication/list',
+        // routerLink: 'redirect-link',
+      },
+      {
+        label: 'Beneficiary Report',
+        icon: 'fas fa-file-alt',
+        items: [
+          {
+            label: 'Boma Wise Beneficiary List Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-beneficiary-list',
+          },
+          {
+            label: 'Boma & Data Entry Staff Wise Registration Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/data-entry-wise-registration',
+          },
+          {
+            label: 'Boma Wise Age Group Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/boma-wise-age-group',
+          },
+          {
+            label: 'Households Interested in Component 2 Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/interested-in-component2',
+          },
+          {
+            label: 'Report for Biometric Match List',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/biometric-match-list',
+          },
+          {
+            label: 'Complete Household Survey Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/complete-household-survey',
+          },
+          {
+            label: 'Async Report Generation',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/async-report-generation',
+          },
+        ],
       },
       { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },
       {
@@ -226,4 +284,7 @@ export class Header {
     this.apiService.logout();
     window.location.href = `${environment.portals.master}/#/landing`;
   }
+  goToProfile = () => {
+    this.router.navigateByUrl('/profile');
+  };
 }

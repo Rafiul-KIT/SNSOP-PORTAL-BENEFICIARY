@@ -22,12 +22,23 @@ import { NewRegistration } from './pages/beneficiary/new-registration/new-regist
 import { PendingBeneficiaryList } from './pages/beneficiary/pending-beneficiary-list/pending-beneficiary-list';
 import { PendingBeneficiaryManage } from './pages/beneficiary/pending-beneficiary-manage/pending-beneficiary-manage';
 import { BeneficiaryViewList } from './pages/beneficiary/beneficiary-view-list/beneficiary-view-list';
+import { Profile } from './pages/profile/profile';
+import { Unauthorized } from './components/unauthorized/unauthorized';
+import { UnderConstruction } from './pages/under-construction/under-construction';
+import { RedirectLink } from './pages/adjudication/redirect-link/redirect-link';
+import { BeneficiaryMomoWalletUpdate } from './pages/beneficiary/beneficiary-momo-wallet-update/beneficiary-momo-wallet-update';
+import { BeneficiaryMomoList } from './pages/beneficiary/beneficiary-momo-list/beneficiary-momo-list';
+import { BeneficiaryDetailsView } from './pages/beneficiary/beneficiary-details-view/beneficiary-details-view';
 
 export const routes: Routes = [
   {
     component: Dashboard,
     path: 'dashboard',
     canActivate: [routeGuard],
+  },
+   {
+    component: Profile,
+    path: 'profile',
   },
   {
     path: 'adjudication',
@@ -36,10 +47,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: AdjudicationList,
+        canActivate: [routeGuard],
       },
       {
         path: 'match-list/:id',
         component: MatchList,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -51,26 +64,47 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryList,
+        canActivate: [routeGuard],
       },
       {
         path: 'view-list',
         component: BeneficiaryViewList,
+        canActivate: [routeGuard],
+      },
+      {
+        path: 'details-view/:id',
+        component: BeneficiaryDetailsView,
+        canActivate: [routeGuard],
       },
       {
         path: 'new-registration',
         component: NewRegistration,
+        canActivate: [routeGuard],
       },
       {
         path: 'details/:id',
         component: BeneficiaryDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit/:applicationId',
         component: BeneficiaryManage,
+        canActivate: [routeGuard],
       },
       {
         path: 'migrate/:bid',
         component: BeneficiaryMigration,
+        canActivate: [routeGuard],
+      },
+      {
+        path: 'momo-update/:bid',
+        component: BeneficiaryMomoWalletUpdate,
+        canActivate: [routeGuard],
+      },
+      {
+        path: 'momo-list',
+        component: BeneficiaryMomoList,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -82,10 +116,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: PendingBeneficiaryList,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit/:applicationId',
         component: PendingBeneficiaryManage,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -97,18 +133,22 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryEditApprovalList,
+        canActivate: [routeGuard],
       },
       {
         path: 'edit-details/:id',
         component: BeneficiaryEditApprovalDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'migrate-details/:id',
         component: BeneficiaryMigrateApprovalDetails,
+        canActivate: [routeGuard],
       },
       {
         path: 'archive-details/:id',
         component: BeneficiaryArchiveApprovalDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -120,10 +160,12 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryAudit,
+        canActivate: [routeGuard],
       },
       {
         path: 'audit-details/:id',
         component: BeneficiaryAuditDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
@@ -180,6 +222,13 @@ export const routes: Routes = [
           reportTitle: 'Complete Household Survey Report',
         },
       },
+      {
+        path: 'async-report-generation',
+        loadComponent: () =>
+          import('./pages/report/async-report-generation/async-report-generation').then(
+            (m) => m.AsyncReportGeneration
+          ),
+      },
     ],
   },
   {
@@ -189,17 +238,31 @@ export const routes: Routes = [
       {
         path: 'list',
         component: BeneficiaryRestore,
+        canActivate: [routeGuard],
       },
       {
         path: 'details/:id',
         component: BeneficiaryRestoreDetails,
+        canActivate: [routeGuard],
       },
       { path: '', pathMatch: 'full', redirectTo: 'list' },
     ],
   },
+  { path: 'unauthorized',
+    component: Unauthorized
+  },
   {
     path: 'under-construction',
+    component: UnderConstruction,
+  },
+  {
+    path: 'id-card',
     component: BeneficiaryIdCard,
+    canActivate: [routeGuard],
+  },
+  {
+    path: 'redirect-link',
+    component: RedirectLink,
   },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {

@@ -1,3 +1,5 @@
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import {
   Component,
   OnInit,
@@ -88,6 +90,8 @@ interface BeneficiaryVm {
     RouterModule,
     TooltipModule,
     Loader,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -117,6 +121,7 @@ export class BeneficiaryRestore implements OnInit {
   advanceSearchPanelVisible = false;
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
+  isScannerVisible = false;
 
 
   constructor(
@@ -159,6 +164,18 @@ export class BeneficiaryRestore implements OnInit {
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
+  }
+
   initForm() {
     this.searchForm = this.fb.group({
       applicationId: [''],
@@ -177,7 +194,7 @@ export class BeneficiaryRestore implements OnInit {
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [{ label: 'Restore Beneficiary', icon:'fas fa-archive' }];
   }
 
   // ---------- dependent dropdowns ----------

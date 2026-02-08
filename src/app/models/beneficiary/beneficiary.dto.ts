@@ -6,6 +6,7 @@ import {
   MaritalStatus,
   MobileMoneyProvider,
   NotParticipationReason,
+  PaymentMethod,
   RegPhase,
   RelationshipWithHead,
   SelectionCriteria,
@@ -95,6 +96,7 @@ export interface BeneficiaryDto {
   hasMobileWallet: boolean;
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string | null;
+  paymentMethod?: PaymentMethod;
 
   requestId: string;
   comment: string;

@@ -13,17 +13,26 @@
         </button>
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-info btn-sm me-2"
           (click)="exportPdf()"
           pTooltip="PDF"
           tooltipPosition="bottom"
         >
           <i class="fas fa-file-pdf me-2"></i>Export as PDF
         </button>
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm"
+          (click)="previewPdf()"
+          pTooltip="Preview PDF"
+          tooltipPosition="bottom"
+        >
+          <i class="fas fa-eye me-2"></i>Preview PDF
+        </button>
       </div>
     </ng-template>
 
- 
+
     <ng-template pTemplate="header">
       <tr style="border: 2px">
         <th colspan="4" class="text-center" style="background-color: cadetblue; color: white">LOCATION</th>
@@ -37,7 +46,7 @@
       </tr>
     </ng-template>
 
- 
+
     <ng-template pTemplate="body" let-beneficiary>
       <tr>
         <td>{{ beneficiary.stateId > 0 ? lookupService.getStateNameById(beneficiary.stateId) : '-' }}</td>

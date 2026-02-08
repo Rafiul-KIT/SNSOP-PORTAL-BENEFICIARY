@@ -96,6 +96,14 @@
       </p-floatlabel>
     </div>
 
+    <!-- selction criteria -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="criteriaOptions" optionLabel="name" optionValue="id" formControlName="criteria"></p-select>
+        <label>Selection Criteria</label>
+      </p-floatlabel>
+    </div>
+
     }
 
     <div class="col-12 text-end">
@@ -155,7 +163,7 @@
 
       <td class="text-center">
         <p-button type="button" icon="fas fa-eye" pTooltip="Details" tooltipPosition="top" appendTo="body"
-          (onClick)="showUnderConstruction()" size="small" outlined="true" severity="info" class="me-2" />
+          (onClick)="beneficiaryDetails(b)" size="small" outlined="true" severity="info" class="me-2" />
         <!-- <p-button type="button" icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body"
           (onClick)="editBeneficiary(b)" size="small" outlined="true" severity="secondary" class="me-2" />
         <p-button type="button" icon="fas fa-share" pTooltip="Migrate" tooltipPosition="top" appendTo="body"

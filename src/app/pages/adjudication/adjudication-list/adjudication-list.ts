@@ -31,42 +31,26 @@ import { Loader } from '../../../components/loader/loader';
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
-
-interface BeneficiaryDto {
-  applicationId: string;
-  type: 'BENEFICIARY' | 'NOMINEE' | 'ALTERNATE_1' | 'ALTERNATE_2';
-  respondentFirstName: string;
-  respondentMiddleName: string;
-  respondentLastName: string;
-  respondentGender: Gender;
-  respondentId: string;
-  respondentAge: number;
-  respondentPhoneNo: string;
-  address?: {
-    stateId: string;
-    countyId: string;
-    payam: string;
-    boma: string;
-  };
-  registrationPhase: RegPhase;
-}
+type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryVm {
   applicationId: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentAge: number;
   respondentPhoneNo: string;
   address?: {
-    stateId: string;
-    countyId: string;
-    payam: string;
-    boma: string;
+    stateId: string | number;
+    countyId: string | number;
+    payam: string | number;
+    boma: string | number;
   };
   fullName: string;
   stateName: string;
   countyName: string;
   payamName: string;
   bomaName: string;
+  registrationPhase: any;
 }
 @Component({
   selector: 'app-adjudication-list',
@@ -104,6 +88,7 @@ export class AdjudicationList implements OnInit {
   bomas: LookupItem[] = [];
 
   genderOptions: LookupItem[] = [];
+  criteriaOptions: LookupItem[] = []
   registrationPhaseOptions: LookupItem[] = [];
 
   beneficiaries: BeneficiaryVm[] = [];
@@ -137,6 +122,7 @@ export class AdjudicationList implements OnInit {
     this.payams = this.lookup.getAllPayamList();
     this.bomas = this.lookup.getAllBomaList();
     this.genderOptions = this.lookup.getGenderListbyId();
+    this.criteriaOptions = this.lookup.getSelectionCriteriaListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
   }
   ngOnInit() {
@@ -177,12 +163,13 @@ export class AdjudicationList implements OnInit {
       boma: [null as LookupItem | null],
       gender: [null as Gender | null],
       registrationPhase: [null as RegPhase | null],
+      criteria: [null as Criteria | null],
     });
   }
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Adjudication List' }];
+    this.breadcrumbItems = [{ icon: 'fas fa-users-viewfinder', label: 'Adjudication' }];
   }
 
   // ---------- dependent dropdowns ----------
@@ -235,58 +222,64 @@ export class AdjudicationList implements OnInit {
 
     if (f.firstName)
       criteria.push({
-        fieldName: 'RESPONDENT_FIRST_NAME',
+        fieldName: 'firstName',
         operator: 'LIKE',
         value: f.firstName.trim(),
       });
     if (f.middleName)
       criteria.push({
-        fieldName: 'RESPONDENT_MIDDLE_NAME',
+        fieldName: 'middleName',
         operator: 'LIKE',
         value: f.middleName.trim(),
       });
     if (f.lastName)
       criteria.push({
-        fieldName: 'RESPONDENT_LAST_NAME',
+        fieldName: 'lastName',
         operator: 'LIKE',
         value: f.lastName.trim(),
       });
     if (f.phoneNumber)
       criteria.push({
-        fieldName: 'RESPONDENT_PHONE_NO',
+        fieldName: 'phoneNo',
         operator: 'LIKE',
         value: f.phoneNumber.trim(),
       });
 
     if (f.state?.id)
       criteria.push({
-        fieldName: 'STATE_ID',
+        fieldName: 'state',
         operator: 'EQUAL',
         value: f.state.id,
       });
     if (f.county?.id)
       criteria.push({
-        fieldName: 'COUNTY_ID',
+        fieldName: 'county',
         operator: 'EQUAL',
         value: f.county.id,
       });
     if (f.payam?.id)
       criteria.push({
-        fieldName: 'PAYAM_ID',
+        fieldName: 'payam',
         operator: 'EQUAL',
         value: f.payam.id,
       });
     if (f.boma?.id)
       criteria.push({
-        fieldName: 'BOMA_ID',
+        fieldName: 'boma',
         operator: 'EQUAL',
         value: f.boma.id,
       });
     if (f.gender)
       criteria.push({
-        fieldName: 'RESPONDENT_GENDER',
+        fieldName: 'gender',
         operator: 'EQUAL',
         value: f.gender,
+      });
+    if (f.criteria)
+      criteria.push({
+        fieldName: 'SELECTION_CRITERIA',
+        operator: 'LIKE',
+        value: f.criteria,
       });
 
     return criteria;
@@ -296,12 +289,17 @@ export class AdjudicationList implements OnInit {
     const f = this.searchForm.value;
     return {
       applicationId: f.applicationId ? f.applicationId.trim() : null,
-      respondentFirstName: f.firstName ? f.firstName.trim() : null,
-      respondentMiddleName: f.middleName ? f.middleName.trim() : null,
-      respondentLastName: f.lastName ? f.lastName.trim() : null,
+      firstName: f.firstName ? f.firstName.trim() : null,
+      middleName: f.middleName ? f.middleName.trim() : null,
+      lastName: f.lastName ? f.lastName.trim() : null,
+      state: f.state?.id || null,
+      county: f.county?.id || null,
+      payam: f.payam?.id || null,
+      boma: f.boma?.id || null,
       respondentId: null,
       registrationPhase: f.registrationPhase || null,
-      respondentGender: f.gender || null,
+      gender: f.gender || null,
+      selectionCriteria: f.criteria || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',
@@ -311,7 +309,7 @@ export class AdjudicationList implements OnInit {
   }
 
   // ---------- Mapping ----------
-  private toVm(list: BeneficiaryDto[]): BeneficiaryVm[] {
+  private toVm(list: any[]): BeneficiaryVm[] {
     return list.map((b) => {
       const fullName = [
         b.respondentFirstName,
@@ -324,6 +322,7 @@ export class AdjudicationList implements OnInit {
       return {
         applicationId: b.applicationId,
         respondentGender: b.respondentGender,
+        selectionCriteria: b.selectionCriteria,
         respondentAge: b.respondentAge,
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,
@@ -354,10 +353,9 @@ export class AdjudicationList implements OnInit {
     this.isLoading = true;
     const body = this.buildSearchBody(page, size);
     this.api
-      .POST('api/beneficiary/search', body)
+      .POST('api/adjudication/getAdjudicateList', body)
       .then((res: any) => {
         const data = res?.data;
-        console.log(data);
         if (!data) throw new Error('Empty response');
         if (data.operationResult === false) {
           this.messageService.add({
@@ -366,7 +364,7 @@ export class AdjudicationList implements OnInit {
             detail: data.errorMsg || 'No beneficiaries found',
           });
         }
-        const raw: BeneficiaryDto[] = data.beneficiaries || [];
+                const raw: any[] = data.matchList || [];
         this.beneficiaries = this.toVm(raw);
         this.totalRecords = Number(data.total || 0);
       })
@@ -414,7 +412,7 @@ export class AdjudicationList implements OnInit {
   // }
   beneficiaryDetails(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
-    this.router.navigate(['match-list', String(b.applicationId)]);
+        this.router.navigate(['/adjudication/match-list', String(b.applicationId)]);
   }
 
 

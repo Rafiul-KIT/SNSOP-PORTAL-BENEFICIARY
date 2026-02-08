@@ -32,10 +32,9 @@
     (onClick)="showUsermenu = !showUsermenu"></p-button>
 
   <div class="user-menu {{ showUsermenu ? 'show' : '' }}" (mouseleave)="showUsermenu = false">
-    <div class="item">
-      <!-- (click)="goToProfile()" -->
+    <div class="item" (click)="goToProfile()">
       <i class="fas fa-user me-2"></i>
-      Profile ({{userInfo.sub}})
+      Profile
     </div>
     <div class="item" (click)="logout()">
       <i class="fas fa-sign-out-alt me-2"></i>

@@ -1,0 +1,83 @@
+/* beneficiary-momo-wallet-update.scss */
+
+.p-card {
+  margin-bottom: 2rem;
+}
+
+.p-card-body {
+  padding: 1.5rem;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+input[pInputText] {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+/* Redesigned layout helpers */
+.form-check-inline {
+  margin-right: 1rem;
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+/* Sticky action bar */
+.form-action-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Card header */
+.card-header {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Force input group to stay on one line inside p-floatlabel */
+.momo-input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+/* Fixed prefix */
+.momo-prefix {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Input takes remaining space */
+.momo-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0; /* important for flex layouts */
+}

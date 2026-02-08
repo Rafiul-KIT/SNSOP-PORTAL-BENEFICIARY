@@ -12,6 +12,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FormsModule } from '@angular/forms';
 import { LookupService } from '../../../services/lookup.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-beneficiary-migrate-approval-details',
@@ -27,13 +28,16 @@ import { TooltipModule } from 'primeng/tooltip';
     Loader,
     ButtonModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    CardModule,
   ],
-  standalone: true
+  standalone: true,
 })
 export class BeneficiaryMigrateApprovalDetails {
   approvalComment: string = '';
   isSubmitting = false;
+  user: any;
+  isUserLoading: boolean = false;
   isLoading = true;
   isApprove: boolean = true;
   taskId: string | null = null;
@@ -43,11 +47,15 @@ export class BeneficiaryMigrateApprovalDetails {
   approvalStatus: string = '';
 
   items = [
-    { label: 'Approval List', icon: 'fas fa-users me-2', routerLink: '/beneficiary-approval/list' },
-    { label: 'Beneficiary Migration Details', icon: 'fas fa-user-cog me-2' },
+    {
+      label: 'Update Approval',
+      icon: 'fas fa-user-check',
+      routerLink: '/beneficiary-approval/list',
+    },
+    { label: 'Beneficiary Migration Details', icon: 'fas fa-user' },
   ];
 
-  home = { icon: 'fas fa-home me-2', routerLink: '/' };
+  home = { icon: 'fas fa-home', routerLink: '/' };
   beneficiaryPhoto = 'images/dummyHuman.jpg';
 
   constructor(
@@ -55,10 +63,10 @@ export class BeneficiaryMigrateApprovalDetails {
     private api: ApiService,
     private messageService: MessageService,
     private lookup: LookupService,
-    private confirmationService: ConfirmationService,  // Ensure ConfirmationService is injected
+    private confirmationService: ConfirmationService, // Ensure ConfirmationService is injected
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   differences: Record<string, string> = {};
   private diffKeySet = new Set<string>();
@@ -78,13 +86,15 @@ export class BeneficiaryMigrateApprovalDetails {
   /** True if ANY of the given paths changed. */
   isChanged(paths: string | string[]): boolean {
     const arr = Array.isArray(paths) ? paths : [paths];
-    return arr.some(p => this.candidatesFor(p).some(c => this.diffKeySet.has(c)));
+    return arr.some((p) =>
+      this.candidatesFor(p).some((c) => this.diffKeySet.has(c))
+    );
   }
 
   /** Return a tooltip string (merged if multiple) for changed paths. */
   diffTip(paths: string | string[]): string | undefined {
     const arr = Array.isArray(paths) ? paths : [paths];
-    const msgs = new Set<string>();   // ✅ avoid duplicates
+    const msgs = new Set<string>(); // ✅ avoid duplicates
     for (const p of arr) {
       for (const c of this.candidatesFor(p)) {
         const v = this.differences[c];
@@ -112,14 +122,25 @@ export class BeneficiaryMigrateApprovalDetails {
       key: 'approvalDialog',
       header: isApprove ? 'Confirm Approval' : 'Confirm Rejection',
       icon: isApprove ? 'fas fa-check-circle' : 'fas fa-ban',
-      acceptButtonProps: { label: 'Yes', severity: 'success', disabled: this.isLoading },
-      rejectButtonProps: { label: 'No', severity: 'danger', disabled: this.isLoading },
+      acceptButtonProps: {
+        label: 'Yes',
+        severity: 'success',
+        disabled: this.isLoading,
+      },
+      rejectButtonProps: {
+        label: 'No',
+        severity: 'danger',
+        disabled: this.isLoading,
+      },
       accept: () => this.handleApproval(),
     });
   }
 
   private handleApproval() {
-    if (!this.isApprove && (!this.approvalComment || !this.approvalComment.trim())) {
+    if (
+      !this.isApprove &&
+      (!this.approvalComment || !this.approvalComment.trim())
+    ) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Comment Required',
@@ -133,16 +154,19 @@ export class BeneficiaryMigrateApprovalDetails {
     const payload = {
       approvalTaskId: this.taskId,
       approved: this.isApprove,
-      comment: this.approvalComment
+      comment: this.approvalComment,
     };
 
-    this.api.POST('/api/approval/doApprove', payload)
+    this.api
+      .POST('/api/approval/doApprove', payload)
       .then(() => {
         const life = 1200;
         this.messageService.add({
           severity: this.isApprove ? 'success' : 'warn',
           summary: this.isApprove ? 'Approved' : 'Rejected',
-          detail: `Migration request for ${this.editedDetails?.applicationId} ${this.isApprove ? 'approved' : 'rejected'} successfully.`,
+          detail: `Migration request for ${this.editedDetails?.applicationId} ${
+            this.isApprove ? 'approved' : 'rejected'
+          } successfully.`,
           life,
         });
         this.isLoading = false;
@@ -161,10 +185,40 @@ export class BeneficiaryMigrateApprovalDetails {
       });
   }
 
+  async loadUserDetails(userId: number): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    try {
+      this.isUserLoading = true;
+      this.cdr.detectChanges();
+
+      const url = `api/users/findOne?id=${userId}`;
+      const axiosResponse = await this.api.GET<any>(url, {}, 'alt');
+      const res = axiosResponse.data;
+
+      if (res) {
+        this.user = res;
+      }
+    } catch (err: any) {
+      console.error('Failed to load user details', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details from server.',
+      });
+    } finally {
+      this.isUserLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    const isTaskMode = (this.route.snapshot.queryParamMap.get('taskMode') || '').toLowerCase() === 'true';
+    const isTaskMode =
+      (
+        this.route.snapshot.queryParamMap.get('taskMode') || ''
+      ).toLowerCase() === 'true';
     this.isLoading = true;
 
     try {
@@ -179,9 +233,17 @@ export class BeneficiaryMigrateApprovalDetails {
       this.approvalStatus = response?.data?.approvalStatus || '';
       if (response.data) {
         this.oldDetails = response.data.oldBeneficiary;
-        this.editedDetails = response.data.taskDetails || response.data.addressMigrationDetails || {};
+        this.editedDetails =
+          response.data.taskDetails ||
+          response.data.addressMigrationDetails ||
+          {};
         this.taskId = id;
         this.setDifferences(response.data.differences);
+        if (response.data.addressMigrationDetails?.updatedBy) {
+          await this.loadUserDetails(
+            response.data.addressMigrationDetails?.updatedBy
+          );
+        }
       }
     } catch (err) {
       console.error(err);
@@ -221,15 +283,15 @@ export class BeneficiaryMigrateApprovalDetails {
   }
 
   getPhotoSrc(photoData?: string): string {
-  if (!photoData) {
-    return 'images/dummyHuman.jpg';
-  }
+    if (!photoData) {
+      return 'images/dummyHuman.jpg';
+    }
 
-  // Ensure it starts with proper base64 prefix
-  if (photoData.startsWith('data:image')) {
-    return photoData;
-  }
+    // Ensure it starts with proper base64 prefix
+    if (photoData.startsWith('data:image')) {
+      return photoData;
+    }
 
-  return `data:image/jpeg;base64,${photoData}`;
-}
+    return `data:image/jpeg;base64,${photoData}`;
+  }
 }

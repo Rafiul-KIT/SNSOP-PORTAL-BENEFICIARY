@@ -94,7 +94,7 @@ export class Dashboard implements OnInit {
     datasets: [],
   };
 
-  setCategory(value: number | string) {
+  setCategory(value: number | string | undefined) {
     // PrimeNG emits the tab's [value], not an event object
     this.activeCategory = Number(value);
 
@@ -265,58 +265,58 @@ export class Dashboard implements OnInit {
   };
 
   gotoBeneficiaryList(kind?: 'gender' | 'support', label?: string) {
-    let phase = '';
-    let searchPreset: any = {
-      page: 0,
-      size: 10,
-      sortColumn: 'CREATED',
-      sortOrder: 'DESC',
-    };
+    // let phase = '';
+    // let searchPreset: any = {
+    //   page: 0,
+    //   size: 10,
+    //   sortColumn: 'CREATED',
+    //   sortOrder: 'DESC',
+    // };
 
-    if (this.activeCategory === 1) {
-      phase = 'PARENT';
-      searchPreset.criteria = [
-        { fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase },
-      ];
-    } else if (this.activeCategory === 2) {
-      phase = 'AF';
-      searchPreset.criteria = [
-        { fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase },
-      ];
-    } else if (this.activeCategory === 3) {
-      // Don't include 'REGISTRATION_PHASE' criteria for category 3
-      searchPreset.criteria = [];
-    }
+    // if (this.activeCategory === 1) {
+    //   phase = 'PARENT';
+    //   searchPreset.criteria = [
+    //     { fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase },
+    //   ];
+    // } else if (this.activeCategory === 2) {
+    //   phase = 'AF';
+    //   searchPreset.criteria = [
+    //     { fieldName: 'REGISTRATION_PHASE', operator: 'EQUAL', value: phase },
+    //   ];
+    // } else if (this.activeCategory === 3) {
+    //   // Don't include 'REGISTRATION_PHASE' criteria for category 3
+    //   searchPreset.criteria = [];
+    // }
 
-    if (kind && label) {
-      const L = (label ?? '').toString().trim().toUpperCase();
-      let criteria: Array<{
-        fieldName: string;
-        operator: string;
-        value: string;
-      }> = [];
+    // if (kind && label) {
+    //   const L = (label ?? '').toString().trim().toUpperCase();
+    //   let criteria: Array<{
+    //     fieldName: string;
+    //     operator: string;
+    //     value: string;
+    //   }> = [];
 
-      if (kind === 'gender') {
-        // MALE -> "0", FEMALE -> "1"
-        const genderCode = L === 'FEMALE' || L === '1' ? '1' : '0';
-        criteria.push({
-          fieldName: 'RESPONDENT_GENDER',
-          operator: 'EQUAL',
-          value: genderCode,
-        });
-      } else {
-        // LIPW -> "0", DIS -> "1"
-        const supportCode = L === 'DIS' || L === '1' ? '1' : '0';
-        criteria.push({
-          fieldName: 'SELECTION_CRITERIA',
-          operator: 'LIKE',
-          value: supportCode,
-        });
-      }
-      searchPreset.criteria = [...searchPreset.criteria, ...criteria];
-    }
+    //   if (kind === 'gender') {
+    //     // MALE -> "0", FEMALE -> "1"
+    //     const genderCode = L === 'FEMALE' || L === '1' ? '1' : '0';
+    //     criteria.push({
+    //       fieldName: 'RESPONDENT_GENDER',
+    //       operator: 'EQUAL',
+    //       value: genderCode,
+    //     });
+    //   } else {
+    //     // LIPW -> "0", DIS -> "1"
+    //     const supportCode = L === 'DIS' || L === '1' ? '1' : '0';
+    //     criteria.push({
+    //       fieldName: 'SELECTION_CRITERIA',
+    //       operator: 'LIKE',
+    //       value: supportCode,
+    //     });
+    //   }
+    //   searchPreset.criteria = [...searchPreset.criteria, ...criteria];
+    // }
 
-    this.router.navigate(['beneficiary/list'], { state: { searchPreset } });
+    // this.router.navigate(['beneficiary/list'], { state: { searchPreset } });
   }
 
   private buildLegendOptions(): ChartConfiguration['options'] {
@@ -390,33 +390,33 @@ export class Dashboard implements OnInit {
     e: { event?: ChartEvent; active?: any[] },
     kind: 'gender' | 'support'
   ) {
-    const active = e?.active;
-    if (!active?.length) return;
+    // const active = e?.active;
+    // if (!active?.length) return;
 
-    const sliceIndex = active[0].index;
-    if (sliceIndex === undefined) return;
+    // const sliceIndex = active[0].index;
+    // if (sliceIndex === undefined) return;
 
-    const labels = (
-      kind === 'gender'
-        ? this.doughnutChartGenderData.labels
-        : this.doughnutChartSupportCategoryData.labels
-    ) as string[];
+    // const labels = (
+    //   kind === 'gender'
+    //     ? this.doughnutChartGenderData.labels
+    //     : this.doughnutChartSupportCategoryData.labels
+    // ) as string[];
 
-    const label = labels?.[sliceIndex];
-    if (label) this.handleDoughnutSelection(kind, label);
+    // const label = labels?.[sliceIndex];
+    // if (label) this.handleDoughnutSelection(kind, label);
   }
 
   onBarClick(e: { event?: ChartEvent; active?: any[] }) {
-    const active = e?.active;
-    if (!active?.length) return;
+    // const active = e?.active;
+    // if (!active?.length) return;
 
-    const barIndex = active[0].index;
-    if (barIndex === undefined) return;
+    // const barIndex = active[0].index;
+    // if (barIndex === undefined) return;
 
-    const selected = this.countyAxis[barIndex];
-    if (!selected) return;
+    // const selected = this.countyAxis[barIndex];
+    // if (!selected) return;
 
-    this.handleBarSelectionById(selected.id);
+    // this.handleBarSelectionById(selected.id);
   }
 
   private handleBarSelectionById(countyId: string) {

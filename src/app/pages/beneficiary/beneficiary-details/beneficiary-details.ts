@@ -86,6 +86,7 @@ interface BeneficiaryVm {
     gender: string;
     relation: string;
     nomineeOccupation: Occupation;
+    otherOccupation?: string;
     relationshipOther?: string;
     photo?: string;
     isReadWrite?: boolean;
@@ -133,11 +134,11 @@ export class BeneficiaryDetails implements OnInit {
 
   items = [
     {
-      label: 'Beneficiary List',
-      icon: 'fas fa-users me-2',
+      label: 'Beneficiary Update',
+      icon: 'fas fa-user-gear',
       routerLink: '/beneficiary/list',
     },
-    { label: 'Beneficiary Details', icon: 'fas fa-user-cog me-2' },
+    { label: 'Beneficiary Details', icon: 'fas fa-user' },
   ];
   home = { icon: 'fas fa-home me-2', routerLink: '/' };
 
@@ -337,6 +338,7 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
       relation: n.relationshipWithHouseholdHead,
       relationshipOther: n.relationshipOther,
       nomineeOccupation: n.nomineeOccupation,
+      otherOccupation: n.otherOccupation,
       photo: normalizeFinger(n.biometric?.photoData),
       isReadWrite: n.isReadWrite,
     })),

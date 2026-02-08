@@ -15,6 +15,14 @@ export interface LookupItem {
   name: string;
 }
 
+interface EnumItem {
+  id: number;
+  value: string;
+  label?: string;
+  name?: string;
+}
+
+
 export interface GetLookupResponse {
   operationResult: boolean;
   errorMsg?: string;
@@ -211,6 +219,13 @@ export class LookupService {
     ];
   }
 
+    getSelectionCriteriaListbyId(): LookupItem[] {
+    return [
+      { id: '0', name: 'LIPW' },
+      { id: '1', name: 'DIS' },
+    ];
+  }
+
   getRegistrationPhaseList(): LookupItem[] {
     return [
       { id: 'PARENT', name: 'Parent' },
@@ -218,20 +233,27 @@ export class LookupService {
     ];
   }
 
-  SelectionCriteriaEnum = [
-    { id: 0, value: 'LIPW', label: 'Public Works' },
-    { id: 1, value: 'DIS', label: 'Direct Income Support' },
+  SelectionCriteriaEnum: EnumItem[] = [
+    { id: 0, value: 'LIPW', name: 'Public Works' },
+    { id: 1, value: 'DIS', name: 'Direct Income Support' },
   ];
   getSelectionCriteriaEnum = () => {
     return this.SelectionCriteriaEnum;
   };
+
+  getSelectionCriteriaLookup(): LookupItem[] {
+  return this.SelectionCriteriaEnum.map(item => ({
+    id: item.value,
+    name: item.name!,
+  }));
+}
 
   getSelectionCriteriaEnumByValue = (value: any) => {
     const dataFpund = this.SelectionCriteriaEnum.find(
       (sce: any) => sce.value == value
     );
     if (dataFpund) {
-      return dataFpund.label;
+      return dataFpund.name;
     } else {
       return '--';
     }

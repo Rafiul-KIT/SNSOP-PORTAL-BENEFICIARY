@@ -372,7 +372,7 @@
                                 </td>
                                 <td colspan="2"></td>
                               </tr>
-                            </tbody>
+                            </tbody> 
                           </table>
 
 
@@ -614,7 +614,13 @@
                       </tr>
                       <tr>
                         <th>Occupation</th>
-                        <td>{{ nominee.nomineeOccupation }}</td>
+                        <td>{{ nominee.nomineeOccupation }}
+                          @if (
+                          nominee.nomineeOccupation === 'OTHER' && nominee.nomineeOccupation
+                          ) {
+                          ({{ nominee.otherOccupation }})
+                          }
+                        </td>
 
                       </tr>
                       <tr>

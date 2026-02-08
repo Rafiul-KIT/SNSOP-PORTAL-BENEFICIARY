@@ -16,7 +16,6 @@ interface Column {
 interface ExportColumn {
   title: string;
   dataKey: string;
-  displayProperty?: string; 
 }
 
 @Component({
@@ -30,37 +29,85 @@ export class ReportLocationWiseNomineeCount {
 
   reportResult = input<any>(null);
 
- 
+  // Signals to hold column configurations and export data
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   nomineeCountList = signal<any[]>([]);
 
-
   public lookupService = inject(LookupService);
 
-  async exportPdf() {
-    const jsPDF = await import('jspdf');
+
+  private async createPdfDoc() {
+    // Dynamically import jsPDF and autoTable
+    const { jsPDF } = await import('jspdf');
     const autoTable = (await import('jspdf-autotable')).default;
-    const doc = new jsPDF.default('l', 'px', 'a4');
-    (doc as any).autoTable({
-      body: this.nomineeCountList(),
-      columns: this.exportColumns(),
-      didParseCell: (data: any) => {
-        if (data.column.raw.displayProperty) {
-          const prop = data.column.raw.displayProperty;
-          const text = data.cell.raw[prop];
-          const tType = data.cell.section;
-          if (text) {
-            data.cell.text = text.toString();
-          } else {
-            data.cell.text = tType === 'head' ? data.cell.raw : '0';
-          }
-        }
-      },
+  
+    // Get the data from nomineeCountList and exportColumns
+    const nomineeData = this.nomineeCountList();
+    const exportColumns = this.exportColumns();
+  
+    // Check if the data is not empty
+    if (!nomineeData || nomineeData.length === 0) {
+      console.error("No data to export.");
+      return undefined; // Return undefined if no data
+    }
+  
+    if (!exportColumns || exportColumns.length === 0) {
+      console.error("No columns defined for export.");
+      return undefined; // Return undefined if no columns
+    }
+  
+    // Create a new jsPDF instance
+    const doc = new jsPDF('landscape', 'px', 'a4');
+  
+    // Prepare the data with names for state, county, payam, and boma
+    const formattedData = nomineeData.map((row: any) => {
+      return {
+        State: this.lookupService.getStateNameById(row.stateId) ?? '-',
+        County: this.lookupService.getCountyNameById(row.countyId) ?? '-',
+        Payam: this.lookupService.getPayamNameById(row.payamId) ?? '-',
+        Boma: this.lookupService.getBomaNameById(row.bomaId) ?? '-',
+        Count: row.householdCount || 0,
+      };
     });
-    doc.save(`location_wise_nominee_count_${Date.now()}.pdf`);
+    // Map columns correctly for autoTable
+    const columns = exportColumns.map((col) => ({
+      header: col.title,
+      dataKey: col.dataKey,
+    }));
+  
+    // Ensure autoTable is added to jsPDF instance
+    autoTable(doc, {
+      body: formattedData,
+      columns: columns,
+      margin: { top: 20, left: 20 },
+      theme: 'grid',
+    });
+  
+    return doc;
   }
 
+  async previewPdf() {
+    const doc = await this.createPdfDoc();
+    if (doc) {
+      doc.output('dataurlnewwindow');
+    }
+  }
+
+  async exportPdf() {
+    const doc = await this.createPdfDoc();
+    if (doc) {
+      doc.save(`location_wise_nominee_count_${Date.now()}.pdf`);
+    }
+  }
+
+
+
+
+
+
+
+  // Excel Export Function
   async exportExcel() {
     const filteredListForXL: any[] = this.nomineeCountList().map((element: any) => ({
       State: element.stateId > 0 ? this.lookupService.getStateNameById(element.stateId) : '-',
@@ -77,6 +124,7 @@ export class ReportLocationWiseNomineeCount {
     this.saveAsExcelFile(excelBuffer, 'location_wise_nominee_count_');
   }
 
+  // Save as Excel File function
   private saveAsExcelFile(buffer: any, fileName: string): void {
     const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const EXCEL_EXTENSION = '.xlsx';
@@ -84,7 +132,9 @@ export class ReportLocationWiseNomineeCount {
     FileSaver.saveAs(data, `${fileName}${Date.now()}${EXCEL_EXTENSION}`);
   }
 
+  // Component initialization
   ngOnInit() {
+    // Define table columns
     this.cols.set([
       { field: 'stateId', header: 'STATE' },
       { field: 'countyId', header: 'COUNTY' },
@@ -93,14 +143,16 @@ export class ReportLocationWiseNomineeCount {
       { field: 'householdCount', header: 'NOMINEE COUNT' },
     ]);
 
+    // Define export columns with properties
     this.exportColumns.set([
-      { dataKey: 'State', title: 'State', displayProperty: 'stateId' },
-      { dataKey: 'County', title: 'County', displayProperty: 'countyId' },
-      { dataKey: 'Payam', title: 'Payam', displayProperty: 'payamId' },
-      { dataKey: 'Boma', title: 'Boma', displayProperty: 'bomaId' },
-      { dataKey: 'Count', title: 'Nominee Count', displayProperty: 'householdCount' },
+      { dataKey: 'State', title: 'State' },
+      { dataKey: 'County', title: 'County' },
+      { dataKey: 'Payam', title: 'Payam' },
+      { dataKey: 'Boma', title: 'Boma' },
+      { dataKey: 'Count', title: 'Nominee Count' },
     ]);
 
+    // Set nominee count list (dummy data for now)
     this.nomineeCountList.set(this.reportResult()?.dataList ?? []);
   }
 }

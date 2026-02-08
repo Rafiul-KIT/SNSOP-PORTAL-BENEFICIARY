@@ -1,3 +1,5 @@
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import {
   Component,
   OnInit,
@@ -29,6 +31,7 @@ import { LookupService, LookupItem } from '../../../services/lookup.service';
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
+type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryDto {
   applicationId: string;
@@ -37,6 +40,7 @@ interface BeneficiaryDto {
   respondentMiddleName: string;
   respondentLastName: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentId: string;
   respondentAge: number;
   respondentPhoneNo: string;
@@ -52,6 +56,7 @@ interface BeneficiaryDto {
 interface BeneficiaryVm {
   applicationId: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentAge: number;
   respondentPhoneNo: string;
   address?: {
@@ -86,6 +91,8 @@ interface BeneficiaryVm {
     RouterModule,
     TooltipModule,
     Loader,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   templateUrl: './beneficiary-audit.html',
   styleUrl: './beneficiary-audit.scss',
@@ -103,6 +110,7 @@ export class BeneficiaryAudit implements OnInit {
   bomas: LookupItem[] = [];
 
   genderOptions: LookupItem[] = [];
+  criteriaOptions: LookupItem[] = []
   registrationPhaseOptions: LookupItem[] = [];
 
   beneficiaries: BeneficiaryVm[] = [];
@@ -116,6 +124,7 @@ export class BeneficiaryAudit implements OnInit {
   advanceSearchPanelVisible = false;
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
+  isScannerVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -145,6 +154,7 @@ export class BeneficiaryAudit implements OnInit {
 
     // Use MALE/FEMALE ids, not 0/1
     this.genderOptions = this.lookup.getGenderListbyId();
+    this.criteriaOptions = this.lookup.getSelectionCriteriaListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
     this.cdr.markForCheck();
@@ -157,6 +167,18 @@ export class BeneficiaryAudit implements OnInit {
 
     await this.loadLookups();                // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
+  }
+
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
+
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
   }
 
   initForm() {
@@ -172,12 +194,13 @@ export class BeneficiaryAudit implements OnInit {
       boma: [null as LookupItem | null],
       gender: [null as Gender | null],
       registrationPhase: [null as RegPhase | null],
+      criteria: [null as Criteria | null],
     });
   }
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary Audit List' }];
+    this.breadcrumbItems = [{ label: 'Beneficiary Audit', icon:'fas fa-address-book' }];
   }
 
   // ---------- dependent dropdowns ----------
@@ -283,7 +306,12 @@ export class BeneficiaryAudit implements OnInit {
         operator: 'EQUAL',
         value: f.gender,
       });
-
+    if (f.criteria)
+      criteria.push({
+        fieldName: 'SELECTION_CRITERIA',
+        operator: 'LIKE',
+        value: f.criteria,
+      });
     return criteria;
   }
 
@@ -297,6 +325,7 @@ export class BeneficiaryAudit implements OnInit {
       respondentId: null,
       registrationPhase: f.registrationPhase || null,
       respondentGender: f.gender || null,
+       selectionCriteria: f.criteria || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',
@@ -319,6 +348,7 @@ export class BeneficiaryAudit implements OnInit {
       return {
         applicationId: b.applicationId,
         respondentGender: b.respondentGender,
+        selectionCriteria: b.selectionCriteria,
         respondentAge: b.respondentAge,
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,

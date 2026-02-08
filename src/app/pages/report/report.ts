@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ApiService } from '../../services/api.service';
-import { LookupService } from '../../services/lookup.service';
+import { LookupItem, LookupService } from '../../services/lookup.service';
 import { LoadingSpinner } from "../../components/loading-spinner/loading-spinner";
 import { Loader } from "../../components/loader/loader";
 import { ReportBeneficiaryList } from "../report-list/report-beneficiary-list/report-beneficiary-list";
@@ -17,17 +17,31 @@ import { ReportReconciledSummaryResult } from "../report-list/report-reconciled-
 import { ReportReconciliationSummaryCount } from "../report-list/report-reconciliation-summary-count/report-reconciliation-summary-count";
 import { Button } from "primeng/button";
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+
 
 
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule, LoadingSpinner, Loader, ReportBeneficiaryList, ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount, ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey, ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button],
+  imports: [CommonModule, ReactiveFormsModule, BreadcrumbModule,
+    LoadingSpinner, Loader, ReportBeneficiaryList,
+    ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount,
+    ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey,
+    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
 export class ReportComponent implements OnInit {
 
+  states: LookupItem[] = [];
+  counties: LookupItem[] = [];
+  payams: LookupItem[] = [];
+  bomas: LookupItem[] = [];
+
+  genderOptions: LookupItem[] = [];
+  registrationPhaseOptions: LookupItem[] = [];
   isLoading: boolean = true;
   isReportGenerating: boolean = false;
   items: MenuItem[] | undefined;
@@ -59,10 +73,11 @@ export class ReportComponent implements OnInit {
   reportForm: FormGroup = new FormGroup({});
 
   constructor(
-    private apiService : ApiService, 
+    private apiService: ApiService,
     public lookupService: LookupService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   showReportForm = (reportType: number, reportTitle: string): void => {
@@ -81,8 +96,8 @@ export class ReportComponent implements OnInit {
         this.reportForm = new FormGroup({
           size: new FormControl(10, Validators.required),
           from: new FormControl(0, Validators.required),
-          stateId: new FormControl(''),
-          countyId: new FormControl(''),
+          stateId: new FormControl('', Validators.required),
+          countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
           registrationPhase: new FormControl('')
@@ -99,13 +114,13 @@ export class ReportComponent implements OnInit {
         break;
       case 3:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
         });
         break;
       case 4:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -115,7 +130,7 @@ export class ReportComponent implements OnInit {
         break;
       case 5:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -126,7 +141,7 @@ export class ReportComponent implements OnInit {
         break;
       case 6:
         this.reportForm = new FormGroup({
-          size: new FormControl(10000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           page: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -154,7 +169,7 @@ export class ReportComponent implements OnInit {
           bomaId: new FormControl('', Validators.required),
           scheme: new FormControl('ALL', Validators.required),
           paymentStatus: new FormControl('ALL', Validators.required),
-          size: new FormControl(1000, Validators.required),
+          size: new FormControl(-1, Validators.required),
           paymentCycle: new FormControl('1', Validators.required)
         });
         break;
@@ -179,11 +194,11 @@ export class ReportComponent implements OnInit {
   getStaffList = (): void => {
     const payload = {
       page: 0,
-      size: 500,
+      size: -1,
       sortColumn: "ID",
       sortOrder: "DESC"
     };
-    this.apiService.POST('api/user/search', payload).then(res => {
+    this.apiService.POST('api/users/search', payload, 'alt').then(res => {
       if (res.status === 200) {
         this.userList = res.data.users;
       }
@@ -196,10 +211,10 @@ export class ReportComponent implements OnInit {
   getCountyLookupByStateId = (evt: Event): void => {
     const target = evt.target as HTMLSelectElement;
     const stateId = target.value;
-    this.apiService.POST('api/lookup/search', { 
-      lookupType: "COUNTY", 
-      parentId: (stateId !== '-1') ? stateId : "", 
-      size: -1 
+    this.apiService.POST('api/lookup/geo/search', {
+      lookupType: "COUNTY",
+      parentId: (stateId !== '-1') ? stateId : "",
+      size: -1
     }).then(res => {
       if (res.status === 200) {
         this.countyList = res.data.lookups;
@@ -220,10 +235,10 @@ export class ReportComponent implements OnInit {
   getPayamLookupByCountyId = (evt: Event): void => {
     const target = evt.target as HTMLSelectElement;
     const countyId = target.value;
-    this.apiService.POST('api/lookup/search', { 
-      lookupType: "PAYAM", 
-      parentId: (countyId !== '-1') ? countyId : "", 
-      size: -1 
+    this.apiService.POST('api/lookup/geo/search', {
+      lookupType: "PAYAM",
+      parentId: (countyId !== '-1') ? countyId : "",
+      size: -1
     }).then(res => {
       if (res.status === 200) {
         this.payamList = res.data.lookups;
@@ -242,10 +257,10 @@ export class ReportComponent implements OnInit {
   getBomaLookupByPayamId = (evt: Event): void => {
     const target = evt.target as HTMLSelectElement;
     const payamId = target.value;
-    this.apiService.POST('api/lookup/search', { 
-      lookupType: "BOMA", 
-      parentId: (payamId !== '-1') ? payamId : "", 
-      size: -1 
+    this.apiService.POST('api/lookup/geo/search', {
+      lookupType: "BOMA",
+      parentId: (payamId !== '-1') ? payamId : "",
+      size: -1
     }).then(res => {
       if (res.status === 200) {
         this.bomaList = res.data.lookups;
@@ -284,7 +299,7 @@ export class ReportComponent implements OnInit {
         endpoint = 'api/report/afis-match-report';
         break;
       case 8:
-        endpoint = 'api/report/file-based-report';
+        endpoint = 'api/report/household-survey-report-files';
         break;
       case 9:
         endpoint = 'api/report/reconciled-summary-report';
@@ -331,7 +346,6 @@ export class ReportComponent implements OnInit {
         break;
     }
   }
-
   generateReport = (): void => {
     this.isReportGenerating = true;
     const endpoint = this.determineEndpoint();
@@ -347,7 +361,7 @@ export class ReportComponent implements OnInit {
         size: this.reportForm.value.size || null,
         paymentCycle: this.reportForm.value.paymentCycle ? parseInt(this.reportForm.value.paymentCycle, 10) : null
       };
-      
+
       this.reportReconciledSummaryTotals = {
         totalBeneficiaries: 0,
         totalPaid: 0,
@@ -372,7 +386,7 @@ export class ReportComponent implements OnInit {
               paymentCenter: beneficiary.paymentCenter,
               status: beneficiary.status,
             }));
-            
+
             this.reportReconciledSummaryTotals = {
               totalBeneficiaries: res?.data?.data?.totalBeneficiaries ?? 0,
               totalPaid: res?.data?.data?.totalPaid ?? 0,
@@ -385,12 +399,15 @@ export class ReportComponent implements OnInit {
             this.reportReconciledSummaryResult = [];
           }
           this.isReportGenerating = false;
+          this.cdr.markForCheck(); // Added here
         })
         .catch((err: any) => {
           console.error('Error calling reconciled-summary-report API:', err.response?.data || err.message);
           this.reportReconciledSummaryResult = [];
           this.isReportGenerating = false;
+          this.cdr.markForCheck(); // Added here
         });
+
       return;
     }
 
@@ -423,11 +440,13 @@ export class ReportComponent implements OnInit {
             this.reportReconciliationSummaryCount = [];
           }
           this.isReportGenerating = false;
+          this.cdr.markForCheck(); // Added here
         })
         .catch((err: any) => {
           console.error('Error calling reconciliation-summary-count API:', err.response?.data || err.message);
           this.reportReconciliationSummaryCount = [];
           this.isReportGenerating = false;
+          this.cdr.markForCheck(); // Added here
         });
 
       return;
@@ -450,10 +469,12 @@ export class ReportComponent implements OnInit {
           this.determineReportResultRenderObject(null);
         }
         this.isReportGenerating = false;
+        this.cdr.markForCheck(); // Added here
       }).catch(err => {
         console.error(err);
         this.determineReportResultRenderObject(null);
         this.isReportGenerating = false;
+        this.cdr.markForCheck(); // Added here
       });
     } else {
       this.apiService.POST(endpoint, this.reportForm.value).then(res => {
@@ -463,13 +484,17 @@ export class ReportComponent implements OnInit {
           this.determineReportResultRenderObject(null);
         }
         this.isReportGenerating = false;
+        this.cdr.markForCheck(); // Added here
       }).catch(err => {
         console.error(err);
         this.determineReportResultRenderObject(null);
         this.isReportGenerating = false;
+        this.cdr.markForCheck(); // Added here
       });
     }
-  }
+    this.cdr.markForCheck(); // Added here
+  };
+
 
   resetForm(form: FormGroup): void {
     this.showReportForm(this.selectedReportTypeId, this.selectedReportTypeTitle);
@@ -486,10 +511,10 @@ export class ReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.home = { 
-      label: '', 
-      icon: 'fas fa-home me-2', 
-      routerLink: '/' 
+    this.home = {
+      label: '',
+      icon: 'fas fa-home me-2',
+      routerLink: '/'
     };
     this.isLoading = false;
 

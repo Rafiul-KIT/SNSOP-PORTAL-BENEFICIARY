@@ -1,66 +1,88 @@
 import { Injectable, signal } from '@angular/core';
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { CookieService } from 'ngx-cookie-service';
-import { environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root',
-})
+type BaseKey = 'global' | 'alt' | 'report';
+
+@Injectable({ providedIn: 'root' })
 export class ApiService {
-  private globalApi: string = environment.globalApi;
-  public loginState = signal({
+  // ---- Base URLs ----
+  private globalApi = environment.globalApi;              
+  private altApi    = environment.authBackend;          
+
+  private reportApi = environment.reportApi;             
+
+  public ACCESS_TOKEN = environment.cookie_name;
+
+  public loginState = signal<{ token: string | null; user: any | null }>({
     token: null,
     user: null,
   });
-  public ACCESS_TOKEN = environment.cookie_name;
-  private apiHeader: any = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+
+  private apiHeader = {
+    headers: { 'Content-Type': 'application/json' },
   };
 
-  axiosInstance = axios.create({
-    baseURL: this.globalApi, // ✅ already sets baseURL
-  });
+  // ---- Three axios clients ----
+  private axiosGlobal: AxiosInstance = axios.create({ baseURL: this.globalApi });
+  private axiosAlt:    AxiosInstance = axios.create({ baseURL: this.altApi });
+  private axiosReport: AxiosInstance = axios.create({ baseURL: this.reportApi });
 
-  constructor(private cookieService: CookieService, private router: Router) {
-    const accessToken: any = this.cookieService.get(this.ACCESS_TOKEN);
-    if (accessToken) {
-      const userData: any = jwtDecode(accessToken);
-      this.loginState.set({
-        token: accessToken,
-        user: userData,
-      });
-      this.axiosInstance.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${accessToken}`;
+  constructor(private cookies: CookieService, private router: Router) {
+    const token = this.cookies.get(this.ACCESS_TOKEN);
+    if (token) {
+      const userData: any = safeDecode(token);
+      this.loginState.set({ token, user: userData });
+
+      this.axiosGlobal.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      this.axiosAlt.defaults.headers.common['Authorization']    = `Bearer ${token}`;
+      this.axiosReport.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
-    // ✅ Request interceptor → always attach fresh token
-    this.axiosInstance.interceptors.request.use(
+    // Attach interceptors to ALL instances
+    this.attachInterceptors(this.axiosGlobal);
+    this.attachInterceptors(this.axiosAlt);
+    this.attachInterceptors(this.axiosReport);
+  }
+
+  private attachInterceptors(inst: AxiosInstance) {
+    // Request: fresh token
+    inst.interceptors.request.use(
       (config) => {
-        const token = this.cookieService.get(this.ACCESS_TOKEN);
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
+        const fresh = this.cookies.get(this.ACCESS_TOKEN);
+        if (fresh) {
+          config.headers = config.headers ?? {};
+          config.headers['Authorization'] = `Bearer ${fresh}`;
+        }
+        if (!config.headers?.['Content-Type']) {
+          config.headers = config.headers ?? {};
+          config.headers['Content-Type'] = 'application/json';
         }
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // ✅ Response interceptor → handle 401 globally
-    this.axiosInstance.interceptors.response.use(
-      (response) => response,
+    // Response: 401
+    inst.interceptors.response.use(
+      (res) => res,
       (error) => {
-        if (error.response && error.response.status === 401) {
-          console.warn('401 Unauthorized → redirecting to login...');
-          this.logout(); // reuse your existing logout
+        if (error?.response?.status === 401) {
+          console.warn('401 Unauthorized → logging out…');
+          this.logout();
         }
         return Promise.reject(error);
       }
     );
+  }
+
+  private client(base: BaseKey): AxiosInstance {
+    if (base === 'alt') return this.axiosAlt;
+    if (base === 'report') return this.axiosReport;
+    return this.axiosGlobal;
   }
 
   logout = () => {
@@ -71,7 +93,7 @@ export class ApiService {
         return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
       }
     })();
-    this.cookieService.delete(this.ACCESS_TOKEN, '/', host, true, 'Lax'); // Explicitly delete mis_ta
+    this.cookies.delete(this.ACCESS_TOKEN, '/', host, true, 'Lax'); // Explicitly delete mis_ta
     sessionStorage.clear();
     this.loginState.set({ token: null, user: null });
 
@@ -82,28 +104,29 @@ export class ApiService {
     window.location.href = redirectUrl;
   };
 
-  // ================= Basic HTTP Functions =================
-  GET = (endpoint: string) => {
-    return this.axiosInstance.get(endpoint, this.apiHeader);
-  };
+  // -------------- Helpers with optional base param (default: 'global') --------------
+  GET  = <T = any>(endpoint: string, params?: Record<string, any>, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
+    this.client(base).get<T>(endpoint, { ...this.apiHeader, params, ...(config ?? {}) });
 
-  POST = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.post(endpoint, payload, this.apiHeader);
-  };
+  POST = <T = any>(endpoint: string, payload: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
+    this.client(base).post<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
 
-  PUTWITHPAYLOAD = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.put(endpoint, payload, this.apiHeader);
-  };
+  PUT  = <T = any>(endpoint: string, payload?: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
+    this.client(base).put<T>(endpoint, payload ?? {}, { ...this.apiHeader, ...(config ?? {}) });
 
-  PUT = (endpoint: string) => {
-    return this.axiosInstance.put(endpoint, {}, this.apiHeader);
-  };
+  PATCH= <T = any>(endpoint: string, payload: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
+    this.client(base).patch<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
 
-  PATCH = (endpoint: string, payload: {}) => {
-    return this.axiosInstance.patch(endpoint, payload, this.apiHeader);
-  };
+  DELETE= <T = any>(endpoint: string, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
+    this.client(base).delete<T>(endpoint, { ...this.apiHeader, ...(config ?? {}) });
 
-  DELETE = (endpoint: string) => {
-    return this.axiosInstance.delete(endpoint, this.apiHeader);
-  };
+  PUTWITHPAYLOAD = <T = any>(endpoint: string, payload: {}, base: BaseKey = 'global', config?: AxiosRequestConfig) => {
+  return this.client(base).put<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
+};
+
+}
+
+// safe decode
+function safeDecode(token: string) {
+  try { return jwtDecode(token); } catch { return null; }
 }

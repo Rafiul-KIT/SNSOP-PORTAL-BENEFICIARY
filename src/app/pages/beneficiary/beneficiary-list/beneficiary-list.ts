@@ -1,3 +1,6 @@
+import { SelectionCriteria } from './../../../models/beneficiary/enums';
+import { QrInputDirective } from './../../../directives/qr-input.directive';
+import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 import {
   Component,
   OnInit,
@@ -29,6 +32,7 @@ import { LookupService, LookupItem } from '../../../services/lookup.service';
 
 type Gender = 'MALE' | 'FEMALE';
 type RegPhase = 'PARENT' | 'AF';
+type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryDto {
   applicationId: string;
@@ -37,6 +41,7 @@ interface BeneficiaryDto {
   respondentMiddleName: string;
   respondentLastName: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentId: string;
   respondentAge: number;
   respondentPhoneNo: string;
@@ -52,6 +57,7 @@ interface BeneficiaryDto {
 interface BeneficiaryVm {
   applicationId: string;
   respondentGender: Gender;
+  selectionCriteria: Criteria;
   respondentAge: number;
   respondentPhoneNo: string;
   registrationPhase: RegPhase;
@@ -89,6 +95,8 @@ interface BeneficiaryVm {
     RouterModule,
     TooltipModule,
     Loader,
+    QrScannerComponent,
+    QrInputDirective,
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -104,6 +112,7 @@ export class BeneficiaryList implements OnInit {
   bomas: LookupItem[] = [];
 
   genderOptions: LookupItem[] = [];
+  criteriaOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
 
   beneficiaries: BeneficiaryVm[] = [];
@@ -117,7 +126,7 @@ export class BeneficiaryList implements OnInit {
   advanceSearchPanelVisible = false;
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
-
+  isScannerVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -127,8 +136,8 @@ export class BeneficiaryList implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private lookup: LookupService,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   private async loadLookups() {
     // Warm the caches (Promises)
@@ -147,6 +156,7 @@ export class BeneficiaryList implements OnInit {
 
     // Use MALE/FEMALE ids, not 0/1
     this.genderOptions = this.lookup.getGenderListbyId();
+    this.criteriaOptions = this.lookup.getSelectionCriteriaListbyId();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
 
     this.cdr.markForCheck();
@@ -156,11 +166,21 @@ export class BeneficiaryList implements OnInit {
     this.initForm();
     this.initBreadcrumb();
 
-    await this.loadLookups();                // ✅ caches ready + names resolvable
+    await this.loadLookups(); // ✅ caches ready + names resolvable
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
+  openQrScanner() {
+    this.isScannerVisible = true;
+  }
 
+  onQrScanSuccess(decodedText: string) {
+    if (decodedText) {
+      this.searchForm.patchValue({ applicationId: decodedText });
+      this.searchBeneficiaries();
+    }
+    this.isScannerVisible = false;
+  }
 
   initForm() {
     this.searchForm = this.fb.group({
@@ -175,12 +195,15 @@ export class BeneficiaryList implements OnInit {
       boma: [null as LookupItem | null],
       gender: [null as Gender | null],
       registrationPhase: [null as RegPhase | null],
+      criteria: [null as Criteria | null],
     });
   }
 
   initBreadcrumb() {
     this.breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-    this.breadcrumbItems = [{ label: 'Beneficiary List' }];
+    this.breadcrumbItems = [
+      { label: 'Beneficiary Update', icon: 'fas fa-user-gear' },
+    ];
   }
 
   // ---------- dependent dropdowns ----------
@@ -286,6 +309,12 @@ export class BeneficiaryList implements OnInit {
         operator: 'EQUAL',
         value: f.gender,
       });
+    if (f.criteria)
+      criteria.push({
+        fieldName: 'SELECTION_CRITERIA',
+        operator: 'LIKE',
+        value: f.criteria,
+      });
 
     return criteria;
   }
@@ -300,6 +329,7 @@ export class BeneficiaryList implements OnInit {
       respondentId: null,
       registrationPhase: f.registrationPhase || null,
       respondentGender: f.gender || null,
+      selectionCriteria: f.criteria || null,
       criteria: this.buildCriteria(),
       sortColumn: 'ID',
       sortOrder: 'DESC',
@@ -322,6 +352,7 @@ export class BeneficiaryList implements OnInit {
       return {
         applicationId: b.applicationId,
         respondentGender: b.respondentGender,
+        selectionCriteria: b.selectionCriteria,
         respondentAge: b.respondentAge,
         respondentPhoneNo: b.respondentPhoneNo,
         address: b.address,
@@ -329,19 +360,19 @@ export class BeneficiaryList implements OnInit {
         fullName,
         stateName: b.address?.stateId
           ? this.lookup.getStateNameById(b.address.stateId) ||
-          String(b.address.stateId)
+            String(b.address.stateId)
           : '',
         countyName: b.address?.countyId
           ? this.lookup.getCountyNameById(b.address.countyId) ||
-          String(b.address.countyId)
+            String(b.address.countyId)
           : '',
         payamName: b.address?.payam
           ? this.lookup.getPayamNameById(b.address.payam) ||
-          String(b.address.payam)
+            String(b.address.payam)
           : '',
         bomaName: b.address?.boma
           ? this.lookup.getBomaNameById(b.address.boma) ||
-          String(b.address.boma)
+            String(b.address.boma)
           : '',
       };
     });
@@ -398,8 +429,6 @@ export class BeneficiaryList implements OnInit {
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
-
-
   // ---------- Actions ----------
   editBeneficiary(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
@@ -413,7 +442,6 @@ export class BeneficiaryList implements OnInit {
     if (!b?.applicationId) return;
     this.router.navigate(['/beneficiary/details', String(b.applicationId)]);
   }
-
 
   deleteBeneficiary(b: BeneficiaryVm) {
     this.beneficiaryToDelete = b;
@@ -471,12 +499,14 @@ export class BeneficiaryList implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Archive Failed',
-              detail: response.errorMessage || 'Failed to send request for archiving beneficiary',
+              detail:
+                response.errorMessage ||
+                'Failed to send request for archiving beneficiary',
             });
           } else if (response.result === 'SUCCESS') {
             // Handle success if result is successful
             this.beneficiaries = this.beneficiaries.filter(
-              (x) => x.applicationId !== b.applicationId
+              (x) => x.applicationId !== b.applicationId,
             );
 
             this.messageService.add({
@@ -508,8 +538,6 @@ export class BeneficiaryList implements OnInit {
         this.beneficiaryToDelete = null;
       });
   }
-
-
 
   trackByAppId = (_: number, row: BeneficiaryVm) => row.applicationId;
 }
