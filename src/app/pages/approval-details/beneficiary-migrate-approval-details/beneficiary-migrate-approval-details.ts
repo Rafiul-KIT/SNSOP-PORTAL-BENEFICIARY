@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { LookupService } from '../../../services/lookup.service';
 import { TooltipModule } from 'primeng/tooltip';
 import { CardModule } from 'primeng/card';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-beneficiary-migrate-approval-details',
@@ -159,28 +160,42 @@ export class BeneficiaryMigrateApprovalDetails {
 
     this.api
       .POST('/api/approval/doApprove', payload)
-      .then(() => {
-        const life = 1200;
-        this.messageService.add({
-          severity: this.isApprove ? 'success' : 'warn',
-          summary: this.isApprove ? 'Approved' : 'Rejected',
-          detail: `Migration request for ${this.editedDetails?.applicationId} ${
-            this.isApprove ? 'approved' : 'rejected'
-          } successfully.`,
-          life,
-        });
+      .then((res: any) => {
         this.isLoading = false;
-        setTimeout(() => {
+        this.cdr.detectChanges();
+
+        const operationResult = res?.data?.operationResult;
+        const isSuccess = operationResult === 'SUCCESS';
+
+        const responseMessage =
+          res?.data?.message ||
+          `Migration request for ${this.editedDetails?.applicationId} ${
+            isSuccess ? 'approved' : 'rejected'
+          } successfully.`;
+
+        Swal.fire({
+          icon: isSuccess ? 'success' : 'warning',
+          title: isSuccess ? 'Approved' : 'Rejected',
+          text: responseMessage,
+          confirmButtonText: 'OK',
+        }).then(() => {
           this.router.navigate(['/beneficiary-approval/list']);
-        }, life);
+        });
       })
       .catch((err: any) => {
         console.error(err);
         this.isLoading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: `Failed to ${this.isApprove ? 'approve' : 'reject'} task`,
+        this.cdr.detectChanges();
+
+        const errorMessage =
+          err?.response?.data?.message ||
+          `Failed to ${this.isApprove ? 'approve' : 'reject'} task`;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          confirmButtonText: 'OK',
         });
       });
   }
