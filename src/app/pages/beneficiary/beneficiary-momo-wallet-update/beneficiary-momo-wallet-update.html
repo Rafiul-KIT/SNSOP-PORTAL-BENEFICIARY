@@ -19,7 +19,7 @@
         severity="info"
         type="submit"
         class="p-2"
-        [disabled]="beneficiaryForm.invalid || isSubmitting"
+        [disabled]="beneficiaryForm.invalid || isSubmitting || isUnchanged()"
         icon="fas fa-save"
         label="Update"
         size="small">
@@ -118,22 +118,22 @@
 
                             <p-floatlabel variant="on" class="w-100">
                               <p-select
-                                id="mobileWalletId"
-                                formControlName="mobileWalletId"
+                                id="mobileMoneyProvider"
+                                formControlName="mobileMoneyProvider"
                                 class="w-100"
                                 [options]="mobileMoneyOptions"
                                 optionLabel="label"
                                 optionValue="value"
                                 [ngClass]="{
                                   'is-invalid':
-                                    beneficiaryForm.get('mobileWalletId')?.invalid &&
-                                    beneficiaryForm.get('mobileWalletId')?.touched
+                                    beneficiaryForm.get('mobileMoneyProvider')?.invalid &&
+                                    beneficiaryForm.get('mobileMoneyProvider')?.touched
                                 }">
                               </p-select>
-                              <label for="mobileWalletId">Mobile Money Provider</label>
+                              <label for="mobileMoneyProvider">Mobile Money Provider</label>
                             </p-floatlabel>
 
-                            @if (beneficiaryForm.get('mobileWalletId')?.invalid && beneficiaryForm.get('mobileWalletId')?.touched) {
+                            @if (beneficiaryForm.get('mobileMoneyProvider')?.invalid && beneficiaryForm.get('mobileMoneyProvider')?.touched) {
                               <small class="text-danger">Provider is required.</small>
                             }
                           </div>
@@ -185,6 +185,37 @@
 
                       </div>
 
+                    </div>
+                  </div>
+
+                  <!-- Right: Payment method -->
+                  <div class="card shadow-sm rounded mt-3">
+                    <h5 class="card-header">Payment method</h5>
+
+                    <div class="card-body">
+                      <div class="col-md-6">
+                        <div class="form-check form-check-inline">
+                          <input
+                            class="form-check-input"
+                            type="radio"
+                            name="paymentMethod"
+                            id="paymentMethodCash"
+                            [value]="'cash'"
+                            formControlName="paymentMethod" />
+                          <label class="form-check-label" for="paymentMethodCash">Cash</label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                          <input
+                            class="form-check-input"
+                            type="radio"
+                            name="paymentMethod"
+                            id="paymentMethodMobile"
+                            [value]="'mobile_wallet'"
+                            formControlName="paymentMethod" />
+                          <label class="form-check-label" for="paymentMethodMobile">Mobile Payment</label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
