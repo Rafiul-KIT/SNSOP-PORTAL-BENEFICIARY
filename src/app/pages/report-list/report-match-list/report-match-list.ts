@@ -196,9 +196,9 @@ export class ReportMatchList {
                   ? 'BENEFICIARY'
                   : 'ALTERNATE',
               'Registration Phase':
-                nowMatch.primary.registrationPhase === 1
+                nowMatch.primary.registrationPhase === 'AF'
                   ? 'AF (Additional Financing)'
-                  : nowMatch.primary.registrationPhase === 0
+                  : nowMatch.primary.registrationPhase === 'PARENT'
                   ? 'PP (Parent Project)'
                   : 'N/A',
               'First Name': nowMatch.primary.respondentFirstName,
@@ -234,9 +234,9 @@ export class ReportMatchList {
               'Type(M)':
                 matched.type === 'BENEFICIARY' ? 'BENEFICIARY' : 'ALTERNATE',
               'Registration Phase(M)':
-                matched.registrationPhase === 1
+                matched.registrationPhase === 'AF'
                   ? 'AF (Additional Financing)'
-                  : matched.registrationPhase === 0
+                  : matched.registrationPhase === 'PARENT'
                   ? 'PP (Parent Project)'
                   : 'N/A',
               'First Name(M)': matched.respondentFirstName,

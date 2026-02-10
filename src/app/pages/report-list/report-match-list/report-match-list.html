@@ -35,9 +35,9 @@
         match.primary.type=="BENEFICIARY"?"BENEFICIARY":"ALTERNATE"}}</td>
       <td class="text-center">
         {{
-        match.primary.registrationPhase === 1
+        match.primary.registrationPhase === 'AF'
         ? 'AF (Additional Financing)'
-        : match.primary.registrationPhase === 0
+        : match.primary.registrationPhase === 'PARENT'
         ? 'PP (Parent Project)'
         : 'N/A'
         }}
