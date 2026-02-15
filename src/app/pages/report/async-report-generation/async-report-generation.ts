@@ -449,6 +449,15 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.selectedFormat) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select a format.'
+      });
+      return;
+    }
+
     this.isGenerating = true;
 
     const parameters = this.buildReportParameters();
@@ -723,7 +732,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
   resetForm(): void {
     this.selectedReportType = null;
-    this.selectedFormat = 'EXCEL';
+    this.selectedFormat = 'CSV';
     this.reportForm = new FormGroup({});
     this.countyList = [];
     this.payamList = [];
