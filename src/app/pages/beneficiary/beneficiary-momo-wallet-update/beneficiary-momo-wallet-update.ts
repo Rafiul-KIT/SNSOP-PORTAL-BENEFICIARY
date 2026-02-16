@@ -103,7 +103,7 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
       hasMobileWallet: [false], // ✅ boolean
       mobileMoneyProvider: [{ value: null, disabled: true }],
       mobileWalletNumber: [{ value: '', disabled: true }],
-      paymentMethod: ['cash', Validators.required], // Added payment method form control
+      paymentMethod: [{ value: 'cash', disabled: true }, Validators.required], // Added payment method form control
     });
 
     this.beneficiaryForm
@@ -152,7 +152,7 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
     const formValues = this.beneficiaryForm.getRawValue();
 
     if (formValues.hasMobileWallet !== this.initialHasMobileWallet) return false;
-    if (formValues.paymentMethod !== this.initialPaymentMethod) return false;
+    // if (formValues.paymentMethod !== this.initialPaymentMethod) return false;
     if (formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) return false;
     if (formValues.mobileWalletNumber.trim() !== '') return false; // a new number has been entered
 
@@ -233,16 +233,16 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
     }
 
     // 2. Check paymentMethod
-    if (formValues.paymentMethod !== this.initialPaymentMethod) {
-      let paymentMethodForApi: PaymentMethod = 'CASH';
-      if (formValues.paymentMethod === 'mobile_wallet') {
-        paymentMethodForApi = 'MOBILE_WALLET';
-      }
-      fieldList.push({
-        fieldName: 'paymentMethod',
-        fieldValue: paymentMethodForApi,
-      });
-    }
+    // if (formValues.paymentMethod !== this.initialPaymentMethod) {
+    //   let paymentMethodForApi: PaymentMethod = 'CASH';
+    //   if (formValues.paymentMethod === 'mobile_wallet') {
+    //     paymentMethodForApi = 'MOBILE_WALLET';
+    //   }
+    //   fieldList.push({
+    //     fieldName: 'paymentMethod',
+    //     fieldValue: paymentMethodForApi,
+    //   });
+    // }
 
     // 3. Check mobileMoneyProvider - only if hasMobileWallet is true
     if (formValues.hasMobileWallet && formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) {
@@ -265,7 +265,7 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
         fieldList.push({ fieldName: 'mobileMoneyProvider', fieldValue: null });
         fieldList.push({ fieldName: 'mobileWalletNumber', fieldValue: null });
     }
-    
+
     if (fieldList.length === 0) {
       return null; // No changes detected
     }
