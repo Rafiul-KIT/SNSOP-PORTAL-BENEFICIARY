@@ -19,6 +19,7 @@ import { Button } from "primeng/button";
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
+import { ReportPaymentMethodWiseBeneficiaryList } from '../report-list/report-payment-method-wise-beneficiary-list/report-payment-method-wise-beneficiary-list';
 
 
 
@@ -29,7 +30,7 @@ import { SelectModule } from 'primeng/select';
     LoadingSpinner, Loader, ReportBeneficiaryList,
     ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount,
     ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey,
-    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule],
+    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule,ReportPaymentMethodWiseBeneficiaryList],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
@@ -68,6 +69,7 @@ export class ReportComponent implements OnInit {
   };
   reportReconciliationSummaryCount: any = null;
   reportMatchListResult: any = null;
+  reportPaymentMethodWiseBeneficiaryListResult: any = null;
 
   date: Date[] | undefined;
   reportForm: FormGroup = new FormGroup({});
@@ -90,6 +92,7 @@ export class ReportComponent implements OnInit {
     this.reportHouseholdSurvery = null;
     this.reportReconciledSummaryResult = null;
     this.reportReconciliationSummaryCount = null;
+    this.reportPaymentMethodWiseBeneficiaryListResult = null;
 
     switch (reportType) {
       case 1:
@@ -180,6 +183,19 @@ export class ReportComponent implements OnInit {
           payamId: new FormControl('', Validators.required),
           bomaId: new FormControl(''),
           paymentCycle: new FormControl('1', Validators.required)
+        });
+        break;
+        case 11:
+        this.reportForm = new FormGroup({
+          stateId: new FormControl('', Validators.required),
+          countyId: new FormControl(''),
+          payamId: new FormControl(''),
+          bomaId: new FormControl(''),
+          paymentMethod: new FormControl('ALL'),
+          hasMobileWalletNumber: new FormControl(null),
+          registrationPhase: new FormControl(''),
+          supportType: new FormControl(null),
+          mobilePaymentProvider: new FormControl(null),
         });
         break;
       default:
@@ -307,6 +323,9 @@ export class ReportComponent implements OnInit {
       case 10:
         endpoint = 'api/report/reconciliation-summary-count-report';
         break;
+      case 11:
+        endpoint = 'api/report/payment-method-wise-beneficiary-list';
+        break;
     }
     return endpoint;
   }
@@ -343,6 +362,9 @@ export class ReportComponent implements OnInit {
         break;
       case 10:
         this.reportReconciliationSummaryCount = data;
+        break;
+      case 11:
+        this.reportPaymentMethodWiseBeneficiaryListResult = data;
         break;
     }
   }

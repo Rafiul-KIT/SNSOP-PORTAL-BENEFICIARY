@@ -247,6 +247,11 @@ export class Header {
             routerLink: 'report/complete-household-survey',
           },
           {
+            label: 'Payment Method Wise Beneficiary List Report',
+            icon: 'fas fa-file-alt',
+            routerLink: 'report/payment-method-wise-beneficiary-list',
+          },
+          {
             label: 'Async Report Generation',
             icon: 'fas fa-file-alt',
             routerLink: 'report/async-report-generation',
