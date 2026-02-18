@@ -277,7 +277,7 @@
                     </div>
                 </div>
                 }
-                @if (reportForm.get('mobilePaymentProvider')) {
+                @if (reportForm.get('mobilePaymentProvider') && reportForm.get('paymentMethod')?.value === 'MOBILE_WALLET') {
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="form-floating mb-3">
                         <select class="form-select" id="mobilePaymentProvider" formControlName="mobilePaymentProvider">
