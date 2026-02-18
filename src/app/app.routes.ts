@@ -223,6 +223,15 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'payment-method-wise-beneficiary-list',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 11,
+          reportTitle: 'Payment Method Wise Beneficiary List Report',
+        },
+      },
+      {
         path: 'async-report-generation',
         loadComponent: () =>
           import('./pages/report/async-report-generation/async-report-generation').then(

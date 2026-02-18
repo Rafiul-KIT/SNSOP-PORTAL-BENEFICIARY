@@ -51,6 +51,12 @@
                         Complete Household Survey Report
                     </button>
                 </div>
+                <div class="col-12 col-md-12 col-lg-12">
+                    <button class="btn btn-outline-custom btn-lg w-100"
+                        (click)="showReportForm(11, 'Payment Method Wise Beneficiary List Report')">
+                        Payment Method Wise Beneficiary List Report
+                    </button>
+                </div>
                 <!-- <div class="col-12 col-md-12 col-lg-12">
                     <button class="btn btn-outline-custom btn-lg w-100"
                         (click)="showReportForm(9, 'Reconciliation Detail Report')">
@@ -113,10 +119,10 @@
                         <select class="form-select" id="stateId" formControlName="stateId"
                             (change)="getCountyLookupByStateId($event)">
                             <option value="">Select State</option>
-                            @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
-                            10) {
+                            <!-- @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
+                            10 ) {
                             <option value="-1">ALL</option>
-                            }
+                            } -->
                             @for (state of lookupService.getStateList(); track state.id) {
                             <option [value]="state.id">{{state.name}}</option>
                             }
@@ -131,10 +137,10 @@
                         <select class="form-select" id="countyId" formControlName="countyId"
                             (change)="getPayamLookupByCountyId($event)">
                             <option value="">Select County</option>
-                            @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
+                            <!-- @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
                             10) {
                             <option value="-1">ALL</option>
-                            }
+                            } -->
                             @for (county of countyList; track county.id) {
                             <option [value]="county.id">{{county.name}}</option>
                             }
@@ -149,10 +155,10 @@
                         <select class="form-select" id="payamId" formControlName="payamId"
                             (change)="getBomaLookupByPayamId($event)">
                             <option value="">Select Payam</option>
-                            @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
+                            <!-- @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
                             10) {
                             <option value="-1">ALL</option>
-                            }
+                            } -->
                             @for (payam of payamList; track payam.id) {
                             <option [value]="payam.id">{{payam.name}}</option>
                             }
@@ -166,10 +172,10 @@
                     <div class="form-floating mb-3">
                         <select class="form-select" id="bomaId" formControlName="bomaId">
                             <option value="">Select Boma</option>
-                            @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
+                            <!-- @if (selectedReportTypeId !== 1 && selectedReportTypeId !== 9 && selectedReportTypeId !==
                             10) {
                             <option value="-1">ALL</option>
-                            }
+                            } -->
                             @for (boma of bomaList; track boma.id) {
                             <option [value]="boma.id">{{boma.name}}</option>
                             }
@@ -223,6 +229,31 @@
                     </div>
                 </div>
                 }
+                @if (reportForm.get('supportType')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="supportType" formControlName="supportType">
+                            <option [ngValue]="null">ALL</option>
+                            <option value="LIPW">LIPW</option>
+                            <option value="DIS">DIS</option>
+                        </select>
+                        <label for="supportType">Support Type</label>
+                    </div>
+                </div>
+                }
+                @if (reportForm.get('mobilePaymentProvider')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="mobilePaymentProvider" formControlName="mobilePaymentProvider">
+                            <option [ngValue]="null">ALL</option>
+                            <option value="MOMO">MOMO</option>
+                            <option value="MGURUSH">MGURUSH</option>
+                            <option value="DIGICASH">DIGICASH</option>
+                        </select>
+                        <label for="mobilePaymentProvider">Mobile Payment Provider</label>
+                    </div>
+                </div>
+                }
                 @if (reportForm.get('paymentStatus')) {
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="form-floating mb-3">
@@ -232,6 +263,18 @@
                             <option value="UNPAID">Unpaid</option>
                         </select>
                         <label for="paymentStatus">Payment Status</label>
+                    </div>
+                </div>
+                }
+                 @if (reportForm.get('paymentMethod')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="paymentMethod" formControlName="paymentMethod">
+                            <option value="ALL">ALL</option>
+                            <option value="CASH">Cash</option>
+                            <option value="MOBILE_WALLET">Mobile Money</option>
+                        </select>
+                        <label for="paymentMethod">Payment Method</label>
                     </div>
                 </div>
                 }
@@ -262,6 +305,18 @@
                             <option value= "0" >PARENT</option>
                         </select>
                         <label for="registrationPhase">Registration Phase</label>
+                    </div>
+                </div>
+                }
+                @if (reportForm.get('hasMobileWalletNumber')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="hasMobileWalletNumber" formControlName="hasMobileWalletNumber">
+                            <option [ngValue]="null">Select Mobile Wallet Status</option>
+                            <option [ngValue]="true">Has Mobile Wallet</option>
+                            <option [ngValue]="false">Does Not Have Mobile Wallet</option>
+                        </select>
+                        <label for="hasMobileWalletNumber">Has Mobile Wallet Number</label>
                     </div>
                 </div>
                 }

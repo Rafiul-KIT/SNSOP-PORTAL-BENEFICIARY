@@ -791,8 +791,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   // Registration phase options for dropdown
   registrationPhaseOptions = [
     { id: '', name: 'All Phases' },
-    { id: '0', name: 'PARENT' },
-    { id: '1', name: 'AF' },
+    { id: 'PARENT', name: 'PARENT' },
+    { id: 'AF', name: 'AF' },
 
   ];
 
