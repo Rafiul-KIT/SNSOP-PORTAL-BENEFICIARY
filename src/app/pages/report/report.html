@@ -229,6 +229,18 @@
                     </div>
                 </div>
                 }
+                @if (reportForm.get('registrationPhase')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="registrationPhase" formControlName="registrationPhase">
+                            <option value= "" >Select Registration Phase</option>
+                            <option value= "1" >AF</option>
+                            <option value= "0" >PARENT</option>
+                        </select>
+                        <label for="registrationPhase">Registration Phase</label>
+                    </div>
+                </div>
+                }
                 @if (reportForm.get('supportType')) {
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="form-floating mb-3">
@@ -238,19 +250,6 @@
                             <option value="DIS">DIS</option>
                         </select>
                         <label for="supportType">Support Type</label>
-                    </div>
-                </div>
-                }
-                @if (reportForm.get('mobilePaymentProvider')) {
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="form-floating mb-3">
-                        <select class="form-select" id="mobilePaymentProvider" formControlName="mobilePaymentProvider">
-                            <option [ngValue]="null">ALL</option>
-                            <option value="MOMO">MOMO</option>
-                            <option value="MGURUSH">MGURUSH</option>
-                            <option value="DIGICASH">DIGICASH</option>
-                        </select>
-                        <label for="mobilePaymentProvider">Mobile Payment Provider</label>
                     </div>
                 </div>
                 }
@@ -278,6 +277,19 @@
                     </div>
                 </div>
                 }
+                @if (reportForm.get('mobilePaymentProvider') && reportForm.get('paymentMethod')?.value === 'MOBILE_WALLET') {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="mobilePaymentProvider" formControlName="mobilePaymentProvider">
+                            <option [ngValue]="null">ALL</option>
+                            <option value="MOMO">MOMO</option>
+                            <option value="MGURUSH">MGURUSH</option>
+                            <option value="DIGICASH">DIGICASH</option>
+                        </select>
+                        <label for="mobilePaymentProvider">Mobile Payment Provider</label>
+                    </div>
+                </div>
+                }
                 @if (reportForm.get('paymentCycle')) {
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="form-floating mb-3">
@@ -293,18 +305,6 @@
                             <option value="9">Payment Cycle 9</option>
                         </select>
                         <label for="paymentCycle">Payment Cycle</label>
-                    </div>
-                </div>
-                }
-                @if (reportForm.get('registrationPhase')) {
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="form-floating mb-3">
-                        <select class="form-select" id="registrationPhase" formControlName="registrationPhase">
-                            <option value= "" >Select Registration Phase</option>
-                            <option value= "1" >AF</option>
-                            <option value= "0" >PARENT</option>
-                        </select>
-                        <label for="registrationPhase">Registration Phase</label>
                     </div>
                 </div>
                 }
