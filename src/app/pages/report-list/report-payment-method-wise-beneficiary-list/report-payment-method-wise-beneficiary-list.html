@@ -31,7 +31,7 @@
             <td>{{ beneficiary.age }}</td>
             <td>{{ beneficiary.phoneNumber }}</td>
             <td>{{ beneficiary.supportType }}</td>
-            <td>{{ beneficiary.paymentMethod }}</td>
+            <td>{{ beneficiary.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Money' : beneficiary.paymentMethod }}</td>
             <td>{{ beneficiary.mobilePaymentProvider }}</td>
             <td>{{ beneficiary.mobileWalletNumber }}</td>
           </tr>
