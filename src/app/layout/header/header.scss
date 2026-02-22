@@ -166,11 +166,12 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .header {
     // flex-wrap: wrap;
     padding: 0 8px;
     min-height: 50px;
+    
 
     .portals {
       flex: 0 0 auto;
