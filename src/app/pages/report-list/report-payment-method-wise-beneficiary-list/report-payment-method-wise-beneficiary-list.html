@@ -1,1 +1,55 @@
-<p>report-payment-method-wise-beneficiary-list works!</p>
+<div class="report-container">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="export-buttons">
+      <p-button label="Download PDF" icon="pi pi-file-pdf" styleClass="p-button-danger me-2" (onClick)="downloadPdf()"></p-button>
+      <p-button label="Download CSV" icon="pi pi-file-excel" styleClass="p-button-success" (onClick)="downloadCsv()"></p-button>
+    </div>
+
+    @if (beneficiaryList().length > 0) {
+      <div class="total-records">
+        <strong>Total Records: {{ totalRecords() }}</strong>
+      </div>
+    }
+  </div>
+
+  <!-- Beneficiary Table -->
+  @if (beneficiaryList().length > 0) {
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          @for (col of cols(); track col.field) {
+            <th>{{ col.header }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (beneficiary of displayedList(); track beneficiary.householdNumber) {
+          <tr>
+            <td>{{ beneficiary.householdNumber }}</td>
+            <td>{{ beneficiary.name }}</td>
+            <td>{{ beneficiary.gender }}</td>
+            <td>{{ beneficiary.age }}</td>
+            <td>{{ beneficiary.phoneNumber }}</td>
+            <td>{{ beneficiary.supportType }}</td>
+            <td>{{ beneficiary.paymentMethod }}</td>
+            <td>{{ beneficiary.mobilePaymentProvider }}</td>
+            <td>{{ beneficiary.mobileWalletNumber }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <p-paginator
+      (onPageChange)="handlePageChange($event)"
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="totalRecords()"
+      [rowsPerPageOptions]="[10, 20, 50, 100]"
+    ></p-paginator>
+
+  } @else {
+    <div class="text-center p-4">
+        <p>No beneficiaries found for the selected criteria.</p>
+    </div>
+  }
+</div>
