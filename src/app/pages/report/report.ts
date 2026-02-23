@@ -103,7 +103,7 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 2:
@@ -112,7 +112,7 @@ export class ReportComponent implements OnInit {
           fromDate: new FormControl('', Validators.required),
           toDate: new FormControl('', Validators.required),
           staffUserName: new FormControl('', Validators.required),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 3:
@@ -139,7 +139,7 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 6:
@@ -150,13 +150,13 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 7:
         this.reportForm = new FormGroup({
           page: new FormControl(0, Validators.required),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 8:

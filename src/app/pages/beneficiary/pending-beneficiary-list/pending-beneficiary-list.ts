@@ -129,6 +129,7 @@ export class PendingBeneficiaryList implements OnInit {
   archiveComment: string = ''; // holds comment text
   beneficiaryToDelete: BeneficiaryVm | null = null; // holds current target
   isScannerVisible = false;
+  private readonly FILTER_STORAGE_KEY = 'pending_beneficiary_filters';
 
   constructor(
     private fb: FormBuilder,
@@ -140,6 +141,88 @@ export class PendingBeneficiaryList implements OnInit {
     private lookup: LookupService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  private saveFiltersToStorage(): void {
+    const state = {
+      filters: this.searchForm.getRawValue(),
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+      advanceSearchPanelVisible: this.advanceSearchPanelVisible,
+    };
+    sessionStorage.setItem(this.FILTER_STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private async restoreFiltersFromStorage(): Promise<boolean> {
+    const stored = sessionStorage.getItem(this.FILTER_STORAGE_KEY);
+    if (!stored) return false;
+
+    sessionStorage.removeItem(this.FILTER_STORAGE_KEY);
+
+    try {
+      const savedState = JSON.parse(stored);
+      const filters = savedState.filters;
+
+      this.currentPage = savedState.currentPage ?? 0;
+      this.pageSize = savedState.pageSize ?? 10;
+      this.advanceSearchPanelVisible =
+        savedState.advanceSearchPanelVisible ?? false;
+
+      // Restore non-geo fields
+      this.searchForm.patchValue({
+        applicationId: filters.applicationId,
+        firstName: filters.firstName,
+        middleName: filters.middleName,
+        lastName: filters.lastName,
+        phoneNumber: filters.phoneNumber,
+        gender: filters.gender,
+        registrationPhase: filters.registrationPhase,
+        criteria: filters.criteria,
+      });
+
+      // Restore geo fields with cascading
+      if (filters.state) {
+        const stateObj = this.states.find((s) => s.id === filters.state.id);
+        if (stateObj) {
+          this.searchForm.patchValue({ state: stateObj });
+          await this.onStateChange(stateObj);
+
+          if (filters.county) {
+            const countyObj = this.counties.find(
+              (c) => c.id === filters.county.id
+            );
+            if (countyObj) {
+              this.searchForm.patchValue({ county: countyObj });
+              await this.onCountyChange(countyObj);
+
+              if (filters.payam) {
+                const payamObj = this.payams.find(
+                  (p) => p.id === filters.payam.id
+                );
+                if (payamObj) {
+                  this.searchForm.patchValue({ payam: payamObj });
+                  await this.onPayamChange(payamObj);
+
+                  if (filters.boma) {
+                    const bomaObj = this.bomas.find(
+                      (b) => b.id === filters.boma.id
+                    );
+                    if (bomaObj) {
+                      this.searchForm.patchValue({ boma: bomaObj });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      this.cdr.markForCheck();
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   private async loadLookups() {
     // Warm the caches (Promises)
@@ -169,6 +252,8 @@ export class PendingBeneficiaryList implements OnInit {
     this.initBreadcrumb();
 
     await this.loadLookups(); // ✅ caches ready + names resolvable
+
+    await this.restoreFiltersFromStorage();
     this.fetchPage(this.currentPage, this.pageSize);
   }
 
@@ -199,15 +284,14 @@ export class PendingBeneficiaryList implements OnInit {
   }
 
   // ---------- dependent dropdowns ----------
-  onStateChange(state: LookupItem | null) {
+  async onStateChange(state: LookupItem | null) {
     if (state?.id) {
-      this.lookup.getCountyListByStateId(state.id).then((list) => {
-        this.counties = list;
-        this.payams = [];
-        this.bomas = [];
-        this.searchForm.patchValue({ county: null, payam: null, boma: null });
-        this.cdr.markForCheck();
-      });
+      const list = await this.lookup.getCountyListByStateId(state.id);
+      this.counties = list;
+      this.payams = [];
+      this.bomas = [];
+      this.searchForm.patchValue({ county: null, payam: null, boma: null });
+      this.cdr.markForCheck();
     } else {
       this.counties = [];
       this.payams = [];
@@ -215,27 +299,25 @@ export class PendingBeneficiaryList implements OnInit {
     }
   }
 
-  onCountyChange(county: LookupItem | null) {
+  async onCountyChange(county: LookupItem | null) {
     if (county?.id) {
-      this.lookup.getPayamListByCountyId(county.id).then((list) => {
-        this.payams = list;
-        this.bomas = [];
-        this.searchForm.patchValue({ payam: null, boma: null });
-        this.cdr.markForCheck();
-      });
+      const list = await this.lookup.getPayamListByCountyId(county.id);
+      this.payams = list;
+      this.bomas = [];
+      this.searchForm.patchValue({ payam: null, boma: null });
+      this.cdr.markForCheck();
     } else {
       this.payams = [];
       this.bomas = [];
     }
   }
 
-  onPayamChange(payam: LookupItem | null) {
+  async onPayamChange(payam: LookupItem | null) {
     if (payam?.id) {
-      this.lookup.getBomaListByPayamId(payam.id).then((list) => {
-        this.bomas = list;
-        this.searchForm.patchValue({ boma: null });
-        this.cdr.markForCheck();
-      });
+      const list = await this.lookup.getBomaListByPayamId(payam.id);
+      this.bomas = list;
+      this.searchForm.patchValue({ boma: null });
+      this.cdr.markForCheck();
     } else {
       this.bomas = [];
     }
@@ -426,6 +508,7 @@ export class PendingBeneficiaryList implements OnInit {
   // ---------- Actions ----------
   editBeneficiary(b: BeneficiaryVm) {
     if (!b?.applicationId) return;
+    this.saveFiltersToStorage();
     this.router.navigate([
       '/pending-beneficiary/edit',
       String(b.applicationId),
