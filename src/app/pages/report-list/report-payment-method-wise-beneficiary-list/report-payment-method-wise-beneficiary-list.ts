@@ -80,26 +80,36 @@ export class ReportPaymentMethodWiseBeneficiaryList implements OnInit {
   }
 
   downloadPdf(): void {
-    const payload = this.searchCriteria();
-    this.apiService.POST('api/report/payment-method-wise-report/pdf', payload, 'global', { responseType: 'blob' })
-      .then((res: any) => {
-        const blob = new Blob([res], { type: 'application/pdf' });
-        saveAs(blob, `payment_method_wise_beneficiary_report_${Date.now()}.pdf`);
-      })
-      .catch((err: any) => {
-        console.error('Error downloading PDF:', err);
-      });
-  }
+  const payload = { ...this.searchCriteria() };
+  payload.stateId = payload.stateId ? parseInt(payload.stateId, 10) : null;
+  payload.countyId = payload.countyId ? parseInt(payload.countyId, 10) : null;
+  payload.payamId = payload.payamId ? parseInt(payload.payamId, 10) : null;
+  payload.bomaId = payload.bomaId ? parseInt(payload.bomaId, 10) : null;
+
+  this.apiService.POST('api/report/payment-method-wise-report/pdf', payload, 'global', { responseType: 'blob' })
+    .then((res: any) => {
+      const blob = new Blob([res.data], { type: 'application/pdf' }); // ← res.data not res
+      saveAs(blob, `payment_method_wise_beneficiary_report_${Date.now()}.pdf`);
+    })
+    .catch((err: any) => {
+      console.error('Error downloading PDF:', err);
+    });
+}
 
   downloadCsv(): void {
-    const payload = this.searchCriteria();
-    this.apiService.POST('api/report/payment-method-wise-report/csv', payload, 'global', { responseType: 'blob' })
-      .then((res: any) => {
-        const blob = new Blob([res], { type: 'text/csv' });
-        saveAs(blob, `payment_method_wise_beneficiary_report_${Date.now()}.csv`);
-      })
-      .catch((err: any) => {
-        console.error('Error downloading CSV:', err);
-      });
-  }
+  const payload = { ...this.searchCriteria() };
+  payload.stateId = payload.stateId ? parseInt(payload.stateId, 10) : null;
+  payload.countyId = payload.countyId ? parseInt(payload.countyId, 10) : null;
+  payload.payamId = payload.payamId ? parseInt(payload.payamId, 10) : null;
+  payload.bomaId = payload.bomaId ? parseInt(payload.bomaId, 10) : null;
+
+  this.apiService.POST('api/report/payment-method-wise-report/csv', payload, 'global', { responseType: 'blob' })
+    .then((res: any) => {
+      const blob = new Blob([res.data], { type: 'text/csv' }); // ← res.data not res
+      saveAs(blob, `payment_method_wise_beneficiary_report_${Date.now()}.csv`);
+    })
+    .catch((err: any) => {
+      console.error('Error downloading CSV:', err);
+    });
+}
 }

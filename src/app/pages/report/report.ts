@@ -193,7 +193,7 @@ export class ReportComponent implements OnInit {
           bomaId: new FormControl(''),
           paymentMethod: new FormControl(null),
           hasMobileWalletNumber: new FormControl(null),
-          registrationPhase: new FormControl(''),
+          registrationPhase: new FormControl(null),
           supportType: new FormControl(null),
           mobilePaymentProvider: new FormControl(null),
         });
