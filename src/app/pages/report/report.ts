@@ -103,7 +103,7 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 2:
@@ -112,7 +112,7 @@ export class ReportComponent implements OnInit {
           fromDate: new FormControl('', Validators.required),
           toDate: new FormControl('', Validators.required),
           staffUserName: new FormControl('', Validators.required),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 3:
@@ -139,7 +139,7 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 6:
@@ -150,13 +150,13 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 7:
         this.reportForm = new FormGroup({
           page: new FormControl(0, Validators.required),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(null)
         });
         break;
       case 8:
@@ -191,9 +191,9 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl(''),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          paymentMethod: new FormControl('ALL'),
+          paymentMethod: new FormControl(null),
           hasMobileWalletNumber: new FormControl(null),
-          registrationPhase: new FormControl(''),
+          registrationPhase: new FormControl(null),
           supportType: new FormControl(null),
           mobilePaymentProvider: new FormControl(null),
         });
@@ -324,7 +324,7 @@ export class ReportComponent implements OnInit {
         endpoint = 'api/report/reconciliation-summary-count-report';
         break;
       case 11:
-        endpoint = 'api/report/payment-method-wise-beneficiary-list';
+        endpoint = 'api/report/payment-method-wise-report';
         break;
     }
     return endpoint;
@@ -469,6 +469,39 @@ export class ReportComponent implements OnInit {
           this.reportReconciliationSummaryCount = [];
           this.isReportGenerating = false;
           this.cdr.markForCheck(); // Added here
+        });
+
+      return;
+    } else if (this.selectedReportTypeId === 11) {
+      const payloadForReport = {
+        stateId: this.reportForm.value.stateId ? parseInt(this.reportForm.value.stateId) : null,
+        countyId: this.reportForm.value.countyId ? parseInt(this.reportForm.value.countyId) : null,
+        payamId: this.reportForm.value.payamId ? parseInt(this.reportForm.value.payamId) : null,
+        bomaId: this.reportForm.value.bomaId ? parseInt(this.reportForm.value.bomaId) : null,
+        paymentMethod: this.reportForm.value.paymentMethod || null,
+        hasMobileWalletNumber: this.reportForm.value.hasMobileWalletNumber,
+        registrationPhase: this.reportForm.value.registrationPhase || null,
+        supportType: this.reportForm.value.supportType || null,
+        mobilePaymentProvider: this.reportForm.value.mobilePaymentProvider || null,
+      };
+
+      this.apiService.POST(endpoint, payloadForReport)
+        .then((res: any) => {
+          console.log('Full API Response Data for Case 11:', res.data);
+
+          if (res.status === 200 && res.data) {
+            this.reportPaymentMethodWiseBeneficiaryListResult = res.data;
+          } else {
+            this.reportPaymentMethodWiseBeneficiaryListResult = null;
+          }
+          this.isReportGenerating = false;
+          this.cdr.markForCheck();
+        })
+        .catch((err: any) => {
+          console.error('Error calling payment-method-wise-report API:', err.response?.data || err.message);
+          this.reportPaymentMethodWiseBeneficiaryListResult = null;
+          this.isReportGenerating = false;
+          this.cdr.markForCheck();
         });
 
       return;
