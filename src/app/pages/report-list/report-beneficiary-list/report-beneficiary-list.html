@@ -49,7 +49,7 @@
             <td>{{ lookupService.getGenderEnumByValue(beneficiary.respondentGender) }}</td>
             <td>{{ beneficiary.respondentAge }}</td>
             <td>{{ beneficiary.registrationPhase }}</td>
-            <td>{{ beneficiary.registrationStatus }}</td>
+            <td>{{ beneficiary.registrationStatus == 'ACTIVE' ? 'Enrolled' : 'Pending' }}</td>
           </tr>
         }
       </tbody>

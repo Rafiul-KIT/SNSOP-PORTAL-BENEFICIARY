@@ -43,6 +43,7 @@ export class ReportComponent implements OnInit {
 
   genderOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
+  registrationStatusOptions: LookupItem[] = [];
   isLoading: boolean = true;
   isReportGenerating: boolean = false;
   items: MenuItem[] | undefined;

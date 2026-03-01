@@ -176,7 +176,7 @@ export class ReportBeneficiaryList {
         "Respondent relationship to the household head": elem.relationshipOther ? elem.relationshipOther : (this.lookupService.getRelationshipEnumByValue(elem.relationshipWithHouseholdHead) ?? ''),
         "Age": elem.respondentAge ?? '',
         "Registration Phase": elem.registrationPhase ?? '',
-        "Enrollment Status": elem.registrationStatus ?? '',
+        "Enrollment Status": elem.registrationStatus == 'ACTIVE' ? 'Enrolled' : 'Pending',
         "Respondent gender": elem.respondentGender ?? '',
         "Do you have an ID": elem.respondentId ? 'true' : 'false',
         "What type of ID": elem.documentTypeOther ? elem.documentTypeOther : (this.lookupService.getDocumentTypeEnumByValue(elem.documentType) ?? ''),
