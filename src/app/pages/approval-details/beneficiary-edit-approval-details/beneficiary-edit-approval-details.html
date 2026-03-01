@@ -133,6 +133,10 @@
                         <th>Phone</th>
                         <td>{{ oldDetails?.phone }}</td>
                       </tr>
+                      <tr>
+                        <th>Payment Method</th>
+                        <td>{{ oldDetails?.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Wallet' : 'Cash' }}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -678,6 +682,12 @@
                         <th>Phone</th>
                         <td [ngClass]="changedClass('respondentPhoneNo')" [pTooltip]="diffTip('respondentPhoneNo')">
                           {{ editedDetails?.phone }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Payment Method</th>
+                        <td [ngClass]="changedClass('paymentMethod')" [pTooltip]="diffTip('paymentMethod')">
+                          {{ editedDetails?.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Wallet' : 'Cash' }}
                         </td>
                       </tr>
                     </tbody>

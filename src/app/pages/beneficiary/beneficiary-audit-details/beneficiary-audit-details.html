@@ -122,6 +122,10 @@
                                                 <th>Phone</th>
                                                 <td>{{ beneficiaryDetails.phone }}</td>
                                             </tr>
+                                            <tr>
+                                                <th>Payment Method</th>
+                                                <td>{{ beneficiaryDetails.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Wallet' : 'Cash' }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

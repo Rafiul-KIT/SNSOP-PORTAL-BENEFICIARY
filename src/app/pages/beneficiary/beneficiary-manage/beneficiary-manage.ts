@@ -1,3 +1,4 @@
+import { PaymentMethod } from './../../../models/beneficiary/enums';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
@@ -52,6 +53,7 @@ export class BeneficiaryManage implements OnInit {
 
   genderOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
+  paymentMethodOptions: LookupItem[] = [];
   maritalStatusOptions: any[] = [];
   relationshipOptions: any[] = [];
   legalStatusOptions: any[] = [];
@@ -160,8 +162,8 @@ export class BeneficiaryManage implements OnInit {
     private lookup: LookupService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   // ========= Init =========
   ngOnInit(): void {
@@ -170,10 +172,13 @@ export class BeneficiaryManage implements OnInit {
     // Lookups
     this.genderOptions = this.lookup.getGenderList();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+    this.paymentMethodOptions = this.lookup.getPaymentMethodList();
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
-    this.alternateIdTypeOptions = this.lookup.getDocumentTypeEnum().filter(o => o.value !== 'SELECT');
+    this.alternateIdTypeOptions = this.lookup
+      .getDocumentTypeEnum()
+      .filter((o) => o.value !== 'SELECT');
 
     this.occupationOptions = this.lookup.getNomineeOccupationEnum();
     this.incomeSourceOptions = this.lookup.getIncomeSourceEnum();
@@ -184,47 +189,71 @@ export class BeneficiaryManage implements OnInit {
     this.ageGroups.forEach((group) => {
       this.beneficiaryForm.addControl(
         group.maleTotal,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.maleDisable,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.maleChronicalIll,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.maleBoth,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.femaleTotal,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.femaleDisable,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.femaleChronicalIll,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
       this.beneficiaryForm.addControl(
         group.femaleBoth,
-        this.fb.control('0', [this.numMin(0), this.numMax(10)])
+        this.fb.control('0', [this.numMin(0), this.numMax(10)]),
       );
     });
 
-    this.beneficiaryForm.addControl('f18_35_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f18_35_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f18_35_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f18_35_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl(
+      'f18_35_lactating_total',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f18_35_lactating_disable',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f18_35_lactating_chronic',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f18_35_lactating_both',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
 
-    this.beneficiaryForm.addControl('f36_64_lactating_total', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f36_64_lactating_disable', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f36_64_lactating_chronic', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
-    this.beneficiaryForm.addControl('f36_64_lactating_both', this.fb.control('0', [this.numMin(0), this.numMax(10)]));
+    this.beneficiaryForm.addControl(
+      'f36_64_lactating_total',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f36_64_lactating_disable',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f36_64_lactating_chronic',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
+    this.beneficiaryForm.addControl(
+      'f36_64_lactating_both',
+      this.fb.control('0', [this.numMin(0), this.numMax(10)]),
+    );
 
     // Form-level validators (mirror Java)
     this.beneficiaryForm.setValidators([
@@ -263,9 +292,11 @@ export class BeneficiaryManage implements OnInit {
       });
 
     // REAL-TIME VALIDATION: Subscribe to form changes to update selection reasons
-    this.beneficiaryForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.updateSelectionReasonValidation();
-    });
+    this.beneficiaryForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateSelectionReasonValidation();
+      });
 
     // Conditional validators
     this.beneficiaryForm
@@ -375,8 +406,9 @@ export class BeneficiaryManage implements OnInit {
   }
 
   private updateMobileWalletValidation(value: string): void {
-    const mobileMoneyProviderCtrl =
-      this.beneficiaryForm.get('mobileMoneyProvider')!;
+    const mobileMoneyProviderCtrl = this.beneficiaryForm.get(
+      'mobileMoneyProvider',
+    )!;
     const mobileWalletNumberCtrl =
       this.beneficiaryForm.get('mobileWalletNumber')!;
 
@@ -447,10 +479,10 @@ export class BeneficiaryManage implements OnInit {
 
     const allIdTypes = this.lookup.getDocumentTypeEnum();
     const refugeeIdTypes = allIdTypes.filter((o) =>
-      o.value.startsWith('REFUGEE')
+      o.value.startsWith('REFUGEE'),
     );
     const nonRefugeeIdTypes = allIdTypes.filter(
-      (o) => !o.value.startsWith('REFUGEE') && o.value !== 'SELECT'
+      (o) => !o.value.startsWith('REFUGEE') && o.value !== 'SELECT',
     );
 
     if (legalStatus === 'REFUGEE') {
@@ -478,14 +510,14 @@ export class BeneficiaryManage implements OnInit {
         this.requiredWithWhitespace(),
         this.disallow(
           ['SELECT', 'PASSPORT', 'NATIONAL_ID', 'OTHER'],
-          'Please select a valid ID type'
+          'Please select a valid ID type',
         ),
       ]);
       numberControl.setValidators([
         this.requiredWithWhitespace(),
         this.pattern(
           this.RGX_REFUGEE_ID,
-          'ID number must contain digits, letters, hyphen only'
+          'ID number must contain digits, letters, hyphen only',
         ),
         this.size(5, 14),
       ]);
@@ -554,17 +586,17 @@ export class BeneficiaryManage implements OnInit {
 
   private updateFormUI() {
     this.updateRelationshipFields(
-      this.beneficiaryForm.get('relationship')!.value
+      this.beneficiaryForm.get('relationship')!.value,
     );
     this.updateMaritalStatusFields(
-      this.beneficiaryForm.get('maritalStatus')!.value
+      this.beneficiaryForm.get('maritalStatus')!.value,
     );
     this.updateIdLogic();
     this.updateIncomeSourceFields(
-      this.beneficiaryForm.get('mainIncomeSource')!.value
+      this.beneficiaryForm.get('mainIncomeSource')!.value,
     );
     this.updateMobileWalletValidation(
-      this.beneficiaryForm.get('hasMobileWallet')!.value
+      this.beneficiaryForm.get('hasMobileWallet')!.value,
     );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
@@ -617,6 +649,7 @@ export class BeneficiaryManage implements OnInit {
       spouseLastName: [''],
       spouseNickName: [''],
       registrationPhase: ['', [this.notSelectRequired()]],
+      paymentMethod: ['', [this.notSelectRequired()]],
 
       legalStatus: ['', [this.notSelectRequired()]],
       hasNationalId: [''], // 'Yes'|'No'
@@ -628,7 +661,7 @@ export class BeneficiaryManage implements OnInit {
         [
           this.optionalPattern(
             this.RGX_PHONE_9,
-            'Phone number length must be 9'
+            'Phone number length must be 9',
           ),
         ],
       ],
@@ -637,7 +670,7 @@ export class BeneficiaryManage implements OnInit {
         [
           this.optionalPattern(
             this.RGX_PHONE_9,
-            'Phone number length must be 9'
+            'Phone number length must be 9',
           ),
         ],
       ],
@@ -695,6 +728,7 @@ export class BeneficiaryManage implements OnInit {
               ? dto.respondentPhoneNo.substring(4)
               : dto.respondentPhoneNo || null,
             registrationPhase: dto.registrationPhase,
+            paymentMethod: dto.paymentMethod,
             mainIncomeSource: dto.householdIncomeSource,
             mobileMoneyProvider: dto.mobileMoneyProvider,
             mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
@@ -714,7 +748,7 @@ export class BeneficiaryManage implements OnInit {
             literate1835Count: dto.memberReadWrite ?? '0',
             householdSize: dto.householdSize ?? '0',
           },
-          { emitEvent: false }
+          { emitEvent: false },
         );
 
         // Patch breakdown helper
@@ -722,7 +756,7 @@ export class BeneficiaryManage implements OnInit {
           if (!src) return;
           const patch: any = {};
           Object.entries(map).forEach(
-            ([formKey, dtoKey]) => (patch[formKey] = src[dtoKey])
+            ([formKey, dtoKey]) => (patch[formKey] = src[dtoKey]),
           );
           this.beneficiaryForm.patchValue(patch, { emitEvent: false });
         };
@@ -811,7 +845,7 @@ export class BeneficiaryManage implements OnInit {
         this.nominees.clear();
         if (Array.isArray(dto.nominees)) {
           dto.nominees.forEach((n) =>
-            this.nominees.push(this.createNomineeGroup(n))
+            this.nominees.push(this.createNomineeGroup(n)),
           );
         }
 
@@ -836,33 +870,38 @@ export class BeneficiaryManage implements OnInit {
   // ========= Build payload =========
   private buildUpdatePayload(formValue: any): BeneficiaryDto {
     const payload: BeneficiaryDto = JSON.parse(
-      JSON.stringify(this.originalDto)
+      JSON.stringify(this.originalDto),
     );
 
     payload.respondentFirstName = formValue.respondentFirstName;
     payload.respondentMiddleName = this.getOptionalStringValue(
-      formValue.respondentMiddleName
+      formValue.respondentMiddleName,
     );
     payload.respondentLastName = formValue.respondentLastName;
     payload.respondentNickName = this.getOptionalStringValue(
-      formValue.respondentNickName
+      formValue.respondentNickName,
     );
     payload.relationshipWithHouseholdHead = formValue.relationship;
     payload.relationshipOther = this.getOptionalStringValue(
-      formValue.relationshipOther
+      formValue.relationshipOther,
     );
     payload.respondentAge = +formValue.respondentAge;
     payload.respondentGender = formValue.gender;
     payload.respondentMaritalStatus = formValue.maritalStatus;
     payload.spouseFirstName = this.getOptionalStringValue(
-      formValue.spouseFirstName
+      formValue.spouseFirstName,
     );
     payload.spouseMiddleName = this.getOptionalStringValue(
-      formValue.spouseMiddleName
+      formValue.spouseMiddleName,
     );
-    payload.spouseLastName = this.getOptionalStringValue(formValue.spouseLastName);
-    payload.spouseNickName = this.getOptionalStringValue(formValue.spouseNickName);
+    payload.spouseLastName = this.getOptionalStringValue(
+      formValue.spouseLastName,
+    );
+    payload.spouseNickName = this.getOptionalStringValue(
+      formValue.spouseNickName,
+    );
     payload.registrationPhase = formValue.registrationPhase;
+    payload.paymentMethod = formValue.paymentMethod;
     payload.respondentLegalStatus = formValue.legalStatus;
     const phone = formValue.respondentPhone?.toString().trim();
     payload.respondentPhoneNo = phone ? `+211${phone}` : null;
@@ -873,7 +912,7 @@ export class BeneficiaryManage implements OnInit {
     } else {
       payload.documentType = formValue.idType;
       payload.documentTypeOther = this.getOptionalStringValue(
-        formValue.idTypeOther
+        formValue.idTypeOther,
       );
       payload.respondentId = formValue.respondentIdNumber?.trim() || null;
     }
@@ -883,7 +922,7 @@ export class BeneficiaryManage implements OnInit {
     const wphone = formValue.mobileWalletNumber?.toString().trim();
     payload.mobileWalletNumber = wphone ? `+211${wphone}` : null;
     payload.incomeSourceOther = this.getOptionalStringValue(
-      formValue.otherIncomeSource
+      formValue.otherIncomeSource,
     );
     payload.householdMonthlyAvgIncome = +formValue.avgMonthlyIncome || -1;
 
@@ -898,7 +937,7 @@ export class BeneficiaryManage implements OnInit {
     const copy = (
       dstKey: keyof BeneficiaryDto,
       mPrefix: string,
-      fPrefix: string
+      fPrefix: string,
     ) => {
       if ((payload as any)[dstKey]) {
         (payload as any)[dstKey] = {
@@ -1025,7 +1064,7 @@ export class BeneficiaryManage implements OnInit {
     }
 
     const beneficiary = this.buildUpdatePayload(
-      this.beneficiaryForm.getRawValue()
+      this.beneficiaryForm.getRawValue(),
     );
     const payload = { beneficiaries: [beneficiary] };
 
@@ -1084,16 +1123,14 @@ export class BeneficiaryManage implements OnInit {
     let reasons: any[] = [];
     if (supportType === 'Public Works') {
       reasons = this.allReasons.filter((r) =>
-        r.value.startsWith('LIPW_REASON')
+        r.value.startsWith('LIPW_REASON'),
       );
     } else if (supportType === 'Direct Income Support') {
-      reasons = this.allReasons.filter((r) =>
-        r.value.startsWith('DIS_REASON')
-      );
+      reasons = this.allReasons.filter((r) => r.value.startsWith('DIS_REASON'));
     } else {
       reasons = [];
     }
-    this.filteredReasons = reasons.map(r => ({ ...r, disabled: false }));
+    this.filteredReasons = reasons.map((r) => ({ ...r, disabled: false }));
     this.updateSelectionReasonValidation();
   }
   isReasonSelected(value: string): boolean {
@@ -1178,7 +1215,7 @@ export class BeneficiaryManage implements OnInit {
       c.updateValueAndValidity({ emitEvent: false });
     };
     g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe(
-      updateNomineeRelationship
+      updateNomineeRelationship,
     );
     updateNomineeRelationship();
 
@@ -1254,7 +1291,7 @@ export class BeneficiaryManage implements OnInit {
         [
           this.optionalPattern(
             this.RGX_PHONE_9,
-            'Phone number must be 9 digits'
+            'Phone number must be 9 digits',
           ),
         ],
       ],
@@ -1281,8 +1318,9 @@ export class BeneficiaryManage implements OnInit {
       }
       c.updateValueAndValidity({ emitEvent: false });
     };
-    g.get('relationshipWithHouseholdHead')
-      ?.valueChanges.subscribe(updateAltRelationship);
+    g.get('relationshipWithHouseholdHead')?.valueChanges.subscribe(
+      updateAltRelationship,
+    );
     updateAltRelationship();
 
     // ID rules (AlForm1Validation)
@@ -1332,7 +1370,7 @@ export class BeneficiaryManage implements OnInit {
               isRef ? this.RGX_REFUGEE_ID : this.RGX_ALPHANUM_SPACE,
               isRef
                 ? 'ID number must contain digits, letters, hyphen only'
-                : 'ID number must contain digits, letters'
+                : 'ID number must contain digits, letters',
             ),
             this.size(5, 14),
           ]);
@@ -1371,7 +1409,7 @@ export class BeneficiaryManage implements OnInit {
   getError(
     fieldName: string,
     arrayIndex?: number,
-    arrayName?: 'alternates' | 'nominees'
+    arrayName?: 'alternates' | 'nominees',
   ): string {
     let control;
 
@@ -1410,6 +1448,7 @@ export class BeneficiaryManage implements OnInit {
       idTypeOther: 'ID Type Other',
       respondentIdNumber: 'ID Number',
       respondentPhone: 'Phone Number',
+      PaymentMethod: 'Payment Method',
       mobileWalletNumber: 'Mobile Wallet Number',
 
       // Alternate/Nominee fields
@@ -1519,7 +1558,7 @@ export class BeneficiaryManage implements OnInit {
   private onlyLetters() {
     return this.pattern(
       this.RGX_ONLY_CHARS,
-      'Must not contain space, digits or special characters'
+      'Must not contain space, digits or special characters',
     );
   }
   private requiredWithWhitespace() {
@@ -1643,20 +1682,42 @@ export class BeneficiaryManage implements OnInit {
     return (fg: AbstractControl): ValidationErrors | null => {
       if (!(fg instanceof FormGroup)) return null;
 
-      const f18_35_lactating_total = +fg.get('f18_35_lactating_total')?.value || 0;
-      const f18_35_lactating_disable = +fg.get('f18_35_lactating_disable')?.value || 0;
-      const f18_35_lactating_chronic = +fg.get('f18_35_lactating_chronic')?.value || 0;
-      const f18_35_lactating_both = +fg.get('f18_35_lactating_both')?.value || 0;
-      if (f18_35_lactating_disable + f18_35_lactating_chronic + f18_35_lactating_both > f18_35_lactating_total) {
-        return { subExceeds: `Lactating women (18-35) subcategories exceed total` };
+      const f18_35_lactating_total =
+        +fg.get('f18_35_lactating_total')?.value || 0;
+      const f18_35_lactating_disable =
+        +fg.get('f18_35_lactating_disable')?.value || 0;
+      const f18_35_lactating_chronic =
+        +fg.get('f18_35_lactating_chronic')?.value || 0;
+      const f18_35_lactating_both =
+        +fg.get('f18_35_lactating_both')?.value || 0;
+      if (
+        f18_35_lactating_disable +
+          f18_35_lactating_chronic +
+          f18_35_lactating_both >
+        f18_35_lactating_total
+      ) {
+        return {
+          subExceeds: `Lactating women (18-35) subcategories exceed total`,
+        };
       }
 
-      const f36_64_lactating_total = +fg.get('f36_64_lactating_total')?.value || 0;
-      const f36_64_lactating_disable = +fg.get('f36_64_lactating_disable')?.value || 0;
-      const f36_64_lactating_chronic = +fg.get('f36_64_lactating_chronic')?.value || 0;
-      const f36_64_lactating_both = +fg.get('f36_64_lactating_both')?.value || 0;
-      if (f36_64_lactating_disable + f36_64_lactating_chronic + f36_64_lactating_both > f36_64_lactating_total) {
-        return { subExceeds: `Lactating women (36-64) subcategories exceed total` };
+      const f36_64_lactating_total =
+        +fg.get('f36_64_lactating_total')?.value || 0;
+      const f36_64_lactating_disable =
+        +fg.get('f36_64_lactating_disable')?.value || 0;
+      const f36_64_lactating_chronic =
+        +fg.get('f36_64_lactating_chronic')?.value || 0;
+      const f36_64_lactating_both =
+        +fg.get('f36_64_lactating_both')?.value || 0;
+      if (
+        f36_64_lactating_disable +
+          f36_64_lactating_chronic +
+          f36_64_lactating_both >
+        f36_64_lactating_total
+      ) {
+        return {
+          subExceeds: `Lactating women (36-64) subcategories exceed total`,
+        };
       }
 
       for (const g of this.ageGroups) {
@@ -1691,8 +1752,8 @@ export class BeneficiaryManage implements OnInit {
           (+fg.get(g.maleTotal)?.value || 0) +
           (+fg.get(g.femaleTotal)?.value || 0);
       }
-      sum += (+fg.get('f18_35_lactating_total')?.value || 0);
-      sum += (+fg.get('f36_64_lactating_total')?.value || 0);
+      sum += +fg.get('f18_35_lactating_total')?.value || 0;
+      sum += +fg.get('f36_64_lactating_total')?.value || 0;
       const size = +fg.get('householdSize')?.value || 0;
       if (size <= 0)
         return {
@@ -1735,9 +1796,9 @@ export class BeneficiaryManage implements OnInit {
       let count = (+fg.get(g.m)?.value || 0) + (+fg.get(g.f)?.value || 0);
 
       if (age >= 18 && age <= 35) {
-        count += (+fg.get('f18_35_lactating_total')?.value || 0);
+        count += +fg.get('f18_35_lactating_total')?.value || 0;
       } else if (age >= 36 && age <= 64) {
-        count += (+fg.get('f36_64_lactating_total')?.value || 0);
+        count += +fg.get('f36_64_lactating_total')?.value || 0;
       }
 
       if (count <= 0) {
@@ -1792,7 +1853,7 @@ export class BeneficiaryManage implements OnInit {
           mb: string,
           fd: string,
           fc: string,
-          fb: string
+          fb: string,
         ) => {
           const mt = +fg.get(m)?.value || 0;
           const ft = +fg.get(f)?.value || 0;
@@ -1815,7 +1876,7 @@ export class BeneficiaryManage implements OnInit {
             'm18_35_both',
             'f18_35_disable',
             'f18_35_chronic',
-            'f18_35_both'
+            'f18_35_both',
           ) +
           slice(
             'm36_64_total',
@@ -1825,7 +1886,7 @@ export class BeneficiaryManage implements OnInit {
             'm36_64_both',
             'f36_64_disable',
             'f36_64_chronic',
-            'f36_64_both'
+            'f36_64_both',
           )
         );
       })();
@@ -1849,7 +1910,10 @@ export class BeneficiaryManage implements OnInit {
   onReasonChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
     const reasonValue = checkbox.value;
-    const selectedReasons = this.beneficiaryForm.get('selectionReasons')?.value as string[] | null || [];
+    const selectedReasons =
+      (this.beneficiaryForm.get('selectionReasons')?.value as
+        | string[]
+        | null) || [];
 
     if (checkbox.checked) {
       if (!selectedReasons.includes(reasonValue)) {
@@ -1868,19 +1932,23 @@ export class BeneficiaryManage implements OnInit {
   private updateSelectionReasonValidation() {
     if (!this.beneficiaryForm) return;
     const hhData = this.getHouseholdBreakdown();
-    const selectedReasons: string[] = [...this.beneficiaryForm.get('selectionReasons')?.value || []];
+    const selectedReasons: string[] = [
+      ...(this.beneficiaryForm.get('selectionReasons')?.value || []),
+    ];
     let reasonsChanged = false;
 
     const hasDisRule = this.beneficiaryForm.hasError('disRule');
     const hasLipwRule = this.beneficiaryForm.hasError('lipwRule');
 
-    this.filteredReasons.forEach(reason => {
+    this.filteredReasons.forEach((reason) => {
       const isDisReason = reason.value.startsWith('DIS_REASON');
       const isLipwReason = reason.value.startsWith('LIPW_REASON');
 
       const shouldBeDisabledByHhData = this.isReasonDisabled(reason, hhData);
-      const shouldBeDisabledByRules = (hasDisRule && isDisReason) || (hasLipwRule && isLipwReason);
-      const shouldBeDisabled = shouldBeDisabledByHhData || shouldBeDisabledByRules;
+      const shouldBeDisabledByRules =
+        (hasDisRule && isDisReason) || (hasLipwRule && isLipwReason);
+      const shouldBeDisabled =
+        shouldBeDisabledByHhData || shouldBeDisabledByRules;
 
       reason.disabled = shouldBeDisabled;
 
@@ -1894,7 +1962,9 @@ export class BeneficiaryManage implements OnInit {
     });
 
     if (reasonsChanged) {
-      this.beneficiaryForm.get('selectionReasons')?.setValue(selectedReasons, { emitEvent: false });
+      this.beneficiaryForm
+        .get('selectionReasons')
+        ?.setValue(selectedReasons, { emitEvent: false });
     }
   }
 
@@ -1925,7 +1995,8 @@ export class BeneficiaryManage implements OnInit {
       const femaleDisable = gv(group.femaleDisable);
       const femaleChronicalIll = gv(group.femaleChronicalIll);
       const femaleBoth = gv(group.femaleBoth);
-      const ableFemale = femaleTotal - (femaleDisable + femaleChronicalIll + femaleBoth);
+      const ableFemale =
+        femaleTotal - (femaleDisable + femaleChronicalIll + femaleBoth);
 
       return (ableMale > 0 ? ableMale : 0) + (ableFemale > 0 ? ableFemale : 0);
     };
@@ -1937,22 +2008,37 @@ export class BeneficiaryManage implements OnInit {
     const ableBodied_18_64 = ableBodied_18_35 + ableBodied_36_64;
     const ableBodied_18_plus = ableBodied_18_64 + ableBodied_65_plus;
 
-    const chronicallyIllOrBothInAllAges = this.ageGroups.reduce((sum, group) => {
-      return sum + gv(group.maleChronicalIll) + gv(group.maleBoth) + gv(group.femaleChronicalIll) + gv(group.femaleBoth);
-    }, 0) > 0;
+    const chronicallyIllOrBothInAllAges =
+      this.ageGroups.reduce((sum, group) => {
+        return (
+          sum +
+          gv(group.maleChronicalIll) +
+          gv(group.maleBoth) +
+          gv(group.femaleChronicalIll) +
+          gv(group.femaleBoth)
+        );
+      }, 0) > 0;
 
     const otherAgeGroupDependents = this.ageGroups.reduce((sum, group) => {
       if (group.label === '18-35 yrs' || group.label === '36-64 yrs') {
-        return sum + gv(group.maleDisable) + gv(group.maleChronicalIll) + gv(group.maleBoth) +
-          gv(group.femaleDisable) + gv(group.femaleChronicalIll) + gv(group.femaleBoth);
+        return (
+          sum +
+          gv(group.maleDisable) +
+          gv(group.maleChronicalIll) +
+          gv(group.maleBoth) +
+          gv(group.femaleDisable) +
+          gv(group.femaleChronicalIll) +
+          gv(group.femaleBoth)
+        );
       }
       return sum;
     }, 0);
 
-    const dependents = childrenTotal + elderly_65_plus_total + otherAgeGroupDependents;
+    const dependents =
+      childrenTotal + elderly_65_plus_total + otherAgeGroupDependents;
 
     let ableBodiedTotal = 0;
-    this.ageGroups.forEach(group => {
+    this.ageGroups.forEach((group) => {
       ableBodiedTotal += getAbleBodiedForAgeGroup(group);
     });
 
@@ -1967,11 +2053,14 @@ export class BeneficiaryManage implements OnInit {
       dependents,
       youth_18_35_total,
       ableBodiedTotal: ableBodiedTotal,
-      ableBodied_18_35
+      ableBodied_18_35,
     };
   }
 
-  private isReasonDisabled(reason: { value: string; label: string }, hhData: any): boolean {
+  private isReasonDisabled(
+    reason: { value: string; label: string },
+    hhData: any,
+  ): boolean {
     switch (reason.value) {
       case 'DIS_REASON_1': // Child-headed
         return !(hhData.childrenTotal > 0 && hhData.ableBodied_18_plus === 0);
@@ -1980,12 +2069,16 @@ export class BeneficiaryManage implements OnInit {
         return !(hhData.elderlyTotal > 0 && hhData.ableBodied_18_64 === 0);
 
       case 'DIS_REASON_3':
-        return (hhData.ableBodiedTotal > 0)
+        return hhData.ableBodiedTotal > 0;
       case 'DIS_REASON_4':
-        return !(hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0);
+        return !(
+          hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0
+        );
 
       case 'DIS_REASON_5':
-        return !(hhData.female_18_64_total > 0 && hhData.ableBodied_18_64 === 0);
+        return !(
+          hhData.female_18_64_total > 0 && hhData.ableBodied_18_64 === 0
+        );
 
       case 'LIPW_REASON_1':
         return !(hhData.ableBodiedTotal > 0);
@@ -2000,7 +2093,7 @@ export class BeneficiaryManage implements OnInit {
         return !(hhData.dependents > 3 && hhData.ableBodiedTotal > 0);
 
       case 'LIPW_REASON_5':
-      return !(hhData.ableBodiedTotal > 0);
+        return !(hhData.ableBodiedTotal > 0);
 
       default:
         return false;

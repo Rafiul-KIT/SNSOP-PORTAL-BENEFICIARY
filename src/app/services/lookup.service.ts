@@ -233,6 +233,13 @@ export class LookupService {
     ];
   }
 
+    getPaymentMethodList(): LookupItem[] {
+    return [
+      { id: 'CASH', name: 'Cash' },
+      { id: 'MOBILE_WALLET', name: 'Mobile Wallet' },
+    ];
+  }
+
   SelectionCriteriaEnum: EnumItem[] = [
     { id: 0, value: 'LIPW', name: 'Public Works' },
     { id: 1, value: 'DIS', name: 'Direct Income Support' },

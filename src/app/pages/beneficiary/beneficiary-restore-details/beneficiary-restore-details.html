@@ -42,6 +42,10 @@
                         <td>{{ beneficiaryDetails.applicationId }}</td>
                       </tr>
                       <tr>
+                        <th>Registration Date</th>
+                        <td>{{ beneficiaryDetails.created | date:'dd-MM-yyyy' }}</td>
+                      </tr>
+                      <tr>
                         <th>Name</th>
                         <td>{{ beneficiaryDetails.name }}</td>
                       </tr>
@@ -102,6 +106,10 @@
                       <tr>
                         <th>Phone</th>
                         <td>{{ beneficiaryDetails.phone }}</td>
+                      </tr>
+                      <tr>
+                        <th>Payment Method</th>
+                        <td>{{ beneficiaryDetails.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Wallet' : 'Cash' }}</td>
                       </tr>
                     </tbody>
                   </table>

@@ -52,6 +52,7 @@ interface BeneficiaryVm {
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string | null;
   registrationPhase: string;
+  paymentMethod: string | null | undefined;
 
   photo?: string;
   household: any;
@@ -357,6 +358,7 @@ export class BeneficiaryEditApprovalDetails {
       mobileMoneyProvider: dto.mobileMoneyProvider,
       mobileWalletNumber: dto.mobileWalletNumber,
       registrationPhase: dto.registrationPhase,
+      paymentMethod: dto.paymentMethod,
       phone: dto.respondentPhoneNo,
       photo: normalizePhoto(dto.biometrics?.photoData),
       household: {

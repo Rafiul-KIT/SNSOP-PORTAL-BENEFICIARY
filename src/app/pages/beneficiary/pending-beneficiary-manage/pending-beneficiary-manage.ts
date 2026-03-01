@@ -94,6 +94,11 @@ export class PendingBeneficiaryManage implements OnInit {
   filteredReasons: any[] = [];
   mobileMoneyOptions: any[] = [];
 
+  payamList: LookupItem[] = [];
+  bomaList: LookupItem[] = [];
+  stateName: string = '--';
+  countyName: string = '--';
+
   // ===== Regex & constants (aligned with mobile/Java) =====
   private RGX_ONLY_CHARS = /^[A-Za-z]+$/; // names (no spaces/digits/special)
   private RGX_CHARS_SPACES = /^[A-Za-z ]+$/; // letters + spaces
@@ -716,8 +721,44 @@ export class PendingBeneficiaryManage implements OnInit {
       literate1835Count: ['0', [this.intMin(0)]],
       householdSize: ['0', [this.intMin(0)]],
 
+      stateId: [{ value: '', disabled: true }],
+      countyId: [{ value: '', disabled: true }],
+      payam: ['', [Validators.required]],
+      boma: ['', [Validators.required]],
+
       alternates: this.fb.array([]),
       nominees: this.fb.array([]),
+    });
+
+    this.beneficiaryForm.get('payam')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
+      if (val) {
+        this.loadBomas(val);
+      }
+    });
+  }
+
+  private loadPayams(countyId: number) {
+    this.lookup.getPayamListByCountyId(String(countyId)).then(list => {
+      this.payamList = list;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private loadBomas(payamId: number) {
+    this.lookup.getBomaListByPayamId(String(payamId)).then(list => {
+      this.bomaList = list;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private updateGeoLocationNames(stateId: number, countyId: number) {
+    this.lookup.getOrFetchStateList().then(() => {
+      this.stateName = this.lookup.getStateNameById(String(stateId));
+      this.cdr.detectChanges();
+    });
+    this.lookup.fetchAllCountyList().then(() => {
+      this.countyName = this.lookup.getCountyNameById(String(countyId));
+      this.cdr.detectChanges();
     });
   }
 
@@ -773,9 +814,27 @@ export class PendingBeneficiaryManage implements OnInit {
             hasMobileWallet: dto.hasMobileWallet ? 'Yes' : 'No',
             literate1835Count: dto.memberReadWrite ?? '0',
             householdSize: dto.householdSize ?? '0',
+
+            stateId: dto.address?.stateId ? String(dto.address.stateId) : '',
+            countyId: dto.address?.countyId ? String(dto.address.countyId) : '',
+            payam: dto.address?.payam ? String(dto.address.payam) : '',
+            boma: dto.address?.boma ? String(dto.address.boma) : '',
           },
           { emitEvent: false },
         );
+
+        // Load geo names and lists
+        if (dto.address) {
+          if (dto.address.stateId && dto.address.countyId) {
+            this.updateGeoLocationNames(dto.address.stateId, dto.address.countyId);
+          }
+          if (dto.address.countyId) {
+            this.loadPayams(dto.address.countyId);
+          }
+          if (dto.address.payam) {
+            this.loadBomas(dto.address.payam);
+          }
+        }
 
         // Patch breakdown helper
         const pv = (src: any, map: Record<string, string>) => {
@@ -958,6 +1017,17 @@ export class PendingBeneficiaryManage implements OnInit {
     payload.memberReadWrite = +formValue.literate1835Count;
     payload.householdSize = +formValue.householdSize;
 
+    if (formValue.stateId && formValue.countyId && formValue.payam && formValue.boma) {
+      payload.address = {
+        stateId: +formValue.stateId,
+        countyId: +formValue.countyId,
+        payam: +formValue.payam,
+        boma: String(formValue.boma),
+        lat: this.originalDto.address?.lat || 0,
+        lon: this.originalDto.address?.lon || 0,
+      };
+    }
+
     // Breakdown copy helper
     const copy = (
       dstKey: keyof BeneficiaryDto,
@@ -1111,7 +1181,7 @@ export class PendingBeneficiaryManage implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Update Successful',
-            detail: 'Beneficiary edit request sent successfully!',
+            detail: 'Beneficiary Updated and Approved successfully!',
           });
           setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
         } else if (first.result === 'FAILED') {

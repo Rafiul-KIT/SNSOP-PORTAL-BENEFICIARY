@@ -49,7 +49,8 @@ interface BeneficiaryVm {
   mobileMoneyProvider?: MobileMoneyProvider;
   mobileWalletNumber?: string | null;
   registrationPhase: string;
-
+  paymentMethod: string | null | undefined;
+  created: Date;
 
   photo?: string;
   household: any;
@@ -255,6 +256,8 @@ private mapToVm(dto: BeneficiaryDto): BeneficiaryVm {
     mobileMoneyProvider: dto.mobileMoneyProvider,
     mobileWalletNumber: dto.mobileWalletNumber,
     registrationPhase: dto.registrationPhase,
+     paymentMethod: dto.paymentMethod,
+    created: new Date(dto.created),
 
     phone: dto.respondentPhoneNo,
     photo: normalizePhoto(dto.biometrics?.photoData),

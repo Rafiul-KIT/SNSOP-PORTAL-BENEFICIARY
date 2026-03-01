@@ -296,6 +296,55 @@
               </div>
             </div>
 
+            <!-- GEO Location -->
+            <div class="card mt-3">
+              <h5 class="card-header">GEO Location</h5>
+              <br />
+              <div class="card-body row g-2">
+                <!-- State (readonly) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="state" [value]="stateName" class="w-100" readonly />
+                    <label for="state">State</label>
+                  </p-floatlabel>
+                </div>
+
+                <!-- County (readonly) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="county" [value]="countyName" class="w-100" readonly />
+                    <label for="county">County</label>
+                  </p-floatlabel>
+                </div>
+
+                <!-- Payam (editable) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <p-select id="payam" formControlName="payam" class="w-100" [options]="payamList" optionLabel="name"
+                      optionValue="id" [filter]="true" [ngClass]="{'is-invalid': showError('payam')}">
+                    </p-select>
+                    <label for="payam">Payam</label>
+                  </p-floatlabel>
+                  @if (showError('payam')) {
+                  <small class="text-danger">Payam is required</small>
+                  }
+                </div>
+
+                <!-- Boma (editable) -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <p-select id="boma" formControlName="boma" class="w-100" [options]="bomaList" optionLabel="name"
+                      optionValue="id" [filter]="true" [ngClass]="{'is-invalid': showError('boma')}">
+                    </p-select>
+                    <label for="boma">Boma</label>
+                  </p-floatlabel>
+                  @if (showError('boma')) {
+                  <small class="text-danger">Boma is required</small>
+                  }
+                </div>
+              </div>
+            </div>
+
             <!-- Selection Criteria -->
             <div class="card mt-3">
               <h5 class="card-header">Selection Criteria</h5>
