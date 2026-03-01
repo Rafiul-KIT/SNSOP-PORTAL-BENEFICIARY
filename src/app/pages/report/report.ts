@@ -103,7 +103,8 @@ export class ReportComponent implements OnInit {
           countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl(null)
+          registrationPhase: new FormControl(null),
+          registrationStatus : new FormControl(null)
         });
         break;
       case 2:

@@ -25,30 +25,31 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          @for (col of cols(); track col.field) {
-            <th>{{ col.header }}</th>
-          }
           <th>State</th>
           <th>County</th>
           <th>Payam</th>
           <th>Boma</th>
+          @for (col of cols(); track col.field) {
+            <th>{{ col.header }}</th>
+          }
         </tr>
       </thead>
       <tbody>
         @for (beneficiary of displayedList(); track beneficiary.applicationId) {
           <tr>
-            <td>{{ beneficiary.applicationId }}</td>
-            <td>{{ beneficiary.respondentFirstName }}</td>
-            <td>{{ beneficiary.respondentMiddleName }}</td>
-            <td>{{ beneficiary.respondentLastName }}</td>
-            <td>{{ beneficiary.respondentNickName }}</td>
-            <td>{{ lookupService.getGenderEnumByValue(beneficiary.respondentGender) }}</td>
-            <td>{{ beneficiary.respondentAge }}</td>
-            <td>{{ beneficiary.registrationPhase }}</td>
             <td>{{ lookupService.getStateNameById(beneficiary.address?.stateId) }}</td>
             <td>{{ lookupService.getCountyNameById(beneficiary.address?.countyId) }}</td>
             <td>{{ lookupService.getPayamNameById(beneficiary.address?.payam) }}</td>
             <td>{{ lookupService.getBomaNameById(beneficiary.address?.boma) }}</td>
+            <td>{{ beneficiary.applicationId }}</td>
+            <td>{{ beneficiary.respondentFirstName }}</td>
+            <td>{{ beneficiary.respondentMiddleName }}</td>
+            <td>{{ beneficiary.respondentLastName }}</td>
+            <!-- <td>{{ beneficiary.respondentNickName }}</td> -->
+            <td>{{ lookupService.getGenderEnumByValue(beneficiary.respondentGender) }}</td>
+            <td>{{ beneficiary.respondentAge }}</td>
+            <td>{{ beneficiary.registrationPhase }}</td>
+            <td>{{ beneficiary.registrationStatus }}</td>
           </tr>
         }
       </tbody>

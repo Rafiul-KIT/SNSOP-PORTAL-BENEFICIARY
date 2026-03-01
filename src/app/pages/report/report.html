@@ -320,6 +320,18 @@
                     </div>
                 </div>
                 }
+                @if (reportForm.get('registrationStatus ')) {
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="registrationStatus " formControlName="registrationStatus ">
+                            <option [ngValue]="null">ALL</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="ACTIVE">Enrolled</option>
+                        </select>
+                        <label for="registrationStatus ">Enrollment status</label>
+                    </div>
+                </div>
+                }
                 <div class="col-12">
                     <div class="bg-light p-2 text-end">
 

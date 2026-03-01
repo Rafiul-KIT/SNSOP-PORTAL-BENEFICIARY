@@ -79,6 +79,7 @@ export class ReportBeneficiaryList {
       { header: 'Respondent Gender', dataKey: 'respondentGender' },
       { header: 'Respondent Age', dataKey: 'respondentAge' },
       { header: 'Registration Phase', dataKey: 'registrationPhase' },
+      { header: 'Enrollment status', dataKey: 'registrationStatus' },
       { header: 'State', dataKey: 'state' },
       { header: 'County', dataKey: 'county' },
       { header: 'Payam', dataKey: 'payam' },
@@ -96,6 +97,7 @@ export class ReportBeneficiaryList {
       ),
       respondentAge: beneficiary.respondentAge,
       registrationPhase: beneficiary.registrationPhase,
+      registrationStatus: beneficiary.registrationStatus,
       state:
         this.lookupService.getStateNameById(beneficiary.address?.stateId) ??
         '-',
@@ -174,6 +176,7 @@ export class ReportBeneficiaryList {
         "Respondent relationship to the household head": elem.relationshipOther ? elem.relationshipOther : (this.lookupService.getRelationshipEnumByValue(elem.relationshipWithHouseholdHead) ?? ''),
         "Age": elem.respondentAge ?? '',
         "Registration Phase": elem.registrationPhase ?? '',
+        "Enrollment Status": elem.registrationStatus ?? '',
         "Respondent gender": elem.respondentGender ?? '',
         "Do you have an ID": elem.respondentId ? 'true' : 'false',
         "What type of ID": elem.documentTypeOther ? elem.documentTypeOther : (this.lookupService.getDocumentTypeEnumByValue(elem.documentType) ?? ''),
@@ -386,10 +389,11 @@ export class ReportBeneficiaryList {
       { field: 'respondentFirstName', header: 'Respondent First Name' },
       { field: 'respondentMiddleName', header: 'Respondent Middle Name' },
       { field: 'respondentLastName', header: 'Respondent Last Name' },
-      { field: 'respondentNickName', header: 'Respondent Nick Name' },
+      // { field: 'respondentNickName', header: 'Respondent Nick Name' },
       { field: 'respondentGender', header: 'Respondent Gender' },
       { field: 'respondentAge', header: 'Respondent Age' },
       { field: 'registrationPhase', header: 'Registration Phase' },
+      { field: 'registrationStatus', header: 'Enrollment Status' },
     ]);
 
 

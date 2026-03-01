@@ -281,7 +281,8 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
           countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
           bomaId: new FormControl(''),
-          registrationPhase: new FormControl('')
+          registrationPhase: new FormControl(''),
+          registrationStatus: new FormControl('')
         });
         break;
 
@@ -790,9 +791,15 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
 
   // Registration phase options for dropdown
   registrationPhaseOptions = [
-    { id: '', name: 'All Phases' },
     { id: 'PARENT', name: 'PARENT' },
     { id: 'AF', name: 'AF' },
+
+  ];
+
+    // Enrollment Status options for dropdown
+  registrationStatusOptions = [
+    { id: 'PENDING', name: 'Pending' },
+    { id: 'ACTIVE', name: 'Enrolled' },
 
   ];
 
