@@ -82,6 +82,7 @@ export class PendingBeneficiaryManage implements OnInit {
 
   genderOptions: LookupItem[] = [];
   registrationPhaseOptions: LookupItem[] = [];
+  paymentMethodOptions: LookupItem[] = [];
   maritalStatusOptions: any[] = [];
   relationshipOptions: any[] = [];
   legalStatusOptions: any[] = [];
@@ -206,6 +207,7 @@ export class PendingBeneficiaryManage implements OnInit {
     // Lookups
     this.genderOptions = this.lookup.getGenderList();
     this.registrationPhaseOptions = this.lookup.getRegistrationPhaseList();
+    this.paymentMethodOptions = this.lookup.getPaymentMethodList();
     this.maritalStatusOptions = this.lookup.getMaritalStatusEnum();
     this.relationshipOptions = this.lookup.getRelationshipEnum();
     this.legalStatusOptions = this.lookup.getLegalStatusEnum();
@@ -682,6 +684,7 @@ export class PendingBeneficiaryManage implements OnInit {
       spouseLastName: [''],
       spouseNickName: [''],
       registrationPhase: ['', [this.notSelectRequired()]],
+      paymentMethod: ['', [this.notSelectRequired()]],
 
       legalStatus: ['', [this.notSelectRequired()]],
       hasNationalId: [''], // 'Yes'|'No'
@@ -796,6 +799,7 @@ export class PendingBeneficiaryManage implements OnInit {
               ? dto.respondentPhoneNo.substring(4)
               : dto.respondentPhoneNo || null,
             registrationPhase: dto.registrationPhase,
+            paymentMethod: dto.paymentMethod,
             mainIncomeSource: dto.householdIncomeSource,
             mobileMoneyProvider: dto.mobileMoneyProvider,
             mobileWalletNumber: dto.mobileWalletNumber?.startsWith('+211')
@@ -986,6 +990,7 @@ export class PendingBeneficiaryManage implements OnInit {
       formValue.spouseNickName,
     );
     payload.registrationPhase = formValue.registrationPhase;
+    payload.paymentMethod = formValue.paymentMethod;
     payload.respondentLegalStatus = formValue.legalStatus;
     const phone = formValue.respondentPhone?.toString().trim();
     payload.respondentPhoneNo = phone ? `+211${phone}` : null;
@@ -1533,6 +1538,7 @@ export class PendingBeneficiaryManage implements OnInit {
       respondentAge: 'Age',
       gender: 'Gender',
       registrationPhase: 'registrationPhase',
+      paymentMethod: 'Payment Method',
       maritalStatus: 'Marital Status',
       spouseFirstName: 'Spouse First Name',
       spouseMiddleName: 'Spouse Middle Name',

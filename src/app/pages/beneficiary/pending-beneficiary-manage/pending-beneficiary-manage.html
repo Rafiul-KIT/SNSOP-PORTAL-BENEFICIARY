@@ -442,8 +442,15 @@
                   }
                 </div>
 
-
-
+                <!-- Payment Method -->
+                <div class="col-md-3 mb-1">
+                  <p-floatlabel variant="on">
+                    <p-select id="paymentMethod" formControlName="paymentMethod" class="w-100"
+                      [options]="paymentMethodOptions" optionLabel="name" optionValue="id">
+                    </p-select>
+                    <label for="paymentMethod">Payment Method</label>
+                  </p-floatlabel>
+                </div>
 
                 <!-- Support Type -->
                 <div class="col-md-3 mb-1">
