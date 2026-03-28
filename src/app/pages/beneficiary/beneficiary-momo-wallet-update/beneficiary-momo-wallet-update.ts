@@ -103,7 +103,7 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
       hasMobileWallet: [false], // ✅ boolean
       mobileMoneyProvider: [{ value: null, disabled: true }],
       mobileWalletNumber: [{ value: '', disabled: true }],
-      paymentMethod: [{ value: 'cash', disabled: true }, Validators.required], // Added payment method form control
+      paymentMethod: ['cash', Validators.required],
     });
 
     this.beneficiaryForm
@@ -125,6 +125,7 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
   private updateWalletValidators(hasWallet: boolean): void {
     const mobileMoneyProviderControl = this.beneficiaryForm.get('mobileMoneyProvider');
     const mobileWalletNumberControl = this.beneficiaryForm.get('mobileWalletNumber');
+    const paymentMethodControl = this.beneficiaryForm.get('paymentMethod');
 
     if (hasWallet) {
       mobileMoneyProviderControl?.setValidators([Validators.required]);
@@ -134,6 +135,8 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
         Validators.pattern('^[0-9]{9}$'),
       ]);
       mobileWalletNumberControl?.enable({ emitEvent: false });
+
+      paymentMethodControl?.enable({ emitEvent: false });
     } else {
       mobileMoneyProviderControl?.clearValidators();
       mobileMoneyProviderControl?.disable({ emitEvent: false });
@@ -142,17 +145,21 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
       mobileWalletNumberControl?.clearValidators();
       mobileWalletNumberControl?.disable({ emitEvent: false });
       mobileWalletNumberControl?.reset('', { emitEvent: false });
+
+      paymentMethodControl?.setValue('cash', { emitEvent: false });
+      paymentMethodControl?.disable({ emitEvent: false });
     }
 
     mobileMoneyProviderControl?.updateValueAndValidity({ emitEvent: false });
     mobileWalletNumberControl?.updateValueAndValidity({ emitEvent: false });
+    paymentMethodControl?.updateValueAndValidity({ emitEvent: false });
   }
 
   isUnchanged(): boolean {
     const formValues = this.beneficiaryForm.getRawValue();
 
     if (formValues.hasMobileWallet !== this.initialHasMobileWallet) return false;
-    // if (formValues.paymentMethod !== this.initialPaymentMethod) return false;
+    if (formValues.paymentMethod !== this.initialPaymentMethod) return false;
     if (formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) return false;
     if (formValues.mobileWalletNumber.trim() !== '') return false; // a new number has been entered
 
@@ -233,16 +240,16 @@ export class BeneficiaryMomoWalletUpdate implements OnInit, OnDestroy {
     }
 
     // 2. Check paymentMethod
-    // if (formValues.paymentMethod !== this.initialPaymentMethod) {
-    //   let paymentMethodForApi: PaymentMethod = 'CASH';
-    //   if (formValues.paymentMethod === 'mobile_wallet') {
-    //     paymentMethodForApi = 'MOBILE_WALLET';
-    //   }
-    //   fieldList.push({
-    //     fieldName: 'paymentMethod',
-    //     fieldValue: paymentMethodForApi,
-    //   });
-    // }
+    if (formValues.paymentMethod !== this.initialPaymentMethod) {
+      let paymentMethodForApi: PaymentMethod = 'CASH';
+      if (formValues.paymentMethod === 'mobile_wallet') {
+        paymentMethodForApi = 'MOBILE_WALLET';
+      }
+      fieldList.push({
+        fieldName: 'paymentMethod',
+        fieldValue: paymentMethodForApi,
+      });
+    }
 
     // 3. Check mobileMoneyProvider - only if hasMobileWallet is true
     if (formValues.hasMobileWallet && formValues.mobileMoneyProvider !== this.initialMobileMoneyProvider) {

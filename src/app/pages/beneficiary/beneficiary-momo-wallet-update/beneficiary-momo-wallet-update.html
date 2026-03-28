@@ -189,7 +189,7 @@
                   </div>
 
                   <!-- Right: Payment method -->
-                  <div class="card shadow-sm rounded mt-3" [attr.readonly]="true">
+                  <div class="card shadow-sm rounded mt-3">
                     <h5 class="card-header">Payment method</h5>
 
                     <div class="card-body">
@@ -201,8 +201,7 @@
                             name="paymentMethod"
                             id="paymentMethodCash"
                             [value]="'cash'"
-                            formControlName="paymentMethod"
-                            [disabled]="true" />
+                            formControlName="paymentMethod" />
                           <label class="form-check-label" for="paymentMethodCash">Cash</label>
                         </div>
 
@@ -213,8 +212,7 @@
                             name="paymentMethod"
                             id="paymentMethodMobile"
                             [value]="'mobile_wallet'"
-                            formControlName="paymentMethod"
-                            [disabled]="true" />
+                            formControlName="paymentMethod" />
                           <label class="form-check-label" for="paymentMethodMobile">Mobile Payment</label>
                         </div>
                       </div>
