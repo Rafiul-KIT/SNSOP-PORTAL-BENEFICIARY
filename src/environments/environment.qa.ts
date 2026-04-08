@@ -8,6 +8,7 @@ export const environment = {
     master: 'https://qa-mis.southsudansafetynet.info/v2/',
     masterSettings: 'https://qa-mis.southsudansafetynet.info/v2/#/user-management/users',
     surveyCTO: 'https://qa-mis.southsudansafetynet.info/v2/#/cto-dashboard',
+    mNe: 'https://qa-mis.southsudansafetynet.info/v2/#/monitoring-evaluation/beneficiary-enrolment-summary',
     beneficiary: 'https://qa-mis.southsudansafetynet.info/v2/beneficiary/',
     payment: 'https://qa-mis.southsudansafetynet.info/v2/payment',
     grm: 'https://qa-mis.southsudansafetynet.info/v2/grm',
