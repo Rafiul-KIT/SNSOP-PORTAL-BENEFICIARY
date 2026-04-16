@@ -20,7 +20,10 @@ export class Header {
   showUsermenu = false;
   menuList: any[] = [];
   userInfo: any = null;
-  menusLoaded = false; // ✅ controls when to render
+  menusLoaded = false; // controls when to render
+  canAccessHelpDesk: boolean = false;
+  showHelpDeskDropdown: boolean = false;
+  helpDeskChildren: any[] = this.getHelpDeskMenuItems();
 
   portalList = [
     {
@@ -66,6 +69,7 @@ export class Header {
       if (this.userInfo?.roleId) {
         this.loadMenusForUser(this.userInfo.roleId);
       }
+      this.canAccessHelpDesk = !!this.userInfo;
     });
   }
 
@@ -288,7 +292,25 @@ export class Header {
           : undefined,
       }));
   }
+  getHelpDeskMenuItems(): any[] {
+    return [
+      { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
+      { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
+      { label: 'My Requests', routerLink: '/help-desk/my-requests', icon: 'fas fa-clipboard-list' },
+      { label: 'Support Management', routerLink: '/help-desk/support-management', icon: 'fas fa-users-cog' },
+      { label: 'Status Tracker', routerLink: '/help-desk/status-tracker', icon: 'fas fa-search' },
+      { label: 'Reports', routerLink: '/help-desk/reports', icon: 'fas fa-chart-bar' },
+      { separator: true, label: 'User Manual', routerLink: '/help-desk/user-manual', icon: 'fas fa-book' },
+    ];
+  }
 
+  toggleHelpDeskDropdown = () => {
+    this.showHelpDeskDropdown = !this.showHelpDeskDropdown;
+  };
+
+  hideHelpDeskDropdown = () => {
+    this.showHelpDeskDropdown = false;
+  };
   logout() {
     this.apiService.logout();
     window.location.href = `${environment.portals.master}/#/landing`;
@@ -297,3 +319,4 @@ export class Header {
     this.router.navigateByUrl('/profile');
   };
 }
+

@@ -57,7 +57,7 @@ export class ApiService {
           config.headers = config.headers ?? {};
           config.headers['Authorization'] = `Bearer ${fresh}`;
         }
-        if (!config.headers?.['Content-Type']) {
+        if (!config.headers?.['Content-Type'] && !(config.data instanceof FormData)) {
           config.headers = config.headers ?? {};
           config.headers['Content-Type'] = 'application/json';
         }
@@ -119,6 +119,22 @@ export class ApiService {
 
   DELETE= <T = any>(endpoint: string, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
     this.client(base).delete<T>(endpoint, { ...this.apiHeader, ...(config ?? {}) });
+
+  POST_FORM = async <T = any>(endpoint: string, formData: FormData, base: BaseKey = 'global'): Promise<T> => {
+    const token = this.cookies.get(this.ACCESS_TOKEN);
+    const baseURL = base === 'alt' ? this.altApi : base === 'report' ? this.reportApi : this.globalApi;
+
+    const response = await fetch(`${baseURL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    return { data } as T;
+  };
 
   PUTWITHPAYLOAD = <T = any>(endpoint: string, payload: {}, base: BaseKey = 'global', config?: AxiosRequestConfig) => {
   return this.client(base).put<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
