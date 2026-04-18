@@ -29,15 +29,6 @@ import { RedirectLink } from './pages/adjudication/redirect-link/redirect-link';
 import { BeneficiaryMomoWalletUpdate } from './pages/beneficiary/beneficiary-momo-wallet-update/beneficiary-momo-wallet-update';
 import { BeneficiaryMomoList } from './pages/beneficiary/beneficiary-momo-list/beneficiary-momo-list';
 import { BeneficiaryDetailsView } from './pages/beneficiary/beneficiary-details-view/beneficiary-details-view';
-import { HelpDeskDashboard } from './pages/help-desk/dashboard/help-desk-dashboard';
-import { HelpDeskSubmitRequest } from './pages/help-desk/submit-request/help-desk-submit-request';
-import { HelpDeskMyRequests } from './pages/help-desk/my-requests/help-desk-my-requests';
-import { HelpDeskRequestDetail } from './pages/help-desk/request-detail/help-desk-request-detail';
-import { HelpDeskRequestDetails } from './pages/help-desk/request-details/help-desk-request-details';
-import { HelpDeskSupportManagement } from './pages/help-desk/support-management/help-desk-support-management';
-import { HelpDeskStatusTracker } from './pages/help-desk/status-tracker/help-desk-status-tracker';
-import { HelpDeskReports } from './pages/help-desk/reports/help-desk-reports';
-import { HelpDeskUserManual } from './pages/help-desk/user-manual/help-desk-user-manual';
 
 export const routes: Routes = [
   {
@@ -247,23 +238,6 @@ export const routes: Routes = [
             (m) => m.AsyncReportGeneration
           ),
       },
-    ],
-  },
-  {
-    path: 'help-desk',
-    canActivate: [routeGuard],
-    children: [
-      { path: 'dashboard', component: HelpDeskDashboard, canActivate: [routeGuard] },
-      { path: 'submit-request', component: HelpDeskSubmitRequest, canActivate: [routeGuard] },
-      { path: 'my-requests', component: HelpDeskMyRequests, canActivate: [routeGuard] },
-      { path: 'request-detail/:id', component: HelpDeskRequestDetail, canActivate: [routeGuard] },
-      { path: 'request-details/:id', component: HelpDeskRequestDetails, canActivate: [routeGuard] },
-      { path: 'support-management/:id', component: HelpDeskRequestDetail, canActivate: [routeGuard] },
-      { path: 'support-management', component: HelpDeskSupportManagement, canActivate: [routeGuard] },
-      { path: 'status-tracker', component: HelpDeskStatusTracker, canActivate: [routeGuard] },
-      { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
-      { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
   {
