@@ -12,7 +12,7 @@ export const environment = {
     beneficiary: 'https://newmis.southsudansafetynet.info/trial/beneficiary',
     payment: 'https://newmis.southsudansafetynet.info/trial/payment',
     grm: 'https://newmis.southsudansafetynet.info/trial/grm',
-    report: 'https://newmis.southsudansafetynet.info/trial/report',
+    report: 'https://newmis.southsudansafetynet.info/trial/master/#/home/metabase',
     economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard'
   },
     authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
