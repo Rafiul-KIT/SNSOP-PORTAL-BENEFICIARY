@@ -12,7 +12,7 @@ export const environment = {
     beneficiary: 'https://qa-mis.southsudansafetynet.info/v2/beneficiary/',
     payment: 'https://qa-mis.southsudansafetynet.info/v2/payment',
     grm: 'https://qa-mis.southsudansafetynet.info/v2/grm',
-    report: 'https://qa-mis.southsudansafetynet.info/v2/#/home/metabase',
+    report: 'https://qa-mis.southsudansafetynet.info/v2/#/home/report',
     economicOpportunities: 'https://qa-mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard'
   },
   authBackend: 'https://qa-gwapp.southsudansafetynet.info/mis_auth',
