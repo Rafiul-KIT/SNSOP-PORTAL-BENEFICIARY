@@ -1,3 +1,5 @@
+import { UnderConstruction } from "../app/pages/under-construction/under-construction";
+
 export const environment = {
   production: true,
   env: 'prod',
@@ -13,7 +15,8 @@ export const environment = {
     payment: 'https://mis.southsudansafetynet.info/v2/payment',
     grm: 'https://mis.southsudansafetynet.info/v2/grm',
     report: 'https://mis.southsudansafetynet.info/v2/#/home/metabase',
-    economicOpportunities: 'https://mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard'
+    economicOpportunities: 'https://mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard',
+    UnderConstruction: 'https://mis.southsudansafetynet.info/v2/#/under-construction'
   },
   authBackend: 'https://gwapp.southsudansafetynet.info/mis_auth',
   reportApi: 'https://gwapp.southsudansafetynet.info/mis_report/',
