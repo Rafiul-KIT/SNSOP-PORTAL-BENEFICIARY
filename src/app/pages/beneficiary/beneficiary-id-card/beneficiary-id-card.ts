@@ -32,7 +32,7 @@ import Swal from 'sweetalert2';
 import { CheckboxModule } from 'primeng/checkbox';
 
 type Gender = 'MALE' | 'FEMALE';
-type RegPhase = 'PARENT' | 'AF';
+type RegPhase = 'PARENT' | 'AF' | 'RP';
 type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryDto {

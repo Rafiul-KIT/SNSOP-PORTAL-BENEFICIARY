@@ -793,6 +793,7 @@ export class AsyncReportGeneration implements OnInit, OnDestroy {
   registrationPhaseOptions = [
     { id: 'PARENT', name: 'PARENT' },
     { id: 'AF', name: 'AF' },
+    { id: 'RP', name: 'RP' }
 
   ];
 

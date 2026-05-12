@@ -200,6 +200,8 @@ export class ReportMatchList {
                   ? 'AF (Additional Financing)'
                   : nowMatch.primary.registrationPhase === 'PARENT'
                   ? 'PP (Parent Project)'
+                  : nowMatch.primary.registrationPhase === 'RP'
+                  ? 'RP'
                   : 'N/A',
               'First Name': nowMatch.primary.respondentFirstName,
               'Middle Name': nowMatch.primary.respondentMiddleName,
@@ -237,7 +239,8 @@ export class ReportMatchList {
                 matched.registrationPhase === 'AF'
                   ? 'AF (Additional Financing)'
                   : matched.registrationPhase === 'PARENT'
-                  ? 'PP (Parent Project)'
+                  ? 'PP (Parent Project)': matched.registrationPhase === 'RP'
+                  ? 'RP'
                   : 'N/A',
               'First Name(M)': matched.respondentFirstName,
               'Middle Name(M)': matched.respondentMiddleName,
