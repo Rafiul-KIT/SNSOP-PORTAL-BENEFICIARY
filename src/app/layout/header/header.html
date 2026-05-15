@@ -15,13 +15,13 @@
   <div class="menues">
     <p-menubar [model]="menuList"></p-menubar>
   </div>
-
+<!-- portal.newTab ? null :  -->
   <div class="portals-option-wrapper {{ showPortalOptions ? 'show' : '' }}" (mouseleave)="showPortalOptions = false">
     <div class="portal-items">
       @for (portal of portalList; track portal) {
       <a
         class="item"
-        [attr.href]="portal.link"
+        [attr.href]="portal.newTab ? null : portal.link"
         (click)="onPortalClick($event, portal)">
         <i class="{{ portal.icon }} w-50"></i>
         <span>{{ portal.label }}</span>

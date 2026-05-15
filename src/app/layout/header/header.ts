@@ -39,7 +39,7 @@ export class Header {
     { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
     {
       label: 'Report',
-      link: environment.portals.UnderConstruction,
+      link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
     {
@@ -54,10 +54,10 @@ export class Header {
     },
     {
       label: 'Help Desk',
-      // link: this.getMasterHelpDeskLink(),
+      link: this.getMasterHelpDeskLink(),
       icon: 'fas fa-headset',
-      link: environment.portals.UnderConstruction,
-      // newTab: true,
+      // link: environment.portals.UnderConstruction,
+      newTab: true,
     },
     { label: 'Monitoring & Evaluation',
       link: environment.portals.mNe,
@@ -65,7 +65,8 @@ export class Header {
     },
          {
         label: 'Economic Opportunities',
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.economicOpportunities,
+        // link: environment.portals.UnderConstruction,
         icon: 'fas fa-briefcase',
 
       },
@@ -325,11 +326,12 @@ export class Header {
 
   getHelpDeskMenuItems(): any[] {
     const items = [
-      { label: 'Help Desk Dashboard', route: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt', newTab: true },
+      { label: 'Helpdesk Dashboard', route: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt', newTab: true },
       { label: 'Submit Support Request', route: '/help-desk/submit-request', icon: 'fas fa-plus-circle', newTab: true },
       { label: 'My Requests', route: '/help-desk/my-requests', icon: 'fas fa-clipboard-list', newTab: true },
         { label: 'Assigned Requests', route: '/help-desk/assigned-requests', icon: 'fas fa-user-check', newTab: true },
       { label: 'Support Management', route: '/help-desk/support-management', icon: 'fas fa-users-cog', newTab: true },
+       { label: 'Request List', route: '/help-desk/assigned-requests', icon: 'fas fa-user-check', newTab: true },
       { label: 'Status Tracker', route: '/help-desk/status-tracker', icon: 'fas fa-search', newTab: true },
       { label: 'Reports', route: '/help-desk/reports', icon: 'fas fa-chart-bar', newTab: true },
       { separator: true, label: 'User Manual', route: '/help-desk/user-manual', icon: 'fas fa-book', newTab: true }
