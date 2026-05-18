@@ -69,7 +69,7 @@ export class Header {
         // link: environment.portals.economicOpportunities,
         link: environment.portals.UnderConstruction,
         icon: 'fas fa-briefcase',
-    
+
       },
   ];
 
@@ -143,7 +143,7 @@ export class Header {
   getStaticMenus(): any[] {
     return [
       {
-        label: 'Dashboard',
+        label: 'Beneficiary Dashboard',
         icon: 'fas fa-tachometer-alt',
         routerLink: 'dashboard',
       },
