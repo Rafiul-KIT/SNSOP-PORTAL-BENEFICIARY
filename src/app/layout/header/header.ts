@@ -67,7 +67,7 @@ export class Header {
      {
         label: 'DMS',
         icon: 'fas fa-file',
-        link: environment.portals.dms,
+        link: environment.portals.UnderConstruction,
         tooltipText: 'Document Management System'
       },
     {
