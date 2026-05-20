@@ -6,6 +6,7 @@
         <th class="text-center" style="background-color: cadetblue; color: white">Date</th>
         <th class="text-center" style="background-color: cadetblue; color: white">PP (Parent project)</th>
         <th class="text-center" style="background-color: cadetblue; color: white">AF (Additional Financing)</th>
+        <th class="text-center" style="background-color: cadetblue; color: white">RP(Restructured Project)</th>
         <th class="text-center" style="background-color: cadetblue; color: white">ALL</th>
       </tr>
     </ng-template>
@@ -31,6 +32,17 @@
               <app-loader></app-loader>
             } @else {
               <button type="button" class="btn btn-primary btn-sm" (click)="downloadReport(row.af_file)" [disabled]="downloadingFile()">Download</button>
+            }
+          } @else {
+            <span>N/A</span>
+          }
+        </td>
+        <td class="text-center">
+          @if (row.rp_file) {
+            @if (downloadingFile() === row.rp_file) {
+              <app-loader></app-loader>
+            } @else {
+              <button type="button" class="btn btn-primary btn-sm" (click)="downloadReport(row.rp_file)" [disabled]="downloadingFile()">Download</button>
             }
           } @else {
             <span>N/A</span>
