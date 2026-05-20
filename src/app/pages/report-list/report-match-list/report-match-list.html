@@ -39,6 +39,8 @@
         ? 'AF (Additional Financing)'
         : match.primary.registrationPhase === 'PARENT'
         ? 'PP (Parent Project)'
+        : match.primary.registrationPhase === 'RP'
+        ? 'RP'
         : 'N/A'
         }}
       </td>

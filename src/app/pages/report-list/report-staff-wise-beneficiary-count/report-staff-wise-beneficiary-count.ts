@@ -29,7 +29,7 @@ export class ReportStaffWiseBeneficiaryCount {
 
   reportResult = input<any>(null);
 
- 
+
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   beneficiaryList = signal<any[]>([]);
@@ -42,9 +42,16 @@ export class ReportStaffWiseBeneficiaryCount {
     const doc = new jsPDF.default('l', 'px', 'a4');
     const mappedBeneficiaryList = this.beneficiaryList().map(beneficiary => {
       return {
-        ...beneficiary,
-        registrationPhase: beneficiary.registrationPhase === 0 ? 'PARENT' : 'AF'
-      };
+  ...beneficiary,
+  registrationPhase:
+    beneficiary.registrationPhase === 0
+      ? 'PP'
+      : beneficiary.registrationPhase === 1
+        ? 'AF'
+        : beneficiary.registrationPhase === 2
+          ? 'RP'
+          : 'N/A'
+};
     });
 
     autoTable(doc, {
@@ -60,7 +67,7 @@ export class ReportStaffWiseBeneficiaryCount {
     doc.save(`staff_wise_beneficiary_count_${Date.now()}.pdf`);
   }
 
- 
+
   async exportExcel() {
     const xlsx = await import('xlsx');
     const worksheet = xlsx.utils.json_to_sheet(this.beneficiaryList());
@@ -77,7 +84,7 @@ export class ReportStaffWiseBeneficiaryCount {
   }
 
   ngOnInit() {
- 
+
     this.cols.set([
       { field: 'staffId', header: 'Staff ID' },
       { field: 'staffName', header: 'Staff Name' },

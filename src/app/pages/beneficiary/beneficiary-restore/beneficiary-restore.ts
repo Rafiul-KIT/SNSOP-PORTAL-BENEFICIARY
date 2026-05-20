@@ -30,7 +30,7 @@ import { ApiService } from '../../../services/api.service';
 import { LookupService, LookupItem } from '../../../services/lookup.service';
 
 type Gender = 'MALE' | 'FEMALE';
-type RegPhase = 'PARENT' | 'AF';
+type RegPhase = 'PARENT' | 'AF' | 'RP';
 
 interface BeneficiaryDto {
   applicationId: string;

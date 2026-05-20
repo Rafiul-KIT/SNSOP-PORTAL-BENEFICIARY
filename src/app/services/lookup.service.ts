@@ -230,6 +230,7 @@ export class LookupService {
     return [
       { id: 'PARENT', name: 'Parent' },
       { id: 'AF', name: 'AF' },
+      { id: 'RP', name: 'RP' }
     ];
   }
 
@@ -306,7 +307,8 @@ export class LookupService {
   }
   RegistrationPhaseEnum = [
     { id: 0, value: 'PARENT', label: "PP (Parent Project)" },
-    { id: 1, value: 'AF', label: "AF (Additional Financing)" }
+    { id: 1, value: 'AF', label: "AF (Additional Financing)" },
+    { id: 2, value: 'RP', label: "RP" }
   ];
   getRegistrationPhaseEnum = () => {
     return this.RegistrationPhaseEnum;

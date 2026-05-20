@@ -30,7 +30,7 @@ import { QrInputDirective } from './../../../directives/qr-input.directive';
 import { QrScannerComponent } from './../../../components/qr-scanner/qr-scanner.component';
 
 type Gender = 'MALE' | 'FEMALE';
-type RegPhase = 'PARENT' | 'AF';
+type RegPhase = 'PARENT' | 'AF' | 'RP';
 type Criteria = 'LIPW' | 'DIS';
 
 interface BeneficiaryDto {

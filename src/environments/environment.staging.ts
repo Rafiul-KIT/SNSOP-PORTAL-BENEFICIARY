@@ -14,7 +14,8 @@ export const environment = {
     payment: 'https://newmis.southsudansafetynet.info/trial/payment',
     grm: 'https://newmis.southsudansafetynet.info/trial/grm',
     report: 'https://newmis.southsudansafetynet.info/trial/master/#/home/metabase',
-    economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard'
+    economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard',
+    
   },
     authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
   reportApi: 'https://devgwapp.southsudansafetynet.info/mis_report/',

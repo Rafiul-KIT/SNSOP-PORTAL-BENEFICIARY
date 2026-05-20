@@ -70,7 +70,7 @@ export class ReportCompleteHouseholdSurvey {
 
   ngOnInit() {
     const files = this.reportResult()?.files ?? [];
-    const groupedByDate: { [key: string]: { af_file?: string; parent_file?: string; all_file?: string } } = {};
+    const groupedByDate: { [key: string]: { af_file?: string; parent_file?: string; rp_file?: string; all_file?: string } } = {};
 
     for (const file of files) {
       const dateStr = this.extractDateFromFileName(file.fileName);
@@ -85,6 +85,8 @@ export class ReportCompleteHouseholdSurvey {
         groupedByDate[dateStr].parent_file = file.fileName;
       } else if (file.registrationPhase === 'ALL') {
         groupedByDate[dateStr].all_file = file.fileName;
+      } else if (file.registrationPhase === 'RP') {
+        groupedByDate[dateStr].rp_file = file.fileName;
       }
     }
 
@@ -93,6 +95,7 @@ export class ReportCompleteHouseholdSurvey {
         date,
         af_file: groupedByDate[date].af_file,
         parent_file: groupedByDate[date].parent_file,
+        rp_file: groupedByDate[date].rp_file,
         all_file: groupedByDate[date].all_file,
       }))
     );

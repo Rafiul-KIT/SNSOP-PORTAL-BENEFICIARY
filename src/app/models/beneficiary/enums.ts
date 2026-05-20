@@ -1,5 +1,5 @@
 export type Gender = 'MALE' | 'FEMALE';
-export type RegPhase = 'PARENT' | 'AF';
+export type RegPhase = 'PARENT' | 'AF' | 'RP';
 
 export type RelationshipWithHead =
   | 'HOUSEHOLD_HEAD'

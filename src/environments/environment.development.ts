@@ -13,8 +13,8 @@ export const environment = {
     payment: 'https://localhost:4030',
     grm: 'https://localhost:4040',
     report: 'https://localhost:4010/#/home/metabase',
-    UnderConstruction: 'https://localhost:4010/#/under-construction',
-    economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard'
+    economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard',
+    UnderConstruction: 'https://localhost:4010/#/under-construction'
   },
   authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
   reportApi: 'https://devgwapp.southsudansafetynet.info/mis_report/',
