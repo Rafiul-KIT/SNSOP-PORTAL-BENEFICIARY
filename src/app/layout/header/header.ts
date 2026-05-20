@@ -15,7 +15,6 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./header.scss'],
 })
 export class Header {
-
   showPortalOptions = false;
   showUsermenu = false;
   menuList: any[] = [];
@@ -38,19 +37,25 @@ export class Header {
     },
     { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
     {
-      label: 'Report',
-      link: environment.portals.report,
-      icon: 'fas fa-chart-line',
+      label: 'Economic Opportunities',
+      link: environment.portals.UnderConstruction,
+      // link: environment.portals.UnderConstruction,
+      icon: 'fas fa-briefcase',
     },
     {
-      label: 'Settings',
-      link: environment.portals.masterSettings,
-      icon: 'fas fa-cog',
+      label: 'Monitoring & Evaluation',
+      link: environment.portals.mNe,
+      icon: 'fas fa-chart-bar',
     },
     {
       label: 'Survey CTO',
       link: environment.portals.surveyCTO,
       icon: 'fas fa-poll',
+    },
+    {
+      label: 'Report',
+      link: environment.portals.UnderConstruction,
+      icon: 'fas fa-chart-line',
     },
     {
       label: 'Help Desk',
@@ -59,31 +64,25 @@ export class Header {
       // link: environment.portals.UnderConstruction,
       newTab: true,
     },
-    { label: 'Monitoring & Evaluation',
-      link: environment.portals.mNe,
-      icon: 'fas fa-chart-bar'
+    {
+      label: 'Settings',
+      link: environment.portals.masterSettings,
+      icon: 'fas fa-cog',
     },
-         {
-        label: 'Economic Opportunities',
-        link: environment.portals.economicOpportunities,
-        // link: environment.portals.UnderConstruction,
-        icon: 'fas fa-briefcase',
-
-      },
   ];
 
   constructor(
     private router: Router,
     private apiService: ApiService,
     private http: HttpClient,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
   ) {
     // Watch login state and load menus dynamically
     effect(() => {
       this.userInfo = this.apiService.loginState()?.user;
       if (this.userInfo?.roleId) {
         this.loadMenusForUser(this.userInfo.roleId);
-      }else {
+      } else {
         this.menuList = [];
         this.helpDeskChildren = [];
         this.canAccessHelpDesk = false;
@@ -102,7 +101,7 @@ export class Header {
         if (responseData.length === 0) {
           console.warn(`No menus found for role ${roleId}`);
           this.menuList = [];
-              this.helpDeskChildren = [];
+          this.helpDeskChildren = [];
           this.canAccessHelpDesk = false;
           this.menusLoaded = true;
           this.cdRef.detectChanges();
@@ -114,9 +113,11 @@ export class Header {
 
         // ✅ Update safely and trigger view refresh
         this.menuList = this.filterMenusByAccess(allMenus, allowedNames);
-           // Filter help desk items based on permitted URLs
+        // Filter help desk items based on permitted URLs
         const allHelpDeskItems = this.getHelpDeskMenuItems();
-        this.helpDeskChildren = allHelpDeskItems.filter(item => this.checkRouteAccess(responseData, item.route));
+        this.helpDeskChildren = allHelpDeskItems.filter((item) =>
+          this.checkRouteAccess(responseData, item.route),
+        );
         this.canAccessHelpDesk = this.helpDeskChildren.length > 0;
 
         this.menusLoaded = true;
@@ -124,14 +125,14 @@ export class Header {
       } else {
         console.warn(`No menus found in sessionStorage for role ${roleId}`);
         this.menuList = [];
-           this.helpDeskChildren = [];
+        this.helpDeskChildren = [];
         this.canAccessHelpDesk = false;
         this.menusLoaded = true;
         this.cdRef.detectChanges();
       }
     } catch (error) {
       console.error('Error loading menus:', error);
-           this.menuList = [];
+      this.menuList = [];
       this.helpDeskChildren = [];
       this.canAccessHelpDesk = false;
       this.menusLoaded = true;
@@ -151,7 +152,6 @@ export class Header {
         label: 'Beneficiary Registration',
         icon: 'fas fa-people-group',
         items: [
-
           // {
           //   label: 'Beneficiary Update',
           //   icon: 'fas fa-user-gear',
@@ -172,12 +172,11 @@ export class Header {
           //   icon: 'fas fa-archive',
           //   routerLink: 'restore/list',
           // },
-          {
-            label: 'New Registration',
-            icon: 'fas fa-user-plus',
-            // routerLink: 'beneficiary/new-registration',
-            routerLink: 'under-construction',
-          },
+          // {
+          //   label: 'New Registration',
+          //   icon: 'fas fa-user-plus',
+          //   routerLink: 'beneficiary/new-registration',
+          // },
           {
             label: 'Pending Verification',
             icon: 'fas fa-users-viewfinder',
@@ -195,7 +194,6 @@ export class Header {
         label: 'Beneficiary Manage',
         icon: 'fas fa-people-group',
         items: [
-
           {
             label: 'Beneficiary Update',
             icon: 'fas fa-user-gear',
@@ -297,17 +295,17 @@ export class Header {
           },
         ],
       },
-      { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },
-      {
-        label: 'Work Progress',
-        icon: 'fas fa-chart-line',
-        routerLink: 'work-progress',
-      },
-      {
-        label: 'LIPW Export',
-        icon: 'fas fa-file-export',
-        routerLink: 'lipw-export',
-      },
+      // { label: 'Job Card', icon: 'fas fa-briefcase', routerLink: 'job-card' },
+      // {
+      //   label: 'Work Progress',
+      //   icon: 'fas fa-chart-line',
+      //   routerLink: 'work-progress',
+      // },
+      // {
+      //   label: 'LIPW Export',
+      //   icon: 'fas fa-file-export',
+      //   routerLink: 'lipw-export',
+      // },
     ];
   }
 
@@ -326,37 +324,88 @@ export class Header {
 
   getHelpDeskMenuItems(): any[] {
     const items = [
-      { label: 'Helpdesk Dashboard', route: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt', newTab: true },
-      { label: 'Submit Support Request', route: '/help-desk/submit-request', icon: 'fas fa-plus-circle', newTab: true },
-      { label: 'My Requests', route: '/help-desk/my-requests', icon: 'fas fa-clipboard-list', newTab: true },
-        { label: 'Assigned Requests', route: '/help-desk/assigned-requests', icon: 'fas fa-user-check', newTab: true },
-      { label: 'Support Management', route: '/help-desk/support-management', icon: 'fas fa-users-cog', newTab: true },
-       { label: 'Request List', route: '/help-desk/assigned-requests', icon: 'fas fa-user-check', newTab: true },
-      { label: 'Status Tracker', route: '/help-desk/status-tracker', icon: 'fas fa-search', newTab: true },
-      { label: 'Reports', route: '/help-desk/reports', icon: 'fas fa-chart-bar', newTab: true },
-      { separator: true, label: 'User Manual', route: '/help-desk/user-manual', icon: 'fas fa-book', newTab: true }
+      {
+        label: 'Helpdesk Dashboard',
+        route: '/help-desk/dashboard',
+        icon: 'fas fa-tachometer-alt',
+        newTab: true,
+      },
+      {
+        label: 'Submit Support Request',
+        route: '/help-desk/submit-request',
+        icon: 'fas fa-plus-circle',
+        newTab: true,
+      },
+      {
+        label: 'My Requests',
+        route: '/help-desk/my-requests',
+        icon: 'fas fa-clipboard-list',
+        newTab: true,
+      },
+      {
+        label: 'Assigned Requests',
+        route: '/help-desk/assigned-requests',
+        icon: 'fas fa-user-check',
+        newTab: true,
+      },
+      {
+        label: 'Support Management',
+        route: '/help-desk/support-management',
+        icon: 'fas fa-users-cog',
+        newTab: true,
+      },
+      {
+        label: 'Request List',
+        route: '/help-desk/assigned-requests',
+        icon: 'fas fa-user-check',
+        newTab: true,
+      },
+      {
+        label: 'Status Tracker',
+        route: '/help-desk/status-tracker',
+        icon: 'fas fa-search',
+        newTab: true,
+      },
+      {
+        label: 'Reports',
+        route: '/help-desk/reports',
+        icon: 'fas fa-chart-bar',
+        newTab: true,
+      },
+      {
+        separator: true,
+        label: 'User Manual',
+        route: '/help-desk/user-manual',
+        icon: 'fas fa-book',
+        newTab: true,
+      },
     ];
 
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
-      link: this.getMasterHelpDeskMenuLink(item.route)
+      link: this.getMasterHelpDeskMenuLink(item.route),
     }));
   }
 
   private checkRouteAccess(permittedMenus: any[], url: string): boolean {
     if (!url) return false;
     const cleanUrl = url.split('?')[0];
-    const urlSegments = cleanUrl.split('/').filter(s => s.length > 0);
+    const urlSegments = cleanUrl.split('/').filter((s) => s.length > 0);
 
     for (const menu of permittedMenus) {
       if (!menu.url) continue;
 
-      const menuUrlSegments = menu.url.split('/').filter((s: string) => s.length > 0);
+      const menuUrlSegments = menu.url
+        .split('/')
+        .filter((s: string) => s.length > 0);
 
       if (urlSegments.length === menuUrlSegments.length) {
         let match = true;
         for (let i = 0; i < urlSegments.length; i++) {
-          if (menuUrlSegments[i].startsWith(':') || menuUrlSegments[i] === urlSegments[i]) {
+          if (
+            menuUrlSegments[i].startsWith(':') ||
+            menuUrlSegments[i] === urlSegments[i]
+          ) {
             continue;
           } else {
             match = false;
@@ -396,14 +445,17 @@ export class Header {
   }
 
   private getMasterHelpDeskLink(): string {
-    const explicitHelpDeskLink = (environment.portals as any)?.masterHelpDesk as string | undefined;
+    const explicitHelpDeskLink = (environment.portals as any)
+      ?.masterHelpDesk as string | undefined;
     if (explicitHelpDeskLink) {
       return explicitHelpDeskLink;
     }
 
     const masterPortal = (environment.portals.master ?? '').replace(/\/+$/, '');
     const helpDeskPath = '/help-desk/dashboard';
-    const masterUsesHashRouting = (environment.portals.masterSettings ?? '').includes('/#/');
+    const masterUsesHashRouting = (
+      environment.portals.masterSettings ?? ''
+    ).includes('/#/');
 
     return masterUsesHashRouting
       ? `${masterPortal}/#${helpDeskPath}`
@@ -412,7 +464,8 @@ export class Header {
 
   private getMasterHelpDeskMenuLink(route: string): string {
     const dashboardLink = this.getMasterHelpDeskLink();
-    const routeSuffix = route.replace(/^\/+/, '').replace(/^help-desk\/?/, '') || 'dashboard';
+    const routeSuffix =
+      route.replace(/^\/+/, '').replace(/^help-desk\/?/, '') || 'dashboard';
 
     if (dashboardLink.endsWith('/dashboard')) {
       return dashboardLink.replace(/\/dashboard$/, `/${routeSuffix}`);
@@ -436,4 +489,3 @@ export class Header {
     this.router.navigateByUrl('/profile');
   };
 }
-
