@@ -38,7 +38,7 @@ export class Header {
     { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
     {
       label: 'Economic Opportunities',
-      link: environment.portals.UnderConstruction,
+      link: environment.portals.economicOpportunities,
       // link: environment.portals.UnderConstruction,
       icon: 'fas fa-briefcase',
     },
@@ -54,7 +54,7 @@ export class Header {
     },
     {
       label: 'Report',
-      link: environment.portals.UnderConstruction,
+      link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
     {
