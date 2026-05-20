@@ -57,13 +57,19 @@ export class Header {
       link: environment.portals.report,
       icon: 'fas fa-chart-line',
     },
-    {
-      label: 'Help Desk',
-      link: this.getMasterHelpDeskLink(),
-      icon: 'fas fa-headset',
-      // link: environment.portals.UnderConstruction,
-      newTab: true,
-    },
+    // {
+    //   label: 'Help Desk',
+    //   link: this.getMasterHelpDeskLink(),
+    //   icon: 'fas fa-headset',
+    //   // link: environment.portals.UnderConstruction,
+    //   newTab: true,
+    // },
+     {
+        label: 'DMS',
+        icon: 'fas fa-file',
+        link: environment.portals.dms,
+        tooltipText: 'Document Management System'
+      },
     {
       label: 'Settings',
       link: environment.portals.masterSettings,
