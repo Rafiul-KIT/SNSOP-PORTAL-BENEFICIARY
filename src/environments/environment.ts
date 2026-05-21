@@ -17,7 +17,7 @@ export const environment = {
     grm: 'https://mis.southsudansafetynet.info/v2/grm',
     report: 'https://mis.southsudansafetynet.info/v2/#/home/metabase',
     economicOpportunities: 'https://mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard',
-    dms: 'https://mis.southsudansafetynet.info/v2/dms/dashboard',
+    dms: 'https://mis.southsudansafetynet.info/v2/dms/',
   },
   authBackend: 'https://gwapp.southsudansafetynet.info/mis_auth',
   reportApi: 'https://gwapp.southsudansafetynet.info/mis_report/',
