@@ -330,6 +330,7 @@ export class PendingBeneficiaryManage implements OnInit {
     this.beneficiaryForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
+        this.autoCalculateHouseholdSize();
         this.updateSelectionReasonValidation();
       });
 
@@ -635,6 +636,7 @@ export class PendingBeneficiaryManage implements OnInit {
     );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
+    this.autoCalculateHouseholdSize();
     this.updateSelectionReasonValidation(); // Set initial state
     this.cdr.detectChanges();
   }
@@ -2029,6 +2031,19 @@ export class PendingBeneficiaryManage implements OnInit {
     this.beneficiaryForm.get('selectionReasons')?.setValue(selectedReasons);
   }
 
+  private autoCalculateHouseholdSize() {
+    if (!this.beneficiaryForm) return;
+    let sum = 0;
+    for (const g of this.ageGroups) {
+      sum +=
+        (+this.beneficiaryForm.get(g.maleTotal)?.value || 0) +
+        (+this.beneficiaryForm.get(g.femaleTotal)?.value || 0);
+    }
+    sum += +this.beneficiaryForm.get('f18_35_lactating_total')?.value || 0;
+    sum += +this.beneficiaryForm.get('f36_64_lactating_total')?.value || 0;
+    this.beneficiaryForm.get('householdSize')?.setValue(sum, { emitEvent: false });
+  }
+
   private updateSelectionReasonValidation() {
     if (!this.beneficiaryForm) return;
     const hhData = this.getHouseholdBreakdown();
@@ -2066,6 +2081,7 @@ export class PendingBeneficiaryManage implements OnInit {
         .get('selectionReasons')
         ?.setValue(selectedReasons, { emitEvent: false });
     }
+    this.cdr.detectChanges();
   }
 
   private getHouseholdBreakdown() {
@@ -2135,7 +2151,9 @@ export class PendingBeneficiaryManage implements OnInit {
     }, 0);
 
     const dependents =
-      childrenTotal + elderly_65_plus_total + otherAgeGroupDependents;
+      childrenTotal + elderly_65_plus_total + otherAgeGroupDependents +
+      gv('f18_35_lactating_total') +
+      gv('f36_64_lactating_total');
 
     let ableBodiedTotal = 0;
     this.ageGroups.forEach((group) => {
@@ -2149,7 +2167,11 @@ export class PendingBeneficiaryManage implements OnInit {
       ableBodied_18_plus,
       ableBodied_18_64,
       adults_36_64_total,
-      female_18_64_total: youth_18_35_female_total + adults_36_64_female_total,
+      female_18_64_total:
+        youth_18_35_female_total +
+        adults_36_64_female_total +
+        gv('f18_35_lactating_total') +
+        gv('f36_64_lactating_total'),
       dependents,
       youth_18_35_total,
       ableBodiedTotal: ableBodiedTotal,

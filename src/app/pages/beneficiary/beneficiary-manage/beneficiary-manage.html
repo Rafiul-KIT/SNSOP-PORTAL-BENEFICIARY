@@ -471,7 +471,8 @@
                       </td>
                       <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth"/></td>
                     </tr>
-                    }
+
+                    @if (ageGroup.label === '18-35 yrs') {
                     <tr>
                       <td>Lactating Women (18-35)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -480,7 +481,9 @@
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic"/></td>
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_both"/></td>
                     </tr>
+                    }
 
+                    @if (ageGroup.label === '36-64 yrs') {
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -489,6 +492,8 @@
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_chronic"/></td>
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_both"/></td>
                     </tr>
+                    }
+                    }
                   </tbody>
                 </table>
 
