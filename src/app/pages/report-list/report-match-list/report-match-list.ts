@@ -1,12 +1,13 @@
-import { Component, inject, input } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, effect, inject, input, signal, untracked } from '@angular/core';
 import FileSaver from 'file-saver';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { LookupService } from '../../../services/lookup.service';
 import { DatePipe } from '@angular/common';
+import { ApiService } from '../../../services/api.service';
 
 interface Column {
   field: string;
@@ -22,26 +23,137 @@ interface ExportColumn {
 @Component({
   selector: 'app-report-match-list',
   standalone: true,
-  imports: [TableModule, ButtonModule, TooltipModule, DatePipe],
+  imports: [TableModule, ButtonModule, TooltipModule, PaginatorModule, DatePipe],
   templateUrl: './report-match-list.html',
   styleUrls: ['./report-match-list.scss'],
 })
 export class ReportMatchList {
   reportResult = input<any>(null);
+  searchCriteria = input<any>(null);
+  endpoint = input<string>('');
 
   cols = signal<Column[]>([]);
   exportColumns = signal<ExportColumn[]>([]);
   matchList = signal<any[]>([]);
+  displayedList = signal<any[]>([]);
   isReportGenerating = signal<boolean>(false);
+  totalRecords = signal(0);
+  rows = signal(10);
+  first = signal(0);
 
   public lookupService = inject(LookupService);
+  private apiService = inject(ApiService);
+
+  constructor() {
+    effect(() => {
+      const result = this.reportResult();
+      const criteria = this.searchCriteria();
+
+      if (result) {
+        const list = this.extractMatchList(result);
+        this.matchList.set(list);
+        this.totalRecords.set(this.extractTotalRecords(result, list.length));
+        this.rows.set(Number(criteria?.size) > 0 ? Number(criteria.size) : 10);
+        this.first.set((Number(criteria?.page) || 0) * this.rows());
+        untracked(() => this.sliceList());
+      }
+    });
+  }
+
+  private extractMatchList(result: any): any[] {
+    if (Array.isArray(result)) return result;
+    if (Array.isArray(result?.matchList)) return result.matchList;
+    if (Array.isArray(result?.data?.matchList)) return result.data.matchList;
+    if (Array.isArray(result?.data)) return result.data;
+    return [];
+  }
+
+  private extractTotalRecords(result: any, fallback: number): number {
+    return (
+      result?.totalRecords ??
+      result?.totalCount ??
+      result?.count ??
+      result?.data?.totalRecords ??
+      result?.data?.totalCount ??
+      result?.data?.count ??
+      fallback
+    );
+  }
+
+  private sliceList() {
+    const criteria = this.searchCriteria();
+    const isServerPaged = !!this.endpoint() && Number(criteria?.size) > 0;
+
+    if (isServerPaged) {
+      this.displayedList.set(this.matchList());
+      return;
+    }
+
+    const start = this.first();
+    const end = start + this.rows();
+    this.displayedList.set(this.matchList().slice(start, end));
+  }
+
+  async handlePageChange(event: PaginatorState) {
+    const rows = event.rows ?? 10;
+    const first = event.first ?? 0;
+    const page = event.page ?? Math.floor(first / rows);
+
+    this.rows.set(rows);
+    this.first.set(first);
+
+    const criteria = this.searchCriteria();
+    const ep = this.endpoint();
+
+    if (!criteria || !ep) {
+      this.sliceList();
+      return;
+    }
+
+    try {
+      this.isReportGenerating.set(true);
+      const payload = { ...criteria, page, size: rows };
+      const res = await this.apiService.POST(ep, payload);
+
+      if (res.status === 200) {
+        const list = this.extractMatchList(res.data);
+        this.matchList.set(list);
+        this.totalRecords.set(this.extractTotalRecords(res.data, list.length));
+        this.displayedList.set(list);
+      }
+    } catch (err) {
+      console.error('Failed to fetch AFIS match report page:', err);
+    } finally {
+      this.isReportGenerating.set(false);
+    }
+  }
+
+  private async getAllMatchListForExport(): Promise<any[]> {
+    const criteria = this.searchCriteria();
+    const ep = this.endpoint();
+
+    if (!criteria || !ep) return this.matchList();
+
+    try {
+      const payload = { ...criteria, page: 0, size: -1 };
+      const res = await this.apiService.POST(ep, payload);
+      if (res.status === 200) {
+        return this.extractMatchList(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch all AFIS match report data for export:', err);
+    }
+
+    return this.matchList();
+  }
 
   async exportPdf() {
     this.isReportGenerating.set(true);
     const filteredListForPDF: any[] = [];
+    const allMatchList = await this.getAllMatchListForExport();
 
-    if (this.matchList().length > 0) {
-      this.matchList().forEach((nowMatch: any) => {
+    if (allMatchList.length > 0) {
+      allMatchList.forEach((nowMatch: any) => {
         if (nowMatch.matchList?.length > 0) {
           nowMatch.matchList.forEach((matched: any) => {
             const primaryMatchDate = nowMatch.primary.matchCreated
@@ -157,9 +269,10 @@ export class ReportMatchList {
   async exportExcel() {
     this.isReportGenerating.set(true);
     const filteredListForXL: any[] = [];
+    const allMatchList = await this.getAllMatchListForExport();
 
-    if (this.matchList().length > 0) {
-      this.matchList().forEach((nowMatch: any) => {
+    if (allMatchList.length > 0) {
+      allMatchList.forEach((nowMatch: any) => {
         if (nowMatch.matchList?.length > 0) {
           nowMatch.matchList.forEach((matched: any) => {
             const primaryMatchDate = nowMatch.primary.matchCreated
@@ -264,7 +377,6 @@ export class ReportMatchList {
               'Match Date(M)': formattedMatchedMatchDate,
             });
           });
-          filteredListForXL.push({ PRIMARY: '' });
         }
       });
 
@@ -333,6 +445,10 @@ export class ReportMatchList {
       this.cols().map((col) => ({ title: col.header, dataKey: col.field }))
     );
 
-    this.matchList.set(this.reportResult()?.matchList ?? []);
+    const result = this.reportResult();
+    const list = this.extractMatchList(result);
+    this.matchList.set(list);
+    this.displayedList.set(list);
+    this.totalRecords.set(this.extractTotalRecords(result, list.length));
   }
 }

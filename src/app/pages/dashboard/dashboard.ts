@@ -98,7 +98,7 @@ export class Dashboard implements OnInit {
     // PrimeNG emits the tab's [value], not an event object
     this.activeCategory = Number(value);
 
-    // 3 = ALL, 1 = PP, 2 = AF
+    // 3 = ALL, 1 = PP, 2 = AF, 4 = RP
     console.log('Tab switched to category:', value);
 
     this.getSummary();
@@ -115,6 +115,8 @@ export class Dashboard implements OnInit {
       apiUrl = 'api/dashboard/summary/AF'; // Category 2 endpoint
     } else if (this.activeCategory === 3) {
       apiUrl = 'api/dashboard/summary'; // Category 3 endpoint
+    } else if (this.activeCategory === 4) {
+      apiUrl = 'api/dashboard/summary/RP'; // Category 4 endpoint
     }
 
     this.apiService
@@ -153,13 +155,21 @@ export class Dashboard implements OnInit {
     this.countyAxis = [];
 
     // 👉 filter out counties whose target == 0 for the active category
-    const filteredIds = Array.from(allIds).filter(
-      (id) =>
-        (this.lookupService.getTargetRegistrationTotalById(
+    const filteredIds = Array.from(allIds).filter((id) => {
+      const targetTotal =
+        this.lookupService.getTargetRegistrationTotalById(
           id,
           this.activeCategory
-        ) || 0) > 0
-    );
+        ) || 0;
+      const countyBeneficiary = graphData?.countyWiseBeneficiary?.[id] ?? 0;
+      const countyDuplicate = graphData?.countyWiseDeduplicate?.[id] ?? 0;
+
+      return (
+        targetTotal > 0 ||
+        (this.activeCategory === 4 &&
+          (countyBeneficiary > 0 || countyDuplicate > 0))
+      );
+    });
 
     for (const id of filteredIds) {
       const name = this.lookupService.getCountyNameById(id) || id;
@@ -338,6 +348,8 @@ export class Dashboard implements OnInit {
       phase = 'AF';
     } else if (this.activeCategory === 3) {
       phase = ''; // ✅ or "" if you want to skip filtering
+    } else if (this.activeCategory === 4) {
+      phase = 'RP';
     }
 
     const L = (label ?? '').toString().trim().toUpperCase();
@@ -423,6 +435,7 @@ export class Dashboard implements OnInit {
     let phase = '';
     if (this.activeCategory === 1) phase = 'PARENT';
     else if (this.activeCategory === 2) phase = 'AF';
+    else if (this.activeCategory === 4) phase = 'RP';
     else phase = '';
 
     const criteria: Array<{

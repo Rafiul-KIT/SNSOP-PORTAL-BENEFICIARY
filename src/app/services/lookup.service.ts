@@ -853,6 +853,8 @@ export class LookupService {
     { id: "8403", name: "RUMBEK CENTRE", TOTAL: 5500, LIPW: 3850, DIS: 1650 },
   ];
 
+  counyWiseRpRegistrationTarget: RegistrationTarget[] = [];
+
 
   getCombinedRegistrationTarget(): RegistrationTarget[] {
     const combinedMap: { [key: string]: RegistrationTarget } = {};
@@ -878,6 +880,7 @@ export class LookupService {
     let source: any[] = [];
     if (category === 1) source = this.counyWisePpRegistrationTarget;
     else if (category === 2) source = this.counyWiseAfRegistrationTarget;
+    else if (category === 4) source = this.counyWiseRpRegistrationTarget;
     else source = this.getCombinedRegistrationTarget();
 
     const nowRes = source.find((sce: any) => sce.id == id);

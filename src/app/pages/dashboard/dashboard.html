@@ -4,6 +4,7 @@
       <p-tab [value]="3">Summary ALL</p-tab>
       <p-tab [value]="1">Summary PP</p-tab>
       <p-tab [value]="2">Summary AF</p-tab>
+      <p-tab [value]="4">Summary RP</p-tab>
     </p-tablist>
 
 
@@ -17,6 +18,9 @@
       <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
     </p-tabpanel>
     <p-tabpanel [value]="2">
+      <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
+    </p-tabpanel>
+    <p-tabpanel [value]="4">
       <ng-template [ngTemplateOutlet]="dashboardTemplate"></ng-template>
     </p-tabpanel>
   </p-tabpanels>

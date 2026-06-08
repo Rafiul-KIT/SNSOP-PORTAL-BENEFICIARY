@@ -482,7 +482,7 @@ export class ReportComponent implements OnInit {
         bomaId: this.reportForm.value.bomaId ? parseInt(this.reportForm.value.bomaId) : null,
         paymentMethod: this.reportForm.value.paymentMethod || null,
         hasMobileWalletNumber: this.reportForm.value.hasMobileWalletNumber,
-        registrationPhase: this.reportForm.value.registrationPhase || null,
+        registrationPhase: this.valueOrNull(this.reportForm.value.registrationPhase),
         supportType: this.reportForm.value.supportType || null,
         mobilePaymentProvider: this.reportForm.value.mobilePaymentProvider || null,
       };
@@ -514,10 +514,6 @@ export class ReportComponent implements OnInit {
       this.reportForm.value.toDate = this.formatDateToDDMMYYYY(this.reportForm.value.toDate);
     }
 
-    if (endpoint === "api/report/afis-match-report") {
-      this.reportForm.value.size = -1;
-    }
-
     if (this.selectedReportTypeId === 8) {
       this.apiService.GET(endpoint).then(res => {
         if (res.status === 200) {
@@ -534,7 +530,12 @@ export class ReportComponent implements OnInit {
         this.cdr.markForCheck(); // Added here
       });
     } else {
-      this.apiService.POST(endpoint, this.reportForm.value).then(res => {
+      const payload =
+        endpoint === 'api/report/afis-match-report'
+          ? { ...this.reportForm.value, page: 0, size: 10 }
+          : this.reportForm.value;
+
+      this.apiService.POST(endpoint, payload).then(res => {
         if (res.status === 200) {
           this.determineReportResultRenderObject(res.data);
         } else {
@@ -565,6 +566,10 @@ export class ReportComponent implements OnInit {
   private parseDateFromDDMMYYYY(date: string): string {
     const [day, month, year] = date.split('-');
     return `${year}-${month}-${day}`;
+  }
+
+  private valueOrNull(value: any) {
+    return value === '' || value === undefined ? null : value;
   }
 
   ngOnInit(): void {

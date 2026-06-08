@@ -234,9 +234,9 @@
                     <div class="form-floating mb-3">
                         <select class="form-select" id="registrationPhase" formControlName="registrationPhase">
                             <option [ngValue]="null" >Select Registration Phase</option>
-                            <option value= "1" >AF</option>
-                            <option value= "0" >PARENT</option>
-                            <option value= "2" >RP</option>
+                            <option [ngValue]="0">PARENT</option>
+                            <option [ngValue]="1">AF</option>
+                            <option [ngValue]="2">RP</option>
                         </select>
                         <label for="registrationPhase">Registration Phase</label>
                     </div>
@@ -359,7 +359,8 @@
         <app-report-age-group-gender-wise-beneficiary-count [reportResult]="reportAgeGroupGenderWiseCountResult" />
         }
         @if (reportMatchListResult) {
-        <app-report-match-list [reportResult]="reportMatchListResult" />
+        <app-report-match-list [reportResult]="reportMatchListResult" [searchCriteria]="reportForm.value"
+            [endpoint]="determineEndpoint()" />
         }
         @if (reportLocationWiseNomineeCount) {
         <app-report-location-wise-nominee-count [reportResult]="reportLocationWiseNomineeCount" />
