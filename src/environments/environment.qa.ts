@@ -4,6 +4,7 @@ export const environment = {
   useHash: true,
   domain: 'https://qa-mis.southsudansafetynet.info',
   globalApi: 'https://qa-gwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://qa-mis.southsudansafetynet.info/v2',
     masterSettings: 'https://qa-mis.southsudansafetynet.info/v2/#/user-management/users',

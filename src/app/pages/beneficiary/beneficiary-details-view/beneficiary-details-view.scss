@@ -8,5 +8,64 @@
 
 /* Optional: ensure TabView panel itself can scroll if it overflows */
 :host ::ng-deep .p-tabview-panels {
-  overflow: visible; /* or auto if you want inner scrolling instead */
+  overflow: visible;
+  /* or auto if you want inner scrolling instead */
+}
+
+.breakdown-table th,
+.breakdown-table td {
+  vertical-align: middle;
+}
+
+.breakdown-table input {
+  min-width: 84px;
+}
+
+.lactating-row td {
+  background-color: #f8f9fa;
+}
+
+.breakdown-table .male-breakdown-cell {
+  background-color: #eaf5ff;
+}
+
+.breakdown-table .female-breakdown-cell {
+  background-color: #fff0f6;
+}
+
+.breakdown-table .male-breakdown-cell input,
+.breakdown-table .female-breakdown-cell input {
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+.comparison-panel {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  min-height: 150px;
+  padding: 1rem;
+}
+
+.comparison-title {
+  color: #6c757d;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.comparison-value {
+  align-items: center;
+  display: flex;
+  font-size: 2rem;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.current-support {
+  background-color: #f8f9fa;
+}
+
+.model-support {
+  background-color: #eef7ff;
 }

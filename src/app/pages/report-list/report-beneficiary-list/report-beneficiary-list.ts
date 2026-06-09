@@ -34,6 +34,7 @@ export class ReportBeneficiaryList {
   beneficiaryList = signal<any[]>([]);
   displayedList = signal<any[]>([]);
   isExporting = signal(false);
+  isPaging = signal(false);
 
   totalRecords = signal(0);
   rows = signal(10);
@@ -47,14 +48,24 @@ export class ReportBeneficiaryList {
       const result = this.reportResult();
       if (result) {
         this.beneficiaryList.set(result.data ?? []);
-        this.totalRecords.set(result.data?.length ?? 0);
+        this.totalRecords.set(result.totalCount ?? result.data?.length ?? 0);
+        this.rows.set(result.size ?? 10);
         this.first.set(0);
-        untracked(() => this.sliceList());
+        untracked(() => this.updateDisplayedList());
       }
     });
   }
 
-  private sliceList() {
+  private isBackendPaginated() {
+    const result = this.reportResult();
+    return this.endpoint() === 'api/report/household-report' && result?.totalCount !== undefined;
+  }
+
+  private updateDisplayedList() {
+    if (this.isBackendPaginated()) {
+      this.displayedList.set(this.beneficiaryList());
+      return;
+    }
     const start = this.first();
     const end = start + this.rows();
     this.displayedList.set(this.beneficiaryList().slice(start, end));
@@ -139,7 +150,10 @@ export class ReportBeneficiaryList {
     if (criteria && ep) {
       try {
         this.isExporting.set(true);
-        const payload = { ...criteria, size: -1, from: 0 };
+        const payload =
+          ep === 'api/report/household-report'
+            ? { ...criteria, from: 0, size: -1 }
+            : { ...criteria, size: -1, from: 0 };
         const res = await this.apiService.POST(ep, payload);
         if (res.status === 200) {
           allData = res.data?.data ?? [];
@@ -178,6 +192,7 @@ export class ReportBeneficiaryList {
         "Age": elem.respondentAge ?? '',
         "Registration Phase": elem.registrationPhase ?? '',
         "Enrollment Status": elem.registrationStatus == 'ACTIVE' ? 'Enrolled' : 'Pending',
+        "Adjudication Status": elem.adjudicationStatus ?? '',
         "Respondent gender": elem.respondentGender ?? '',
         "Do you have an ID": elem.respondentId ? 'true' : 'false',
         "What type of ID": elem.documentTypeOther ? elem.documentTypeOther : (this.lookupService.getDocumentTypeEnumByValue(elem.documentType) ?? ''),
@@ -395,6 +410,7 @@ export class ReportBeneficiaryList {
       { field: 'respondentAge', header: 'Respondent Age' },
       { field: 'registrationPhase', header: 'Registration Phase' },
       { field: 'registrationStatus', header: 'Enrollment Status' },
+      { field: 'adjudicationStatus', header: 'Adjudication Status' },
     ]);
 
 
@@ -406,6 +422,32 @@ export class ReportBeneficiaryList {
   handlePageChange(event: PaginatorState) {
     this.first.set(event.first ?? 0);
     this.rows.set(event.rows ?? 10);
-    this.sliceList();
+    if (this.isBackendPaginated()) {
+      this.fetchPage(event.page ?? 0, event.rows ?? 10);
+      return;
+    }
+    this.updateDisplayedList();
+  }
+
+  private async fetchPage(from: number, size: number) {
+    const criteria = this.searchCriteria();
+    const ep = this.endpoint();
+    if (!criteria || !ep) return;
+
+    try {
+      this.isPaging.set(true);
+      const res = await this.apiService.POST(ep, { ...criteria, from, size });
+      if (res.status === 200) {
+        this.beneficiaryList.set(res.data?.data ?? []);
+        this.displayedList.set(res.data?.data ?? []);
+        this.totalRecords.set(res.data?.totalCount ?? 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch report page:', err);
+      this.beneficiaryList.set([]);
+      this.displayedList.set([]);
+    } finally {
+      this.isPaging.set(false);
+    }
   }
 }

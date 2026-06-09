@@ -42,6 +42,7 @@ import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-pending-beneficiary-manage',
@@ -63,6 +64,7 @@ import { TooltipModule } from 'primeng/tooltip';
     SelectModule,
     RouterModule,
     TooltipModule,
+    DialogModule,
     Loader,
     TabPanel,
     Tabs,
@@ -99,6 +101,11 @@ export class PendingBeneficiaryManage implements OnInit {
   bomaList: LookupItem[] = [];
   stateName: string = '--';
   countyName: string = '--';
+  isModelLoading = false;
+  modelComparisonDialogVisible = false;
+  currentSupportType = '';
+  modelSupportType = '';
+  modelErrorMessage = '';
 
   // ===== Regex & constants (aligned with mobile/Java) =====
   private RGX_ONLY_CHARS = /^[A-Za-z]+$/; // names (no spaces/digits/special)
@@ -1151,6 +1158,84 @@ export class PendingBeneficiaryManage implements OnInit {
 
     delete (payload as any).biometrics;
     return payload;
+  }
+
+  private buildModelPayload(formValue: any) {
+    const household: Record<string, number> = {};
+    const groups = [
+      { suffix: '0_2', malePrefix: 'm0_2', femalePrefix: 'f0_2' },
+      { suffix: '3_5', malePrefix: 'm3_5', femalePrefix: 'f3_5' },
+      { suffix: '6_17', malePrefix: 'm6_17', femalePrefix: 'f6_17' },
+      { suffix: '18_35', malePrefix: 'm18_35', femalePrefix: 'f18_35' },
+      { suffix: '36_64', malePrefix: 'm36_64', femalePrefix: 'f36_64' },
+      { suffix: '65_plus', malePrefix: 'm65', femalePrefix: 'f65' },
+    ];
+    const valueOf = (key: string) => Number(formValue[key]) || 0;
+    const assignGenderValues = (
+      gender: 'male' | 'female',
+      suffix: string,
+      prefix: string,
+    ) => {
+      const disabled = valueOf(`${prefix}_disable`);
+      const chronicallyIll = valueOf(`${prefix}_chronic`);
+      const both = valueOf(`${prefix}_both`);
+      const total = valueOf(`${prefix}_total`);
+      household[`${gender}_${suffix}_both`] = both;
+      household[`${gender}_${suffix}_chronically_ill`] = chronicallyIll;
+      household[`${gender}_${suffix}_disabled`] = disabled;
+      household[`${gender}_${suffix}_normal`] = Math.max(
+        total - disabled - chronicallyIll - both,
+        0,
+      );
+    };
+
+    groups.forEach((group) => {
+      assignGenderValues('male', group.suffix, group.malePrefix);
+      assignGenderValues('female', group.suffix, group.femalePrefix);
+    });
+
+    return { household };
+  }
+
+  private formatModelSupportType(supportType: string): string {
+    if (supportType === 'LIPW') return 'Public Works';
+    if (supportType === 'DIS') return 'Direct Income Support';
+    if (supportType === 'OTHER') return 'BOTH';
+    return supportType;
+  }
+
+  runModel() {
+    if (this.isModelLoading) return;
+
+    this.isModelLoading = true;
+    this.currentSupportType =
+      this.beneficiaryForm.get('supportType')?.value || 'Not selected';
+    this.modelSupportType = '';
+    this.modelErrorMessage = '';
+    this.cdr.detectChanges();
+
+    const payload = this.buildModelPayload(this.beneficiaryForm.getRawValue());
+    this.api
+      .POST('get_support_type', payload, 'model')
+      .then((res: any) => {
+        const supportType = res?.data?.support_type || res?.support_type || '';
+        this.modelSupportType = this.formatModelSupportType(supportType);
+        if (!this.modelSupportType) {
+          this.modelErrorMessage = 'No support type returned from model.';
+        }
+        this.modelComparisonDialogVisible = true;
+        this.cdr.detectChanges();
+      })
+      .catch((err) => {
+        console.error('Model request failed:', err);
+        this.modelErrorMessage = 'Model request could not be processed.';
+        this.modelComparisonDialogVisible = true;
+        this.cdr.detectChanges();
+      })
+      .finally(() => {
+        this.isModelLoading = false;
+        this.cdr.detectChanges();
+      });
   }
 
   // ========= Submit =========

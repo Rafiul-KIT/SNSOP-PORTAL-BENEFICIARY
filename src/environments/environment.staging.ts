@@ -4,6 +4,7 @@ export const environment = {
   useHash: true,
   domain: 'https://newmis.southsudansafetynet.info',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://newmis.southsudansafetynet.info/trial/master',
     UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',

@@ -4,6 +4,7 @@ export const environment = {
   useHash: false,
   domain: 'localhost', // or 'snsopmis.local' if you use hosts file trick
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/', // your Spring Boot backend in dev
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://localhost:4010',
     masterSettings: 'https://localhost:4010/#/user-management/users',
