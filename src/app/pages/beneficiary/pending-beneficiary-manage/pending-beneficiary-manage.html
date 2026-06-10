@@ -39,13 +39,14 @@
       <p-tab value="1">Alternate Payee Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
       <div class="d-flex align-items-center ms-auto mx-4">
-        <button type="button" class="btn btn-success btn-sm me-2" (click)="onApprove()">
-          <i class="fas fa-check me-1"></i> Approve
-        </button>
-        <button type="button" class="btn btn-danger btn-sm me-2" (click)="onDelete()">
-          <i class="fas fa-trash-alt me-1"></i> Delete
-        </button>
-        <p-button class="ms-auto p-2" severity="info" type="submit" icon="fas fa-save" size="small" label="Update" />
+        <p-button class="me-2" severity="success" label="Approve" icon="fas fa-check" size="small"
+          (onClick)="onApprove()"></p-button>
+
+        <p-button class="me-2" severity="danger" label="Delete" icon="fas fa-trash-alt" size="small"
+          (onClick)="onDelete()"></p-button>
+
+        <p-button severity="info" type="submit" icon="fas fa-save" size="small"
+          label="Update"></p-button>
       </div>
 
     </p-tablist>
@@ -493,8 +494,8 @@
                   }
                 </div>
                 <div class="col-md-9 mb-1 d-flex justify-content-end align-items-start">
-                  <p-button severity="info" size="small" type="button" label="Support Type Recommendation" icon="fas fa-play"
-                    [loading]="isModelLoading" [disabled]="isModelLoading" (onClick)="runModel()" />
+                  <p-button severity="info" size="small" type="button" label="Support Type Recommendation"
+                    icon="fas fa-play" [loading]="isModelLoading" [disabled]="isModelLoading" (onClick)="runModel()" />
                 </div>
 
                 <!-- Selection Reasons -->
