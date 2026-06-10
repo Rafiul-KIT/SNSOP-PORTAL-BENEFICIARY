@@ -80,6 +80,7 @@ export class PendingBeneficiaryManage implements OnInit {
   beneficiaryForm!: FormGroup;
   originalDto!: BeneficiaryDto;
   deleteComment: string = '';
+  approveComment: string = '';
   destroy$ = new Subject<void>();
 
   genderOptions: LookupItem[] = [];
@@ -1273,9 +1274,9 @@ export class PendingBeneficiaryManage implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Update Successful',
-            detail: 'Beneficiary Updated and Approved successfully!',
+            detail: 'Beneficiary Updated successfully!',
           });
-          setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
+          // setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
         } else if (first.result === 'FAILED') {
           this.messageService.add({
             severity: 'error',
@@ -2319,6 +2320,78 @@ export class PendingBeneficiaryManage implements OnInit {
       acceptButtonStyleClass: 'p-button-success',
       rejectButtonStyleClass: 'p-button-danger',
     });
+  }
+
+  onApprove() {
+    this.approveComment = '';
+    this.confirmationService.confirm({
+      key: 'approveDialog',
+      header: 'Confirm Approval',
+      accept: () => this.handleApproveConfirm(),
+      reject: () => {
+        // User rejected, no action needed
+      },
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+    });
+  }
+
+  handleApproveConfirm() {
+    const applicationId = this.originalDto?.applicationId;
+    if (!applicationId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Beneficiary Application ID not found.',
+      });
+      return;
+    }
+
+    const payload = {
+      householdId: [applicationId],
+      comment: this.approveComment.trim(),
+      enrollmentStatusEnum: 'APPROVED',
+    };
+
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.api
+      .POST('api/beneficiary/update/approveBeneficiary/batch', payload)
+      .then((res: any) => {
+        if (res.status === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Approved',
+            detail: 'Beneficiary has been approved successfully.',
+          });
+          this.approveComment = '';
+          setTimeout(
+            () => this.router.navigate(['/pending-beneficiary/list']),
+            2000,
+          );
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Approval Failed',
+            detail:
+              res.errorMsg ||
+              'There was a problem approving the beneficiary.',
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Approve beneficiary error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'API Error',
+          detail: 'Failed to approve beneficiary.',
+        });
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      });
   }
 
   handleDeleteConfirm() {

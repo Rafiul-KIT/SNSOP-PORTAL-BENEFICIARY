@@ -14,6 +14,21 @@
     </div>
   </ng-template>
 </p-confirmDialog>
+<p-confirmDialog key="approveDialog" position="center" [style]="{ width: '500px' }">
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: green;">approve</strong>
+        this beneficiary?
+      </p>
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="approveComment" class="form-control"
+          placeholder="Optional: Add a comment for approval."></textarea>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>
 @if(isLoading){
 <app-loader />
 }@else {
@@ -24,6 +39,9 @@
       <p-tab value="1">Alternate Payee Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
       <div class="d-flex align-items-center ms-auto mx-4">
+        <button type="button" class="btn btn-success btn-sm me-2" (click)="onApprove()">
+          <i class="fas fa-check me-1"></i> Approve
+        </button>
         <button type="button" class="btn btn-danger btn-sm me-2" (click)="onDelete()">
           <i class="fas fa-trash-alt me-1"></i> Delete
         </button>
