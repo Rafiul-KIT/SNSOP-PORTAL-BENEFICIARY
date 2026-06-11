@@ -529,7 +529,7 @@ export class ReportComponent implements OnInit {
       const payload =
         endpoint === 'api/report/afis-match-report' ||
         endpoint === 'api/report/household-report'
-          ? { ...this.reportForm.value, from: 0, size: 10 }
+          ? { ...this.reportForm.value, page: 0, size: 10 }
           : this.reportForm.value;
 
       this.apiService.POST(endpoint, payload).then(res => {

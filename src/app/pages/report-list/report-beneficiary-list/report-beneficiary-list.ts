@@ -152,8 +152,8 @@ export class ReportBeneficiaryList {
         this.isExporting.set(true);
         const payload =
           ep === 'api/report/household-report'
-            ? { ...criteria, from: 0, size: -1 }
-            : { ...criteria, size: -1, from: 0 };
+            ? { ...criteria, page: 0, size: -1 }
+            : { ...criteria, size: -1, page: 0 };
         const res = await this.apiService.POST(ep, payload);
         if (res.status === 200) {
           allData = res.data?.data ?? [];
@@ -429,14 +429,14 @@ export class ReportBeneficiaryList {
     this.updateDisplayedList();
   }
 
-  private async fetchPage(from: number, size: number) {
+  private async fetchPage(page: number, size: number) {
     const criteria = this.searchCriteria();
     const ep = this.endpoint();
     if (!criteria || !ep) return;
 
     try {
       this.isPaging.set(true);
-      const res = await this.apiService.POST(ep, { ...criteria, from, size });
+      const res = await this.apiService.POST(ep, { ...criteria, page, size });
       if (res.status === 200) {
         this.beneficiaryList.set(res.data?.data ?? []);
         this.displayedList.set(res.data?.data ?? []);
