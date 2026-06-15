@@ -853,7 +853,18 @@ export class LookupService {
     { id: "8403", name: "RUMBEK CENTRE", TOTAL: 5500, LIPW: 3850, DIS: 1650 },
   ];
 
-  counyWiseRpRegistrationTarget: RegistrationTarget[] = [];
+  counyWiseRpRegistrationTarget: RegistrationTarget[] = [
+  { id: "9312", name: "BOR MUNICIPAL", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "8103", name: "GOGRIAL WEST", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "9202", name: "JUBA", TOTAL: 5518, LIPW: 3863, DIS: 1655 },
+  { id: "9304", name: "KAPOTEA EAST", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "7104", name: "MELUTH", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "9109", name: "MUNDRI WEST", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "8301", name: "RAJA", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "8107", name: "TONJ SOUTH", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "9301", name: "TORIT", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+  { id: "9204", name: "YEI", TOTAL: 4600, LIPW: 3220, DIS: 1380 },
+];
 
 
   getCombinedRegistrationTarget(): RegistrationTarget[] {
