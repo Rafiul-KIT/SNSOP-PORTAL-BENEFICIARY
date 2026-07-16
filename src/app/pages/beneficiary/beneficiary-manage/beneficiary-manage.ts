@@ -2043,7 +2043,8 @@ export class BeneficiaryManage implements OnInit {
     const hasLipwRule = this.beneficiaryForm.hasError('lipwRule');
 
     this.filteredReasons.forEach((reason) => {
-      const isDisReason = reason.value.startsWith('DIS_REASON');
+      const isDisReason =
+        reason.value.startsWith('DIS_REASON') && reason.value !== 'DIS_REASON_3';
       const isLipwReason = reason.value.startsWith('LIPW_REASON');
 
       const shouldBeDisabledByHhData = this.isReasonDisabled(reason, hhData);
@@ -2181,7 +2182,7 @@ export class BeneficiaryManage implements OnInit {
         return !(hhData.elderlyTotal > 0 && hhData.ableBodied_18_64 === 0);
 
       case 'DIS_REASON_3':
-        return hhData.ableBodiedTotal > 0;
+        return false;
       case 'DIS_REASON_4':
         return !(
           hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0
