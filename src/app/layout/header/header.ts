@@ -296,6 +296,11 @@ export class Header {
             routerLink: 'report/payment-method-wise-beneficiary-list',
           },
           {
+            label: 'Fingerprint Quality Report',
+            icon: 'fas fa-fingerprint',
+            routerLink: 'report/finger-score',
+          },
+          {
             label: 'Async Report Generation',
             icon: 'fas fa-file-alt',
             routerLink: 'report/async-report-generation',

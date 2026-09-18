@@ -1,0 +1,158 @@
+<p-toast position="bottom-right" />
+
+<section class="finger-score-report">
+  <div class="summary-grid">
+    <article class="summary-card total">
+      <span class="summary-icon"><i class="fas fa-fingerprint"></i></span>
+      <div><small>Total subjects</small><strong>{{ stats().total | number }}</strong></div>
+    </article>
+    <article class="summary-card beneficiary">
+      <span class="summary-icon"><i class="fas fa-user-check"></i></span>
+      <div><small>Beneficiaries</small><strong>{{ stats().beneficiaries | number }}</strong></div>
+    </article>
+    <article class="summary-card alternate">
+      <span class="summary-icon"><i class="fas fa-user-group"></i></span>
+      <div><small>Alternates</small><strong>{{ stats().alternates | number }}</strong></div>
+    </article>
+    <article class="summary-card boma">
+      <span class="summary-icon"><i class="fas fa-location-dot"></i></span>
+      <div><small>Processed bomas</small><strong>{{ bomaCount() | number }}</strong></div>
+    </article>
+  </div>
+
+  <div class="report-panel upload-panel">
+    <div>
+      <h5><i class="fas fa-file-arrow-up me-2"></i>Process WSQ file</h5>
+      <p>Upload a WSQ fingerprint file to calculate its quality score.</p>
+    </div>
+    <div class="upload-controls">
+      <input #wsqInput type="file" class="form-control" accept=".wsq,application/octet-stream"
+        [disabled]="uploading()" aria-label="WSQ fingerprint file" (change)="onFileSelected($event)" />
+      <button type="button" class="btn btn-primary" [disabled]="!selectedFile || uploading()" (click)="uploadWsq(wsqInput)">
+        @if (uploading()) { <i class="fas fa-spinner fa-spin me-2"></i>Processing... }
+        @else { <i class="fas fa-upload me-2"></i>Upload }
+      </button>
+    </div>
+  </div>
+
+  @if (uploadScore() !== null) {
+    <div class="alert alert-success" role="status">Fingerprint quality score: {{ uploadScore() }}</div>
+  }
+  <div class="report-panel">
+    <div class="panel-heading">
+      <div>
+        <h5>Processed bomas</h5>
+        <p>Browse locations, inspect scores, or export a complete boma CSV.</p>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="search" class="form-control" placeholder="Search boma or location" [(ngModel)]="bomaSearch"
+          (keyup.enter)="loadBomas(true)" />
+        <button type="button" class="btn btn-outline-primary" (click)="loadBomas(true)">Search</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table report-table align-middle mb-0">
+        <thead><tr><th>Boma</th><th>Payam</th><th>County</th><th>State</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          @if (loadingBomas()) {
+            <tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin me-2"></i>Loading bomas...</td></tr>
+          } @else {
+            @for (boma of bomas(); track boma.id) {
+              <tr [class.selected-row]="selectedBoma()?.id === boma.id">
+                <td><strong>{{ boma.name }}</strong></td><td>{{ boma.payam || '—' }}</td><td>{{ boma.county || '—' }}</td><td>{{ boma.state || '—' }}</td>
+                <td class="text-end action-buttons">
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="selectBoma(boma)"><i class="fas fa-users me-1"></i>Subjects</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="loadBomaScores(boma)"><i class="fas fa-fingerprint me-1"></i>Scores</button>
+                  <button type="button" class="btn btn-sm btn-outline-success" [disabled]="downloadingBomas().has(boma.id)" (click)="downloadCsv(boma)">
+                    <i class="fas" [class.fa-spinner]="downloadingBomas().has(boma.id)" [class.fa-spin]="downloadingBomas().has(boma.id)" [class.fa-download]="!downloadingBomas().has(boma.id)"></i> CSV
+                  </button>
+                </td>
+              </tr>
+            } @empty { <tr><td colspan="5" class="empty-state">No processed bomas found.</td></tr> }
+          }
+        </tbody>
+      </table>
+    </div>
+    <p-paginator (onPageChange)="onBomaPageChange($event)" [first]="bomaFirst()" [rows]="bomaRows()"
+      [totalRecords]="bomaTotal()" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} bomas" />
+  </div>
+
+  <div class="report-panel lookup-panel">
+    <div><h5>Household score lookup</h5><p>View every beneficiary and alternate score in a household.</p></div>
+    <div class="search-box household-search">
+      <input type="text" class="form-control" placeholder="Household number" [(ngModel)]="householdNumber" (keyup.enter)="searchHousehold()" />
+      <button type="button" class="btn btn-primary" [disabled]="!householdNumber.trim() || loadingScore()" (click)="searchHousehold()"><i class="fas fa-search me-2"></i>Find</button>
+    </div>
+  </div>
+
+  @if (selectedBoma() && bomaView() === 'subjects') {
+    <div class="report-panel">
+      <div class="panel-heading">
+        <div><h5>Subjects in {{ selectedBoma()!.name }}</h5><p>Select a subject to retrieve the individual finger-score record.</p></div>
+        <div class="search-box">
+          <input type="search" class="form-control" placeholder="Search subjects" [(ngModel)]="subjectSearch" (keyup.enter)="loadSubjects(true)" />
+          <button type="button" class="btn btn-outline-primary" (click)="loadSubjects(true)">Search</button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table report-table align-middle mb-0">
+          <thead><tr><th>Household</th><th>Name</th><th>Type</th><th class="text-end">Action</th></tr></thead>
+          <tbody>
+            @if (loadingSubjects()) { <tr><td colspan="4" class="empty-state"><i class="fas fa-spinner fa-spin me-2"></i>Loading subjects...</td></tr> }
+            @else {
+              @for (subject of subjects(); track trackScore(subject)) {
+                <tr><td>{{ subject.householdNumber }}</td><td><strong>{{ subject.name }}</strong></td><td><span class="type-badge">{{ subject.type }}</span></td>
+                  <td class="text-end"><button type="button" class="btn btn-sm btn-outline-primary" (click)="loadIndividualScore(subject.id)">View scores</button></td></tr>
+              } @empty { <tr><td colspan="4" class="empty-state">No subjects found.</td></tr> }
+            }
+          </tbody>
+        </table>
+      </div>
+      <p-paginator (onPageChange)="onSubjectPageChange($event)" [first]="subjectFirst()" [rows]="subjectRows()"
+        [totalRecords]="subjectTotal()" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subjects" />
+    </div>
+  }
+
+  @if (loadingBomaScores()) {
+    <div class="report-panel empty-state"><i class="fas fa-spinner fa-spin me-2"></i>Loading all boma scores...</div>
+  } @else if (selectedBoma() && bomaView() === 'scores') {
+    <div class="report-panel">
+      <div class="panel-heading"><div><h5>All finger scores — {{ selectedBoma()?.name }}</h5><p>{{ bomaScores().length | number }} records returned.</p></div>
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="closeBomaScores()"><i class="fas fa-xmark me-1"></i>Close</button></div>
+      <div class="table-responsive score-list"><table class="table report-table table-sm align-middle mb-0">
+        <thead><tr><th>Household</th><th>Name</th><th>Type</th>@for (finger of fingerColumns; track finger.field) { <th class="score-cell">{{ finger.label }}</th> }</tr></thead>
+        <tbody>@for (score of visibleBomaScores(); track trackScore(score)) { <tr><td>{{ score.householdNumber }}</td><td>{{ score.name }}</td><td>{{ score.type }}</td>@for (finger of fingerColumns; track finger.field) { <td class="score-cell"><span class="score-value">{{ score[finger.field] }}</span></td> }</tr> } @empty { <tr><td colspan="13" class="empty-state">No finger scores found.</td></tr> }</tbody>
+      </table></div>
+      <p-paginator [first]="scoreFirst()" [rows]="scoreRows()" [totalRecords]="bomaScores().length"
+        [rowsPerPageOptions]="[20, 50, 100]"
+        (onPageChange)="scoreFirst.set($event.first ?? 0); scoreRows.set($event.rows ?? 20)" />
+    </div>
+  }
+
+  @if (loadingScore()) {
+    <div class="report-panel empty-state" role="status"><i class="fas fa-spinner fa-spin me-2"></i>Loading finger scores...</div>
+  }
+  @if (selectedScore()) {
+    <div class="report-panel score-detail">
+      <div class="panel-heading"><div><h5>{{ selectedScore()!.name }}</h5><p>{{ selectedScore()!.householdNumber }} · {{ selectedScore()!.type }}</p></div>
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="selectedScore.set(null)"><i class="fas fa-xmark me-1"></i>Close</button></div>
+      <div class="finger-grid">@for (finger of fingerColumns; track finger.field) { <div><small>{{ finger.label }}</small><strong>{{ selectedScore()![finger.field] }}</strong></div> }</div>
+    </div>
+  }
+
+  @if (householdScores().length) {
+    <div class="report-panel">
+      <div class="panel-heading"><div><h5>Household {{ householdResultNumber() }}</h5><p>{{ householdScores().length }} score record(s).</p></div>
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="householdScores.set([])"><i class="fas fa-xmark me-1"></i>Close</button></div>
+      @for (score of householdScores(); track trackScore(score)) {
+        <div class="household-member"><div class="member-title"><strong>{{ score.name }}</strong><span class="type-badge">{{ score.type }}</span></div>
+          <div class="finger-grid compact">@for (finger of fingerColumns; track finger.field) { <div><small>{{ finger.label }}</small><strong>{{ score[finger.field] }}</strong></div> }</div>
+        </div>
+      }
+    </div>
+  }
+</section>

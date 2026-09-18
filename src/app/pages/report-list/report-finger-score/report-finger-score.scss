@@ -1,0 +1,60 @@
+:host { display: block; }
+
+.finger-score-report { display: grid; gap: 1rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.summary-card { display: flex; align-items: center; gap: 1rem; min-height: 92px; padding: 1rem 1.15rem; border: 1px solid #e7ebf0; border-radius: 12px; background: #fff; box-shadow: 0 3px 12px rgba(25, 43, 73, .06); }
+.summary-card small { display: block; color: #667085; margin-bottom: .25rem; }
+.summary-card strong { display: block; color: #1f2937; font-size: 1.55rem; line-height: 1; }
+.summary-icon { display: grid; place-items: center; width: 46px; height: 46px; flex: 0 0 46px; border-radius: 10px; font-size: 1.2rem; }
+.total .summary-icon { color: #155eef; background: #eff4ff; }
+.beneficiary .summary-icon { color: #087443; background: #ecfdf3; }
+.alternate .summary-icon { color: #93370d; background: #fff6ed; }
+.boma .summary-icon { color: #6941c6; background: #f4f3ff; }
+
+.report-panel { padding: 1rem; overflow: hidden; border: 1px solid #e5e9ef; border-radius: 12px; background: #fff; box-shadow: 0 3px 12px rgba(25, 43, 73, .05); }
+.report-panel h5 { margin: 0 0 .25rem; color: #26334d; font-size: 1rem; font-weight: 600; }
+.report-panel p { margin: 0; color: #667085; font-size: .85rem; }
+.panel-heading, .upload-panel, .lookup-panel { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.panel-heading { margin-bottom: 1rem; }
+.upload-panel { border-left: 4px solid #155eef; }
+.lookup-panel { border-left: 4px solid #6941c6; }
+.upload-controls, .search-box { display: flex; align-items: center; gap: .5rem; }
+.upload-controls .form-control { width: min(390px, 45vw); }
+.search-box { position: relative; }
+.search-box > i { position: absolute; left: .75rem; color: #98a2b3; }
+.search-box > i + input { padding-left: 2.15rem; }
+.search-box input { width: 260px; }
+.household-search input { width: 300px; }
+
+.report-table thead th { padding: .75rem; white-space: nowrap; color: #475467; border-bottom-width: 1px; background: #f8fafc; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+.report-table tbody td { padding: .7rem .75rem; border-color: #eef1f5; color: #344054; }
+.selected-row td { background: #f0f7ff; }
+.action-buttons { white-space: nowrap; }
+.action-buttons .btn + .btn { margin-left: .35rem; }
+.empty-state { padding: 2rem !important; text-align: center; color: #667085 !important; }
+.type-badge { display: inline-flex; padding: .22rem .5rem; color: #344054; border-radius: 999px; background: #f2f4f7; font-size: .72rem; font-weight: 600; }
+.score-list { max-height: 520px; }
+.score-list thead { position: sticky; top: 0; z-index: 1; }
+.score-cell { min-width: 92px; text-align: center; }
+.score-value { display: inline-grid; place-items: center; min-width: 36px; height: 28px; padding: 0 .35rem; color: #175cd3; border-radius: 6px; background: #eff8ff; font-weight: 600; }
+.finger-grid { display: grid; grid-template-columns: repeat(5, minmax(90px, 1fr)); gap: .75rem; margin-top: .5rem; }
+.finger-grid > div { padding: .75rem; text-align: center; border: 1px solid #e5e9ef; border-radius: 8px; background: #f8fafc; }
+.finger-grid small { display: block; margin-bottom: .3rem; color: #667085; }
+.finger-grid strong { color: #175cd3; font-size: 1.15rem; }
+.household-member + .household-member { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e9ef; }
+.member-title { display: flex; align-items: center; gap: .5rem; }
+.compact { margin-top: .75rem; }
+
+@media (max-width: 992px) {
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .panel-heading, .upload-panel, .lookup-panel { align-items: stretch; flex-direction: column; }
+  .upload-controls .form-control, .search-box input, .household-search input { width: 100%; }
+  .finger-grid { grid-template-columns: repeat(2, minmax(90px, 1fr)); }
+}
+
+@media (max-width: 576px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .upload-controls, .search-box { align-items: stretch; flex-direction: column; }
+  .search-box > i { display: none; }
+  .action-buttons .btn { display: block; width: 100%; margin: .25rem 0 !important; }
+}

@@ -20,6 +20,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { ReportPaymentMethodWiseBeneficiaryList } from '../report-list/report-payment-method-wise-beneficiary-list/report-payment-method-wise-beneficiary-list';
+import { ReportFingerScore } from '../report-list/report-finger-score/report-finger-score';
 
 
 
@@ -30,7 +31,8 @@ import { ReportPaymentMethodWiseBeneficiaryList } from '../report-list/report-pa
     LoadingSpinner, Loader, ReportBeneficiaryList,
     ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount,
     ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey,
-    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule,ReportPaymentMethodWiseBeneficiaryList],
+    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule,
+    ReportPaymentMethodWiseBeneficiaryList, ReportFingerScore],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
@@ -183,7 +185,7 @@ export class ReportComponent implements OnInit {
           paymentCycle: new FormControl('1', Validators.required)
         });
         break;
-        case 11:
+      case 11:
         this.reportForm = new FormGroup({
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -195,6 +197,9 @@ export class ReportComponent implements OnInit {
           supportType: new FormControl(null),
           mobilePaymentProvider: new FormControl(null),
         });
+        break;
+      case 12:
+        this.reportForm = new FormGroup({});
         break;
       default:
         this.reportForm.reset();
