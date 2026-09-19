@@ -1,132 +1,86 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { FingerScoreResults } from './finger-score-results';
 import { MessageService } from 'primeng/api';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ToastModule } from 'primeng/toast';
-
-import {
-  BomaProgress,
-  FingerScore,
-  FingerScoreService,
-  SubjectStats,
-} from './finger-score.service';
-
-interface FingerColumn {
-  field: keyof FingerScore;
-  label: string;
-}
+import { BomaProgress, FingerScoreService, SubjectStats } from './finger-score.service';
+import { LoadingSpinner } from '../../../components/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-report-finger-score',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorModule, ToastModule],
+  imports: [CommonModule, FormsModule, DialogModule, FingerScoreResults, LoadingSpinner, PaginatorModule, ToastModule],
   templateUrl: './report-finger-score.html',
   styleUrl: './report-finger-score.scss',
 })
 export class ReportFingerScore implements OnInit, OnDestroy {
-  private readonly fingerScoreService = inject(FingerScoreService);
-  private readonly messageService = inject(MessageService);
-
-  private bomaRequest = 0;
-  private subjectRequest = 0;
-  private scoresRequest = 0;
-  private detailRequest = 0;
-  readonly bomaView = signal<'subjects' | 'scores'>('subjects');
-  readonly scoreFirst = signal(0);
-  readonly scoreRows = signal(20);
-  readonly visibleBomaScores = computed(() =>
-    this.bomaScores().slice(this.scoreFirst(), this.scoreFirst() + this.scoreRows()));
-  readonly downloadingBomas = signal<ReadonlySet<number>>(new Set());
-  readonly householdResultNumber = signal('');
-  readonly uploadScore = signal<number | null>(null);
-
-  ngOnDestroy(): void {
-    ++this.bomaRequest;
-    ++this.subjectRequest;
-    ++this.scoresRequest;
-    ++this.detailRequest;
-  }
-
+  private readonly service = inject(FingerScoreService);
+  private readonly document = inject(DOCUMENT);
+  private resultsTrigger: HTMLElement | null = null;
+  private readonly messages = inject(MessageService);
+  private request = 0;
+  private destroyed = false;
   readonly stats = signal<SubjectStats>({ total: 0, beneficiaries: 0, alternates: 0 });
   readonly bomaCount = signal(0);
   readonly bomas = signal<BomaProgress[]>([]);
   readonly bomaTotal = signal(0);
   readonly bomaFirst = signal(0);
   readonly bomaRows = signal(10);
-
-  readonly selectedBoma = signal<BomaProgress | null>(null);
-  readonly subjects = signal<FingerScore[]>([]);
-  readonly subjectTotal = signal(0);
-  readonly subjectFirst = signal(0);
-  readonly subjectRows = signal(10);
-  readonly bomaScores = signal<FingerScore[]>([]);
-  readonly selectedScore = signal<FingerScore | null>(null);
-  readonly householdScores = signal<FingerScore[]>([]);
-
-  readonly loadingSummary = signal(false);
-  readonly loadingBomas = signal(false);
-  readonly loadingSubjects = signal(false);
-  readonly loadingBomaScores = signal(false);
-  readonly loadingScore = signal(false);
+  readonly initialLoading = signal(true);
+  readonly loadingSummary = signal(true);
+  readonly summaryError = signal(false);
+  readonly loadingBomas = signal(true);
+  readonly bomaError = signal('');
   readonly uploading = signal(false);
-
+  readonly uploadScore = signal<number | null>(null);
+  readonly uploadName = signal('');
+  readonly fileError = signal('');
+  readonly downloadingBomas = signal<ReadonlySet<number>>(new Set());
+  readonly resultsContext = signal<{ boma: BomaProgress | null; household: string; view: 'subjects' | 'scores' } | null>(null);
   bomaSearch = '';
-  subjectSearch = '';
   householdNumber = '';
   selectedFile: File | null = null;
 
-  readonly fingerColumns: FingerColumn[] = [
-    { field: 'leftThumb', label: 'Left Thumb' },
-    { field: 'leftIndex', label: 'Left Index' },
-    { field: 'leftMiddle', label: 'Left Middle' },
-    { field: 'leftRing', label: 'Left Ring' },
-    { field: 'leftSmall', label: 'Left Small' },
-    { field: 'rightThumb', label: 'Right Thumb' },
-    { field: 'rightIndex', label: 'Right Index' },
-    { field: 'rightMiddle', label: 'Right Middle' },
-    { field: 'rightRing', label: 'Right Ring' },
-    { field: 'rightSmall', label: 'Right Small' },
-  ];
+  ngOnInit(): void { void this.loadInitialData(); }
 
-  ngOnInit(): void {
-    void Promise.all([this.loadSummary(), this.loadBomas(true)]);
+  async loadInitialData(): Promise<void> {
+    // Keep one stable loading state until the parallel initial requests finish.
+    await Promise.all([this.loadSummary(), this.loadBomas()]);
+    if (!this.destroyed) this.initialLoading.set(false);
   }
+  ngOnDestroy(): void { this.destroyed = true; ++this.request; }
 
   async loadSummary(): Promise<void> {
     this.loadingSummary.set(true);
+    this.summaryError.set(false);
     try {
-      const [statsResponse, countResponse] = await Promise.all([
-        this.fingerScoreService.getSubjectStats(),
-        this.fingerScoreService.getBomaCount(),
-      ]);
-      this.stats.set(statsResponse.data ?? { total: 0, beneficiaries: 0, alternates: 0 });
-      this.bomaCount.set(countResponse.data ?? 0);
-    } catch (error) {
-      this.showError(error, 'Could not load finger-score progress.');
-    } finally {
-      this.loadingSummary.set(false);
-    }
+      const [stats, count] = await Promise.all([this.service.getSubjectStats(), this.service.getBomaCount()]);
+      if (this.destroyed) return;
+      this.stats.set(stats.data ?? { total: 0, beneficiaries: 0, alternates: 0 });
+      this.bomaCount.set(count.data ?? 0);
+    } catch { if (!this.destroyed) this.summaryError.set(true); }
+    finally { if (!this.destroyed) this.loadingSummary.set(false); }
   }
 
-  async loadBomas(resetPage = false): Promise<void> {
-    if (resetPage) this.bomaFirst.set(0);
-    const request = ++this.bomaRequest;
+  async loadBomas(reset = false): Promise<void> {
+    if (reset) this.bomaFirst.set(0);
+    const request = ++this.request;
     this.loadingBomas.set(true);
+    this.bomaError.set('');
     try {
-      const page = Math.floor(this.bomaFirst() / this.bomaRows());
-      const response = await this.fingerScoreService.getBomas(page, this.bomaRows(), this.bomaSearch);
-      if (request !== this.bomaRequest) return;
+      const response = await this.service.getBomas(Math.floor(this.bomaFirst() / this.bomaRows()), this.bomaRows(), this.bomaSearch);
+      if (request !== this.request) return;
       this.bomas.set(response.data?.content ?? []);
       this.bomaTotal.set(response.data?.totalElements ?? 0);
-    } catch (error) {
-      if (request !== this.bomaRequest) return;
+    } catch {
+      if (request !== this.request) return;
       this.bomas.set([]);
       this.bomaTotal.set(0);
-      this.showError(error, 'Could not load processed bomas.');
-    } finally {
-      if (request === this.bomaRequest) this.loadingBomas.set(false);
-    }
+      this.bomaError.set('We couldn’t load the bomas. Please try again.');
+    } finally { if (request === this.request) this.loadingBomas.set(false); }
   }
 
   onBomaPageChange(event: PaginatorState): void {
@@ -135,178 +89,68 @@ export class ReportFingerScore implements OnInit, OnDestroy {
     void this.loadBomas();
   }
 
-  selectBoma(boma: BomaProgress): void {
-    ++this.scoresRequest;
-    ++this.detailRequest;
-    this.loadingScore.set(false);
-    this.loadingBomaScores.set(false);
-    this.bomaView.set('subjects');
-    this.selectedBoma.set(boma);
-    this.subjectSearch = '';
-    this.subjectFirst.set(0);
-    this.bomaScores.set([]);
-    this.selectedScore.set(null);
-    void this.loadSubjects(true);
+  clearSearch(): void { this.bomaSearch = ''; void this.loadBomas(true); }
+
+  searchHousehold(): void {
+    const number = this.householdNumber.trim();
+    if (!number) return;
+    this.rememberResultsTrigger();
+    this.resultsContext.set({ boma: null, household: number, view: 'scores' });
   }
 
-  async loadSubjects(resetPage = false): Promise<void> {
-    const boma = this.selectedBoma();
-    if (!boma) return;
-    if (resetPage) this.subjectFirst.set(0);
-    const request = ++this.subjectRequest;
-    this.loadingSubjects.set(true);
-    try {
-      const page = Math.floor(this.subjectFirst() / this.subjectRows());
-      const response = await this.fingerScoreService.getBomaSubjects(
-        boma.id,
-        page,
-        this.subjectRows(),
-        this.subjectSearch
-      );
-      if (request !== this.subjectRequest) return;
-      this.subjects.set(response.data?.content ?? []);
-      this.subjectTotal.set(response.data?.totalElements ?? 0);
-    } catch (error) {
-      if (request !== this.subjectRequest) return;
-      this.subjects.set([]);
-      this.subjectTotal.set(0);
-      this.showError(error, 'Could not load subjects for this boma.');
-    } finally {
-      if (request === this.subjectRequest) this.loadingSubjects.set(false);
-    }
+  openBoma(boma: BomaProgress, view: 'subjects' | 'scores'): void {
+    this.rememberResultsTrigger();
+    this.resultsContext.set({ boma, household: '', view });
   }
 
-  onSubjectPageChange(event: PaginatorState): void {
-    this.subjectFirst.set(event.first ?? 0);
-    this.subjectRows.set(event.rows ?? 10);
-    void this.loadSubjects();
+  closeResults(): void { this.resultsContext.set(null); }
+
+  restoreResultsFocus(): void {
+    if (!this.resultsContext() && this.resultsTrigger?.isConnected) this.resultsTrigger.focus();
   }
 
-  async loadBomaScores(boma: BomaProgress): Promise<void> {
-    const request = ++this.scoresRequest;
-    ++this.subjectRequest;
-    ++this.detailRequest;
-    this.loadingScore.set(false);
-    this.loadingSubjects.set(false);
-    this.subjectSearch = '';
-    this.bomaView.set('scores');
-    this.bomaScores.set([]);
-    this.scoreFirst.set(0);
-    this.selectedBoma.set(boma);
-    this.subjects.set([]);
-    this.subjectTotal.set(0);
-    this.loadingBomaScores.set(true);
-    this.selectedScore.set(null);
-    try {
-      const response = await this.fingerScoreService.getBomaScores(boma.id);
-      if (request !== this.scoresRequest) return;
-      this.bomaScores.set(response.data ?? []);
-    } catch (error) {
-      if (request !== this.scoresRequest) return;
-      this.bomaScores.set([]);
-      this.showError(error, 'Could not load finger scores for this boma.');
-    } finally {
-      if (request === this.scoresRequest) this.loadingBomaScores.set(false);
-    }
-  }
-
-  closeBomaScores(): void {
-    const boma = this.selectedBoma();
-    if (boma) this.selectBoma(boma);
-  }
-
-  async loadIndividualScore(id: number): Promise<void> {
-    const request = ++this.detailRequest;
-    this.selectedScore.set(null);
-    this.loadingScore.set(true);
-    try {
-      const response = await this.fingerScoreService.getIndividualScore(id);
-      if (request !== this.detailRequest) return;
-      this.selectedScore.set(response.data ?? null);
-    } catch (error) {
-      if (request !== this.detailRequest) return;
-      this.selectedScore.set(null);
-      this.showError(error, 'Could not load this individual finger score.');
-    } finally {
-      if (request === this.detailRequest) this.loadingScore.set(false);
-    }
-  }
-
-  async searchHousehold(): Promise<void> {
-    if (!this.householdNumber.trim()) return;
-    const request = ++this.detailRequest;
-    this.selectedScore.set(null);
-    this.loadingScore.set(true);
-    try {
-      const household = this.householdNumber.trim();
-      const response = await this.fingerScoreService.getHouseholdScores(household);
-      if (request !== this.detailRequest) return;
-      this.householdResultNumber.set(household);
-      this.householdScores.set(response.data ?? []);
-      this.selectedScore.set(null);
-      if (!response.data?.length) {
-        this.messageService.add({ severity: 'info', summary: 'No records', detail: 'No finger scores found for this household.' });
-      }
-    } catch (error) {
-      if (request !== this.detailRequest) return;
-      this.householdScores.set([]);
-      this.showError(error, 'Could not load household finger scores.');
-    } finally {
-      if (request === this.detailRequest) this.loadingScore.set(false);
-    }
+  private rememberResultsTrigger(): void {
+    this.resultsTrigger = this.document.activeElement instanceof HTMLElement ? this.document.activeElement : null;
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.selectedFile = input.files?.[0] ?? null;
+    const file = input.files?.[0] ?? null;
+    this.fileError.set('');
+    this.uploadScore.set(null);
+    this.selectedFile = null;
+    if (file && (!/\.wsq$/i.test(file.name) || file.size === 0)) {
+      this.fileError.set(file.size === 0 ? 'This file is empty. Choose a WSQ fingerprint file.' : 'Choose a file with the .wsq extension.');
+      input.value = '';
+      return;
+    }
+    this.selectedFile = file;
   }
 
-  async uploadWsq(fileInput: HTMLInputElement): Promise<void> {
+  async uploadWsq(input: HTMLInputElement): Promise<void> {
     if (!this.selectedFile || this.uploading()) return;
-    this.uploadScore.set(null);
+    const file = this.selectedFile;
     this.uploading.set(true);
+    this.fileError.set('');
+    this.uploadScore.set(null);
     try {
-      const response = await this.fingerScoreService.uploadWsq(this.selectedFile);
+      const response = await this.service.uploadWsq(file);
+      if (this.destroyed) return;
       this.uploadScore.set(response.data);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'File processed',
-        detail: response.message
-          ? `${response.message} (Score: ${response.data})`
-          : `Finger score: ${response.data}`,
-      });
+      this.uploadName.set(file.name);
       this.selectedFile = null;
-      fileInput.value = '';
-      void Promise.all([this.loadSummary(), this.loadBomas(true)]);
-    } catch (error) {
-      this.showError(error, 'Could not process the WSQ file.');
-    } finally {
-      this.uploading.set(false);
-    }
+      input.value = '';
+      void this.loadSummary();
+      void this.loadBomas(true);
+    } catch { if (!this.destroyed) this.fileError.set('We couldn’t process this file. Please try again or choose another WSQ file.'); }
+    finally { if (!this.destroyed) this.uploading.set(false); }
   }
 
   async downloadCsv(boma: BomaProgress): Promise<void> {
     if (this.downloadingBomas().has(boma.id)) return;
     this.downloadingBomas.update(ids => new Set([...ids, boma.id]));
-    try {
-      await this.fingerScoreService.downloadBomaCsv(boma);
-    } catch (error) {
-      this.showError(error, 'Could not download the boma CSV file.');
-    } finally {
-      this.downloadingBomas.update(ids => {
-        const remaining = new Set(ids);
-        remaining.delete(boma.id);
-        return remaining;
-      });
-    }
-  }
-
-  trackScore(score: FingerScore): string {
-    return `${score.id}-${score.type}`;
-  }
-
-  private showError(error: any, fallback: string): void {
-    const detail = error?.response?.data?.message || error?.message || fallback;
-    this.messageService.add({ severity: 'error', summary: 'Request failed', detail });
+    try { await this.service.downloadBomaCsv(boma); }
+    catch { this.messages.add({ severity: 'error', summary: 'Download failed', detail: 'Please try downloading the boma CSV again.' }); }
+    finally { this.downloadingBomas.update(ids => { const next = new Set(ids); next.delete(boma.id); return next; }); }
   }
 }

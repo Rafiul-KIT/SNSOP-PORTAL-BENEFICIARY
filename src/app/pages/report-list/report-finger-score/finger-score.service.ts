@@ -30,16 +30,16 @@ export interface FingerScore {
   id: number;
   bomaId: number;
   type: 'BENEFICIARY' | 'ALTERNATE' | string;
-  leftIndex: number;
-  leftMiddle: number;
-  leftRing: number;
-  leftSmall: number;
-  leftThumb: number;
-  rightIndex: number;
-  rightMiddle: number;
-  rightRing: number;
-  rightSmall: number;
-  rightThumb: number;
+  leftIndex: number | null;
+  leftMiddle: number | null;
+  leftRing: number | null;
+  leftSmall: number | null;
+  leftThumb: number | null;
+  rightIndex: number | null;
+  rightMiddle: number | null;
+  rightRing: number | null;
+  rightSmall: number | null;
+  rightThumb: number | null;
 }
 
 export interface PageResult<T> {
