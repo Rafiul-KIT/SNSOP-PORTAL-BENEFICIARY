@@ -71,19 +71,6 @@ export class FingerScoreService {
     return response;
   }
 
-  async uploadWsq(file: File): Promise<ApiEnvelope<number>> {
-    const formData = new FormData();
-    formData.append('wsqFile', file, file.name);
-
-    const response = await this.api.POST<ApiEnvelope<number>>(
-      this.endpoint('api/v1/finger-score'),
-      formData,
-      'global',
-      { headers: { Accept: '*/*' } }
-    );
-    return this.checkResponse(response.data);
-  }
-
   async getSubjectStats(): Promise<ApiEnvelope<SubjectStats>> {
     const response = await this.api.GET<ApiEnvelope<SubjectStats>>(this.endpoint('api/v1/progress/subject-stats'));
     return this.checkResponse(response.data);
