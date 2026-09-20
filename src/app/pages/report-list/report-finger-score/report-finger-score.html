@@ -75,4 +75,7 @@
   @if (resultsContext(); as context) {
     <app-finger-score-results [boma]="context.boma" [household]="context.household" [initialView]="context.view" (close)="closeResults()" />
   }
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn btn-outline-primary" (click)="closeResults()"><i class="fas fa-xmark me-2" aria-hidden="true"></i>Close</button>
+  </ng-template>
 </p-dialog>

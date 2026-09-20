@@ -28,13 +28,13 @@ p { color: #64748b; font-size: .875rem; line-height: 1.6; }
 .form-control, .form-select { border-color: #d7dfe9; border-radius: 8px; font-size: .875rem; min-height: 42px; }
 .form-control:focus, .form-select:focus { border-color: #6b9df4; box-shadow: 0 0 0 3px #2563eb20; }
 .btn { border-radius: 8px; font-size: .84rem; font-weight: 500; padding: .6rem 1rem; white-space: nowrap; }
-.btn-primary { background: #2563eb; border-color: #2563eb; }
-.btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
-.btn-outline-primary { color: #245bd0; border-color: #c6d7f6; }
-.btn-outline-primary:hover { color: white; background: #2563eb; border-color: #2563eb; }
+.btn-primary { background: #059669; border-color: #059669; }
+.btn-primary:hover { background: #047857; border-color: #047857; }
+.btn-outline-primary { color: #047857; border-color: #a7f3d0; }
+.btn-outline-primary:hover { color: white; background: #059669; border-color: #059669; }
 .btn-sm { font-size: .78rem; padding: .45rem .75rem; }
 .btn-light { color: #475569; background: #f1f5f9; }
-.btn:focus-visible, a:focus-visible, .text-button:focus-visible, .score-list:focus-visible { outline: 3px solid #7ba6ed; outline-offset: 3px; }
+.btn:focus-visible, a:focus-visible, .text-button:focus-visible, .score-list:focus-visible { outline: 3px solid #6ee7b7; outline-offset: 3px; }
 .tool-submit { margin-top: auto; align-self: flex-start; }
 .file-picker { position: relative; display: flex; align-items: center; gap: .85rem; min-height: 84px; padding: 1rem; margin-bottom: 1.15rem; border: 1px dashed #a9bdd9; border-radius: 10px; background: #f8fbff; }
 .file-picker > i { color: #6c8ebd; font-size: 1.5rem; }
@@ -44,7 +44,7 @@ p { color: #64748b; font-size: .875rem; line-height: 1.6; }
 .file-picker input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
 .file-picker:focus-within { outline: 3px solid #7ba6ed; outline-offset: 2px; }
 .file-picker:has(input:disabled) { opacity: .65; }
-.file-choose { color: #245bd0; font-size: .78rem; border: 1px solid #c6d7f6; padding: .35rem .65rem; border-radius: 6px; background: white; }
+.file-choose { color: #047857; font-size: .78rem; border: 1px solid #a7f3d0; padding: .35rem .65rem; border-radius: 6px; background: white; }
 .has-file { border-style: solid; border-color: #7ea7de; }
 .field-hint { font-size: .78rem; margin: .7rem 0 1rem; }
 .field-hint i { margin-right: .3rem; }
@@ -53,7 +53,7 @@ p { color: #64748b; font-size: .875rem; line-height: 1.6; }
 .upload-result { display: flex; align-items: center; gap: .75rem; padding: .8rem; margin-bottom: 1rem; background: #effaf4; border: 1px solid #c8ebd7; color: #17663b; border-radius: 8px; }
 .upload-result small { display: block; font-size: .75rem; overflow-wrap: anywhere; }
 .inline-notice { padding: .75rem 1rem; background: #fffaeb; border-radius: 8px; color: #7a4e10; }
-.text-button { border: 0; background: none; color: #245bd0; text-decoration: underline; font-size: .8rem; padding: .4rem; }
+.text-button { border: 0; background: none; color: #047857; text-decoration: underline; font-size: .8rem; padding: .4rem; }
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.4rem; }
 .count-badge { display: inline-block; vertical-align: middle; padding: .2rem .5rem; margin-left: .35rem; font-size: .72rem; font-weight: 600; color: #526680; background: #f0f4f9; border-radius: 6px; }
 .search-box { display: flex; align-items: center; gap: .5rem; }
@@ -77,7 +77,7 @@ p { color: #64748b; font-size: .875rem; line-height: 1.6; }
 .export-action small { display: block; color: #64748b; margin-top: .45rem; font-size: .72rem; }
 .view-tabs { display: flex; gap: 1.5rem; padding: 0 1.4rem; border-bottom: 1px solid #e2e8f0; }
 .view-tabs button { border: 0; background: none; display: block; padding: 1.1rem .2rem; border-bottom: 3px solid transparent; color: #64748b; font-weight: 500; font-size: .85rem; }
-.view-tabs button.active { color: #245bd0; border-bottom-color: #2563eb; }
+.view-tabs button.active { color: #047857; border-bottom-color: #059669; }
 .score-filters { display: flex; gap: .6rem; }
 .score-filters input { width: 240px; }
 .score-filters select { width: 175px; }
@@ -146,4 +146,4 @@ p { color: #64748b; font-size: .875rem; line-height: 1.6; }
   .export-action small { display: block; margin-left: 0; }
 }
 
-.view-tabs button:focus-visible { outline: 3px solid #7ba6ed; outline-offset: -3px; }
+.view-tabs button:focus-visible { outline: 3px solid #6ee7b7; outline-offset: -3px; }
