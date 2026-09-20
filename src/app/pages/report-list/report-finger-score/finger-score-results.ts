@@ -51,8 +51,12 @@ export class FingerScoreResults implements OnInit, OnDestroy {
     return this.records().filter(score => (!this.role() || score.type === this.role()) &&
       (!search || `${score.name ?? ''} ${score.householdNumber ?? ''}`.toLowerCase().includes(search)));
   });
-  readonly visibleRecords = computed(() => this.view() === 'subjects' ? this.records() :
-    this.filteredScores().slice(this.first(), this.first() + this.rows()));
+  readonly visibleRecords = computed(() => {
+    if (this.view() === 'subjects') return this.records();
+    // A household's own results are already the complete, small list — paginating them adds clicks for no benefit.
+    if (this.household()) return this.filteredScores();
+    return this.filteredScores().slice(this.first(), this.first() + this.rows());
+  });
   readonly resultCount = computed(() => this.view() === 'subjects' ? this.total() : this.filteredScores().length);
 
   ngOnInit(): void {

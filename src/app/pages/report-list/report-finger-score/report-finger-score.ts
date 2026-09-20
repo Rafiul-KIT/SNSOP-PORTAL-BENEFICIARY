@@ -2,23 +2,30 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { FingerScoreResults } from './finger-score-results';
 import { MessageService } from 'primeng/api';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ToastModule } from 'primeng/toast';
 import { BomaProgress, FingerScoreService, SubjectStats } from './finger-score.service';
 import { LoadingSpinner } from '../../../components/loading-spinner/loading-spinner';
+import { LookupItem, LookupService } from '../../../services/lookup.service';
 
 @Component({
   selector: 'app-report-finger-score',
   standalone: true,
-  imports: [CommonModule, FormsModule, DialogModule, FingerScoreResults, LoadingSpinner, PaginatorModule, ToastModule],
+  imports: [CommonModule, FormsModule, DialogModule, FingerScoreResults, LoadingSpinner, PaginatorModule, ToastModule, SelectModule, FloatLabelModule, TableModule, ButtonModule, InputTextModule],
   templateUrl: './report-finger-score.html',
   styleUrl: './report-finger-score.scss',
 })
 export class ReportFingerScore implements OnInit, OnDestroy {
   private readonly service = inject(FingerScoreService);
   private readonly document = inject(DOCUMENT);
+  private readonly lookup = inject(LookupService);
   private resultsTrigger: HTMLElement | null = null;
   private readonly messages = inject(MessageService);
   private request = 0;
@@ -34,22 +41,32 @@ export class ReportFingerScore implements OnInit, OnDestroy {
   readonly summaryError = signal(false);
   readonly loadingBomas = signal(true);
   readonly bomaError = signal('');
-  readonly uploading = signal(false);
-  readonly uploadScore = signal<number | null>(null);
-  readonly uploadName = signal('');
-  readonly fileError = signal('');
   readonly downloadingBomas = signal<ReadonlySet<number>>(new Set());
   readonly resultsContext = signal<{ boma: BomaProgress | null; household: string; view: 'subjects' | 'scores' } | null>(null);
   bomaSearch = '';
   householdNumber = '';
-  selectedFile: File | null = null;
+  readonly stateOptions = signal<LookupItem[]>([]);
+  readonly countyOptions = signal<LookupItem[]>([]);
+  readonly payamOptions = signal<LookupItem[]>([]);
+  readonly bomaOptions = signal<LookupItem[]>([]);
+  readonly selectedState = signal<LookupItem | null>(null);
+  readonly selectedCounty = signal<LookupItem | null>(null);
+  readonly selectedPayam = signal<LookupItem | null>(null);
+  readonly selectedBoma = signal<LookupItem | null>(null);
 
   ngOnInit(): void { void this.loadInitialData(); }
 
   async loadInitialData(): Promise<void> {
     // Keep one stable loading state until the parallel initial requests finish.
-    await Promise.all([this.loadSummary(), this.loadBomas()]);
+    await Promise.all([this.loadSummary(), this.loadBomas(), this.loadStateOptions()]);
     if (!this.destroyed) this.initialLoading.set(false);
+  }
+
+  async loadStateOptions(): Promise<void> {
+    try {
+      const states = await this.lookup.getOrFetchStateList();
+      if (!this.destroyed) this.stateOptions.set(states);
+    } catch { /* The location filter is a convenience; leave it empty if lookups are unavailable. */ }
   }
   ngOnDestroy(): void { this.destroyed = true; ++this.request; }
 
@@ -89,7 +106,53 @@ export class ReportFingerScore implements OnInit, OnDestroy {
     void this.loadBomas();
   }
 
-  clearSearch(): void { this.bomaSearch = ''; void this.loadBomas(true); }
+  hasLocationFilter(): boolean {
+    return !!(this.selectedState() || this.selectedCounty() || this.selectedPayam() || this.selectedBoma());
+  }
+
+  async onStateChange(state: LookupItem | null): Promise<void> {
+    this.selectedState.set(state);
+    this.selectedCounty.set(null);
+    this.selectedPayam.set(null);
+    this.selectedBoma.set(null);
+    this.countyOptions.set([]);
+    this.payamOptions.set([]);
+    this.bomaOptions.set([]);
+    if (state?.id) this.countyOptions.set(await this.lookup.getCountyListByStateId(state.id));
+  }
+
+  async onCountyChange(county: LookupItem | null): Promise<void> {
+    this.selectedCounty.set(county);
+    this.selectedPayam.set(null);
+    this.selectedBoma.set(null);
+    this.payamOptions.set([]);
+    this.bomaOptions.set([]);
+    if (county?.id) this.payamOptions.set(await this.lookup.getPayamListByCountyId(county.id));
+  }
+
+  async onPayamChange(payam: LookupItem | null): Promise<void> {
+    this.selectedPayam.set(payam);
+    this.selectedBoma.set(null);
+    this.bomaOptions.set([]);
+    if (payam?.id) this.bomaOptions.set(await this.lookup.getBomaListByPayamId(payam.id));
+  }
+
+  searchByLocation(): void {
+    this.bomaSearch = this.selectedBoma()?.name || this.selectedPayam()?.name || this.selectedCounty()?.name || this.selectedState()?.name || '';
+    void this.loadBomas(true);
+  }
+
+  clearSearch(): void {
+    this.bomaSearch = '';
+    this.selectedState.set(null);
+    this.selectedCounty.set(null);
+    this.selectedPayam.set(null);
+    this.selectedBoma.set(null);
+    this.countyOptions.set([]);
+    this.payamOptions.set([]);
+    this.bomaOptions.set([]);
+    void this.loadBomas(true);
+  }
 
   searchHousehold(): void {
     const number = this.householdNumber.trim();
@@ -111,39 +174,6 @@ export class ReportFingerScore implements OnInit, OnDestroy {
 
   private rememberResultsTrigger(): void {
     this.resultsTrigger = this.document.activeElement instanceof HTMLElement ? this.document.activeElement : null;
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.fileError.set('');
-    this.uploadScore.set(null);
-    this.selectedFile = null;
-    if (file && (!/\.wsq$/i.test(file.name) || file.size === 0)) {
-      this.fileError.set(file.size === 0 ? 'This file is empty. Choose a WSQ fingerprint file.' : 'Choose a file with the .wsq extension.');
-      input.value = '';
-      return;
-    }
-    this.selectedFile = file;
-  }
-
-  async uploadWsq(input: HTMLInputElement): Promise<void> {
-    if (!this.selectedFile || this.uploading()) return;
-    const file = this.selectedFile;
-    this.uploading.set(true);
-    this.fileError.set('');
-    this.uploadScore.set(null);
-    try {
-      const response = await this.service.uploadWsq(file);
-      if (this.destroyed) return;
-      this.uploadScore.set(response.data);
-      this.uploadName.set(file.name);
-      this.selectedFile = null;
-      input.value = '';
-      void this.loadSummary();
-      void this.loadBomas(true);
-    } catch { if (!this.destroyed) this.fileError.set('We couldn’t process this file. Please try again or choose another WSQ file.'); }
-    finally { if (!this.destroyed) this.uploading.set(false); }
   }
 
   async downloadCsv(boma: BomaProgress): Promise<void> {

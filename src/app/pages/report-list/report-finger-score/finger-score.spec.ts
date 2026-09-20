@@ -18,6 +18,9 @@ describe('Fingerprint quality report', () => {
 
   beforeEach(() => {
     api = jasmine.createSpyObj('ApiService', ['GET', 'POST']);
+    // The location filter's geo lookups go through POST; default to an empty, successful result so specs
+    // that don't care about the filter aren't broken by its background fetch.
+    api.POST.and.resolveTo({ data: { operationResult: true, lookups: [] } } as any);
     TestBed.configureTestingModule({
       providers: [provideZonelessChangeDetection(), provideNoopAnimations(), { provide: ApiService, useValue: api }, MessageService],
     });
@@ -35,17 +38,6 @@ describe('Fingerprint quality report', () => {
   it('rejects HTTP 200 failure envelopes', async () => {
     api.GET.and.resolveTo({ data: { success: false, message: 'Failed' } } as any);
     await expectAsync(service.getBomaCount()).toBeRejectedWithError('Failed');
-  });
-
-  it('uploads wsqFile as FormData and preserves a zero score', async () => {
-    api.POST.and.resolveTo({ data: { success: true, data: 0 } } as any);
-    const file = new File(['wsq'], 'sample.wsq');
-    const result = await service.uploadWsq(file);
-    expect(result.data).toBe(0);
-    const args = api.POST.calls.mostRecent().args;
-    expect(args[0]).toBe('https://gwapp.southsudansafetynet.info/fingerquality/api/v1/finger-score');
-    expect((args[1] as FormData).get('wsqFile')).toEqual(file);
-    expect(args[3]?.headers?.['Content-Type']).toBeUndefined();
   });
 
   it('uses page pagination without assuming the meaning of optional start', async () => {
@@ -170,16 +162,6 @@ describe('Fingerprint quality report', () => {
     expect(csv).toContain('"Right Little"');
     expect(csv).toContain('"001","A, ""B""","\'=formula","0"');
     expect(csv).toContain(',"42"');
-  });
-
-  it('rejects incorrect file types and clears a previous upload result', () => {
-    report.uploadScore.set(88);
-    const input = { files: [new File(['text'], 'sample.txt')], value: 'sample.txt' };
-    report.onFileSelected({ target: input } as unknown as Event);
-    expect(report.selectedFile).toBeNull();
-    expect(report.uploadScore()).toBeNull();
-    expect(report.fileError()).toContain('.wsq');
-    expect(input.value).toBe('');
   });
 
   it('renders zero and missing scores distinctly in the results table', async () => {
