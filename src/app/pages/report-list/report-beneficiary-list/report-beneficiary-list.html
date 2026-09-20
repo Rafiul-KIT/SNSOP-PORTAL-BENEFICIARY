@@ -25,6 +25,7 @@
     <table class="table table-striped">
       <thead>
         <tr>
+          <th>Serial</th>
           <th>State</th>
           <th>County</th>
           <th>Payam</th>
@@ -35,8 +36,9 @@
         </tr>
       </thead>
       <tbody>
-        @for (beneficiary of displayedList(); track beneficiary.applicationId) {
+        @for (beneficiary of displayedList(); track beneficiary.applicationId; let i = $index) {
           <tr>
+            <td>{{ first() + i + 1 }}</td>
             <td>{{ lookupService.getStateNameById(beneficiary.address?.stateId) }}</td>
             <td>{{ lookupService.getCountyNameById(beneficiary.address?.countyId) }}</td>
             <td>{{ lookupService.getPayamNameById(beneficiary.address?.payam) }}</td>
@@ -50,6 +52,7 @@
             <td>{{ beneficiary.respondentAge }}</td>
             <td>{{ beneficiary.registrationPhase }}</td>
             <td>{{ beneficiary.registrationStatus == 'ACTIVE' ? 'Enrolled' : 'Pending' }}</td>
+            <td>{{ beneficiary.adjudicationStatus }}</td>
           </tr>
         }
       </tbody>

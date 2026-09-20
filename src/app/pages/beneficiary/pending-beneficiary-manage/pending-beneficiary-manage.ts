@@ -42,6 +42,7 @@ import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-pending-beneficiary-manage',
@@ -63,6 +64,7 @@ import { TooltipModule } from 'primeng/tooltip';
     SelectModule,
     RouterModule,
     TooltipModule,
+    DialogModule,
     Loader,
     TabPanel,
     Tabs,
@@ -78,6 +80,7 @@ export class PendingBeneficiaryManage implements OnInit {
   beneficiaryForm!: FormGroup;
   originalDto!: BeneficiaryDto;
   deleteComment: string = '';
+  approveComment: string = '';
   destroy$ = new Subject<void>();
 
   genderOptions: LookupItem[] = [];
@@ -99,6 +102,11 @@ export class PendingBeneficiaryManage implements OnInit {
   bomaList: LookupItem[] = [];
   stateName: string = '--';
   countyName: string = '--';
+  isModelLoading = false;
+  modelComparisonDialogVisible = false;
+  currentSupportType = '';
+  modelSupportType = '';
+  modelErrorMessage = '';
 
   // ===== Regex & constants (aligned with mobile/Java) =====
   private RGX_ONLY_CHARS = /^[A-Za-z]+$/; // names (no spaces/digits/special)
@@ -330,6 +338,7 @@ export class PendingBeneficiaryManage implements OnInit {
     this.beneficiaryForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
+        this.autoCalculateHouseholdSize();
         this.updateSelectionReasonValidation();
       });
 
@@ -635,6 +644,7 @@ export class PendingBeneficiaryManage implements OnInit {
     );
     this.filterReasons(this.beneficiaryForm.get('supportType')?.value);
     this.beneficiaryForm.updateValueAndValidity();
+    this.autoCalculateHouseholdSize();
     this.updateSelectionReasonValidation(); // Set initial state
     this.cdr.detectChanges();
   }
@@ -1151,6 +1161,84 @@ export class PendingBeneficiaryManage implements OnInit {
     return payload;
   }
 
+  private buildModelPayload(formValue: any) {
+    const household: Record<string, number> = {};
+    const groups = [
+      { suffix: '0_2', malePrefix: 'm0_2', femalePrefix: 'f0_2' },
+      { suffix: '3_5', malePrefix: 'm3_5', femalePrefix: 'f3_5' },
+      { suffix: '6_17', malePrefix: 'm6_17', femalePrefix: 'f6_17' },
+      { suffix: '18_35', malePrefix: 'm18_35', femalePrefix: 'f18_35' },
+      { suffix: '36_64', malePrefix: 'm36_64', femalePrefix: 'f36_64' },
+      { suffix: '65_plus', malePrefix: 'm65', femalePrefix: 'f65' },
+    ];
+    const valueOf = (key: string) => Number(formValue[key]) || 0;
+    const assignGenderValues = (
+      gender: 'male' | 'female',
+      suffix: string,
+      prefix: string,
+    ) => {
+      const disabled = valueOf(`${prefix}_disable`);
+      const chronicallyIll = valueOf(`${prefix}_chronic`);
+      const both = valueOf(`${prefix}_both`);
+      const total = valueOf(`${prefix}_total`);
+      household[`${gender}_${suffix}_both`] = both;
+      household[`${gender}_${suffix}_chronically_ill`] = chronicallyIll;
+      household[`${gender}_${suffix}_disabled`] = disabled;
+      household[`${gender}_${suffix}_normal`] = Math.max(
+        total - disabled - chronicallyIll - both,
+        0,
+      );
+    };
+
+    groups.forEach((group) => {
+      assignGenderValues('male', group.suffix, group.malePrefix);
+      assignGenderValues('female', group.suffix, group.femalePrefix);
+    });
+
+    return { household };
+  }
+
+  private formatModelSupportType(supportType: string): string {
+    if (supportType === 'LIPW') return 'Public Works';
+    if (supportType === 'DIS') return 'Direct Income Support';
+    if (supportType === 'OTHER') return 'BOTH';
+    return supportType;
+  }
+
+  runModel() {
+    if (this.isModelLoading) return;
+
+    this.isModelLoading = true;
+    this.currentSupportType =
+      this.beneficiaryForm.get('supportType')?.value || 'Not selected';
+    this.modelSupportType = '';
+    this.modelErrorMessage = '';
+    this.cdr.detectChanges();
+
+    const payload = this.buildModelPayload(this.beneficiaryForm.getRawValue());
+    this.api
+      .POST('get_support_type', payload, 'model')
+      .then((res: any) => {
+        const supportType = res?.data?.support_type || res?.support_type || '';
+        this.modelSupportType = this.formatModelSupportType(supportType);
+        if (!this.modelSupportType) {
+          this.modelErrorMessage = 'No support type returned from model.';
+        }
+        this.modelComparisonDialogVisible = true;
+        this.cdr.detectChanges();
+      })
+      .catch((err) => {
+        console.error('Model request failed:', err);
+        this.modelErrorMessage = 'Model request could not be processed.';
+        this.modelComparisonDialogVisible = true;
+        this.cdr.detectChanges();
+      })
+      .finally(() => {
+        this.isModelLoading = false;
+        this.cdr.detectChanges();
+      });
+  }
+
   // ========= Submit =========
   onSubmit() {
     this.beneficiaryForm.markAllAsTouched();
@@ -1186,9 +1274,9 @@ export class PendingBeneficiaryManage implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Update Successful',
-            detail: 'Beneficiary Updated and Approved successfully!',
+            detail: 'Beneficiary Updated successfully!',
           });
-          setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
+          // setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 3000);
         } else if (first.result === 'FAILED') {
           this.messageService.add({
             severity: 'error',
@@ -2029,6 +2117,19 @@ export class PendingBeneficiaryManage implements OnInit {
     this.beneficiaryForm.get('selectionReasons')?.setValue(selectedReasons);
   }
 
+  private autoCalculateHouseholdSize() {
+    if (!this.beneficiaryForm) return;
+    let sum = 0;
+    for (const g of this.ageGroups) {
+      sum +=
+        (+this.beneficiaryForm.get(g.maleTotal)?.value || 0) +
+        (+this.beneficiaryForm.get(g.femaleTotal)?.value || 0);
+    }
+    sum += +this.beneficiaryForm.get('f18_35_lactating_total')?.value || 0;
+    sum += +this.beneficiaryForm.get('f36_64_lactating_total')?.value || 0;
+    this.beneficiaryForm.get('householdSize')?.setValue(sum, { emitEvent: false });
+  }
+
   private updateSelectionReasonValidation() {
     if (!this.beneficiaryForm) return;
     const hhData = this.getHouseholdBreakdown();
@@ -2041,7 +2142,8 @@ export class PendingBeneficiaryManage implements OnInit {
     const hasLipwRule = this.beneficiaryForm.hasError('lipwRule');
 
     this.filteredReasons.forEach((reason) => {
-      const isDisReason = reason.value.startsWith('DIS_REASON');
+      const isDisReason =
+        reason.value.startsWith('DIS_REASON') && reason.value !== 'DIS_REASON_3';
       const isLipwReason = reason.value.startsWith('LIPW_REASON');
 
       const shouldBeDisabledByHhData = this.isReasonDisabled(reason, hhData);
@@ -2066,6 +2168,7 @@ export class PendingBeneficiaryManage implements OnInit {
         .get('selectionReasons')
         ?.setValue(selectedReasons, { emitEvent: false });
     }
+    this.cdr.detectChanges();
   }
 
   private getHouseholdBreakdown() {
@@ -2135,7 +2238,9 @@ export class PendingBeneficiaryManage implements OnInit {
     }, 0);
 
     const dependents =
-      childrenTotal + elderly_65_plus_total + otherAgeGroupDependents;
+      childrenTotal + elderly_65_plus_total + otherAgeGroupDependents +
+      gv('f18_35_lactating_total') +
+      gv('f36_64_lactating_total');
 
     let ableBodiedTotal = 0;
     this.ageGroups.forEach((group) => {
@@ -2149,7 +2254,11 @@ export class PendingBeneficiaryManage implements OnInit {
       ableBodied_18_plus,
       ableBodied_18_64,
       adults_36_64_total,
-      female_18_64_total: youth_18_35_female_total + adults_36_64_female_total,
+      female_18_64_total:
+        youth_18_35_female_total +
+        adults_36_64_female_total +
+        gv('f18_35_lactating_total') +
+        gv('f36_64_lactating_total'),
       dependents,
       youth_18_35_total,
       ableBodiedTotal: ableBodiedTotal,
@@ -2169,7 +2278,7 @@ export class PendingBeneficiaryManage implements OnInit {
         return !(hhData.elderlyTotal > 0 && hhData.ableBodied_18_64 === 0);
 
       case 'DIS_REASON_3':
-        return hhData.ableBodiedTotal > 0;
+        return false;
       case 'DIS_REASON_4':
         return !(
           hhData.chronicallyIllOrBothInAllAges && hhData.ableBodied_18_64 === 0
@@ -2213,6 +2322,80 @@ export class PendingBeneficiaryManage implements OnInit {
       rejectButtonStyleClass: 'p-button-danger',
     });
   }
+
+onApprove() {
+  this.approveComment = '';
+  this.confirmationService.confirm({
+    key: 'approveDialog',
+    header: 'Confirm Approval',
+    accept: () => this.handleApproveWithUpdate(),
+    reject: () => { },
+    acceptButtonStyleClass: 'p-button-success',
+    rejectButtonStyleClass: 'p-button-danger',
+  });
+}
+
+private handleApproveWithUpdate() {
+  this.beneficiaryForm.markAllAsTouched();
+  if (!this.beneficiaryForm.valid) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validation',
+      detail: 'Please fix the highlighted errors before approval.',
+    });
+    return;
+  }
+
+  const beneficiary = this.buildUpdatePayload(this.beneficiaryForm.getRawValue());
+  const updatePayload = { beneficiaries: [beneficiary] };
+
+  this.isLoading = true;
+  this.cdr.markForCheck();
+  this.api.POST('api/beneficiary/update/batch', updatePayload)
+    .then((res: any) => {
+      const responses = res?.bulkResponse || res?.data?.bulkResponse || [];
+      if (!responses.length || responses[0].result !== 'SUCCESS') {
+        throw new Error(responses[0]?.errorMessage || 'Update failed');
+      }
+
+      // 4. If update succeeds, call approve API
+      const applicationId = this.originalDto?.applicationId;
+      if (!applicationId) throw new Error('Beneficiary Application ID not found.');
+
+      const approvePayload = {
+        householdId: [applicationId],
+        comment: this.approveComment.trim(),
+        enrollmentStatusEnum: 'APPROVED',
+      };
+
+      return this.api.POST('api/beneficiary/update/approveBeneficiary/batch', approvePayload);
+    })
+    .then((res: any) => {
+      if (res.status === 200) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Approved',
+          detail: 'Beneficiary has been updated and approved successfully.',
+        });
+        this.approveComment = '';
+        setTimeout(() => this.router.navigate(['/pending-beneficiary/list']), 2000);
+      } else {
+        throw new Error(res.errorMsg || 'Approval failed.');
+      }
+    })
+    .catch((err: any) => {
+      console.error('Approve with update error:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.message || 'Operation failed.',
+      });
+    })
+    .finally(() => {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    });
+}
 
   handleDeleteConfirm() {
     if (!this.deleteComment || !this.deleteComment.trim()) {

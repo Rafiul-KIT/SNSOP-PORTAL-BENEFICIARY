@@ -232,6 +232,15 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'finger-score',
+        loadComponent: () =>
+          import('./pages/report/report').then((m) => m.ReportComponent),
+        data: {
+          reportType: 12,
+          reportTitle: 'Fingerprint Quality Report',
+        },
+      },
+      {
         path: 'async-report-generation',
         loadComponent: () =>
           import('./pages/report/async-report-generation/async-report-generation').then(

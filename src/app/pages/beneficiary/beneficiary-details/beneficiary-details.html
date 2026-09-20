@@ -11,6 +11,7 @@
       <p-tab value="0">Beneficiary Information</p-tab>
       <p-tab value="1">Alternate Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
+      <p-tab value="3">Automated Targeting</p-tab>
       @if(activeStatus === 1){
       <div style="position: absolute; bottom: 10px; right: 0; z-index: 99">
 
@@ -238,7 +239,9 @@
                                   (beneficiaryDetails.householdMember17?.femaleTotal || 0) +
                                   (beneficiaryDetails.householdMember35?.femaleTotal || 0) +
                                   (beneficiaryDetails.householdMember64?.femaleTotal || 0) +
-                                  (beneficiaryDetails.householdMember65?.femaleTotal || 0)
+                                  (beneficiaryDetails.householdMember65?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMemberLactating35?.femaleTotal || 0) +
+                                  (beneficiaryDetails.householdMemberLactating64?.femaleTotal || 0)
                                   }}
                                 </td>
 
@@ -280,7 +283,11 @@
                                   (beneficiaryDetails.householdMember65?.maleBoth || 0) +
                                   (beneficiaryDetails.householdMember65?.maleChronicalIll || 0) +
                                   (beneficiaryDetails.householdMember65?.femaleBoth || 0) +
-                                  (beneficiaryDetails.householdMember65?.femaleChronicalIll || 0)
+                                  (beneficiaryDetails.householdMember65?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMemberLactating35?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMemberLactating35?.femaleChronicalIll || 0) +
+                                  (beneficiaryDetails.householdMemberLactating64?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMemberLactating64?.femaleChronicalIll || 0)
                                   }}
                                 </td>
 
@@ -310,7 +317,11 @@
                                   (beneficiaryDetails.householdMember65?.maleBoth || 0) +
                                   (beneficiaryDetails.householdMember65?.maleDisable || 0) +
                                   (beneficiaryDetails.householdMember65?.femaleBoth || 0) +
-                                  (beneficiaryDetails.householdMember65?.femaleDisable || 0)
+                                  (beneficiaryDetails.householdMember65?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMemberLactating35?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMemberLactating35?.femaleDisable || 0) +
+                                  (beneficiaryDetails.householdMemberLactating64?.femaleBoth || 0) +
+                                  (beneficiaryDetails.householdMemberLactating64?.femaleDisable || 0)
                                   }}
                                 </td>
                               </tr>
@@ -658,6 +669,99 @@
           </div>
         </div>
       </p-tabpanel>
+      <p-tabpanel value="3">
+        <div class="px-5" style="height: calc(100vh - 210px); overflow-y: auto">
+          <div class="card shadow-sm rounded">
+            <div class="card-header bg-gray text-black">
+              Household Breakdown
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm breakdown-table">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Age Group</th>
+                      <th colspan="4" class="male-breakdown-cell">Male</th>
+                      <th colspan="4" class="female-breakdown-cell">Female</th>
+                    </tr>
+                    <tr>
+                      <th class="male-breakdown-cell">Total</th>
+                      <th class="male-breakdown-cell">With Disability</th>
+                      <th class="male-breakdown-cell">With Chronic Illness</th>
+                      <th class="male-breakdown-cell">Both</th>
+                      <th class="female-breakdown-cell">Total</th>
+                      <th class="female-breakdown-cell">With Disability</th>
+                      <th class="female-breakdown-cell">With Chronic Illness</th>
+                      <th class="female-breakdown-cell">Both</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (ageGroup of breakdownRows; track ageGroup.key) {
+                    <tr>
+                      <td>{{ ageGroup.label }}</td>
+                      <td class="male-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.maleTotal" /></td>
+                      <td class="male-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.maleDisable" /></td>
+                      <td class="male-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.maleChronicalIll" /></td>
+                      <td class="male-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.maleBoth" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.femaleTotal" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.femaleDisable" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.femaleChronicalIll" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="ageGroup.group.femaleBoth" /></td>
+                    </tr>
+
+                    @if (ageGroup.key === 'householdMember35') {
+                    <tr class="lactating-row">
+                      <td>Lactating Women (18-35)</td>
+                      <td colspan="4" class="bg-light"></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating35Breakdown.femaleTotal" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating35Breakdown.femaleDisable" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating35Breakdown.femaleChronicalIll" />
+                      </td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating35Breakdown.femaleBoth" /></td>
+                    </tr>
+                    }
+
+                    @if (ageGroup.key === 'householdMember64') {
+                    <tr class="lactating-row">
+                      <td>Lactating Women (36-64)</td>
+                      <td colspan="4" class="bg-light"></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating64Breakdown.femaleTotal" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating64Breakdown.femaleDisable" /></td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating64Breakdown.femaleChronicalIll" />
+                      </td>
+                      <td class="female-breakdown-cell"><input pInputText type="number" min="0"
+                          class="form-control form-control-sm" [(ngModel)]="lactating64Breakdown.femaleBoth" /></td>
+                    </tr>
+                    }
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-3 text-end">
+                <p-button size="small" type="button" label="Support Type Recommendation" icon="fas fa-play"
+                  severity="info" [disabled]="isRunningModel" [loading]="isRunningModel"
+                  (onClick)="runAutomatedTargetingModel()" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
 
@@ -682,11 +786,32 @@
 </div>
 
 <p-toast position="bottom-right" />
+<p-dialog header="Automated Targeting Comparison" [(visible)]="modelComparisonDialogVisible" [modal]="true"
+  [style]="{ width: '620px' }">
+  <div class="row g-3 comparison-dialog">
+    <div class="col-md-6">
+      <div class="comparison-panel current-support">
+        <div class="comparison-title">Present Support Type</div>
+        <div class="comparison-value">{{ currentSupportType }}</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="comparison-panel model-support">
+        <div class="comparison-title">Targeting Result</div>
+        <div class="comparison-value">{{ modelSupportType }}</div>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="fas fa-check" label="OK" severity="primary"
+      (onClick)="modelComparisonDialogVisible = false"></p-button>
+  </ng-template>
+</p-dialog>
 <p-dialog header="Confirm Restore" [(visible)]="isRestoreDialogVisible" [modal]="true" [style]="{ width: '450px' }">
   <div class="p-fluid">
     <div class="field">
-        <label for="restore-comment">Please provide a comment before restoring:</label>
-        <textarea id="restore-comment" rows="3" pInputTextarea [(ngModel)]="restoreComment"></textarea>
+      <label for="restore-comment">Please provide a comment before restoring:</label>
+      <textarea id="restore-comment" rows="3" pInputTextarea [(ngModel)]="restoreComment"></textarea>
     </div>
   </div>
   <ng-template pTemplate="footer">

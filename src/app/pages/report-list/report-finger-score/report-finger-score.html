@@ -1,0 +1,81 @@
+<p-toast position="bottom-right" [baseZIndex]="10000" />
+<section class="finger-score-report">
+  <header class="page-intro">
+    <div class="intro-icon"><i class="fas fa-fingerprint" aria-hidden="true"></i></div>
+    <div><span class="eyebrow">BIOMETRIC REPORTS</span><h1>Fingerprint quality</h1><p>Find a person, review fingerprint scores, and download the results you need.</p></div>
+  </header>
+
+  @if (initialLoading()) {
+    <div class="initial-loading" aria-busy="true"><app-loading-spinner /></div>
+  } @else {
+  <div class="summary-grid" [attr.aria-busy]="loadingSummary()">
+    <article class="summary-card total"><span class="summary-icon"><i class="fas fa-fingerprint" aria-hidden="true"></i></span><div><small>Total subjects</small><strong>{{ summaryError() ? '—' : (stats().total | number) }}</strong></div></article>
+    <article class="summary-card beneficiary"><span class="summary-icon"><i class="fas fa-user-check" aria-hidden="true"></i></span><div><small>Beneficiaries</small><strong>{{ summaryError() ? '—' : (stats().beneficiaries | number) }}</strong></div></article>
+    <article class="summary-card alternate"><span class="summary-icon"><i class="fas fa-user-group" aria-hidden="true"></i></span><div><small>Alternates</small><strong>{{ summaryError() ? '—' : (stats().alternates | number) }}</strong></div></article>
+    <article class="summary-card boma"><span class="summary-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span><div><small>Processed bomas</small><strong>{{ summaryError() ? '—' : (bomaCount() | number) }}</strong></div></article>
+  </div>
+  @if (summaryError()) { <div class="inline-notice" role="alert">Summary unavailable. <button type="button" class="text-button" (click)="loadSummary()">Try again</button></div> }
+
+  <div class="quick-actions">
+    <article class="report-panel tool-card">
+      <div class="tool-heading"><span class="tool-icon"><i class="fas fa-file-arrow-up" aria-hidden="true"></i></span><div><h2>Process WSQ file</h2><p>Calculate the quality score of a fingerprint file.</p></div></div>
+      <label for="wsq-file" class="field-label">Fingerprint file</label>
+      <div class="file-picker" [class.has-file]="selectedFile">
+        <i class="fas fa-file-circle-plus" aria-hidden="true"></i>
+        <div><strong>{{ selectedFile ? selectedFile.name : 'Choose a WSQ file' }}</strong><small>{{ selectedFile ? 'Ready to process · ' + (selectedFile.size / 1024 | number:'1.0-1') + ' KB' : 'Select one .wsq file from your device' }}</small></div>
+        <span class="file-choose">Browse</span>
+        <input #wsqInput id="wsq-file" type="file" accept=".wsq" [disabled]="uploading()" aria-describedby="file-feedback" (change)="onFileSelected($event)" />
+      </div>
+      <div id="file-feedback" aria-live="polite">
+        @if (fileError()) { <p class="field-error" role="alert">{{ fileError() }}</p> }
+        @if (uploadScore() !== null) { <div class="upload-result"><i class="fas fa-circle-check" aria-hidden="true"></i><div><strong>Quality score: {{ uploadScore() }}</strong><small>{{ uploadName() }} · Processing complete</small></div></div> }
+      </div>
+      <button type="button" class="btn btn-primary tool-submit" [disabled]="!selectedFile || uploading()" (click)="uploadWsq(wsqInput)"><i class="fas me-2" [class.fa-spinner]="uploading()" [class.fa-spin]="uploading()" [class.fa-fingerprint]="!uploading()" aria-hidden="true"></i>{{ uploading() ? 'Processing file…' : 'Calculate quality score' }}</button>
+    </article>
+
+    <article class="report-panel tool-card household-tool">
+      <div class="tool-heading"><span class="tool-icon"><i class="fas fa-house-user" aria-hidden="true"></i></span><div><h2>Household score lookup</h2><p>Find scores for a household’s beneficiaries and alternates.</p></div></div>
+      <form (ngSubmit)="searchHousehold()" class="lookup-form">
+        <label for="household-number" class="field-label">Household number</label>
+        <input id="household-number" name="householdNumber" type="text" class="form-control" placeholder="Enter the full household number" [(ngModel)]="householdNumber" aria-describedby="household-help" required />
+        <p id="household-help" class="field-hint"><i class="fas fa-circle-info" aria-hidden="true"></i> Review and download scores without leaving this page.</p>
+        <button type="submit" class="btn btn-primary tool-submit" [disabled]="!householdNumber.trim()"><i class="fas fa-search me-2" aria-hidden="true"></i>Find household scores</button>
+      </form>
+    </article>
+  </div>
+
+  <section class="report-panel location-panel" aria-labelledby="bomas-title">
+    <div class="panel-heading"><div><span class="eyebrow">BROWSE BY LOCATION</span><h2 id="bomas-title">Processed bomas <span class="count-badge">{{ bomaTotal() | number }}</span></h2><p>Browse people in a boma or open all fingerprint scores.</p></div>
+      <form class="search-box" (ngSubmit)="loadBomas(true)"><label class="visually-hidden" for="boma-search">Search boma or location</label><input id="boma-search" type="search" name="bomaSearch" class="form-control" placeholder="Search boma or location" [(ngModel)]="bomaSearch" /><button type="submit" class="btn btn-outline-primary" [disabled]="loadingBomas()">{{ loadingBomas() ? 'Loading…' : 'Search' }}</button>@if (bomaSearch) { <button type="button" class="text-button" (click)="clearSearch()">Clear</button> }</form>
+    </div>
+    <div class="table-responsive" [attr.aria-busy]="loadingBomas()" [attr.inert]="loadingBomas() ? '' : null">
+      <table class="table report-table align-middle mb-0"><caption class="visually-hidden">Processed bomas and links to their subjects and fingerprint scores</caption>
+        <thead><tr><th scope="col">Boma</th><th scope="col">Payam</th><th scope="col">County</th><th scope="col">State</th><th scope="col" class="text-end">Explore results</th></tr></thead>
+        <tbody>
+          @if (loadingBomas() && !bomas().length) { <tr><td colspan="5" class="empty-state" role="status">Loading…</td></tr> }
+          @else if (bomaError()) { <tr><td colspan="5" class="empty-state"><p role="alert">{{ bomaError() }}</p><button type="button" class="btn btn-outline-primary mt-3" (click)="loadBomas()">Try again</button></td></tr> }
+          @else {
+            @for (boma of bomas(); track boma.id) {
+              <tr><td><span class="location-name"><i class="fas fa-location-dot" aria-hidden="true"></i><strong>{{ boma.name }}</strong></span></td><td>{{ boma.payam || '—' }}</td><td>{{ boma.county || '—' }}</td><td>{{ boma.state || '—' }}</td>
+                <td><div class="action-buttons"><button type="button" class="btn btn-sm btn-outline-primary" (click)="openBoma(boma, 'subjects')" aria-haspopup="dialog" [attr.aria-label]="'View subjects in ' + boma.name"><i class="fas fa-users me-1" aria-hidden="true"></i>View subjects</button><button type="button" class="btn btn-sm btn-primary" (click)="openBoma(boma, 'scores')" aria-haspopup="dialog" [attr.aria-label]="'View scores in ' + boma.name">View scores <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i></button><button type="button" class="btn btn-sm btn-light" [disabled]="downloadingBomas().has(boma.id)" (click)="downloadCsv(boma)" [attr.aria-label]="'Download CSV for ' + boma.name"><i class="fas me-1" [class.fa-spinner]="downloadingBomas().has(boma.id)" [class.fa-spin]="downloadingBomas().has(boma.id)" [class.fa-download]="!downloadingBomas().has(boma.id)" aria-hidden="true"></i>CSV</button></div></td>
+              </tr>
+            } @empty { <tr><td colspan="5" class="empty-state"><i class="fas fa-magnifying-glass empty-icon" aria-hidden="true"></i><strong>No bomas found</strong><p>{{ bomaSearch ? 'Try a different location or clear your search.' : 'Processed locations will appear here when available.' }}</p>@if (bomaSearch) { <button type="button" class="btn btn-outline-primary mt-3" (click)="clearSearch()">Clear search</button> }</td></tr> }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (bomaTotal() > 0) { <p-paginator [attr.inert]="loadingBomas() ? '' : null" (onPageChange)="onBomaPageChange($event)" [first]="bomaFirst()" [rows]="bomaRows()" [totalRecords]="bomaTotal()" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="{first}–{last} of {totalRecords} bomas" /> }
+  </section>
+  }
+</section>
+
+<p-dialog header="Fingerprint quality results" [visible]="!!resultsContext()" (visibleChange)="!$event && closeResults()" (onHide)="restoreResultsFocus()"
+  [modal]="true" [blockScroll]="true" [draggable]="false" [resizable]="false" [maximizable]="true"
+  [style]="{ width: '1240px', maxWidth: '96vw' }" [breakpoints]="{ '767px': '96vw' }">
+  @if (resultsContext(); as context) {
+    <app-finger-score-results [boma]="context.boma" [household]="context.household" [initialView]="context.view" (close)="closeResults()" />
+  }
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn btn-outline-primary" (click)="closeResults()"><i class="fas fa-xmark me-2" aria-hidden="true"></i>Close</button>
+  </ng-template>
+</p-dialog>

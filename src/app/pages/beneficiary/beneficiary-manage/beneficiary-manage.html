@@ -410,6 +410,11 @@
                   <small class="text-danger">{{ beneficiaryForm.errors?.['lipwRule'] }}</small>
                   }
                 </div>
+                <div class="col-md-9 mb-1 d-flex justify-content-end align-items-start">
+                  <p-button severity="info" size="small" type="button" label="Support Type Recommendation" icon="fas fa-play"
+                    [loading]="isModelLoading" [disabled]="isModelLoading" (onClick)="runModel()" />
+                </div>
+
 
                 <!-- Selection Reasons -->
                 <div class="col-md-12 mb-1">
@@ -471,7 +476,8 @@
                       </td>
                       <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth"/></td>
                     </tr>
-                    }
+
+                    @if (ageGroup.label === '18-35 yrs') {
                     <tr>
                       <td>Lactating Women (18-35)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -480,7 +486,9 @@
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic"/></td>
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_both"/></td>
                     </tr>
+                    }
 
+                    @if (ageGroup.label === '36-64 yrs') {
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -489,6 +497,8 @@
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_chronic"/></td>
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_both"/></td>
                     </tr>
+                    }
+                    }
                   </tbody>
                 </table>
 
@@ -991,4 +1001,29 @@
     </p-tabpanels>
   </p-tabs>
 </form>
+
+<p-dialog header="Automated Targeting Comparison" [(visible)]="modelComparisonDialogVisible" [modal]="true"
+  [style]="{ width: '620px' }" [draggable]="false" [resizable]="false">
+  @if (modelErrorMessage) {
+  <div class="alert alert-danger mb-3">{{ modelErrorMessage }}</div>
+  }
+  <div class="row g-3 comparison-dialog">
+    <div class="col-md-6">
+      <div class="comparison-panel current-support">
+        <div class="comparison-title">Present Support Type</div>
+        <div class="comparison-value">{{ currentSupportType }}</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="comparison-panel model-support">
+        <div class="comparison-title">Targeting Result</div>
+        <div class="comparison-value">{{ modelSupportType || '-' }}</div>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="fas fa-check" label="OK" severity="primary"
+      (onClick)="modelComparisonDialogVisible = false"></p-button>
+  </ng-template>
+</p-dialog>
 }

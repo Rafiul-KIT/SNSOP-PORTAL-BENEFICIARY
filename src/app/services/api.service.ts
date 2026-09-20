@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-type BaseKey = 'global' | 'alt' | 'report';
+type BaseKey = 'global' | 'alt' | 'report' | 'model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -14,6 +14,7 @@ export class ApiService {
   private altApi    = environment.authBackend;          
 
   private reportApi = environment.reportApi;             
+  private modelApi = environment.modelApi;
 
   public ACCESS_TOKEN = environment.cookie_name;
 
@@ -30,6 +31,7 @@ export class ApiService {
   private axiosGlobal: AxiosInstance = axios.create({ baseURL: this.globalApi });
   private axiosAlt:    AxiosInstance = axios.create({ baseURL: this.altApi });
   private axiosReport: AxiosInstance = axios.create({ baseURL: this.reportApi });
+  private axiosModel: AxiosInstance = axios.create({ baseURL: this.modelApi });
 
   constructor(private cookies: CookieService, private router: Router) {
     const token = this.cookies.get(this.ACCESS_TOKEN);
@@ -40,12 +42,14 @@ export class ApiService {
       this.axiosGlobal.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       this.axiosAlt.defaults.headers.common['Authorization']    = `Bearer ${token}`;
       this.axiosReport.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      this.axiosModel.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
     // Attach interceptors to ALL instances
     this.attachInterceptors(this.axiosGlobal);
     this.attachInterceptors(this.axiosAlt);
     this.attachInterceptors(this.axiosReport);
+    this.attachInterceptors(this.axiosModel);
   }
 
   private attachInterceptors(inst: AxiosInstance) {
@@ -82,6 +86,7 @@ export class ApiService {
   private client(base: BaseKey): AxiosInstance {
     if (base === 'alt') return this.axiosAlt;
     if (base === 'report') return this.axiosReport;
+    if (base === 'model') return this.axiosModel;
     return this.axiosGlobal;
   }
 
@@ -122,7 +127,7 @@ export class ApiService {
 
   POST_FORM = async <T = any>(endpoint: string, formData: FormData, base: BaseKey = 'global'): Promise<T> => {
     const token = this.cookies.get(this.ACCESS_TOKEN);
-    const baseURL = base === 'alt' ? this.altApi : base === 'report' ? this.reportApi : this.globalApi;
+    const baseURL = base === 'alt' ? this.altApi : base === 'report' ? this.reportApi : base === 'model' ? this.modelApi : this.globalApi;
 
     const response = await fetch(`${baseURL}${endpoint}`, {
       method: 'POST',

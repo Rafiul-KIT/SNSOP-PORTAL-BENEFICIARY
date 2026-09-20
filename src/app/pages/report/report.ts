@@ -20,6 +20,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { ReportPaymentMethodWiseBeneficiaryList } from '../report-list/report-payment-method-wise-beneficiary-list/report-payment-method-wise-beneficiary-list';
+import { ReportFingerScore } from '../report-list/report-finger-score/report-finger-score';
 
 
 
@@ -30,7 +31,8 @@ import { ReportPaymentMethodWiseBeneficiaryList } from '../report-list/report-pa
     LoadingSpinner, Loader, ReportBeneficiaryList,
     ReportStaffWiseBeneficiaryCount, ReportAgeGroupGenderWiseBeneficiaryCount,
     ReportMatchList, ReportLocationWiseNomineeCount, ReportCompleteHouseholdSurvey,
-    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule,ReportPaymentMethodWiseBeneficiaryList],
+    ReportReconciledSummaryResult, ReportReconciliationSummaryCount, Button, FloatLabelModule, SelectModule,
+    ReportPaymentMethodWiseBeneficiaryList, ReportFingerScore],
   templateUrl: './report.html',
   styleUrls: ['./report.scss']
 })
@@ -98,8 +100,6 @@ export class ReportComponent implements OnInit {
     switch (reportType) {
       case 1:
         this.reportForm = new FormGroup({
-          size: new FormControl(10, Validators.required),
-          from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl('', Validators.required),
           payamId: new FormControl(''),
@@ -125,8 +125,6 @@ export class ReportComponent implements OnInit {
         break;
       case 4:
         this.reportForm = new FormGroup({
-          size: new FormControl(-1, Validators.required),
-          from: new FormControl(0, Validators.required),
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
           payamId: new FormControl(''),
@@ -187,7 +185,7 @@ export class ReportComponent implements OnInit {
           paymentCycle: new FormControl('1', Validators.required)
         });
         break;
-        case 11:
+      case 11:
         this.reportForm = new FormGroup({
           stateId: new FormControl('', Validators.required),
           countyId: new FormControl(''),
@@ -199,6 +197,9 @@ export class ReportComponent implements OnInit {
           supportType: new FormControl(null),
           mobilePaymentProvider: new FormControl(null),
         });
+        break;
+      case 12:
+        this.reportForm = new FormGroup({});
         break;
       default:
         this.reportForm.reset();
@@ -482,7 +483,7 @@ export class ReportComponent implements OnInit {
         bomaId: this.reportForm.value.bomaId ? parseInt(this.reportForm.value.bomaId) : null,
         paymentMethod: this.reportForm.value.paymentMethod || null,
         hasMobileWalletNumber: this.reportForm.value.hasMobileWalletNumber,
-        registrationPhase: this.reportForm.value.registrationPhase || null,
+        registrationPhase: this.valueOrNull(this.reportForm.value.registrationPhase),
         supportType: this.reportForm.value.supportType || null,
         mobilePaymentProvider: this.reportForm.value.mobilePaymentProvider || null,
       };
@@ -514,10 +515,6 @@ export class ReportComponent implements OnInit {
       this.reportForm.value.toDate = this.formatDateToDDMMYYYY(this.reportForm.value.toDate);
     }
 
-    if (endpoint === "api/report/afis-match-report") {
-      this.reportForm.value.size = -1;
-    }
-
     if (this.selectedReportTypeId === 8) {
       this.apiService.GET(endpoint).then(res => {
         if (res.status === 200) {
@@ -534,7 +531,13 @@ export class ReportComponent implements OnInit {
         this.cdr.markForCheck(); // Added here
       });
     } else {
-      this.apiService.POST(endpoint, this.reportForm.value).then(res => {
+      const payload =
+        endpoint === 'api/report/afis-match-report' ||
+        endpoint === 'api/report/household-report'
+          ? { ...this.reportForm.value, page: 0, size: 10 }
+          : this.reportForm.value;
+
+      this.apiService.POST(endpoint, payload).then(res => {
         if (res.status === 200) {
           this.determineReportResultRenderObject(res.data);
         } else {
@@ -565,6 +568,10 @@ export class ReportComponent implements OnInit {
   private parseDateFromDDMMYYYY(date: string): string {
     const [day, month, year] = date.split('-');
     return `${year}-${month}-${day}`;
+  }
+
+  private valueOrNull(value: any) {
+    return value === '' || value === undefined ? null : value;
   }
 
   ngOnInit(): void {

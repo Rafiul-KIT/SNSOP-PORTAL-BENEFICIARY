@@ -1,19 +1,32 @@
-<p-table [value]="matchList()" [tableStyle]="{ 'width': '100%' }">
+<p-table [value]="displayedList()" [tableStyle]="{ 'width': '100%' }">
   <ng-template pTemplate="caption">
-    <div class="d-flex justify-content-start align-items-center">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
       <!-- <button type="button" pButton pRipple icon="pi pi-file" (click)="exportCSV()" class="mr-2" pTooltip="CSV" tooltipPosition="bottom"></button> -->
-      <button type="button" class="btn btn-success btn-sm me-2" (click)="exportExcel()" pTooltip="XLS"
-        tooltipPosition="bottom">
+      <button type="button" class="btn btn-success btn-sm me-2" (click)="exportExcel()" [disabled]="isReportGenerating()"
+        pTooltip="XLS" tooltipPosition="bottom">
+        @if (isReportGenerating()) {
+        <span class="spinner-border spinner-border-sm me-1" role="status"></span>Processing...
+        } @else {
         <i class="fas fa-file-excel me-2"></i>Export as XLS (Detail Report)
+        }
       </button>
       <!-- <button type="button" class="btn btn-warning btn-sm" (click)="exportPdf()" pTooltip="PDF"
                 tooltipPosition="bottom">
                 <i class="fas fa-file-pdf me-2"></i>Export as PDF (Summary Report)
             </button> -->
+      </div>
+
+      @if (totalRecords() > 0) {
+      <div>
+        <strong>Total Records: {{ totalRecords() }}</strong>
+      </div>
+      }
     </div>
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
+      <th class="text-center" style="background-color:cornflowerblue;color:white;">SL</th>
       <th class="text-center" style="background-color:cornflowerblue;color:white;">Household Number</th>
       <th class="text-center" style="background-color:cornflowerblue;color:white;">Type</th>
       <th class="text-center" style="background-color:cornflowerblue;color:white;">Registration Phase</th>
@@ -28,8 +41,9 @@
       <th class="text-center" style="background-color:cornflowerblue;color:white;">Match Date</th>
     </tr>
   </ng-template>
-  <ng-template pTemplate="body" let-match>
+  <ng-template pTemplate="body" let-match let-rowIndex="rowIndex">
     <tr>
+      <td class="text-center">{{ first() + rowIndex + 1 }}</td>
       <td class="text-center">{{ match.primary.applicationId }}</td>
       <td class="text-center" style="background-color:greenyellow;color: black;">{{
         match.primary.type=="BENEFICIARY"?"BENEFICIARY":"ALTERNATE"}}</td>
@@ -71,7 +85,17 @@
   </ng-template>
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="12">Nothing Found.</td>
+      <td colspan="13">Nothing Found.</td>
     </tr>
   </ng-template>
 </p-table>
+
+@if (totalRecords() > 0) {
+<p-paginator
+  (onPageChange)="handlePageChange($event)"
+  [first]="first()"
+  [rows]="rows()"
+  [totalRecords]="totalRecords()"
+  [rowsPerPageOptions]="[10, 20, 50, 100]"
+></p-paginator>
+}

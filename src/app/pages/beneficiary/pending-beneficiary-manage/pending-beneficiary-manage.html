@@ -14,6 +14,21 @@
     </div>
   </ng-template>
 </p-confirmDialog>
+<p-confirmDialog key="approveDialog" position="center" [style]="{ width: '500px' }">
+  <ng-template pTemplate="message">
+    <div>
+      <p>
+        Are you sure you want to
+        <strong style="color: green;">approve</strong>
+        this beneficiary?
+      </p>
+      <div class="mt-2">
+        <textarea rows="3" [(ngModel)]="approveComment" class="form-control"
+          placeholder="Optional: Add a comment for approval."></textarea>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>
 @if(isLoading){
 <app-loader />
 }@else {
@@ -24,10 +39,14 @@
       <p-tab value="1">Alternate Payee Information</p-tab>
       <p-tab value="2">Nominee Information</p-tab>
       <div class="d-flex align-items-center ms-auto mx-4">
-        <button type="button" class="btn btn-danger btn-sm me-2" (click)="onDelete()">
-          <i class="fas fa-trash-alt me-1"></i> Delete
-        </button>
-        <p-button class="ms-auto p-2" severity="info" type="submit" icon="fas fa-save" size="small" label="Update" />
+        <p-button class="me-2" severity="success" label="Approve" icon="fas fa-check" size="small"
+          (onClick)="onApprove()"></p-button>
+
+        <p-button class="me-2" severity="danger" label="Delete" icon="fas fa-trash-alt" size="small"
+          (onClick)="onDelete()"></p-button>
+
+        <p-button severity="info" type="submit" icon="fas fa-save" size="small"
+          label="Update"></p-button>
       </div>
 
     </p-tablist>
@@ -474,6 +493,10 @@
                   <small class="text-danger">{{ beneficiaryForm.errors?.['lipwRule'] }}</small>
                   }
                 </div>
+                <div class="col-md-9 mb-1 d-flex justify-content-end align-items-start">
+                  <p-button severity="info" size="small" type="button" label="Support Type Recommendation"
+                    icon="fas fa-play" [loading]="isModelLoading" [disabled]="isModelLoading" (onClick)="runModel()" />
+                </div>
 
                 <!-- Selection Reasons -->
                 <div class="col-md-12 mb-1">
@@ -535,7 +558,8 @@
                       </td>
                       <td><input pInputText class="w-100" [formControlName]="ageGroup.femaleBoth" /></td>
                     </tr>
-                    }
+
+                    @if (ageGroup.label === '18-35 yrs') {
                     <tr>
                       <td>Lactating Women (18-35)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -544,7 +568,9 @@
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_chronic" /></td>
                       <td><input pInputText class="w-100" formControlName="f18_35_lactating_both" /></td>
                     </tr>
+                    }
 
+                    @if (ageGroup.label === '36-64 yrs') {
                     <tr>
                       <td>Lactating Women (36-64)</td>
                       <td colspan="4" class="bg-light"></td>
@@ -553,6 +579,8 @@
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_chronic" /></td>
                       <td><input pInputText class="w-100" formControlName="f36_64_lactating_both" /></td>
                     </tr>
+                    }
+                    }
                   </tbody>
                 </table>
 
@@ -1055,4 +1083,29 @@
     </p-tabpanels>
   </p-tabs>
 </form>
+
+<p-dialog header="Automated Targeting Comparison" [(visible)]="modelComparisonDialogVisible" [modal]="true"
+  [style]="{ width: '620px' }" [draggable]="false" [resizable]="false">
+  @if (modelErrorMessage) {
+  <div class="alert alert-danger mb-3">{{ modelErrorMessage }}</div>
+  }
+  <div class="row g-3 comparison-dialog">
+    <div class="col-md-6">
+      <div class="comparison-panel current-support">
+        <div class="comparison-title">Present Support Type</div>
+        <div class="comparison-value">{{ currentSupportType }}</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="comparison-panel model-support">
+        <div class="comparison-title">Targeting Result</div>
+        <div class="comparison-value">{{ modelSupportType || '-' }}</div>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="fas fa-check" label="OK" severity="primary"
+      (onClick)="modelComparisonDialogVisible = false"></p-button>
+  </ng-template>
+</p-dialog>
 }
