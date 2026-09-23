@@ -200,22 +200,6 @@
   color: #04472f;
 }
 
-.action-btn-soft {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #047857;
-}
-
-.action-btn-soft:hover {
-  background: #d1fae5;
-  border-color: #6ee7b7;
-  color: #04472f;
-}
-
-.action-btn-soft:disabled {
-  opacity: .6;
-}
-
 .serial-column {
   color: #64748b;
 }
@@ -601,6 +585,18 @@
   background: #f3f5f8;
 }
 
+.score-value.low-score {
+  color: #b42318;
+  background: #fef3f2;
+}
+
+.score-value.recapture-score {
+  color: #b42318;
+  background: #fef3f2;
+  white-space: nowrap;
+  font-size: .75rem;
+}
+
 .results-paginator {
   padding: .75rem 1.4rem 1.25rem;
 }
@@ -671,6 +667,16 @@
 .finger-grid strong {
   color: #245bd0;
   font-size: 1.5rem;
+}
+
+.finger-grid strong.low-score {
+  color: #b42318;
+}
+
+.finger-grid strong.recapture-score {
+  color: #b42318;
+  font-size: .85rem;
+  line-height: 1.2;
 }
 
 .detail-footer {

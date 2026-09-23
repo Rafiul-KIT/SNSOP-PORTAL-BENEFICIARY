@@ -11,7 +11,7 @@
     </div>
     <div class="export-action">
       <button type="button" class="btn btn-primary"
-        [disabled]="downloading() || (!boma() && (loading() || !!error() || !records().length))" (click)="downloadCsv()">
+        [disabled]="downloading() || !canDownloadCsv()" (click)="downloadCsv()">
         <i class="fas me-2" [class.fa-spinner]="downloading()" [class.fa-spin]="downloading()"
           [class.fa-download]="!downloading()" aria-hidden="true"></i>{{ downloading() ? 'Preparing CSV…' : 'Download CSV' }}
       </button>
@@ -34,7 +34,7 @@
       <div class="toolbar-info">
         <h3>{{ view() === 'subjects' ? 'Subjects' : 'Fingerprint scores' }} @if (!loading() && !error()) {
           <span class="count-badge">{{ resultCount() | number }}</span> }</h3>
-        <p>{{ view() === 'subjects' ? 'Find a person, then select View scores to see their fingerprints.' : 'Scores are grouped by hand. A dash means no score was returned.' }}</p>
+        <p>{{ view() === 'subjects' ? 'Find a person, then select View scores to see their fingerprints.' : 'Scores are grouped by hand. Beneficiary scores below 40 are red; a negative score requires recapture.' }}</p>
       </div>
 
       @if (view() === 'subjects') {
@@ -147,7 +147,9 @@
                 }}</span></td>
             @for (finger of fingers; track finger.field) {
             <td class="score-cell" [class.hand-start]="finger.label === 'Thumb'"><span class="score-value"
-                [class.missing-score]="score[finger.field] == null">{{ score[finger.field] ?? '—' }}</span></td>
+                [class.missing-score]="score[finger.field] == null"
+                [class.low-score]="isLowScore(score[finger.field], score.type)"
+                [class.recapture-score]="isRecaptureScore(score[finger.field])">{{ scoreDisplay(score[finger.field]) }}</span></td>
             }
           </tr>
           }
@@ -158,7 +160,7 @@
 
     @if (!household()) {
     <div class="results-paginator">
-      <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="resultCount()" [rowsPerPageOptions]="[10, 20, 50]"
+      <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="resultCount()" [rowsPerPageOptions]="[10, 20, 50]" [appendTo]="'body'"
         (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
         currentPageReportTemplate="{first}–{last} of {totalRecords} subjects" />
     </div>
@@ -200,7 +202,8 @@
         @if (finger.hand === hand) {
         <div>
           <small>{{ finger.label }}</small>
-          <strong>{{ score[finger.field] ?? '—' }}</strong>
+          <strong [class.low-score]="isLowScore(score[finger.field], score.type)"
+            [class.recapture-score]="isRecaptureScore(score[finger.field])">{{ scoreDisplay(score[finger.field]) }}</strong>
         </div>
         }
         }
@@ -210,7 +213,7 @@
   </div>
 
   <div class="detail-footer">
-    <p class="field-hint"><i class="fas fa-circle-info me-1" aria-hidden="true"></i>A dash means no score was returned.</p>
+    <p class="field-hint"><i class="fas fa-circle-info me-1" aria-hidden="true"></i>Beneficiary scores below 40 are red. A dash means no score was returned; a negative score requires recapture.</p>
     <button type="button" class="btn btn-primary" (click)="exportScores([score], score.name || 'subject')"><i
         class="fas fa-download me-2" aria-hidden="true"></i>Download subject CSV</button>
   </div>

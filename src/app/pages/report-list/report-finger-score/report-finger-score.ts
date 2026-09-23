@@ -8,7 +8,6 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FingerScoreResults } from './finger-score-results';
-import { MessageService } from 'primeng/api';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ToastModule } from 'primeng/toast';
 import { BomaProgress, FingerScoreService, SubjectStats } from './finger-score.service';
@@ -27,7 +26,6 @@ export class ReportFingerScore implements OnInit, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly lookup = inject(LookupService);
   private resultsTrigger: HTMLElement | null = null;
-  private readonly messages = inject(MessageService);
   private request = 0;
   private destroyed = false;
   readonly stats = signal<SubjectStats>({ total: 0, beneficiaries: 0, alternates: 0 });
@@ -41,9 +39,9 @@ export class ReportFingerScore implements OnInit, OnDestroy {
   readonly summaryError = signal(false);
   readonly loadingBomas = signal(true);
   readonly bomaError = signal('');
-  readonly downloadingBomas = signal<ReadonlySet<number>>(new Set());
   readonly resultsContext = signal<{ boma: BomaProgress | null; household: string; view: 'subjects' | 'scores' } | null>(null);
   bomaSearch = '';
+  private appliedBomaId = '';
   householdNumber = '';
   readonly stateOptions = signal<LookupItem[]>([]);
   readonly countyOptions = signal<LookupItem[]>([]);
@@ -88,7 +86,7 @@ export class ReportFingerScore implements OnInit, OnDestroy {
     this.loadingBomas.set(true);
     this.bomaError.set('');
     try {
-      const response = await this.service.getBomas(Math.floor(this.bomaFirst() / this.bomaRows()), this.bomaRows(), this.bomaSearch);
+      const response = await this.service.getBomas(Math.floor(this.bomaFirst() / this.bomaRows()), this.bomaRows(), this.bomaSearch, this.appliedBomaId);
       if (request !== this.request) return;
       this.bomas.set(response.data?.content ?? []);
       this.bomaTotal.set(response.data?.totalElements ?? 0);
@@ -108,6 +106,10 @@ export class ReportFingerScore implements OnInit, OnDestroy {
 
   hasLocationFilter(): boolean {
     return !!(this.selectedState() || this.selectedCounty() || this.selectedPayam() || this.selectedBoma());
+  }
+
+  canSearchByLocation(): boolean {
+    return !!(this.selectedState()?.id && this.selectedCounty()?.id && this.selectedPayam()?.id && this.selectedBoma()?.id);
   }
 
   async onStateChange(state: LookupItem | null): Promise<void> {
@@ -138,12 +140,15 @@ export class ReportFingerScore implements OnInit, OnDestroy {
   }
 
   searchByLocation(): void {
-    this.bomaSearch = this.selectedBoma()?.name || this.selectedPayam()?.name || this.selectedCounty()?.name || this.selectedState()?.name || '';
+    if (!this.canSearchByLocation() || this.loadingBomas()) return;
+    this.bomaSearch = '';
+    this.appliedBomaId = this.selectedBoma()!.id;
     void this.loadBomas(true);
   }
 
   clearSearch(): void {
     this.bomaSearch = '';
+    this.appliedBomaId = '';
     this.selectedState.set(null);
     this.selectedCounty.set(null);
     this.selectedPayam.set(null);
@@ -174,13 +179,5 @@ export class ReportFingerScore implements OnInit, OnDestroy {
 
   private rememberResultsTrigger(): void {
     this.resultsTrigger = this.document.activeElement instanceof HTMLElement ? this.document.activeElement : null;
-  }
-
-  async downloadCsv(boma: BomaProgress): Promise<void> {
-    if (this.downloadingBomas().has(boma.id)) return;
-    this.downloadingBomas.update(ids => new Set([...ids, boma.id]));
-    try { await this.service.downloadBomaCsv(boma); }
-    catch { this.messages.add({ severity: 'error', summary: 'Download failed', detail: 'Please try downloading the boma CSV again.' }); }
-    finally { this.downloadingBomas.update(ids => { const next = new Set(ids); next.delete(boma.id); return next; }); }
   }
 }

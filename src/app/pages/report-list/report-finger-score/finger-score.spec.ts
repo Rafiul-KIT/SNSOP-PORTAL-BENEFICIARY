@@ -46,6 +46,10 @@ describe('Fingerprint quality report', () => {
     expect(api.GET.calls.mostRecent().args[1]).toEqual({
       search: 'test', page: 2, size: 10, sort: 'name,asc',
     });
+    await service.getBomas(0, 10, '', '42');
+    expect(api.GET.calls.mostRecent().args[1]).toEqual({
+      search: undefined, bomaId: '42', page: 0, size: 10, sort: 'name,asc',
+    });
     await service.getHouseholdScores(' A/B ');
     expect(api.GET.calls.mostRecent().args[0]).toBe('https://gwapp.southsudansafetynet.info/fingerquality/api/v1/household/A%2FB/finger-scores');
   });
@@ -74,18 +78,30 @@ describe('Fingerprint quality report', () => {
     expect(results.records()[0].id).toBe(2);
   });
 
-  it('deduplicates each pending CSV download without waiting for report data', async () => {
+  it('enables modal CSV only after score data loads and deduplicates pending downloads', async () => {
+    createResults();
+    results.view.set('scores');
     let complete!: () => void;
     const pending = new Promise<void>(resolve => complete = resolve);
     const download = spyOn(service, 'downloadBomaCsv').and.returnValue(pending);
-    const first = report.downloadCsv(boma);
-    await report.downloadCsv(boma);
+    await results.downloadCsv();
+    expect(download).not.toHaveBeenCalled();
+    results.loading.set(false);
+    results.records.set([{ id: 1 } as FingerScore]);
+    expect(results.canDownloadCsv()).toBeTrue();
+    const first = results.downloadCsv();
+    await results.downloadCsv();
     expect(download).toHaveBeenCalledTimes(1);
     expect(api.GET).not.toHaveBeenCalled();
-    expect(report.downloadingBomas().has(boma.id)).toBeTrue();
+    expect(results.downloading()).toBeTrue();
     complete();
     await first;
-    expect(report.downloadingBomas().size).toBe(0);
+    expect(results.downloading()).toBeFalse();
+    results.error.set('Failed');
+    expect(results.canDownloadCsv()).toBeFalse();
+    results.error.set('');
+    results.records.set([]);
+    expect(results.canDownloadCsv()).toBeFalse();
   });
 
   it('limits rendered score rows and preserves an empty scores view', async () => {
@@ -97,6 +113,25 @@ describe('Fingerprint quality report', () => {
     await results.load();
     expect(results.view()).toBe('scores');
     expect(results.records()).toEqual([]);
+  });
+
+  it('keeps household CSV disabled until a nonempty score response arrives', async () => {
+    createResults(true);
+    fixture.componentRef.setInput('boma', null);
+    fixture.componentRef.setInput('household', '001');
+    let finish!: (value: any) => void;
+    const scores = spyOn(service, 'getHouseholdScores').and.returnValue(new Promise(resolve => finish = resolve));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
+    finish({ success: true, data: [] });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
+    scores.and.resolveTo({ success: true, data: [{ id: 1 } as FingerScore] } as any);
+    await results.load();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeFalse();
   });
 
   it('opens and closes results without losing the boma search or page', () => {
@@ -112,6 +147,30 @@ describe('Fingerprint quality report', () => {
     report.householdNumber = ' A/B ';
     report.searchHousehold();
     expect(report.resultsContext()).toEqual({ boma: null, household: 'A/B', view: 'scores' });
+  });
+
+  it('requires all location selections and keeps the boma ID across pages', async () => {
+    const getBomas = spyOn(service, 'getBomas').and.resolveTo({ success: true, data: { content: [], totalElements: 0 } } as any);
+    report.loadingBomas.set(false);
+    report.selectedState.set({ id: '1', name: 'State' });
+    report.selectedCounty.set({ id: '2', name: 'County' });
+    report.selectedPayam.set({ id: '3', name: 'Payam' });
+    expect(report.canSearchByLocation()).toBeFalse();
+    report.searchByLocation();
+    expect(getBomas).not.toHaveBeenCalled();
+
+    report.selectedBoma.set({ id: '42', name: 'Boma name' });
+    expect(report.canSearchByLocation()).toBeTrue();
+    report.searchByLocation();
+    await Promise.resolve();
+    expect(getBomas).toHaveBeenCalledWith(0, 10, '', '42');
+    report.onBomaPageChange({ first: 10, rows: 10 });
+    await Promise.resolve();
+    expect(getBomas).toHaveBeenCalledWith(1, 10, '', '42');
+    report.clearSearch();
+    await Promise.resolve();
+    expect(getBomas).toHaveBeenCalledWith(0, 10, '', '');
+    expect(report.canSearchByLocation()).toBeFalse();
   });
 
   it('ignores pending subject data after switching to scores', async () => {
@@ -164,23 +223,43 @@ describe('Fingerprint quality report', () => {
     expect(csv).toContain(',"42"');
   });
 
-  it('renders zero and missing scores distinctly in the results table', async () => {
+  it('highlights beneficiary scores below 40 and preserves missing and recapture states', async () => {
     createResults(true);
     fixture.componentRef.setInput('initialView', 'scores');
-    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [{
-      id: 1, name: 'Test subject', type: 'BENEFICIARY', householdNumber: '001', leftThumb: 0, leftIndex: null,
-    }] } as any);
+    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [
+      { id: 1, name: 'Test subject', type: 'BENEFICIARY', householdNumber: '001',
+        leftThumb: 0, leftIndex: null, leftMiddle: -1, leftRing: 39, leftSmall: 40 },
+      { id: 2, name: 'Alternate', type: 'ALTERNATE', householdNumber: '001', leftThumb: 39 },
+    ] } as any);
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
     const cells = fixture.nativeElement.querySelectorAll('.score-value');
-    expect(cells.length).toBe(10);
+    expect(cells.length).toBe(20);
     expect(cells[0].textContent.trim()).toBe('0');
+    expect(cells[0].classList).toContain('low-score');
     expect(cells[1].textContent.trim()).toBe('—');
+    expect(cells[1].classList).not.toContain('low-score');
+    expect(cells[2].textContent.trim()).toBe('Recapture required');
+    expect(cells[2].classList).toContain('recapture-score');
+    expect(cells[2].classList).not.toContain('low-score');
+    expect(cells[3].classList).toContain('low-score');
+    expect(cells[4].classList).not.toContain('low-score');
+    expect(cells[10].classList).not.toContain('low-score');
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeFalse();
     expect(fixture.nativeElement.querySelectorAll('.view-tabs button').length).toBe(2);
+    results.selectedScore.set(results.records()[0]);
+    results.detailName.set('Test subject');
+    results.dialogVisible = true;
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const detailScore = fixture.nativeElement.querySelector('.finger-grid .recapture-score');
+    expect(detailScore.textContent.trim()).toBe('Recapture required');
+    const lowDetailScores = fixture.nativeElement.querySelectorAll('.finger-grid .low-score');
+    expect(Array.from(lowDetailScores, (element: any) => element.textContent.trim())).toEqual(['0', '39']);
   });
 
-  it('opens subjects and switches scores inside a modal without changing the URL', async () => {
+  it('opens households and switches scores inside a modal without changing the URL', async () => {
     const subject = { id: 1, name: 'Test subject', type: 'BENEFICIARY', householdNumber: '001', leftThumb: 0 } as FingerScore;
     spyOn(service, 'getSubjectStats').and.resolveTo({ success: true, data: { total: 1, beneficiaries: 1, alternates: 0 } } as any);
     spyOn(service, 'getBomaCount').and.resolveTo({ success: true, data: 1 } as any);
@@ -193,8 +272,9 @@ describe('Fingerprint quality report', () => {
     await initialLoad.calls.first().returnValue;
     await page.whenStable();
     page.detectChanges();
+    expect(page.nativeElement.querySelector('[aria-label="Download CSV for Boma"]')).toBeNull();
     const url = window.location.href;
-    page.nativeElement.querySelector('[aria-label="View subjects in Boma"]').click();
+    page.nativeElement.querySelector('[aria-label="View households in Boma"]').click();
     await page.whenStable();
     page.detectChanges();
     expect(document.querySelector('[role="dialog"]')).not.toBeNull();
@@ -208,7 +288,7 @@ describe('Fingerprint quality report', () => {
     await page.whenStable();
     page.detectChanges();
     expect(page.componentInstance.resultsContext()).toBeNull();
-    expect(page.nativeElement.querySelector('[aria-label="View subjects in Boma"]')).not.toBeNull();
+    expect(page.nativeElement.querySelector('[aria-label="View households in Boma"]')).not.toBeNull();
   });
 
 

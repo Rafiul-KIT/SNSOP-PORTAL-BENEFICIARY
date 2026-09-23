@@ -76,9 +76,10 @@ export class FingerScoreService {
     return this.checkResponse(response.data);
   }
 
-  async getBomas(page: number, size: number, search = ''): Promise<ApiEnvelope<PageResult<BomaProgress>>> {
+  async getBomas(page: number, size: number, search = '', bomaId?: string): Promise<ApiEnvelope<PageResult<BomaProgress>>> {
     const response = await this.api.GET<ApiEnvelope<PageResult<BomaProgress>>>(this.endpoint('api/v1/progress/bomas'), {
       search: search.trim() || undefined,
+      ...(bomaId ? { bomaId } : {}),
       page,
       size,
       sort: 'name,asc',

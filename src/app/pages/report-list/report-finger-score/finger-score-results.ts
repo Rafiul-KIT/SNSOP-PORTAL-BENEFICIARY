@@ -58,6 +58,7 @@ export class FingerScoreResults implements OnInit, OnDestroy {
     return this.filteredScores().slice(this.first(), this.first() + this.rows());
   });
   readonly resultCount = computed(() => this.view() === 'subjects' ? this.total() : this.filteredScores().length);
+  readonly canDownloadCsv = computed(() => this.view() === 'scores' && !this.loading() && !this.error() && this.records().length > 0);
 
   ngOnInit(): void {
     this.view.set(this.household() ? 'scores' : this.initialView());
@@ -150,7 +151,7 @@ export class FingerScoreResults implements OnInit, OnDestroy {
   retryDetail(): void { void this.openDetail({ id: this.detailId, name: this.detailName() } as FingerScore); }
 
   async downloadCsv(): Promise<void> {
-    if (this.downloading()) return;
+    if (this.downloading() || !this.canDownloadCsv()) return;
     this.downloading.set(true);
     try {
       if (this.boma()) await this.service.downloadBomaCsv(this.boma()!);
@@ -162,6 +163,18 @@ export class FingerScoreResults implements OnInit, OnDestroy {
   exportScores(scores: FingerScore[], name: string): void {
     const safeName = name.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 100) || 'fingerprint';
     saveAs(new Blob([scoresCsv(scores)], { type: 'text/csv;charset=utf-8' }), `${safeName}_scores.csv`);
+  }
+
+  scoreDisplay(value: number | null): number | string {
+    return value == null ? '—' : value < 0 ? 'Recapture required' : value;
+  }
+
+  isRecaptureScore(value: number | null): boolean {
+    return value != null && value < 0;
+  }
+
+  isLowScore(value: number | null, type: string): boolean {
+    return type === 'BENEFICIARY' && value != null && value >= 0 && value < 40;
   }
 
   trackScore(score: FingerScore): string { return `${score.id}-${score.type}`; }

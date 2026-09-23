@@ -9,7 +9,7 @@
 
     <!-- Card 1: Summary -->
     <div class="col-12 col-xl-6 d-flex">
-      <section class="card summary-panel w-100 p-1">
+      <section class="card summary-panel w-100 p-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-1">
           <div>
             <h5 class="mb-0">Fingerprint quality summary</h5>
@@ -24,7 +24,7 @@
           <article class="summary-card total">
             <span class="summary-icon"><i class="fas fa-fingerprint" aria-hidden="true"></i></span>
             <div class="min-w-0">
-              <small>Total subjects</small>
+              <small>Total Households</small>
               <strong>{{ summaryError() ? '—' : (stats().total | number) }}</strong>
             </div>
           </article>
@@ -65,12 +65,12 @@
 
     <!-- Card 2: Household lookup -->
     <div class="col-12 col-xl-6 d-flex">
-      <section class="card household-panel w-100 p-1">
+      <section class="card household-panel w-100 p-3">
         <div class="mb-3">
-          <h5 class="mb-1">Household score lookup</h5>
+          <h5 class="mb-1">Household lookup</h5>
           <p id="household-help" class="text-muted small mb-0">
-            <i class="fas fa-circle-info me-1" aria-hidden="true"></i> Review and download scores without leaving this
-            page.
+            <i class="fas fa-circle-info me-1" aria-hidden="true"></i> Review and download scores for a specific
+            household.
           </p>
         </div>
         <form class="household-form" (ngSubmit)="searchHousehold()">
@@ -88,16 +88,17 @@
   <!-- LOCATION FILTERS -->
   <div class="card p-3 mb-2">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-      <h5 class="mb-0">Browse by location</h5>
-      <span class="text-muted small">Processed bomas
+      <h5 class="mb-0">Search by location</h5>
+      <!-- <span class="text-muted small">Processed bomas
         <span class="count-badge">{{ bomaTotal() | number }}</span>
-      </span>
+      </span> -->
     </div>
     <form class="row g-3" (ngSubmit)="searchByLocation()">
       <div class="col-md-3">
         <p-floatlabel variant="on" class="w-100">
           <p-select inputId="filter-state" [options]="stateOptions()" optionLabel="name" [ngModel]="selectedState()"
             name="filterState" (onChange)="onStateChange($event.value)" [showClear]="true"
+            [filter]="true" filterBy="name" filterPlaceholder="Search states"
             [disabled]="loadingBomas()" />
           <label for="filter-state">State</label>
         </p-floatlabel>
@@ -106,6 +107,7 @@
         <p-floatlabel variant="on" class="w-100">
           <p-select inputId="filter-county" [options]="countyOptions()" optionLabel="name" [ngModel]="selectedCounty()"
             name="filterCounty" (onChange)="onCountyChange($event.value)" [showClear]="true"
+            [filter]="true" filterBy="name" filterPlaceholder="Search counties"
             [disabled]="!selectedState() || loadingBomas()" />
           <label for="filter-county">County</label>
         </p-floatlabel>
@@ -114,6 +116,7 @@
         <p-floatlabel variant="on" class="w-100">
           <p-select inputId="filter-payam" [options]="payamOptions()" optionLabel="name" [ngModel]="selectedPayam()"
             name="filterPayam" (onChange)="onPayamChange($event.value)" [showClear]="true"
+            [filter]="true" filterBy="name" filterPlaceholder="Search payams"
             [disabled]="!selectedCounty() || loadingBomas()" />
           <label for="filter-payam">Payam</label>
         </p-floatlabel>
@@ -122,6 +125,7 @@
         <p-floatlabel variant="on" class="w-100">
           <p-select inputId="filter-boma" [options]="bomaOptions()" optionLabel="name" [ngModel]="selectedBoma()"
             name="filterBoma" (onChange)="selectedBoma.set($event.value)" [showClear]="true"
+            [filter]="true" filterBy="name" filterPlaceholder="Search bomas"
             [disabled]="!selectedPayam() || loadingBomas()" />
           <label for="filter-boma">Boma</label>
         </p-floatlabel>
@@ -132,6 +136,7 @@
           (onClick)="clearSearch()"></p-button>
         }
         <p-button label="Search" icon="fas fa-search" severity="primary" size="small" [loading]="loadingBomas()"
+          [disabled]="!canSearchByLocation() || loadingBomas()"
           (onClick)="searchByLocation()"></p-button>
       </div>
     </form>
@@ -160,7 +165,7 @@
           <th>County</th>
           <th>Payam</th>
           <th>Boma</th>
-          <th class="text-center" [style]="{ width: '400px' }">Explore results</th>
+          <th class="text-center">Explore results</th>
         </tr>
       </ng-template>
 
@@ -173,16 +178,13 @@
           <td>{{ boma.name || '—' }}</td>
           <td class="text-center">
             <div class="action-buttons">
-              <button type="button" class="btn btn-sm action-btn action-btn-outline" (click)="openBoma(boma, 'subjects')"
-                aria-haspopup="dialog" [attr.aria-label]="'View subjects in ' + boma.name"><i class="fas fa-users me-1"
-                  aria-hidden="true"></i>View subjects</button>
-              <button type="button" class="btn btn-sm action-btn action-btn-solid" (click)="openBoma(boma, 'scores')"
-                aria-haspopup="dialog" [attr.aria-label]="'View scores in ' + boma.name">View scores <i
+              <!-- <button type="button" class="btn btn-sm action-btn action-btn-outline"
+                (click)="openBoma(boma, 'subjects')" aria-haspopup="dialog"
+                [attr.aria-label]="'View subjects in ' + boma.name"><i class="fas fa-users me-1"
+                  aria-hidden="true"></i>View subjects</button> -->
+              <button type="button" class="btn btn-sm action-btn action-btn-solid" (click)="openBoma(boma, 'subjects')"
+                aria-haspopup="dialog" [attr.aria-label]="'View households in ' + boma.name">View households <i
                   class="fas fa-arrow-right ms-1" aria-hidden="true"></i></button>
-              <button type="button" class="btn btn-sm action-btn action-btn-soft" [disabled]="downloadingBomas().has(boma.id)"
-                (click)="downloadCsv(boma)" [attr.aria-label]="'Download CSV for ' + boma.name"><i class="fas me-1"
-                  [class.fa-spinner]="downloadingBomas().has(boma.id)" [class.fa-spin]="downloadingBomas().has(boma.id)"
-                  [class.fa-download]="!downloadingBomas().has(boma.id)" aria-hidden="true"></i>CSV</button>
             </div>
           </td>
         </tr>
@@ -209,7 +211,7 @@
     </p-table>
 
     @if (bomaTotal() > 0) {
-    <div class="paginator-wrapper"><p-paginator [first]="bomaFirst()" [rows]="bomaRows()" [totalRecords]="bomaTotal()"
+    <div class="paginator-wrapper"><p-paginator [first]="bomaFirst()" [rows]="bomaRows()" [totalRecords]="bomaTotal()" [appendTo]="'body'"
         [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onBomaPageChange($event)" [showCurrentPageReport]="true"
         currentPageReportTemplate="{first}–{last} of {totalRecords} bomas" /></div>
     }

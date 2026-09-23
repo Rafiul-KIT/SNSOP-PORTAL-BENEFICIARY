@@ -71,7 +71,7 @@
               ]
             },
             "qa": {
-              "baseHref": "/v2/",
+              "baseHref": "/v2/beneficiary/",
               "outputHashing": "all",
               "fileReplacements": [
                 {
