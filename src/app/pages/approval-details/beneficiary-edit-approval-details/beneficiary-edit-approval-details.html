@@ -212,9 +212,11 @@
                               <tr>
                                 <th>Monthly Avg Income</th>
                                 <td>
-                                  {{ oldDetails?.household?.monthlyIncome
-                                  || '-' }}
-                                </td>
+                                  {{
+                                  oldDetails?.household?.monthlyIncome == null
+                                  ? '-'
+                                  : oldDetails!.household!.monthlyIncome! < 0 ? 0 : oldDetails!.household!.monthlyIncome
+                                    }} </td>
                               </tr>
                               <tr>
                                 <th>Selection Criteria</th>
@@ -768,8 +770,11 @@
                                 <th>Monthly Avg Income</th>
                                 <td [ngClass]="changedClass('householdMonthlyAvgIncome')"
                                   [pTooltip]="diffTip('householdMonthlyAvgIncome')">
-                                  {{ editedDetails?.household?.monthlyIncome || '-' }}
-                                </td>
+                                  {{
+                                  editedDetails?.household?.monthlyIncome == null
+                                  ? '-'
+                                  : editedDetails!.household!.monthlyIncome! < 0 ? 0 :
+                                    editedDetails!.household!.monthlyIncome }} </td>
                               </tr>
                               <tr>
                                 <th>Selection Criteria</th>

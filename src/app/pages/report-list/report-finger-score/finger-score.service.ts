@@ -58,7 +58,7 @@ export interface PageResult<T> {
 export class FingerScoreService {
   private readonly api = inject(ApiService);
   // This controller is hosted outside the MIS server context.
-  private readonly baseUrl = 'https://gwapp.southsudansafetynet.info/fingerquality';
+  private readonly baseUrl = 'https://qa-gwapp.southsudansafetynet.info/fingerquality';
 
   private endpoint(path: string): string {
     return `${this.baseUrl}/${path}`;

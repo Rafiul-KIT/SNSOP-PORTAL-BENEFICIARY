@@ -124,7 +124,8 @@
                                             </tr>
                                             <tr>
                                                 <th>Payment Method</th>
-                                                <td>{{ beneficiaryDetails.paymentMethod === 'MOBILE_WALLET' ? 'Mobile Wallet' : 'Cash' }}</td>
+                                                <td>{{ beneficiaryDetails.paymentMethod === 'MOBILE_WALLET' ? 'Mobile
+                                                    Wallet' : 'Cash' }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -205,9 +206,13 @@
                                                             <tr>
                                                                 <th>Monthly Avg Income</th>
                                                                 <td>
-                                                                    {{ beneficiaryDetails.household?.monthlyIncome
-                                                                    || '-' }}
-                                                                </td>
+                                                                    {{
+                                                                    beneficiaryDetails.household?.monthlyIncome== null
+                                                                    ? '-'
+                                                                    : beneficiaryDetails!.household!.monthlyIncome! < 0
+                                                                        ? 0 :
+                                                                        beneficiaryDetails!.household!.monthlyIncome }}
+                                                                        </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Selection Criteria</th>

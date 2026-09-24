@@ -179,9 +179,11 @@
                               <tr>
                                 <th>Monthly Avg Income</th>
                                 <td>
-                                  {{ beneficiaryDetails.household?.monthlyIncome
-                                  || '-' }}
-                                </td>
+                                  {{
+                                  beneficiaryDetails!.household!.monthlyIncome == null
+                                  ? '-'
+                                  : beneficiaryDetails!.household!.monthlyIncome! < 0 ? 0 :
+                                    beneficiaryDetails!.household!.monthlyIncome }} </td>
                               </tr>
                               <tr>
                                 <th>Selection Criteria</th>
