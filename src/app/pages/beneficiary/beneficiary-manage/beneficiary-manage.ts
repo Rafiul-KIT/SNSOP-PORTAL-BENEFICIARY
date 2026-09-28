@@ -27,6 +27,14 @@ import { Toast } from 'primeng/toast';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import {
+  HouseholdComposition,
+  SupportTypeModelService,
+} from '../../../services/support-type-model.service';
+import {
+  SupportTypeLoadingDialog,
+  minimumLoadingTime,
+} from '../../../components/support-type-loading-dialog/support-type-loading-dialog';
 
 @Component({
   selector: 'app-beneficiary-manage',
@@ -41,6 +49,7 @@ import { takeUntil } from 'rxjs/operators';
     ButtonModule,
     DialogModule,
     Loader,
+    SupportTypeLoadingDialog,
     FloatLabel,
     Toast,
   ],
@@ -170,10 +179,12 @@ export class BeneficiaryManage implements OnInit {
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
     private router: Router,
+    private supportTypeModel: SupportTypeModelService,
   ) {}
 
   // ========= Init =========
   ngOnInit(): void {
+    this.supportTypeModel.preload();
     this.initForm();
 
     // Lookups
@@ -1060,41 +1071,27 @@ export class BeneficiaryManage implements OnInit {
     return payload;
   }
 
-  private buildModelPayload(formValue: any) {
-    const household: Record<string, number> = {};
-    const groups = [
-      { suffix: '0_2', malePrefix: 'm0_2', femalePrefix: 'f0_2' },
-      { suffix: '3_5', malePrefix: 'm3_5', femalePrefix: 'f3_5' },
-      { suffix: '6_17', malePrefix: 'm6_17', femalePrefix: 'f6_17' },
-      { suffix: '18_35', malePrefix: 'm18_35', femalePrefix: 'f18_35' },
-      { suffix: '36_64', malePrefix: 'm36_64', femalePrefix: 'f36_64' },
-      { suffix: '65_plus', malePrefix: 'm65', femalePrefix: 'f65' },
-    ];
+  private buildHouseholdComposition(formValue: any): HouseholdComposition {
     const valueOf = (key: string) => Number(formValue[key]) || 0;
-    const assignGenderValues = (
-      gender: 'male' | 'female',
-      suffix: string,
-      prefix: string,
-    ) => {
-      const disabled = valueOf(`${prefix}_disable`);
-      const chronicallyIll = valueOf(`${prefix}_chronic`);
-      const both = valueOf(`${prefix}_both`);
-      const total = valueOf(`${prefix}_total`);
-      household[`${gender}_${suffix}_both`] = both;
-      household[`${gender}_${suffix}_chronically_ill`] = chronicallyIll;
-      household[`${gender}_${suffix}_disabled`] = disabled;
-      household[`${gender}_${suffix}_normal`] = Math.max(
-        total - disabled - chronicallyIll - both,
-        0,
-      );
-    };
-
-    groups.forEach((group) => {
-      assignGenderValues('male', group.suffix, group.malePrefix);
-      assignGenderValues('female', group.suffix, group.femalePrefix);
+    const countsOf = (prefix: string) => ({
+      total: valueOf(`${prefix}_total`),
+      disabled: valueOf(`${prefix}_disable`),
+      chronicallyIll: valueOf(`${prefix}_chronic`),
+      both: valueOf(`${prefix}_both`),
+    });
+    const ageGroup = (suffix: string) => ({
+      male: countsOf(`m${suffix}`),
+      female: countsOf(`f${suffix}`),
     });
 
-    return { household };
+    return {
+      '0_2': ageGroup('0_2'),
+      '3_5': ageGroup('3_5'),
+      '6_17': ageGroup('6_17'),
+      '18_35': ageGroup('18_35'),
+      '36_64': ageGroup('36_64'),
+      '65_plus': ageGroup('65'),
+    };
   }
 
   private formatModelSupportType(supportType: string): string {
@@ -1114,21 +1111,20 @@ export class BeneficiaryManage implements OnInit {
     this.modelErrorMessage = '';
     this.cdr.detectChanges();
 
-    const payload = this.buildModelPayload(this.beneficiaryForm.getRawValue());
-    this.api
-      .POST('get_support_type', payload, 'model')
-      .then((res: any) => {
-        const supportType = res?.data?.support_type || res?.support_type || '';
+    Promise.all([
+      this.supportTypeModel.predict(
+        this.buildHouseholdComposition(this.beneficiaryForm.getRawValue()),
+      ),
+      minimumLoadingTime(),
+    ])
+      .then(([{ supportType }]) => {
         this.modelSupportType = this.formatModelSupportType(supportType);
-        if (!this.modelSupportType) {
-          this.modelErrorMessage = 'No support type returned from model.';
-        }
         this.modelComparisonDialogVisible = true;
         this.cdr.detectChanges();
       })
       .catch((err) => {
-        console.error('Model request failed:', err);
-        this.modelErrorMessage = 'Model request could not be processed.';
+        console.error('Support type model failed:', err);
+        this.modelErrorMessage = 'Support type model could not be run.';
         this.modelComparisonDialogVisible = true;
         this.cdr.detectChanges();
       })

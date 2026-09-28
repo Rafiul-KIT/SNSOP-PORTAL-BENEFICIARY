@@ -1,0 +1,17 @@
+.model-loading {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 0 0.5rem;
+  text-align: center;
+}
+
+.model-loading-title {
+  font-weight: 600;
+}
+
+.model-loading-subtitle {
+  color: #6c757d;
+  font-size: 0.875rem;
+}

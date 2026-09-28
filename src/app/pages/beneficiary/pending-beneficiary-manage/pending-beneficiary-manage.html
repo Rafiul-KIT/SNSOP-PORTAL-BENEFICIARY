@@ -1084,6 +1084,7 @@
   </p-tabs>
 </form>
 
+<app-support-type-loading-dialog [visible]="isModelLoading" />
 <p-dialog header="Automated Targeting Comparison" [(visible)]="modelComparisonDialogVisible" [modal]="true"
   [style]="{ width: '620px' }" [draggable]="false" [resizable]="false">
   @if (modelErrorMessage) {

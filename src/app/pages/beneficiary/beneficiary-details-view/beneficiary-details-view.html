@@ -788,6 +788,7 @@
 </div>
 
 <p-toast position="bottom-right" />
+<app-support-type-loading-dialog [visible]="isRunningModel" />
 <p-dialog header="Automated Targeting Comparison" [(visible)]="modelComparisonDialogVisible" [modal]="true"
   [style]="{ width: '620px' }">
   <div class="row g-3 comparison-dialog">

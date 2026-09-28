@@ -25,7 +25,15 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
-import { environment } from '../../../../environments/environment';
+import {
+  HouseholdComposition,
+  ModelAgeGroup,
+  SupportTypeModelService,
+} from '../../../services/support-type-model.service';
+import {
+  SupportTypeLoadingDialog,
+  minimumLoadingTime,
+} from '../../../components/support-type-loading-dialog/support-type-loading-dialog';
 
 export interface FingerVm {
   label: string;
@@ -131,6 +139,7 @@ interface BeneficiaryVm {
     FormsModule,
     Loader,
     ButtonModule,
+    SupportTypeLoadingDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './beneficiary-details-view.html',
@@ -196,9 +205,11 @@ export class BeneficiaryDetailsView implements OnInit {
     public lookup: LookupService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
+    private supportTypeModel: SupportTypeModelService,
   ) {}
 
   ngOnInit() {
+    this.supportTypeModel.preload();
     this.syncBreakdownRows();
     const id = this.route.snapshot.paramMap.get('id');
     const isTaskMode =
@@ -716,25 +727,6 @@ export class BeneficiaryDetailsView implements OnInit {
       });
   }
 
-  private normalCount(
-    group: HouseholdMemberBreakdown,
-    gender: 'male' | 'female',
-  ): number {
-    const total = gender === 'male' ? group.maleTotal : group.femaleTotal;
-    const disabled =
-      gender === 'male' ? group.maleDisable : group.femaleDisable;
-    const chronic =
-      gender === 'male' ? group.maleChronicalIll : group.femaleChronicalIll;
-    const both = gender === 'male' ? group.maleBoth : group.femaleBoth;
-    return Math.max(
-      this.toNumber(total) -
-        this.toNumber(disabled) -
-        this.toNumber(chronic) -
-        this.toNumber(both),
-      0,
-    );
-  }
-
   private addFemaleGroup(
     base: HouseholdMemberBreakdown,
     extra: HouseholdMemberBreakdown,
@@ -753,56 +745,45 @@ export class BeneficiaryDetailsView implements OnInit {
     };
   }
 
-  private setModelHouseholdFields(
-    payload: Record<string, number>,
-    suffix: string,
+  private toMemberCounts(
     group: HouseholdMemberBreakdown,
-  ) {
-    payload[`female_${suffix}_both`] = this.toNumber(group.femaleBoth);
-    payload[`female_${suffix}_chronically_ill`] = this.toNumber(
-      group.femaleChronicalIll,
-    );
-    payload[`female_${suffix}_disabled`] = this.toNumber(group.femaleDisable);
-    payload[`female_${suffix}_normal`] = this.normalCount(group, 'female');
-    payload[`male_${suffix}_both`] = this.toNumber(group.maleBoth);
-    payload[`male_${suffix}_chronically_ill`] = this.toNumber(
-      group.maleChronicalIll,
-    );
-    payload[`male_${suffix}_disabled`] = this.toNumber(group.maleDisable);
-    payload[`male_${suffix}_normal`] = this.normalCount(group, 'male');
+  ): HouseholdComposition[ModelAgeGroup] {
+    return {
+      male: {
+        total: group.maleTotal,
+        disabled: group.maleDisable,
+        chronicallyIll: group.maleChronicalIll,
+        both: group.maleBoth,
+      },
+      female: {
+        total: group.femaleTotal,
+        disabled: group.femaleDisable,
+        chronicallyIll: group.femaleChronicalIll,
+        both: group.femaleBoth,
+      },
+    };
   }
 
-  private buildModelRequestBody() {
-    const household: Record<string, number> = {};
-    const groups = [
-      { suffix: '0_2', group: this.householdBreakdown['householdMember2'] },
-      { suffix: '3_5', group: this.householdBreakdown['householdMember5'] },
-      { suffix: '6_17', group: this.householdBreakdown['householdMember17'] },
-      {
-        suffix: '18_35',
-        group: this.addFemaleGroup(
-          this.householdBreakdown['householdMember35'],
-          this.householdBreakdown['householdMemberLactating35'],
+  private buildHouseholdComposition(): HouseholdComposition {
+    const breakdown = this.householdBreakdown;
+    return {
+      '0_2': this.toMemberCounts(breakdown['householdMember2']),
+      '3_5': this.toMemberCounts(breakdown['householdMember5']),
+      '6_17': this.toMemberCounts(breakdown['householdMember17']),
+      '18_35': this.toMemberCounts(
+        this.addFemaleGroup(
+          breakdown['householdMember35'],
+          breakdown['householdMemberLactating35'],
         ),
-      },
-      {
-        suffix: '36_64',
-        group: this.addFemaleGroup(
-          this.householdBreakdown['householdMember64'],
-          this.householdBreakdown['householdMemberLactating64'],
+      ),
+      '36_64': this.toMemberCounts(
+        this.addFemaleGroup(
+          breakdown['householdMember64'],
+          breakdown['householdMemberLactating64'],
         ),
-      },
-      {
-        suffix: '65_plus',
-        group: this.householdBreakdown['householdMember65'],
-      },
-    ];
-
-    groups.forEach((item) =>
-      this.setModelHouseholdFields(household, item.suffix, item.group),
-    );
-
-    return { household };
+      ),
+      '65_plus': this.toMemberCounts(breakdown['householdMember65']),
+    };
   }
 
   async runAutomatedTargetingModel() {
@@ -812,9 +793,11 @@ export class BeneficiaryDetailsView implements OnInit {
     this.modelSupportType = '';
 
     try {
-      const url = `${environment.modelApi.replace(/\/$/, '')}/get_support_type`;
-      const res: any = await this.api.POST(url, this.buildModelRequestBody());
-      this.modelSupportType = res?.data?.support_type || 'N/A';
+      const [{ supportType }] = await Promise.all([
+        this.supportTypeModel.predict(this.buildHouseholdComposition()),
+        minimumLoadingTime(),
+      ]);
+      this.modelSupportType = supportType;
       this.modelComparisonDialogVisible = true;
       this.cdr.detectChanges();
     } catch (error) {
