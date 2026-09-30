@@ -1,83 +1,48 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { FingerScoreResults } from './finger-score-results';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ToastModule } from 'primeng/toast';
-import { BomaProgress, FingerScoreService, SubjectStats } from './finger-score.service';
-import { LoadingSpinner } from '../../../components/loading-spinner/loading-spinner';
-import { LookupItem, LookupService } from '../../../services/lookup.service';
+import { FingerScoreResults } from './finger-score-results';
+import { BomaSummary, FingerScoreService } from './finger-score.service';
+
+const SEARCH_DEBOUNCE_MS = 350;
 
 @Component({
   selector: 'app-report-finger-score',
   standalone: true,
-  imports: [CommonModule, FormsModule, DialogModule, FingerScoreResults, LoadingSpinner, PaginatorModule, ToastModule, SelectModule, FloatLabelModule, TableModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, FormsModule, DialogModule, FingerScoreResults, PaginatorModule, ToastModule],
   templateUrl: './report-finger-score.html',
   styleUrl: './report-finger-score.scss',
 })
 export class ReportFingerScore implements OnInit, OnDestroy {
   private readonly service = inject(FingerScoreService);
+  private readonly messages = inject(MessageService);
   private readonly document = inject(DOCUMENT);
-  private readonly lookup = inject(LookupService);
   private resultsTrigger: HTMLElement | null = null;
+  private searchTimer: ReturnType<typeof setTimeout> | undefined;
   private request = 0;
   private destroyed = false;
-  readonly stats = signal<SubjectStats>({ total: 0, beneficiaries: 0, alternates: 0 });
-  readonly bomaCount = signal(0);
-  readonly bomas = signal<BomaProgress[]>([]);
+  readonly bomas = signal<BomaSummary[]>([]);
   readonly bomaTotal = signal(0);
   readonly bomaFirst = signal(0);
   readonly bomaRows = signal(10);
-  readonly initialLoading = signal(true);
-  readonly loadingSummary = signal(true);
-  readonly summaryError = signal(false);
   readonly loadingBomas = signal(true);
   readonly bomaError = signal('');
-  readonly resultsContext = signal<{ boma: BomaProgress | null; household: string; view: 'subjects' | 'scores' } | null>(null);
-  bomaSearch = '';
-  private appliedBomaId = '';
-  householdNumber = '';
-  readonly stateOptions = signal<LookupItem[]>([]);
-  readonly countyOptions = signal<LookupItem[]>([]);
-  readonly payamOptions = signal<LookupItem[]>([]);
-  readonly bomaOptions = signal<LookupItem[]>([]);
-  readonly selectedState = signal<LookupItem | null>(null);
-  readonly selectedCounty = signal<LookupItem | null>(null);
-  readonly selectedPayam = signal<LookupItem | null>(null);
-  readonly selectedBoma = signal<LookupItem | null>(null);
+  readonly bomaSearch = signal('');
+  readonly householdNumber = signal('');
+  readonly downloadingBomaId = signal<number | null>(null);
+  readonly resultsContext = signal<{ boma: BomaSummary | null; household: string } | null>(null);
+  readonly skeletonRows = [1, 2, 3, 4, 5];
 
-  ngOnInit(): void { void this.loadInitialData(); }
+  ngOnInit(): void { void this.loadBomas(); }
 
-  async loadInitialData(): Promise<void> {
-    // Keep one stable loading state until the parallel initial requests finish.
-    await Promise.all([this.loadSummary(), this.loadBomas(), this.loadStateOptions()]);
-    if (!this.destroyed) this.initialLoading.set(false);
-  }
-
-  async loadStateOptions(): Promise<void> {
-    try {
-      const states = await this.lookup.getOrFetchStateList();
-      if (!this.destroyed) this.stateOptions.set(states);
-    } catch { /* The location filter is a convenience; leave it empty if lookups are unavailable. */ }
-  }
-  ngOnDestroy(): void { this.destroyed = true; ++this.request; }
-
-  async loadSummary(): Promise<void> {
-    this.loadingSummary.set(true);
-    this.summaryError.set(false);
-    try {
-      const [stats, count] = await Promise.all([this.service.getSubjectStats(), this.service.getBomaCount()]);
-      if (this.destroyed) return;
-      this.stats.set(stats.data ?? { total: 0, beneficiaries: 0, alternates: 0 });
-      this.bomaCount.set(count.data ?? 0);
-    } catch { if (!this.destroyed) this.summaryError.set(true); }
-    finally { if (!this.destroyed) this.loadingSummary.set(false); }
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    ++this.request;
+    clearTimeout(this.searchTimer);
   }
 
   async loadBomas(reset = false): Promise<void> {
@@ -86,7 +51,7 @@ export class ReportFingerScore implements OnInit, OnDestroy {
     this.loadingBomas.set(true);
     this.bomaError.set('');
     try {
-      const response = await this.service.getBomas(Math.floor(this.bomaFirst() / this.bomaRows()), this.bomaRows(), this.bomaSearch, this.appliedBomaId);
+      const response = await this.service.getBomas(Math.floor(this.bomaFirst() / this.bomaRows()), this.bomaRows(), this.bomaSearch());
       if (request !== this.request) return;
       this.bomas.set(response.data?.content ?? []);
       this.bomaTotal.set(response.data?.totalElements ?? 0);
@@ -104,71 +69,42 @@ export class ReportFingerScore implements OnInit, OnDestroy {
     void this.loadBomas();
   }
 
-  hasLocationFilter(): boolean {
-    return !!(this.selectedState() || this.selectedCounty() || this.selectedPayam() || this.selectedBoma());
+  onBomaSearchChange(value: string): void {
+    this.bomaSearch.set(value);
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => void this.loadBomas(true), SEARCH_DEBOUNCE_MS);
   }
 
-  canSearchByLocation(): boolean {
-    return !!(this.selectedState()?.id && this.selectedCounty()?.id && this.selectedPayam()?.id && this.selectedBoma()?.id);
-  }
-
-  async onStateChange(state: LookupItem | null): Promise<void> {
-    this.selectedState.set(state);
-    this.selectedCounty.set(null);
-    this.selectedPayam.set(null);
-    this.selectedBoma.set(null);
-    this.countyOptions.set([]);
-    this.payamOptions.set([]);
-    this.bomaOptions.set([]);
-    if (state?.id) this.countyOptions.set(await this.lookup.getCountyListByStateId(state.id));
-  }
-
-  async onCountyChange(county: LookupItem | null): Promise<void> {
-    this.selectedCounty.set(county);
-    this.selectedPayam.set(null);
-    this.selectedBoma.set(null);
-    this.payamOptions.set([]);
-    this.bomaOptions.set([]);
-    if (county?.id) this.payamOptions.set(await this.lookup.getPayamListByCountyId(county.id));
-  }
-
-  async onPayamChange(payam: LookupItem | null): Promise<void> {
-    this.selectedPayam.set(payam);
-    this.selectedBoma.set(null);
-    this.bomaOptions.set([]);
-    if (payam?.id) this.bomaOptions.set(await this.lookup.getBomaListByPayamId(payam.id));
-  }
-
-  searchByLocation(): void {
-    if (!this.canSearchByLocation() || this.loadingBomas()) return;
-    this.bomaSearch = '';
-    this.appliedBomaId = this.selectedBoma()!.id;
+  submitBomaSearch(): void {
+    clearTimeout(this.searchTimer);
     void this.loadBomas(true);
   }
 
-  clearSearch(): void {
-    this.bomaSearch = '';
-    this.appliedBomaId = '';
-    this.selectedState.set(null);
-    this.selectedCounty.set(null);
-    this.selectedPayam.set(null);
-    this.selectedBoma.set(null);
-    this.countyOptions.set([]);
-    this.payamOptions.set([]);
-    this.bomaOptions.set([]);
-    void this.loadBomas(true);
+  clearBomaSearch(): void {
+    this.bomaSearch.set('');
+    this.submitBomaSearch();
   }
 
   searchHousehold(): void {
-    const number = this.householdNumber.trim();
+    const number = this.householdNumber().trim();
     if (!number) return;
     this.rememberResultsTrigger();
-    this.resultsContext.set({ boma: null, household: number, view: 'scores' });
+    this.resultsContext.set({ boma: null, household: number });
   }
 
-  openBoma(boma: BomaProgress, view: 'subjects' | 'scores'): void {
+  openBoma(boma: BomaSummary): void {
     this.rememberResultsTrigger();
-    this.resultsContext.set({ boma, household: '', view });
+    this.resultsContext.set({ boma, household: '' });
+  }
+
+  async downloadBomaCsv(boma: BomaSummary): Promise<void> {
+    if (this.downloadingBomaId() != null) return;
+    this.downloadingBomaId.set(boma.id);
+    try {
+      await this.service.downloadBomaCsv(boma);
+    } catch {
+      if (!this.destroyed) this.messages.add({ severity: 'error', summary: 'Download failed', detail: `Couldn’t download the CSV for ${boma.name}. Please try again.` });
+    } finally { if (!this.destroyed) this.downloadingBomaId.set(null); }
   }
 
   closeResults(): void { this.resultsContext.set(null); }

@@ -2,44 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { saveAs } from 'file-saver';
 
 import { ApiService } from '../../../services/api.service';
+import { FINGER_COLUMNS, FingerField, MEMBER_TYPE_ORDER, toScore } from './finger-score.utils';
 
 export interface ApiEnvelope<T> {
-  success: boolean;
-  status: number;
-  data: T;
+  code: number;
   message: string;
-}
+  path: string;
+  data: T;
 
-export interface SubjectStats {
-  total: number;
-  beneficiaries: number;
-  alternates: number;
-}
-
-export interface BomaProgress {
-  id: number;
-  name: string;
-  payam: string;
-  county: string;
-  state: string;
-}
-
-export interface FingerScore {
-  householdNumber: string;
-  name: string;
-  id: number;
-  bomaId: number;
-  type: 'BENEFICIARY' | 'ALTERNATE' | string;
-  leftIndex: number | null;
-  leftMiddle: number | null;
-  leftRing: number | null;
-  leftSmall: number | null;
-  leftThumb: number | null;
-  rightIndex: number | null;
-  rightMiddle: number | null;
-  rightRing: number | null;
-  rightSmall: number | null;
-  rightThumb: number | null;
+  success: boolean;
 }
 
 export interface PageResult<T> {
@@ -54,15 +25,32 @@ export interface PageResult<T> {
   empty: boolean;
 }
 
+export interface BomaSummary {
+  id: number;
+  name: string;
+  payam: string;
+  county: string;
+  state: string;
+}
+
+export type MemberType = 'BENEFICIARY' | 'NOMINEE' | 'ALTERNATE_1' | 'ALTERNATE_2';
+
+/** One household member's scores; the API sends them as strings, so they are parsed to numbers on arrival. */
+export type MemberScores = { type: MemberType | string } & Record<FingerField, number | null>;
+
+export interface HouseholdScores {
+  householdNumber: string;
+  bomaId: number;
+  members: MemberScores[];
+}
+
+type RawHousehold = Omit<HouseholdScores, 'members'> & {
+  members?: ({ type: string } & Partial<Record<FingerField, unknown>>)[] | null;
+};
+
 @Injectable({ providedIn: 'root' })
 export class FingerScoreService {
   private readonly api = inject(ApiService);
-  // This controller is hosted outside the MIS server context.
-  private readonly baseUrl = 'https://qa-gwapp.southsudansafetynet.info/fingerquality';
-
-  private endpoint(path: string): string {
-    return `${this.baseUrl}/${path}`;
-  }
 
   private checkResponse<T>(response: ApiEnvelope<T>): ApiEnvelope<T> {
     if (!response || response.success !== true) {
@@ -71,68 +59,32 @@ export class FingerScoreService {
     return response;
   }
 
-  async getSubjectStats(): Promise<ApiEnvelope<SubjectStats>> {
-    const response = await this.api.GET<ApiEnvelope<SubjectStats>>(this.endpoint('api/v1/progress/subject-stats'));
-    return this.checkResponse(response.data);
-  }
-
-  async getBomas(page: number, size: number, search = '', bomaId?: string): Promise<ApiEnvelope<PageResult<BomaProgress>>> {
-    const response = await this.api.GET<ApiEnvelope<PageResult<BomaProgress>>>(this.endpoint('api/v1/progress/bomas'), {
+  async getBomas(page: number, size: number, search = ''): Promise<ApiEnvelope<PageResult<BomaSummary>>> {
+    const response = await this.api.GET<ApiEnvelope<PageResult<BomaSummary>>>('fingerscore/bomas', {
       search: search.trim() || undefined,
-      ...(bomaId ? { bomaId } : {}),
       page,
       size,
-      sort: 'name,asc',
     });
     return this.checkResponse(response.data);
   }
 
-  async getBomaCount(): Promise<ApiEnvelope<number>> {
-    const response = await this.api.GET<ApiEnvelope<number>>(this.endpoint('api/v1/progress/boma-count'));
-    return this.checkResponse(response.data);
+  async getBomaHouseholds(bomaId: number, page: number, size: number): Promise<ApiEnvelope<PageResult<HouseholdScores>>> {
+    const response = await this.api.GET<ApiEnvelope<PageResult<RawHousehold>>>(`fingerscore/boma/${bomaId}`, { page, size });
+    const envelope = this.checkResponse(response.data);
+    const data = envelope.data && { ...envelope.data, content: (envelope.data.content ?? []).map(normalizeHousehold) };
+    return { ...envelope, data };
   }
 
-  async getIndividualScore(id: number): Promise<ApiEnvelope<FingerScore>> {
-    const response = await this.api.GET<ApiEnvelope<FingerScore>>(this.endpoint(`api/v1/individual/${id}/finger-score`));
-    return this.checkResponse(response.data);
-  }
-
-  async getHouseholdScores(householdNumber: string): Promise<ApiEnvelope<FingerScore[]>> {
+  async getHousehold(householdNumber: string): Promise<ApiEnvelope<HouseholdScores | null>> {
     const household = encodeURIComponent(householdNumber.trim());
-    const response = await this.api.GET<ApiEnvelope<FingerScore[]>>(
-      this.endpoint(`api/v1/household/${household}/finger-scores`)
-    );
-    return this.checkResponse(response.data);
+    const response = await this.api.GET<ApiEnvelope<RawHousehold | null>>(`fingerscore/household/${household}`);
+    const envelope = this.checkResponse(response.data);
+    return { ...envelope, data: envelope.data ? normalizeHousehold(envelope.data) : null };
   }
 
-  async getBomaSubjects(
-    bomaId: number,
-    page: number,
-    size: number,
-    search = ''
-  ): Promise<ApiEnvelope<PageResult<FingerScore>>> {
-    const response = await this.api.GET<ApiEnvelope<PageResult<FingerScore>>>(
-      this.endpoint(`api/v1/boma/${bomaId}/subjects`),
-      {
-        search: search.trim() || undefined,
-        page,
-        size,
-        sort: 'name,asc',
-      }
-    );
-    return this.checkResponse(response.data);
-  }
-
-  async getBomaScores(bomaId: number): Promise<ApiEnvelope<FingerScore[]>> {
-    const response = await this.api.GET<ApiEnvelope<FingerScore[]>>(
-      this.endpoint(`api/v1/boma/${bomaId}/finger-scores`)
-    );
-    return this.checkResponse(response.data);
-  }
-
-  async downloadBomaCsv(boma: BomaProgress): Promise<void> {
+  async downloadBomaCsv(boma: BomaSummary): Promise<void> {
     const response = await this.api.GET<Blob>(
-      this.endpoint(`api/v1/boma/${boma.id}/finger-scores/csv`),
+      `fingerscore/boma/${boma.id}/csv`,
       undefined,
       'global',
       { responseType: 'blob', headers: { Accept: 'text/csv' } }
@@ -148,4 +100,18 @@ export class FingerScoreService {
     const safeName = boma.name.replace(/[^a-z0-9_-]+/gi, '_').replace(/^_+|_+$/g, '');
     saveAs(blob, `${safeName || `boma_${boma.id}`}_finger_scores.csv`);
   }
+}
+
+function normalizeHousehold(household: RawHousehold): HouseholdScores {
+  const rank = (type: string) => {
+    const index = MEMBER_TYPE_ORDER.indexOf(type as MemberType);
+    return index < 0 ? MEMBER_TYPE_ORDER.length : index;
+  };
+  const members = (household.members ?? [])
+    .map(member => {
+      const scores = Object.fromEntries(FINGER_COLUMNS.map(f => [f.field, toScore(member[f.field])]));
+      return { type: member.type, ...scores } as MemberScores;
+    })
+    .sort((a, b) => rank(a.type) - rank(b.type));
+  return { householdNumber: household.householdNumber, bomaId: household.bomaId, members };
 }

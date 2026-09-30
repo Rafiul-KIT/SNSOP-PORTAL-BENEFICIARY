@@ -1,234 +1,149 @@
 <p-toast position="bottom-right" [baseZIndex]="10000" />
 <section class="finger-score-report">
-  @if (initialLoading()) {
-  <div class="initial-loading" aria-busy="true"><app-loading-spinner /></div>
-  } @else {
 
-  <!-- SUMMARY + HOUSEHOLD LOOKUP -->
-  <div class="row g-3 mb-2 align-items-stretch">
-
-    <!-- Card 1: Summary -->
-    <div class="col-12 col-xl-6 d-flex">
-      <section class="card summary-panel w-100 p-3">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-1">
-          <div>
-            <h5 class="mb-0">Fingerprint quality summary</h5>
-            <span class="text-muted small">Overall capture quality across processed locations</span>
-          </div>
-          @if (summaryError()) {
-          <button type="button" class="text-button" (click)="loadSummary()">Retry</button>
-          }
-        </div>
-
-        <div class="summary-grid">
-          <article class="summary-card total">
-            <span class="summary-icon"><i class="fas fa-fingerprint" aria-hidden="true"></i></span>
-            <div class="min-w-0">
-              <small>Total Households</small>
-              <strong>{{ summaryError() ? '—' : (stats().total | number) }}</strong>
-            </div>
-          </article>
-
-          <article class="summary-card beneficiary">
-            <span class="summary-icon"><i class="fas fa-user-check" aria-hidden="true"></i></span>
-            <div class="min-w-0">
-              <small>Beneficiaries</small>
-              <strong>{{ summaryError() ? '—' : (stats().beneficiaries | number) }}</strong>
-            </div>
-          </article>
-
-          <article class="summary-card alternate">
-            <span class="summary-icon"><i class="fas fa-user-group" aria-hidden="true"></i></span>
-            <div class="min-w-0">
-              <small>Alternates</small>
-              <strong>{{ summaryError() ? '—' : (stats().alternates | number) }}</strong>
-            </div>
-          </article>
-
-          <article class="summary-card boma">
-            <span class="summary-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span>
-            <div class="min-w-0">
-              <small>Processed bomas</small>
-              <strong>{{ summaryError() ? '—' : (bomaCount() | number) }}</strong>
-            </div>
-          </article>
-        </div>
-
-        @if (summaryError()) {
-        <div class="inline-notice mt-3" role="alert">
-          Summary unavailable.
-          <button type="button" class="text-button" (click)="loadSummary()">Try again</button>
-        </div>
-        }
-      </section>
+  <!-- HEADER + HOUSEHOLD LOOKUP -->
+  <header class="report-hero">
+    <div class="hero-intro">
+      <span class="hero-icon" aria-hidden="true"><i class="fas fa-fingerprint"></i></span>
+      <div>
+        <h2>Fingerprint quality</h2>
+        <p>Review capture quality boma by boma, or jump straight to a single household.</p>
+      </div>
     </div>
 
-    <!-- Card 2: Household lookup -->
-    <div class="col-12 col-xl-6 d-flex">
-      <section class="card household-panel w-100 p-3">
-        <div class="mb-3">
-          <h5 class="mb-1">Household lookup</h5>
-          <p id="household-help" class="text-muted small mb-0">
-            <i class="fas fa-circle-info me-1" aria-hidden="true"></i> Review and download scores for a specific
-            household.
-          </p>
+    <form class="household-lookup" (ngSubmit)="searchHousehold()" role="search" aria-label="Household lookup">
+      <label for="household-number">Household lookup</label>
+      <div class="lookup-field">
+        <div class="input-icon">
+          <i class="fas fa-house-user" aria-hidden="true"></i>
+          <input id="household-number" name="householdNumber" type="search" class="form-control"
+            placeholder="Enter household number" autocomplete="off" required
+            [ngModel]="householdNumber()" (ngModelChange)="householdNumber.set($event)" />
         </div>
-        <form class="household-form" (ngSubmit)="searchHousehold()">
-          <p-floatlabel variant="on">
-            <input id="household-number" name="householdNumber" pInputText class="w-100" [(ngModel)]="householdNumber"
-              aria-describedby="household-help" required autocomplete="off" />
-            <label for="household-number">Household number</label>
-          </p-floatlabel>
-          <p-button label="Find scores" icon="fas fa-search" severity="primary" size="small"
-            [disabled]="!householdNumber.trim()" (onClick)="searchHousehold()"></p-button>
-        </form>
-      </section>
-    </div>
-  </div>
-  <!-- LOCATION FILTERS -->
-  <div class="card p-3 mb-2">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-      <h5 class="mb-0">Search by location</h5>
-      <!-- <span class="text-muted small">Processed bomas
-        <span class="count-badge">{{ bomaTotal() | number }}</span>
-      </span> -->
-    </div>
-    <form class="row g-3" (ngSubmit)="searchByLocation()">
-      <div class="col-md-3">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select inputId="filter-state" [options]="stateOptions()" optionLabel="name" [ngModel]="selectedState()"
-            name="filterState" (onChange)="onStateChange($event.value)" [showClear]="true"
-            [filter]="true" filterBy="name" filterPlaceholder="Search states"
-            [disabled]="loadingBomas()" />
-          <label for="filter-state">State</label>
-        </p-floatlabel>
-      </div>
-      <div class="col-md-3">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select inputId="filter-county" [options]="countyOptions()" optionLabel="name" [ngModel]="selectedCounty()"
-            name="filterCounty" (onChange)="onCountyChange($event.value)" [showClear]="true"
-            [filter]="true" filterBy="name" filterPlaceholder="Search counties"
-            [disabled]="!selectedState() || loadingBomas()" />
-          <label for="filter-county">County</label>
-        </p-floatlabel>
-      </div>
-      <div class="col-md-3">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select inputId="filter-payam" [options]="payamOptions()" optionLabel="name" [ngModel]="selectedPayam()"
-            name="filterPayam" (onChange)="onPayamChange($event.value)" [showClear]="true"
-            [filter]="true" filterBy="name" filterPlaceholder="Search payams"
-            [disabled]="!selectedCounty() || loadingBomas()" />
-          <label for="filter-payam">Payam</label>
-        </p-floatlabel>
-      </div>
-      <div class="col-md-3">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select inputId="filter-boma" [options]="bomaOptions()" optionLabel="name" [ngModel]="selectedBoma()"
-            name="filterBoma" (onChange)="selectedBoma.set($event.value)" [showClear]="true"
-            [filter]="true" filterBy="name" filterPlaceholder="Search bomas"
-            [disabled]="!selectedPayam() || loadingBomas()" />
-          <label for="filter-boma">Boma</label>
-        </p-floatlabel>
-      </div>
-      <div class="col-12 text-end">
-        @if (hasLocationFilter()) {
-        <p-button label="Clear" icon="fas fa-rotate-left" severity="danger" size="small" outlined="true" class="me-2"
-          (onClick)="clearSearch()"></p-button>
-        }
-        <p-button label="Search" icon="fas fa-search" severity="primary" size="small" [loading]="loadingBomas()"
-          [disabled]="!canSearchByLocation() || loadingBomas()"
-          (onClick)="searchByLocation()"></p-button>
+        <button type="submit" class="btn btn-primary" [disabled]="!householdNumber().trim()">
+          <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>Find scores
+        </button>
       </div>
     </form>
-  </div>
+  </header>
 
+  <!-- BOMAS -->
+  <section class="bomas-panel" aria-labelledby="bomas-heading">
+    <div class="panel-header">
+      <div>
+        <h3 id="bomas-heading">
+          Processed bomas
+          @if (!loadingBomas() && !bomaError()) { <span class="count-badge">{{ bomaTotal() | number }}</span> }
+        </h3>
+        <p>Open a boma to review every household’s scores, or download them all as CSV.</p>
+      </div>
 
+      <form class="boma-search" (ngSubmit)="submitBomaSearch()" role="search" aria-label="Search bomas">
+        <label class="visually-hidden" for="boma-search">Search bomas</label>
+        <div class="input-icon">
+          <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+          <input id="boma-search" name="bomaSearch" type="search" class="form-control" autocomplete="off"
+            placeholder="Search bomas" [ngModel]="bomaSearch()" (ngModelChange)="onBomaSearchChange($event)" />
+          @if (bomaSearch()) {
+          <button type="button" class="clear-input" (click)="clearBomaSearch()" aria-label="Clear search">
+            <i class="fas fa-xmark" aria-hidden="true"></i>
+          </button>
+          }
+        </div>
+      </form>
+    </div>
 
-  <!-- BOMAS TABLE -->
-  <div class="card p-3">
-    <p-table [value]="bomas()" [loading]="loadingBomas()" [totalRecords]="bomaTotal()"
-      [tableStyleClass]="'report-table'" dataKey="id" size="small" [scrollable]="true" [scrollHeight]="'55vh'"
-      [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" [attr.aria-busy]="loadingBomas()">
-
-      <ng-template pTemplate="header">
-        <tr>
-          <th colspan="6" class="text-end">
-            <p class="fw-bold mb-0">
-              Showing <kbd>{{ bomas().length }}</kbd> of
-              <kbd>{{ bomaTotal() | number }}</kbd> bomas
-            </p>
-          </th>
-        </tr>
-        <tr>
-          <th class="serial-column">Serial no</th>
-          <th>State</th>
-          <th>County</th>
-          <th>Payam</th>
-          <th>Boma</th>
-          <th class="text-center">Explore results</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-boma let-i="rowIndex">
-        <tr>
-          <td class="serial-column">{{ bomaFirst() + i + 1 }}</td>
-          <td>{{ boma.state || '—' }}</td>
-          <td>{{ boma.county || '—' }}</td>
-          <td>{{ boma.payam || '—' }}</td>
-          <td>{{ boma.name || '—' }}</td>
-          <td class="text-center">
-            <div class="action-buttons">
-              <!-- <button type="button" class="btn btn-sm action-btn action-btn-outline"
-                (click)="openBoma(boma, 'subjects')" aria-haspopup="dialog"
-                [attr.aria-label]="'View subjects in ' + boma.name"><i class="fas fa-users me-1"
-                  aria-hidden="true"></i>View subjects</button> -->
-              <button type="button" class="btn btn-sm action-btn action-btn-solid" (click)="openBoma(boma, 'subjects')"
-                aria-haspopup="dialog" [attr.aria-label]="'View households in ' + boma.name">View households <i
-                  class="fas fa-arrow-right ms-1" aria-hidden="true"></i></button>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="6" class="text-center empty-state">
-            @if (bomaError()) {
-            <p class="mb-1" role="alert">{{ bomaError() }}</p>
-            <button type="button" class="btn btn-outline-primary mt-2" (click)="loadBomas()">Try again</button>
-            } @else {
-            <i class="fas fa-magnifying-glass empty-icon" aria-hidden="true"></i>
-            <strong class="d-block">No bomas found</strong>
-            <p class="mb-0">{{ hasLocationFilter() ? 'Try a different location or clear your filters.' :
-              'Processed locations will appear here when available.' }}</p>
-            @if (hasLocationFilter()) {
-            <button type="button" class="btn btn-outline-primary mt-2" (click)="clearSearch()">Clear filters</button>
-            }
-            }
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+    <div class="table-responsive bomas-table-wrap" [class.is-refreshing]="loadingBomas() && bomas().length"
+      [attr.aria-busy]="loadingBomas()">
+      <table class="table report-table bomas-table align-middle mb-0">
+        <caption class="visually-hidden">Processed bomas</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="serial-column">#</th>
+            <th scope="col">Boma</th>
+            <th scope="col">Payam</th>
+            <th scope="col">County</th>
+            <th scope="col">State</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loadingBomas() && !bomas().length) {
+          @for (row of skeletonRows; track row) {
+          <tr class="skeleton-row" aria-hidden="true">
+            <td class="serial-column"><span class="skeleton short"></span></td>
+            <td><span class="skeleton"></span></td>
+            <td><span class="skeleton"></span></td>
+            <td><span class="skeleton"></span></td>
+            <td><span class="skeleton"></span></td>
+            <td class="text-end"><span class="skeleton button"></span></td>
+          </tr>
+          }
+          } @else {
+          @for (boma of bomas(); track boma.id; let i = $index) {
+          <tr>
+            <td class="serial-column">{{ bomaFirst() + i + 1 }}</td>
+            <th scope="row">
+              <span class="boma-name"><i class="fas fa-location-dot" aria-hidden="true"></i>{{ boma.name || '—' }}</span>
+            </th>
+            <td>{{ boma.payam || '—' }}</td>
+            <td>{{ boma.county || '—' }}</td>
+            <td>{{ boma.state || '—' }}</td>
+            <td class="text-end">
+              <div class="row-actions">
+                <button type="button" class="btn btn-sm btn-icon" (click)="downloadBomaCsv(boma)"
+                  [disabled]="downloadingBomaId() != null" [attr.aria-label]="'Download CSV for ' + boma.name"
+                  [title]="'Download CSV for ' + boma.name">
+                  <i class="fas" [class.fa-download]="downloadingBomaId() !== boma.id"
+                    [class.fa-spinner]="downloadingBomaId() === boma.id" [class.fa-spin]="downloadingBomaId() === boma.id"
+                    aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="openBoma(boma)" aria-haspopup="dialog"
+                  [attr.aria-label]="'View households in ' + boma.name">
+                  View households<i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="6" class="empty-state">
+              @if (bomaError()) {
+              <i class="fas fa-circle-exclamation empty-icon text-danger" aria-hidden="true"></i>
+              <strong role="alert">{{ bomaError() }}</strong>
+              <button type="button" class="btn btn-outline-primary mt-3" (click)="loadBomas()">Try again</button>
+              } @else {
+              <i class="fas fa-map-location-dot empty-icon" aria-hidden="true"></i>
+              <strong>No bomas found</strong>
+              <p>{{ bomaSearch() ? 'No boma matches “' + bomaSearch() + '”. Try a different name.' :
+                'Processed bomas will appear here once fingerprints are scored.' }}</p>
+              @if (bomaSearch()) {
+              <button type="button" class="btn btn-outline-primary mt-3" (click)="clearBomaSearch()">Clear search</button>
+              }
+              }
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
 
     @if (bomaTotal() > 0) {
-    <div class="paginator-wrapper"><p-paginator [first]="bomaFirst()" [rows]="bomaRows()" [totalRecords]="bomaTotal()" [appendTo]="'body'"
+    <div class="paginator-wrapper">
+      <p-paginator [first]="bomaFirst()" [rows]="bomaRows()" [totalRecords]="bomaTotal()" [appendTo]="'body'"
         [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onBomaPageChange($event)" [showCurrentPageReport]="true"
-        currentPageReportTemplate="{first}–{last} of {totalRecords} bomas" /></div>
+        currentPageReportTemplate="{first}–{last} of {totalRecords} bomas" />
+    </div>
     }
-  </div>
-  }
+  </section>
 </section>
 
-<p-dialog header="Fingerprint quality results" [visible]="!!resultsContext()"
-  (visibleChange)="!$event && closeResults()" (onHide)="restoreResultsFocus()" [modal]="true" [blockScroll]="true"
-  [draggable]="false" [resizable]="false" [maximizable]="true" [style]="{ width: '1240px', maxWidth: '96vw' }"
-  [breakpoints]="{ '767px': '96vw' }">
+<p-dialog header="Fingerprint quality" [visible]="!!resultsContext()" (visibleChange)="!$event && closeResults()"
+  (onHide)="restoreResultsFocus()" [modal]="true" [blockScroll]="true" [draggable]="false" [resizable]="false"
+  [maximizable]="true" [dismissableMask]="true" [style]="{ width: '1240px', maxWidth: '96vw' }"
+  [breakpoints]="{ '767px': '100vw' }" styleClass="finger-score-dialog">
   @if (resultsContext(); as context) {
-  <app-finger-score-results [boma]="context.boma" [household]="context.household" [initialView]="context.view"
-    (close)="closeResults()" />
+  <app-finger-score-results [boma]="context.boma" [household]="context.household" (close)="closeResults()" />
   }
-  <ng-template pTemplate="footer">
-    <button type="button" class="btn btn-outline-primary" (click)="closeResults()"><i class="fas fa-xmark me-2"
-        aria-hidden="true"></i>Close</button>
-  </ng-template>
 </p-dialog>

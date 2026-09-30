@@ -1,222 +1,203 @@
-@if (!dialogVisible) {
-<section class="results-content">
+<section class="results">
+  @if (selected() && boma(); as boma) {
+  <button type="button" class="back-link" (click)="backToHouseholds()">
+    <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>All households in {{ boma.name }}
+  </button>
+  }
+
   <header class="results-header">
     <div class="page-intro">
-      <div class="intro-icon"><i class="fas" [class.fa-house-user]="household()" [class.fa-location-dot]="!household()" aria-hidden="true"></i></div>
-      <div>
-        <span class="eyebrow">{{ household() ? 'HOUSEHOLD RESULTS' : 'BOMA RESULTS' }}</span>
-        <h2 class="result-title" #listHeading tabindex="-1">{{ title() }}</h2>
-        <p>{{ household() ? 'Fingerprint scores for beneficiaries and alternates in this household.' : 'Explore subjects and review their fingerprint quality scores.' }}</p>
+      <span class="intro-icon" aria-hidden="true">
+        <i class="fas" [class.fa-house-user]="household() || selected()" [class.fa-location-dot]="!household() && !selected()"></i>
+      </span>
+      <div class="min-w-0">
+        <span class="eyebrow">{{ household() || selected() ? 'Household' : 'Boma' }}</span>
+        <h2 class="result-title" #resultsHeading tabindex="-1">{{ title() }}</h2>
+        <p class="result-subtitle">
+          @if (detail(); as household) {
+          {{ boma()?.name ? boma()!.name + ' · ' : '' }}{{ household.members.length }} {{ household.members.length === 1 ? 'member' : 'members' }}
+          } @else if (boma()) {
+          {{ bomaLocation() || 'Fingerprint scores for every household in this boma' }}
+          } @else {
+          Fingerprint scores for every member of this household
+          }
+        </p>
       </div>
     </div>
     <div class="export-action">
-      <button type="button" class="btn btn-primary"
-        [disabled]="downloading() || !canDownloadCsv()" (click)="downloadCsv()">
+      <button type="button" class="btn btn-primary" [disabled]="downloading() || !canDownloadCsv()" (click)="downloadCsv()">
         <i class="fas me-2" [class.fa-spinner]="downloading()" [class.fa-spin]="downloading()"
           [class.fa-download]="!downloading()" aria-hidden="true"></i>{{ downloading() ? 'Preparing CSV…' : 'Download CSV' }}
       </button>
-      <small>{{ boma() ? 'All scores in this boma' : 'All scores in this household' }}</small>
+      <small>{{ detail() ? 'Scores for this household' : 'All households in this boma' }}</small>
     </div>
   </header>
 
-  <section class="results-panel" aria-label="Fingerprint results">
-    @if (boma()) {
-    <div class="view-tabs" role="group" aria-label="Result views">
-      <button type="button" (click)="switchView('subjects')" [class.active]="view() === 'subjects'"
-        [attr.aria-pressed]="view() === 'subjects'"><i class="fas fa-users me-2" aria-hidden="true"></i>Subjects</button>
-      <button type="button" (click)="switchView('scores')" [class.active]="view() === 'scores'"
-        [attr.aria-pressed]="view() === 'scores'"><i class="fas fa-fingerprint me-2" aria-hidden="true"></i>Fingerprint
-        scores</button>
+  @if (loading()) {
+  <div class="empty-state" role="status">
+    <i class="fas fa-spinner fa-spin empty-icon" aria-hidden="true"></i>
+    <strong>Loading {{ household() ? 'household scores' : 'households' }}…</strong>
+  </div>
+  } @else if (error()) {
+  <div class="empty-state">
+    <i class="fas fa-circle-exclamation empty-icon text-danger" aria-hidden="true"></i>
+    <strong role="alert">{{ error() }}</strong>
+    <button type="button" class="btn btn-outline-primary mt-3" (click)="load()">Try again</button>
+  </div>
+  } @else if (notFound()) {
+  <div class="empty-state">
+    <i class="fas fa-house-circle-xmark empty-icon" aria-hidden="true"></i>
+    <strong role="alert">No household found</strong>
+    <p>We couldn’t find household “{{ household() }}”. Check the number and try again.</p>
+    <button type="button" class="btn btn-outline-primary mt-3" (click)="close.emit()">Back to search</button>
+  </div>
+  } @else if (detail(); as household) {
+
+  <!-- HOUSEHOLD DETAIL -->
+  @if (detailFlags(); as flags) {
+  <div class="household-overview">
+    <div class="overview-stat">
+      <strong>{{ household.members.length }}</strong><small>Members</small>
+    </div>
+    <div class="overview-stat">
+      <strong>{{ flags.scored }}</strong><small>Fingers scored</small>
+    </div>
+    <div class="overview-stat" [class.is-low]="flags.low">
+      <strong>{{ flags.low }}</strong><small>Low (below {{ lowThreshold }})</small>
+    </div>
+    <div class="overview-stat" [class.is-recapture]="flags.recapture">
+      <strong>{{ flags.recapture }}</strong><small>Need recapture</small>
+    </div>
+  </div>
+  }
+  <ng-container *ngTemplateOutlet="legend" />
+
+  <div class="member-list">
+    @for (member of household.members; track $index) {
+    <article class="member-card">
+      <header class="member-card-header">
+        <span class="type-badge" [attr.data-type]="member.type"><i class="fas fa-user me-1" aria-hidden="true"></i>{{ memberTypeLabel(member.type) }}</span>
+      </header>
+      <div class="hand-grid">
+        @for (group of hands; track group.hand) {
+        <section class="hand-section" [attr.aria-label]="memberTypeLabel(member.type) + ', ' + group.hand.toLowerCase() + ' hand'">
+          <h4><i class="fas fa-hand me-2" [class.fa-flip-horizontal]="group.hand === 'Left'" aria-hidden="true"></i>{{ group.hand }} hand</h4>
+          <div class="finger-grid">
+            @for (finger of group.fingers; track finger.field) {
+            <div class="finger-tile" [ngClass]="statusClass(member[finger.field], member.type)">
+              <small>{{ finger.label }}</small>
+              <strong class="finger-score" aria-hidden="true">
+                @if (isRecapture(member[finger.field])) {
+                <i class="fas fa-rotate-right recapture-icon"></i><span class="recapture-label">Recapture</span>
+                } @else { {{ scoreDisplay(member[finger.field]) }} }
+              </strong>
+              <span class="visually-hidden">{{ scoreText(member[finger.field], member.type) }}</span>
+              <span class="quality-bar" aria-hidden="true"><span [style.width.%]="barWidth(member[finger.field])"></span></span>
+            </div>
+            }
+          </div>
+        </section>
+        }
+      </div>
+    </article>
+    } @empty {
+    <div class="empty-state">
+      <i class="fas fa-fingerprint empty-icon" aria-hidden="true"></i>
+      <strong>No fingerprint scores recorded</strong>
+      <p>This household has no scored members yet.</p>
     </div>
     }
+  </div>
 
-    <div class="toolbar">
-      <div class="toolbar-info">
-        <h3>{{ view() === 'subjects' ? 'Subjects' : 'Fingerprint scores' }} @if (!loading() && !error()) {
-          <span class="count-badge">{{ resultCount() | number }}</span> }</h3>
-        <p>{{ view() === 'subjects' ? 'Find a person, then select View scores to see their fingerprints.' : 'Scores are grouped by hand. Beneficiary scores below 40 are red; a negative score requires recapture.' }}</p>
-      </div>
+  } @else if (!households().length) {
+  <div class="empty-state">
+    <i class="fas fa-fingerprint empty-icon" aria-hidden="true"></i>
+    <strong>No households yet</strong>
+    <p>This boma doesn’t have any scored households yet.</p>
+    <button type="button" class="btn btn-outline-primary mt-3" (click)="close.emit()">Close</button>
+  </div>
+  } @else {
 
-      @if (view() === 'subjects') {
-      <form class="search-box" (ngSubmit)="load(true)">
-        <label class="visually-hidden" for="subject-search">Search subjects</label>
-        <input id="subject-search" type="search" class="form-control" name="subjectSearch" [(ngModel)]="subjectSearch"
-          placeholder="Search subjects" />
-        <button type="submit" class="btn btn-primary" [disabled]="loading()"><i class="fas fa-search me-2"
-            aria-hidden="true"></i>Search</button>
-        @if (subjectSearch) { <button type="button" class="text-button" (click)="clearFilters()">Clear</button> }
-      </form>
-      } @else {
-      <div class="score-filters">
-        <label class="visually-hidden" for="score-search">Search by name or household</label>
-        <input id="score-search" type="search" class="form-control" [ngModel]="search()"
-          (ngModelChange)="filterScores($event)" placeholder="Search name or household" />
-        <label class="visually-hidden" for="score-role">Subject type</label>
-        <select id="score-role" class="form-select" [ngModel]="role()" (ngModelChange)="filterScores(search(), $event)">
-          <option value="">All subject types</option>
-          <option value="BENEFICIARY">Beneficiaries</option>
-          <option value="ALTERNATE">Alternates</option>
-        </select>
-      </div>
+  <!-- BOMA HOUSEHOLDS -->
+  <ng-container *ngTemplateOutlet="legend" />
+  <div class="table-responsive score-list" tabindex="0" aria-label="Household fingerprint scores. Scroll to see every finger.">
+    <table class="table report-table score-table mb-0">
+      <caption class="visually-hidden">Fingerprint scores for households in {{ title() }}</caption>
+      <thead>
+        <tr>
+          <th scope="col" rowspan="2" class="serial-column">#</th>
+          <th scope="col" rowspan="2" class="household-column">Household</th>
+          <th scope="col" rowspan="2">Member</th>
+          <th scope="colgroup" colspan="5" class="hand-heading left-hand">Left hand</th>
+          <th scope="colgroup" colspan="5" class="hand-heading right-hand">Right hand</th>
+        </tr>
+        <tr>
+          @for (finger of fingers; track finger.field) {
+          <th scope="col" class="score-cell finger-heading" [class.hand-start]="finger.label === 'Thumb'">{{ finger.label }}</th>
+          }
+        </tr>
+      </thead>
+      @for (row of rowsWithFlags(); track row.household.householdNumber; let i = $index) {
+      <tbody class="household-group">
+        @for (member of row.household.members; track $index; let m = $index) {
+        <tr>
+          @if (m === 0) {
+          <td class="serial-column" [attr.rowspan]="row.household.members.length">{{ first() + i + 1 }}</td>
+          <th scope="rowgroup" class="household-column" [attr.rowspan]="row.household.members.length">
+            <ng-container *ngTemplateOutlet="householdCell; context: { $implicit: row }" />
+          </th>
+          }
+          <td><span class="type-badge" [attr.data-type]="member.type">{{ memberTypeLabel(member.type) }}</span></td>
+          @for (finger of fingers; track finger.field) {
+          <td class="score-cell" [class.hand-start]="finger.label === 'Thumb'">
+            <span class="score-value" [ngClass]="statusClass(member[finger.field], member.type)"
+              [title]="scoreText(member[finger.field], member.type)" aria-hidden="true">{{ scoreDisplay(member[finger.field]) }}</span>
+            <span class="visually-hidden">{{ scoreText(member[finger.field], member.type) }}</span>
+          </td>
+          }
+        </tr>
+        } @empty {
+        <tr>
+          <td class="serial-column">{{ first() + i + 1 }}</td>
+          <th scope="rowgroup" class="household-column">
+            <ng-container *ngTemplateOutlet="householdCell; context: { $implicit: row }" />
+          </th>
+          <td colspan="11" class="text-muted small">No member scores recorded</td>
+        </tr>
+        }
+      </tbody>
       }
-    </div>
-
-    @if (loading()) {
-    <div class="empty-state loading-state" role="status"><i class="fas fa-spinner fa-spin empty-icon"
-        aria-hidden="true"></i><strong>Loading {{ view() === 'subjects' ? 'subjects' : 'fingerprint scores' }}…</strong>
-      <p>Your results will appear here.</p>
-    </div>
-    } @else if (error()) {
-    <div class="empty-state"><i class="fas fa-circle-exclamation empty-icon text-danger"
-        aria-hidden="true"></i><strong role="alert">{{ error() }}</strong><button type="button"
-        class="btn btn-outline-primary mt-3" (click)="load()">Try again</button></div>
-    } @else if (!resultCount()) {
-    <div class="empty-state"><i class="fas fa-magnifying-glass empty-icon" aria-hidden="true"></i><strong>No
-        {{ view() === 'subjects' ? 'subjects' : 'scores' }} found</strong>
-      <p>{{ search() || role() || subjectSearch ? 'Try another search or clear your filters.' : 'There are no records available for this location or household.' }}</p>
-      @if (search() || role() || subjectSearch) { <button type="button" class="btn btn-outline-primary mt-3"
-        (click)="clearFilters()">Clear filters</button> } @else { <button type="button" class="btn btn-outline-primary mt-3"
-        (click)="close.emit()">Close results</button> }
-    </div>
-    } @else {
-    @if (view() === 'subjects') {
-    <div class="table-responsive">
-      <table class="table report-table align-middle mb-0">
-        <caption class="visually-hidden">Subjects in {{ title() }}</caption>
-        <thead>
-          <tr>
-            <th scope="col" class="serial-column">#</th>
-            <th scope="col">Subject name</th>
-            <th scope="col">Household number</th>
-            <th scope="col">Subject type</th>
-            <th scope="col" class="text-end">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (subject of visibleRecords(); track trackScore(subject); let i = $index) {
-          <tr>
-            <td class="serial-column">{{ first() + i + 1 }}</td>
-            <td>
-              <div class="person-cell">
-                <span class="person-avatar" aria-hidden="true">{{ (subject.name || '?').slice(0, 1) | uppercase }}</span>
-                <strong>{{ subject.name || 'Unnamed subject' }}</strong>
-              </div>
-            </td>
-            <td>{{ subject.householdNumber || '—' }}</td>
-            <td><span class="type-badge"
-                [class.alternate-badge]="subject.type === 'ALTERNATE'">{{ subject.type | titlecase }}</span></td>
-            <td class="text-end">
-              <button type="button" class="btn btn-sm btn-outline-primary action-btn" (click)="openDetail(subject)"
-                [attr.aria-label]="'View scores for ' + subject.name">View scores <i class="fas fa-arrow-right ms-1"
-                  aria-hidden="true"></i></button>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    } @else {
-    <div class="table-hint"><i class="fas fa-arrows-left-right me-2" aria-hidden="true"></i>Scroll across the table to view
-      both hands.</div>
-    <div class="table-responsive score-list" tabindex="0" aria-label="Fingerprint scores. Scroll horizontally to see all fingers.">
-      <table class="table report-table score-table align-middle mb-0">
-        <caption class="visually-hidden">Fingerprint scores for {{ title() }}</caption>
-        <thead>
-          <tr>
-            <th scope="col" rowspan="2" class="serial-column">#</th>
-            <th scope="col" rowspan="2" class="identity-column">Subject / Household</th>
-            <th scope="col" rowspan="2">Type</th>
-            <th scope="colgroup" colspan="5" class="hand-heading left-hand">Left hand</th>
-            <th scope="colgroup" colspan="5" class="hand-heading right-hand">Right hand</th>
-          </tr>
-          <tr>
-            @for (finger of fingers; track finger.field) {
-            <th scope="col" class="score-cell" [class.hand-start]="finger.label === 'Thumb'">{{ finger.label }}</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (score of visibleRecords(); track trackScore(score); let i = $index) {
-          <tr>
-            <td class="serial-column">{{ first() + i + 1 }}</td>
-            <th scope="row" class="identity-column">
-              <strong>{{ score.name || 'Unnamed subject' }}</strong>
-              <small>{{ score.householdNumber || '—' }}</small>
-            </th>
-            <td><span class="type-badge" [class.alternate-badge]="score.type === 'ALTERNATE'">{{ score.type | titlecase
-                }}</span></td>
-            @for (finger of fingers; track finger.field) {
-            <td class="score-cell" [class.hand-start]="finger.label === 'Thumb'"><span class="score-value"
-                [class.missing-score]="score[finger.field] == null"
-                [class.low-score]="isLowScore(score[finger.field], score.type)"
-                [class.recapture-score]="isRecaptureScore(score[finger.field])">{{ scoreDisplay(score[finger.field]) }}</span></td>
-            }
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-
-    @if (!household()) {
-    <div class="results-paginator">
-      <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="resultCount()" [rowsPerPageOptions]="[10, 20, 50]" [appendTo]="'body'"
-        (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
-        currentPageReportTemplate="{first}–{last} of {totalRecords} subjects" />
-    </div>
-    }
-    @if (view() === 'scores' && (search() || role())) {
-    <p class="export-note"><i class="fas fa-circle-info me-1" aria-hidden="true"></i>CSV download includes all scores,
-      including those outside your current filters.</p>
-    }
-    }
-  </section>
-</section>
-
-} @else {
-<section class="subject-detail">
-  <button type="button" class="text-button mb-3" (click)="closeDetail()"><i class="fas fa-arrow-left me-2"
-      aria-hidden="true"></i>Back to subjects</button>
-  <h2 class="result-title" #detailHeading tabindex="-1">{{ detailName() }}</h2>
-
-  @if (loadingDetail()) {
-  <div class="empty-state" role="status"><i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>Loading
-    fingerprint scores…</div>
-  }
-  @else if (detailError()) {
-  <div class="empty-state"><p role="alert">{{ detailError() }}</p><button type="button" class="btn btn-outline-primary mt-3"
-      (click)="retryDetail()">Try again</button></div>
-  }
-  @else if (selectedScore(); as score) {
-  <div class="detail-meta">
-    <span class="type-badge">{{ score.type | titlecase }}</span>
-    <span><i class="fas fa-house-user me-1" aria-hidden="true"></i>Household {{ score.householdNumber || '—' }}</span>
+    </table>
   </div>
 
-  <div class="detail-body">
-    @for (hand of hands; track hand) {
-    <section class="hand-section">
-      <h3><i class="fas fa-hand me-2" aria-hidden="true"></i>{{ hand }} hand</h3>
-      <div class="finger-grid">
-        @for (finger of fingers; track finger.field) {
-        @if (finger.hand === hand) {
-        <div>
-          <small>{{ finger.label }}</small>
-          <strong [class.low-score]="isLowScore(score[finger.field], score.type)"
-            [class.recapture-score]="isRecaptureScore(score[finger.field])">{{ scoreDisplay(score[finger.field]) }}</strong>
-        </div>
-        }
-        }
-      </div>
-    </section>
-    }
-  </div>
-
-  <div class="detail-footer">
-    <p class="field-hint"><i class="fas fa-circle-info me-1" aria-hidden="true"></i>Beneficiary scores below 40 are red. A dash means no score was returned; a negative score requires recapture.</p>
-    <button type="button" class="btn btn-primary" (click)="exportScores([score], score.name || 'subject')"><i
-        class="fas fa-download me-2" aria-hidden="true"></i>Download subject CSV</button>
+  <div class="results-paginator">
+    <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="total()" [rowsPerPageOptions]="[10, 20, 50]"
+      [appendTo]="'body'" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first}–{last} of {totalRecords} households" />
   </div>
   }
 </section>
-}
+
+<ng-template #householdCell let-row>
+  <button type="button" class="household-link" (click)="openHousehold(row.household)"
+    [attr.aria-label]="'Open household ' + row.household.householdNumber">
+    {{ row.household.householdNumber || '—' }}<i class="fas fa-chevron-right" aria-hidden="true"></i>
+  </button>
+  <span class="status-chips">
+    @if (row.flags.recapture) { <span class="status-chip is-recapture">{{ row.flags.recapture }} recapture</span> }
+    @if (row.flags.low) { <span class="status-chip is-low">{{ row.flags.low }} low</span> }
+    @if (!row.flags.recapture && !row.flags.low) {
+    <span class="status-chip" [class.is-ok]="row.flags.scored" [class.is-missing]="!row.flags.scored">
+      {{ row.flags.scored ? 'No issues' : 'No scores' }}</span>
+    }
+  </span>
+</ng-template>
+
+<ng-template #legend>
+  <ul class="score-legend" aria-label="Score legend">
+    <li><span class="legend-swatch is-ok" aria-hidden="true"></span>Captured score</li>
+    <li><span class="legend-swatch is-low" aria-hidden="true"></span>Beneficiary below {{ lowThreshold }}</li>
+    <li><span class="legend-swatch is-recapture" aria-hidden="true"></span>Recapture required</li>
+    <li><span class="legend-swatch is-missing" aria-hidden="true"></span>No score</li>
+  </ul>
+</ng-template>

@@ -1,181 +1,146 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Injector, OnDestroy, OnInit, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { isAxiosError } from 'axios';
 import { saveAs } from 'file-saver';
 import { MessageService } from 'primeng/api';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { BomaProgress, FingerScore, FingerScoreService } from './finger-score.service';
-import { FINGER_COLUMNS, scoresCsv } from './finger-score.utils';
+import { BomaSummary, FingerScoreService, HouseholdScores } from './finger-score.service';
+import { FINGER_COLUMNS, LOW_SCORE_THRESHOLD, ScoreStatus, householdFlags, householdsCsv, memberTypeLabel, scoreStatus } from './finger-score.utils';
 
 @Component({
   selector: 'app-finger-score-results',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorModule],
+  imports: [CommonModule, PaginatorModule],
   templateUrl: './finger-score-results.html',
   styleUrl: './report-finger-score.scss',
 })
 export class FingerScoreResults implements OnInit, OnDestroy {
   private readonly service = inject(FingerScoreService);
-  private readonly injector = inject(Injector);
-  readonly detailHeading = viewChild<ElementRef<HTMLElement>>('detailHeading');
-  readonly listHeading = viewChild<ElementRef<HTMLElement>>('listHeading');
   private readonly messages = inject(MessageService);
+  private readonly injector = inject(Injector);
+  private readonly heading = viewChild<ElementRef<HTMLElement>>('resultsHeading');
   private request = 0;
-  private detailRequest = 0;
-  readonly boma = input<BomaProgress | null>(null);
-  readonly initialView = input<'subjects' | 'scores'>('subjects');
-  readonly close = output<void>();
+  readonly boma = input<BomaSummary | null>(null);
   readonly household = input('');
-  readonly view = signal<'subjects' | 'scores'>('subjects');
+  readonly close = output<void>();
   readonly loading = signal(true);
   readonly error = signal('');
-  readonly records = signal<FingerScore[]>([]);
+  readonly notFound = signal(false);
+  readonly households = signal<HouseholdScores[]>([]);
   readonly total = signal(0);
   readonly first = signal(0);
   readonly rows = signal(10);
-  readonly search = signal('');
-  readonly role = signal('');
   readonly downloading = signal(false);
-  readonly selectedScore = signal<FingerScore | null>(null);
-  readonly loadingDetail = signal(false);
-  readonly detailError = signal('');
-  readonly detailName = signal('');
-  detailId = 0;
-  dialogVisible = false;
-  subjectSearch = '';
+  /** A household opened from the boma list; its scores are already loaded, so no request is needed. */
+  readonly selected = signal<HouseholdScores | null>(null);
   readonly fingers = FINGER_COLUMNS;
-  readonly hands = ['Left', 'Right'] as const;
-  readonly title = computed(() => this.household() ? `Household ${this.household()}` : this.boma()?.name || 'Boma results');
-  readonly filteredScores = computed(() => {
-    const search = this.search().trim().toLowerCase();
-    return this.records().filter(score => (!this.role() || score.type === this.role()) &&
-      (!search || `${score.name ?? ''} ${score.householdNumber ?? ''}`.toLowerCase().includes(search)));
+  readonly hands = (['Left', 'Right'] as const).map(hand => ({ hand, fingers: FINGER_COLUMNS.filter(f => f.hand === hand) }));
+  readonly lowThreshold = LOW_SCORE_THRESHOLD;
+  readonly memberTypeLabel = memberTypeLabel;
+
+  readonly detail = computed(() => this.selected() ?? (this.household() ? this.households()[0] ?? null : null));
+  readonly title = computed(() => {
+    const number = this.selected()?.householdNumber || this.household();
+    return number ? `Household ${number}` : this.boma()?.name || 'Boma';
   });
-  readonly visibleRecords = computed(() => {
-    if (this.view() === 'subjects') return this.records();
-    // A household's own results are already the complete, small list — paginating them adds clicks for no benefit.
-    if (this.household()) return this.filteredScores();
-    return this.filteredScores().slice(this.first(), this.first() + this.rows());
+  readonly rowsWithFlags = computed(() => this.households().map(household => ({ household, flags: householdFlags(household) })));
+  readonly detailFlags = computed(() => {
+    const household = this.detail();
+    return household ? householdFlags(household) : null;
   });
-  readonly resultCount = computed(() => this.view() === 'subjects' ? this.total() : this.filteredScores().length);
-  readonly canDownloadCsv = computed(() => this.view() === 'scores' && !this.loading() && !this.error() && this.records().length > 0);
+  readonly bomaLocation = computed(() => {
+    const boma = this.boma();
+    return boma ? [boma.payam, boma.county, boma.state].filter(Boolean).join(' · ') : '';
+  });
+  readonly canDownloadCsv = computed(() => !this.loading() && !this.error() &&
+    (this.detail() ? this.detail()!.members.length > 0 : this.total() > 0));
 
-  ngOnInit(): void {
-    this.view.set(this.household() ? 'scores' : this.initialView());
-    void this.load();
-  }
+  ngOnInit(): void { void this.load(); }
 
-  ngOnDestroy(): void { ++this.request; ++this.detailRequest; }
+  ngOnDestroy(): void { ++this.request; }
 
-  async load(reset = false): Promise<void> {
-    if (reset) this.first.set(0);
+  async load(): Promise<void> {
     const request = ++this.request;
     this.loading.set(true);
     this.error.set('');
-    this.records.set([]);
-    this.total.set(0);
+    this.notFound.set(false);
     try {
       if (this.household()) {
-        const response = await this.service.getHouseholdScores(this.household());
+        const response = await this.service.getHousehold(this.household());
         if (request !== this.request) return;
-        this.records.set(response.data ?? []);
-      } else if (this.view() === 'scores') {
-        const response = await this.service.getBomaScores(this.boma()!.id);
-        if (request !== this.request) return;
-        this.records.set(response.data ?? []);
+        this.households.set(response.data ? [response.data] : []);
+        this.notFound.set(!response.data);
       } else {
-        const response = await this.service.getBomaSubjects(this.boma()!.id, Math.floor(this.first() / this.rows()), this.rows(), this.subjectSearch);
+        const response = await this.service.getBomaHouseholds(this.boma()!.id, Math.floor(this.first() / this.rows()), this.rows());
         if (request !== this.request) return;
-        this.records.set(response.data?.content ?? []);
+        this.households.set(response.data?.content ?? []);
         this.total.set(response.data?.totalElements ?? 0);
       }
-    } catch {
-      if (request === this.request) this.error.set('We couldn’t load these results. Please try again.');
+    } catch (error) {
+      if (request !== this.request) return;
+      this.households.set([]);
+      if (this.household() && isAxiosError(error) && error.response?.status === 404) this.notFound.set(true);
+      else this.error.set(this.household() ? 'We couldn’t load this household. Please try again.' : 'We couldn’t load the households. Please try again.');
     } finally { if (request === this.request) this.loading.set(false); }
-  }
-
-  switchView(view: 'subjects' | 'scores'): void {
-    if (view === this.view()) return;
-    this.view.set(view);
-    this.first.set(0);
-    this.subjectSearch = '';
-    this.filterScores('', '');
-    void this.load();
   }
 
   onPageChange(event: PaginatorState): void {
     this.first.set(event.first ?? 0);
     this.rows.set(event.rows ?? 10);
-    if (this.view() === 'subjects') void this.load();
+    void this.load();
   }
 
-  filterScores(value: string, role = this.role()): void {
-    this.search.set(value);
-    this.role.set(role);
-    this.first.set(0);
+  openHousehold(household: HouseholdScores): void {
+    this.selected.set(household);
+    this.focusHeading();
   }
 
-  clearFilters(): void {
-    this.subjectSearch = '';
-    this.filterScores('', '');
-    if (this.view() === 'subjects') void this.load(true);
+  backToHouseholds(): void {
+    this.selected.set(null);
+    this.focusHeading();
   }
-
-  async openDetail(subject: FingerScore): Promise<void> {
-    const request = ++this.detailRequest;
-    this.detailId = subject.id;
-    this.detailName.set(subject.name || 'Subject');
-    this.dialogVisible = true;
-    afterNextRender(() => this.detailHeading()?.nativeElement.focus(), { injector: this.injector });
-    this.selectedScore.set(null);
-    this.detailError.set('');
-    this.loadingDetail.set(true);
-    try {
-      const response = await this.service.getIndividualScore(subject.id);
-      if (request !== this.detailRequest) return;
-      this.selectedScore.set(response.data ?? null);
-      if (!response.data) this.detailError.set('No fingerprint scores are available for this subject yet.');
-    } catch {
-      if (request === this.detailRequest) this.detailError.set('We couldn’t load this person’s scores. Please try again.');
-    } finally { if (request === this.detailRequest) this.loadingDetail.set(false); }
-  }
-
-  closeDetail(): void {
-    ++this.detailRequest;
-    this.dialogVisible = false;
-    afterNextRender(() => this.listHeading()?.nativeElement.focus(), { injector: this.injector });
-    this.selectedScore.set(null);
-    this.loadingDetail.set(false);
-  }
-
-  retryDetail(): void { void this.openDetail({ id: this.detailId, name: this.detailName() } as FingerScore); }
 
   async downloadCsv(): Promise<void> {
     if (this.downloading() || !this.canDownloadCsv()) return;
     this.downloading.set(true);
     try {
-      if (this.boma()) await this.service.downloadBomaCsv(this.boma()!);
-      else this.exportScores(this.records(), `household_${this.household()}`);
+      const household = this.detail();
+      if (household) {
+        const safeName = household.householdNumber.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 100) || 'household';
+        saveAs(new Blob([householdsCsv([household])], { type: 'text/csv;charset=utf-8' }), `household_${safeName}_finger_scores.csv`);
+      } else {
+        await this.service.downloadBomaCsv(this.boma()!);
+      }
     } catch { this.messages.add({ severity: 'error', summary: 'Download failed', detail: 'Please try downloading the CSV again.' }); }
     finally { this.downloading.set(false); }
   }
 
-  exportScores(scores: FingerScore[], name: string): void {
-    const safeName = name.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 100) || 'fingerprint';
-    saveAs(new Blob([scoresCsv(scores)], { type: 'text/csv;charset=utf-8' }), `${safeName}_scores.csv`);
+  /** Short visible value; `scoreText` carries the full meaning for screen readers and tooltips. */
+  scoreDisplay(value: number | null): string {
+    return value == null ? '—' : value < 0 ? 'Recapture' : String(value);
   }
 
-  scoreDisplay(value: number | null): number | string {
-    return value == null ? '—' : value < 0 ? 'Recapture required' : value;
-  }
-
-  isRecaptureScore(value: number | null): boolean {
+  isRecapture(value: number | null): boolean {
     return value != null && value < 0;
   }
 
-  isLowScore(value: number | null, type: string): boolean {
-    return type === 'BENEFICIARY' && value != null && value >= 0 && value < 40;
+  scoreText(value: number | null, type: string): string {
+    const status: ScoreStatus = scoreStatus(value, type);
+    if (status === 'missing') return 'No score';
+    if (status === 'recapture') return 'Recapture required';
+    return status === 'low' ? `${value} (below ${LOW_SCORE_THRESHOLD})` : String(value);
   }
 
-  trackScore(score: FingerScore): string { return `${score.id}-${score.type}`; }
+  statusClass(value: number | null, type: string): string {
+    return `is-${scoreStatus(value, type)}`;
+  }
+
+  /** Width of the quality bar in the detail view; scores are on a 0–100 scale. */
+  barWidth(value: number | null): number {
+    return value == null || value < 0 ? 0 : Math.min(value, 100);
+  }
+
+  private focusHeading(): void {
+    afterNextRender(() => this.heading()?.nativeElement.focus(), { injector: this.injector });
+  }
 }

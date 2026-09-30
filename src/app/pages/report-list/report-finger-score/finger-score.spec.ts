@@ -3,13 +3,19 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../../services/api.service';
-import { BomaProgress, FingerScore, FingerScoreService } from './finger-score.service';
+import { BomaSummary, FingerScoreService, HouseholdScores, MemberScores } from './finger-score.service';
 import { ReportFingerScore } from './report-finger-score';
 import { FingerScoreResults } from './finger-score-results';
-import { scoresCsv } from './finger-score.utils';
+import { householdFlags, householdsCsv, memberTypeLabel } from './finger-score.utils';
 
 describe('Fingerprint quality report', () => {
-  const boma: BomaProgress = { id: 1, name: 'Boma', payam: '', county: '', state: '' };
+  const boma: BomaSummary = { id: 1, name: 'Boma', payam: 'Payam', county: 'County', state: 'State' };
+  const blankScores = {
+    leftThumb: null, leftIndex: null, leftMiddle: null, leftRing: null, leftSmall: null,
+    rightThumb: null, rightIndex: null, rightMiddle: null, rightRing: null, rightSmall: null,
+  };
+  const member = (type: string, scores: Partial<MemberScores> = {}): MemberScores => ({ ...blankScores, type, ...scores });
+  const household = (householdNumber: string, members: MemberScores[]): HouseholdScores => ({ householdNumber, bomaId: 1, members });
   let api: jasmine.SpyObj<ApiService>;
   let service: FingerScoreService;
   let report: ReportFingerScore;
@@ -17,10 +23,7 @@ describe('Fingerprint quality report', () => {
   let fixture: ComponentFixture<FingerScoreResults>;
 
   beforeEach(() => {
-    api = jasmine.createSpyObj('ApiService', ['GET', 'POST']);
-    // The location filter's geo lookups go through POST; default to an empty, successful result so specs
-    // that don't care about the filter aren't broken by its background fetch.
-    api.POST.and.resolveTo({ data: { operationResult: true, lookups: [] } } as any);
+    api = jasmine.createSpyObj('ApiService', ['GET']);
     TestBed.configureTestingModule({
       providers: [provideZonelessChangeDetection(), provideNoopAnimations(), { provide: ApiService, useValue: api }, MessageService],
     });
@@ -28,30 +31,54 @@ describe('Fingerprint quality report', () => {
     report = TestBed.runInInjectionContext(() => new ReportFingerScore());
   });
 
-  function createResults(render = false): void {
+  function createResults(inputs: { boma?: BomaSummary | null; household?: string } = { boma }, render = false): void {
     if (!render) spyOn(FingerScoreResults.prototype, 'ngOnInit');
     fixture = TestBed.createComponent(FingerScoreResults);
-    fixture.componentRef.setInput('boma', boma);
+    fixture.componentRef.setInput('boma', inputs.boma ?? null);
+    fixture.componentRef.setInput('household', inputs.household ?? '');
     results = fixture.componentInstance;
+  }
+
+  async function render(target: ComponentFixture<unknown>): Promise<void> {
+    target.detectChanges();
+    await target.whenStable();
+    target.detectChanges();
   }
 
   it('rejects HTTP 200 failure envelopes', async () => {
     api.GET.and.resolveTo({ data: { success: false, message: 'Failed' } } as any);
-    await expectAsync(service.getBomaCount()).toBeRejectedWithError('Failed');
+    await expectAsync(service.getBomas(0, 10)).toBeRejectedWithError('Failed');
   });
 
-  it('uses page pagination without assuming the meaning of optional start', async () => {
-    api.GET.and.resolveTo({ data: { success: true, data: {} } } as any);
-    await service.getBomas(2, 10, ' test ');
-    expect(api.GET.calls.mostRecent().args[1]).toEqual({
-      search: 'test', page: 2, size: 10, sort: 'name,asc',
-    });
-    await service.getBomas(0, 10, '', '42');
-    expect(api.GET.calls.mostRecent().args[1]).toEqual({
-      search: undefined, bomaId: '42', page: 0, size: 10, sort: 'name,asc',
-    });
-    await service.getHouseholdScores(' A/B ');
-    expect(api.GET.calls.mostRecent().args[0]).toBe('https://gwapp.southsudansafetynet.info/fingerquality/api/v1/household/A%2FB/finger-scores');
+  it('calls the fingerscore endpoints on the MIS server with page parameters', async () => {
+    api.GET.and.resolveTo({ data: { success: true, data: { content: [] } } } as any);
+    await service.getBomas(2, 10, ' juba ');
+    expect(api.GET.calls.mostRecent().args.slice(0, 2)).toEqual(['fingerscore/bomas', { search: 'juba', page: 2, size: 10 }]);
+    await service.getBomas(0, 10);
+    expect(api.GET.calls.mostRecent().args[1]).toEqual({ search: undefined, page: 0, size: 10 });
+    await service.getBomaHouseholds(7, 1, 20);
+    expect(api.GET.calls.mostRecent().args.slice(0, 2)).toEqual(['fingerscore/boma/7', { page: 1, size: 20 }]);
+    await service.getHousehold(' A/B ');
+    expect(api.GET.calls.mostRecent().args[0]).toBe('fingerscore/household/A%2FB');
+  });
+
+  it('parses string scores and orders members beneficiary first', async () => {
+    api.GET.and.resolveTo({ data: { success: true, data: {
+      householdNumber: '001', bomaId: 1, members: [
+        { type: 'ALTERNATE_2', leftThumb: '12' },
+        { type: 'BENEFICIARY', leftThumb: '-1', leftIndex: 0, leftMiddle: '', rightSmall: 'x' },
+        { type: 'NOMINEE' },
+      ],
+    } } } as any);
+    const { data } = await service.getHousehold('001');
+    expect(data!.members.map(m => m.type)).toEqual(['BENEFICIARY', 'NOMINEE', 'ALTERNATE_2']);
+    expect(data!.members[0]).toEqual(jasmine.objectContaining({ leftThumb: -1, leftIndex: 0, leftMiddle: null, rightSmall: null }));
+    expect(data!.members[2].leftThumb).toBe(12);
+  });
+
+  it('treats a missing household payload as not found', async () => {
+    api.GET.and.resolveTo({ data: { success: true, data: null } } as any);
+    expect((await service.getHousehold('404')).data).toBeNull();
   });
 
   it('rejects JSON download errors instead of saving them as CSV', async () => {
@@ -60,278 +87,180 @@ describe('Fingerprint quality report', () => {
       { type: 'application/json' },
     ) } as any);
     await expectAsync(service.downloadBomaCsv(boma)).toBeRejectedWithError('Export failed');
+    expect(api.GET.calls.mostRecent().args[0]).toBe('fingerscore/boma/1/csv');
     expect(api.GET.calls.mostRecent().args[3]?.responseType).toBe('blob');
-    expect(api.GET.calls.mostRecent().args[0]).toBe('https://gwapp.southsudansafetynet.info/fingerquality/api/v1/boma/1/finger-scores/csv');
   });
 
-  it('ignores stale subject responses after switching bomas', async () => {
+  it('flags only beneficiary scores below 40 as low, and any negative score as recapture', () => {
+    const flags = householdFlags(household('001', [
+      member('BENEFICIARY', { leftThumb: 0, leftIndex: 39, leftMiddle: 40, leftRing: -1 }),
+      member('NOMINEE', { leftThumb: 10, rightThumb: -2 }),
+    ]));
+    expect(flags).toEqual({ low: 2, recapture: 2, scored: 6 });
+  });
+
+  it('exports all ten fingers per member, preserves zero, and escapes spreadsheet text', () => {
+    const csv = householdsCsv([household('=HH, "1"', [member('BENEFICIARY', { leftThumb: 0, rightSmall: 42 })])]);
+    expect(csv).toContain('"Left Thumb"');
+    expect(csv).toContain('"Right Little"');
+    expect(csv).toContain('"\'=HH, ""1""","Beneficiary","0"');
+    expect(csv).toContain(',"42"');
+    expect(memberTypeLabel('ALTERNATE_1')).toBe('Alternate 1');
+  });
+
+  it('ignores stale household pages after the boma changes', async () => {
     createResults();
     let resolveFirst!: (value: any) => void;
-    const pending = new Promise<any>(resolve => resolveFirst = resolve);
-    spyOn(service, 'getBomaSubjects').and.returnValues(pending,
-      Promise.resolve({ success: true, data: { content: [{ id: 2 }], totalElements: 1 } } as any));
+    spyOn(service, 'getBomaHouseholds').and.returnValues(new Promise(resolve => resolveFirst = resolve),
+      Promise.resolve({ success: true, data: { content: [household('B', [])], totalElements: 1 } } as any));
     const first = results.load();
     fixture.componentRef.setInput('boma', { ...boma, id: 2 });
     await results.load();
-    resolveFirst({ success: true, data: { content: [{ id: 1 }], totalElements: 1 } });
+    resolveFirst({ success: true, data: { content: [household('A', [])], totalElements: 1 } });
     await first;
-    expect(results.records()[0].id).toBe(2);
+    expect(results.households()[0].householdNumber).toBe('B');
   });
 
-  it('enables modal CSV only after score data loads and deduplicates pending downloads', async () => {
+  it('pages households on the server', async () => {
     createResults();
-    results.view.set('scores');
-    let complete!: () => void;
-    const pending = new Promise<void>(resolve => complete = resolve);
-    const download = spyOn(service, 'downloadBomaCsv').and.returnValue(pending);
-    await results.downloadCsv();
-    expect(download).not.toHaveBeenCalled();
-    results.loading.set(false);
-    results.records.set([{ id: 1 } as FingerScore]);
-    expect(results.canDownloadCsv()).toBeTrue();
-    const first = results.downloadCsv();
-    await results.downloadCsv();
-    expect(download).toHaveBeenCalledTimes(1);
-    expect(api.GET).not.toHaveBeenCalled();
-    expect(results.downloading()).toBeTrue();
-    complete();
-    await first;
-    expect(results.downloading()).toBeFalse();
-    results.error.set('Failed');
-    expect(results.canDownloadCsv()).toBeFalse();
-    results.error.set('');
-    results.records.set([]);
-    expect(results.canDownloadCsv()).toBeFalse();
-  });
-
-  it('limits rendered score rows and preserves an empty scores view', async () => {
-    createResults();
-    results.view.set('scores');
-    results.records.set(Array.from({ length: 10000 }, (_, id) => ({ id } as FingerScore)));
-    expect(results.visibleRecords().length).toBe(10);
-    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [] } as any);
-    await results.load();
-    expect(results.view()).toBe('scores');
-    expect(results.records()).toEqual([]);
-  });
-
-  it('keeps household CSV disabled until a nonempty score response arrives', async () => {
-    createResults(true);
-    fixture.componentRef.setInput('boma', null);
-    fixture.componentRef.setInput('household', '001');
-    let finish!: (value: any) => void;
-    const scores = spyOn(service, 'getHouseholdScores').and.returnValue(new Promise(resolve => finish = resolve));
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
-    finish({ success: true, data: [] });
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
-    scores.and.resolveTo({ success: true, data: [{ id: 1 } as FingerScore] } as any);
-    await results.load();
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeFalse();
-  });
-
-  it('opens and closes results without losing the boma search or page', () => {
-    report.bomaSearch = 'Test';
-    report.bomaFirst.set(20);
-    report.openBoma(boma, 'scores');
-    expect(report.resultsContext()?.view).toBe('scores');
-    expect(report.resultsContext()?.boma).toEqual(boma);
-    report.closeResults();
-    expect(report.resultsContext()).toBeNull();
-    expect(report.bomaSearch).toBe('Test');
-    expect(report.bomaFirst()).toBe(20);
-    report.householdNumber = ' A/B ';
-    report.searchHousehold();
-    expect(report.resultsContext()).toEqual({ boma: null, household: 'A/B', view: 'scores' });
-  });
-
-  it('requires all location selections and keeps the boma ID across pages', async () => {
-    const getBomas = spyOn(service, 'getBomas').and.resolveTo({ success: true, data: { content: [], totalElements: 0 } } as any);
-    report.loadingBomas.set(false);
-    report.selectedState.set({ id: '1', name: 'State' });
-    report.selectedCounty.set({ id: '2', name: 'County' });
-    report.selectedPayam.set({ id: '3', name: 'Payam' });
-    expect(report.canSearchByLocation()).toBeFalse();
-    report.searchByLocation();
-    expect(getBomas).not.toHaveBeenCalled();
-
-    report.selectedBoma.set({ id: '42', name: 'Boma name' });
-    expect(report.canSearchByLocation()).toBeTrue();
-    report.searchByLocation();
+    const page = spyOn(service, 'getBomaHouseholds').and.resolveTo({ success: true, data: { content: [], totalElements: 0 } } as any);
+    results.onPageChange({ first: 40, rows: 20 });
     await Promise.resolve();
-    expect(getBomas).toHaveBeenCalledWith(0, 10, '', '42');
-    report.onBomaPageChange({ first: 10, rows: 10 });
-    await Promise.resolve();
-    expect(getBomas).toHaveBeenCalledWith(1, 10, '', '42');
-    report.clearSearch();
-    await Promise.resolve();
-    expect(getBomas).toHaveBeenCalledWith(0, 10, '', '');
-    expect(report.canSearchByLocation()).toBeFalse();
+    expect(page).toHaveBeenCalledWith(1, 2, 20);
   });
 
-  it('ignores pending subject data after switching to scores', async () => {
-    createResults();
-    let complete!: (value: any) => void;
-    spyOn(service, 'getBomaSubjects').and.returnValue(new Promise(resolve => complete = resolve));
-    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [{ id: 2 }] } as any);
-    const pending = results.load();
-    results.switchView('scores');
-    await Promise.resolve();
-    complete({ success: true, data: { content: [{ id: 1 }], totalElements: 1 } });
-    await pending;
-    expect(results.records()[0].id).toBe(2);
-    expect(results.loading()).toBeFalse();
-  });
-
-  it('does not reopen a subject detail after it has been closed', async () => {
-    createResults();
-    let complete!: (value: any) => void;
-    spyOn(service, 'getIndividualScore').and.returnValue(new Promise(resolve => complete = resolve));
-    const pending = results.openDetail({ id: 1, name: 'Test subject' } as FingerScore);
-    results.closeDetail();
-    complete({ success: true, data: { id: 1 } });
-    await pending;
-    expect(results.selectedScore()).toBeNull();
-    expect(results.dialogVisible).toBeFalse();
-  });
-
-  it('filters scores by name or household and role before paginating', () => {
-    createResults();
-    results.view.set('scores');
-    results.records.set([
-      { id: 1, name: 'Mary', householdNumber: 'HH-001', type: 'BENEFICIARY' },
-      { id: 2, name: 'John', householdNumber: 'HH-001', type: 'ALTERNATE' },
-      { id: 3, name: 'Mary', householdNumber: 'HH-002', type: 'BENEFICIARY' },
-    ] as FingerScore[]);
-    results.first.set(20);
-    results.filterScores(' hh-001 ', 'ALTERNATE');
-    expect(results.first()).toBe(0);
-    expect(results.visibleRecords().map(score => score.id)).toEqual([2]);
-    results.filterScores('mary', '');
-    expect(results.resultCount()).toBe(2);
-  });
-
-  it('exports all ten fingers, preserves zero, and escapes spreadsheet text', () => {
-    const csv = scoresCsv([{ householdNumber: '001', name: 'A, "B"', type: '=formula', leftThumb: 0, rightSmall: 42 } as FingerScore]);
-    expect(csv).toContain('"Left Thumb"');
-    expect(csv).toContain('"Right Little"');
-    expect(csv).toContain('"001","A, ""B""","\'=formula","0"');
-    expect(csv).toContain(',"42"');
-  });
-
-  it('highlights beneficiary scores below 40 and preserves missing and recapture states', async () => {
-    createResults(true);
-    fixture.componentRef.setInput('initialView', 'scores');
-    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [
-      { id: 1, name: 'Test subject', type: 'BENEFICIARY', householdNumber: '001',
-        leftThumb: 0, leftIndex: null, leftMiddle: -1, leftRing: 39, leftSmall: 40 },
-      { id: 2, name: 'Alternate', type: 'ALTERNATE', householdNumber: '001', leftThumb: 39 },
-    ] } as any);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+  it('renders households grouped by member with low, recapture and missing states', async () => {
+    createResults({ boma }, true);
+    spyOn(service, 'getBomaHouseholds').and.resolveTo({ success: true, data: { totalElements: 1, content: [
+      household('001', [
+        member('BENEFICIARY', { leftThumb: 0, leftIndex: null, leftMiddle: -1, leftRing: 39, leftSmall: 40 }),
+        member('NOMINEE', { leftThumb: 39 }),
+      ]),
+    ] } } as any);
+    await render(fixture);
     const cells = fixture.nativeElement.querySelectorAll('.score-value');
     expect(cells.length).toBe(20);
     expect(cells[0].textContent.trim()).toBe('0');
-    expect(cells[0].classList).toContain('low-score');
+    expect(cells[0].classList).toContain('is-low');
     expect(cells[1].textContent.trim()).toBe('—');
-    expect(cells[1].classList).not.toContain('low-score');
-    expect(cells[2].textContent.trim()).toBe('Recapture required');
-    expect(cells[2].classList).toContain('recapture-score');
-    expect(cells[2].classList).not.toContain('low-score');
-    expect(cells[3].classList).toContain('low-score');
-    expect(cells[4].classList).not.toContain('low-score');
-    expect(cells[10].classList).not.toContain('low-score');
+    expect(cells[1].classList).toContain('is-missing');
+    expect(cells[2].textContent.trim()).toBe('Recapture');
+    expect(cells[2].classList).toContain('is-recapture');
+    expect(cells[3].classList).toContain('is-low');
+    expect(cells[4].classList).toContain('is-ok');
+    expect(cells[10].classList).toContain('is-ok');
+    expect(fixture.nativeElement.querySelector('.household-column[rowspan="2"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.status-chip.is-recapture').textContent.trim()).toBe('1 recapture');
+    expect(fixture.nativeElement.querySelector('.status-chip.is-low').textContent.trim()).toBe('2 low');
     expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeFalse();
-    expect(fixture.nativeElement.querySelectorAll('.view-tabs button').length).toBe(2);
-    results.selectedScore.set(results.records()[0]);
-    results.detailName.set('Test subject');
-    results.dialogVisible = true;
-    await fixture.whenStable();
-    fixture.detectChanges();
-    const detailScore = fixture.nativeElement.querySelector('.finger-grid .recapture-score');
-    expect(detailScore.textContent.trim()).toBe('Recapture required');
-    const lowDetailScores = fixture.nativeElement.querySelectorAll('.finger-grid .low-score');
-    expect(Array.from(lowDetailScores, (element: any) => element.textContent.trim())).toEqual(['0', '39']);
+
+    fixture.nativeElement.querySelector('.household-link').click();
+    await render(fixture);
+    expect(results.title()).toBe('Household 001');
+    expect(fixture.nativeElement.querySelectorAll('.member-card').length).toBe(2);
+    const lowTiles = fixture.nativeElement.querySelectorAll('.finger-tile.is-low .finger-score');
+    expect(Array.from(lowTiles, (element: any) => element.textContent.trim())).toEqual(['0', '39']);
+    fixture.nativeElement.querySelector('.back-link').click();
+    await render(fixture);
+    expect(fixture.nativeElement.querySelector('.score-table')).not.toBeNull();
   });
 
-  it('opens households and switches scores inside a modal without changing the URL', async () => {
-    const subject = { id: 1, name: 'Test subject', type: 'BENEFICIARY', householdNumber: '001', leftThumb: 0 } as FingerScore;
-    spyOn(service, 'getSubjectStats').and.resolveTo({ success: true, data: { total: 1, beneficiaries: 1, alternates: 0 } } as any);
-    spyOn(service, 'getBomaCount').and.resolveTo({ success: true, data: 1 } as any);
+  it('keeps household CSV disabled until a household with members arrives', async () => {
+    createResults({ household: '001' }, true);
+    let finish!: (value: any) => void;
+    const lookup = spyOn(service, 'getHousehold').and.returnValue(new Promise(resolve => finish = resolve));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
+    finish({ success: true, data: household('001', []) });
+    await render(fixture);
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeTrue();
+    lookup.and.resolveTo({ success: true, data: household('001', [member('BENEFICIARY', { leftThumb: 80 })]) } as any);
+    await results.load();
+    await render(fixture);
+    expect(fixture.nativeElement.querySelector('.export-action button').disabled).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.back-link')).toBeNull();
+  });
+
+  it('shows a not-found state for an unknown household', async () => {
+    createResults({ household: 'missing' }, true);
+    spyOn(service, 'getHousehold').and.resolveTo({ success: true, data: null } as any);
+    await render(fixture);
+    expect(fixture.nativeElement.textContent).toContain('No household found');
+    expect(results.error()).toBe('');
+  });
+
+  it('debounces boma search and resets to the first page', async () => {
+    jasmine.clock().install();
+    try {
+      const getBomas = spyOn(service, 'getBomas').and.resolveTo({ success: true, data: { content: [], totalElements: 0 } } as any);
+      report.bomaFirst.set(20);
+      report.onBomaSearchChange('ju');
+      report.onBomaSearchChange('juba');
+      jasmine.clock().tick(349);
+      expect(getBomas).not.toHaveBeenCalled();
+      jasmine.clock().tick(1);
+      expect(getBomas).toHaveBeenCalledOnceWith(0, 10, 'juba');
+      report.clearBomaSearch();
+      expect(getBomas).toHaveBeenCalledWith(0, 10, '');
+    } finally { jasmine.clock().uninstall(); }
+  });
+
+  it('opens results without losing the boma search or page', () => {
+    report.bomaSearch.set('Test');
+    report.bomaFirst.set(20);
+    report.openBoma(boma);
+    expect(report.resultsContext()).toEqual({ boma, household: '' });
+    report.closeResults();
+    expect(report.resultsContext()).toBeNull();
+    expect(report.bomaSearch()).toBe('Test');
+    expect(report.bomaFirst()).toBe(20);
+    report.householdNumber.set(' A/B ');
+    report.searchHousehold();
+    expect(report.resultsContext()).toEqual({ boma: null, household: 'A/B' });
+  });
+
+  it('downloads one boma CSV at a time from the table', async () => {
+    let complete!: () => void;
+    const download = spyOn(service, 'downloadBomaCsv').and.returnValue(new Promise<void>(resolve => complete = resolve));
+    const first = report.downloadBomaCsv(boma);
+    await report.downloadBomaCsv({ ...boma, id: 2 });
+    expect(download).toHaveBeenCalledTimes(1);
+    expect(report.downloadingBomaId()).toBe(1);
+    complete();
+    await first;
+    expect(report.downloadingBomaId()).toBeNull();
+  });
+
+  it('opens a boma in a modal without changing the URL', async () => {
     spyOn(service, 'getBomas').and.resolveTo({ success: true, data: { content: [boma], totalElements: 1 } } as any);
-    spyOn(service, 'getBomaSubjects').and.resolveTo({ success: true, data: { content: [subject], totalElements: 1 } } as any);
-    spyOn(service, 'getBomaScores').and.resolveTo({ success: true, data: [subject] } as any);
+    spyOn(service, 'getBomaHouseholds').and.resolveTo({ success: true, data: {
+      content: [household('HH-001', [member('BENEFICIARY', { leftThumb: 55 })])], totalElements: 1,
+    } } as any);
     const page = TestBed.createComponent(ReportFingerScore);
-    const initialLoad = spyOn(page.componentInstance, 'loadInitialData').and.callThrough();
-    page.detectChanges();
-    await initialLoad.calls.first().returnValue;
-    await page.whenStable();
-    page.detectChanges();
-    expect(page.nativeElement.querySelector('[aria-label="Download CSV for Boma"]')).toBeNull();
+    await render(page);
+    expect(page.nativeElement.querySelector('.summary-grid')).toBeNull();
+    expect(page.nativeElement.querySelector('[aria-label="Download CSV for Boma"]')).not.toBeNull();
     const url = window.location.href;
     page.nativeElement.querySelector('[aria-label="View households in Boma"]').click();
-    await page.whenStable();
-    page.detectChanges();
-    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(document.querySelector('[role="dialog"]')?.textContent).toContain('Test subject');
-    (document.querySelectorAll('.view-tabs button')[1] as HTMLButtonElement).click();
-    await page.whenStable();
-    page.detectChanges();
-    expect(document.querySelector('.score-table')).not.toBeNull();
+    await render(page);
+    await render(page);
+    expect(document.querySelector('[role="dialog"]')?.textContent).toContain('HH-001');
     expect(window.location.href).toBe(url);
     (document.querySelector('.p-dialog-close-button') as HTMLButtonElement).click();
-    await page.whenStable();
-    page.detectChanges();
+    await render(page);
     expect(page.componentInstance.resultsContext()).toBeNull();
-    expect(page.nativeElement.querySelector('[aria-label="View households in Boma"]')).not.toBeNull();
   });
 
-
-  it('shows one initial loader until both summary and bomas arrive, then keeps content during refresh', async () => {
-    let finishSummary!: (value: any) => void;
-    let finishBomas!: (value: any) => void;
-    spyOn(service, 'getSubjectStats').and.returnValue(new Promise(resolve => finishSummary = resolve));
-    spyOn(service, 'getBomaCount').and.resolveTo({ success: true, data: 1 } as any);
-    const bomas = spyOn(service, 'getBomas').and.returnValue(new Promise(resolve => finishBomas = resolve));
+  it('shows skeleton rows while loading and a retryable error when bomas fail', async () => {
+    let fail!: (reason: unknown) => void;
+    spyOn(service, 'getBomas').and.returnValue(new Promise((_, reject) => fail = reject));
     const page = TestBed.createComponent(ReportFingerScore);
-    const initialLoad = spyOn(page.componentInstance, 'loadInitialData').and.callThrough();
     page.detectChanges();
-    expect(page.nativeElement.querySelectorAll('[role="status"]').length).toBe(1);
-    expect(page.nativeElement.querySelector('.summary-grid')).toBeNull();
-    finishSummary({ success: true, data: { total: 1, beneficiaries: 1, alternates: 0 } });
-    await page.whenStable();
-    page.detectChanges();
-    expect(page.nativeElement.querySelector('.initial-loading')).not.toBeNull();
-    finishBomas({ success: true, data: { content: [boma], totalElements: 1 } });
-    await initialLoad.calls.first().returnValue;
-    await page.whenStable();
-    page.detectChanges();
-    expect(page.nativeElement.querySelector('.initial-loading')).toBeNull();
-    expect(page.nativeElement.querySelector('.summary-grid')).not.toBeNull();
-    const originalRow = page.nativeElement.querySelector('.report-table tbody tr');
-    let finishRefresh!: (value: any) => void;
-    bomas.and.returnValue(new Promise(resolve => finishRefresh = resolve));
-    const refresh = page.componentInstance.loadBomas();
-    page.detectChanges();
-    expect(page.nativeElement.querySelector('.initial-loading')).toBeNull();
-    expect(page.nativeElement.querySelector('.report-table tbody tr')).toBe(originalRow);
-    finishRefresh({ success: true, data: { content: [boma], totalElements: 1 } });
-    await refresh;
+    expect(page.nativeElement.querySelectorAll('.skeleton-row').length).toBe(5);
+    fail(new Error('Unavailable'));
+    await render(page);
+    expect(page.nativeElement.querySelector('.skeleton-row')).toBeNull();
+    expect(page.componentInstance.bomaError()).toContain('try again');
+    expect(page.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
   });
-
-  it('replaces the initial loader with retryable errors when the APIs fail', async () => {
-    spyOn(service, 'getSubjectStats').and.rejectWith(new Error('Unavailable'));
-    spyOn(service, 'getBomaCount').and.rejectWith(new Error('Unavailable'));
-    spyOn(service, 'getBomas').and.rejectWith(new Error('Unavailable'));
-    await report.loadInitialData();
-    expect(report.initialLoading()).toBeFalse();
-    expect(report.summaryError()).toBeTrue();
-    expect(report.bomaError()).toContain('try again');
-  });
-
 });
